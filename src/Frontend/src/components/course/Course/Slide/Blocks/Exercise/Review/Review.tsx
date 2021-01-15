@@ -5,7 +5,7 @@ import Avatar from "src/components/common/Avatar/Avatar.js";
 import { Textarea, ThemeContext, } from "ui";
 import { Send3, Trash, Delete, } from "icons";
 
-import { textareaHidden } from "src/uiTheme.js";
+import { textareaHidden } from "src/uiTheme";
 
 import { ReviewCommentResponse, ReviewInfo } from "src/models/exercise";
 
@@ -32,7 +32,7 @@ interface ReviewState {
 interface ReviewProps {
 	reviews: ReviewInfo[];
 	selectedReviewId: number;
-	userId: string;
+	userId: string | null;
 	onSelectComment: (e: React.MouseEvent | React.FocusEvent, id: number,) => void;
 	addReviewComment: (reviewId: number, comment: string) => void;
 	deleteReviewComment: (reviewId: number, commentId: number) => void;
@@ -217,7 +217,7 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 			>
 				{ this.renderComment(review) }
 				{
-					comments.length > 0 && authorToRender.id !== botUser.id &&
+					comments.length > 0 &&
 					<ol className={ styles.commentRepliesList }>
 						{ comments.map((c, i) =>
 							<li className={ styles.commentReply } key={ i }>
@@ -226,7 +226,7 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 						}
 					</ol>
 				}
-				{ selectedReviewId === id && authorToRender.id !== botUser.id
+				{ selectedReviewId === id && (authorToRender.id !== botUser.id || comments.length > 0)
 				&& this.renderAddReviewComment(selectComment, commentsReplies[id]) }
 			</li>
 		);

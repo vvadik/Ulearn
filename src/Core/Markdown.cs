@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
-using System.Web;
 using MarkdownDeep;
 using Microsoft.AspNetCore.Html;
 using Ulearn.Core.Courses;
@@ -107,12 +106,13 @@ namespace Ulearn.Core
 
 		private class ExtendedMarkdownDeep : MarkdownDeep.Markdown
 		{
+			private readonly Regex fileLinkRegex = new Regex(@".*(StudentZip.*|\.(zip|pdf)$)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 			public override void OnPrepareLink(HtmlTag tag)
 			{
 				base.OnPrepareLink(tag);
-				var isFileLink = tag.attributes["href"].Contains("StudentZip");
+				var isFileLink = fileLinkRegex.IsMatch(tag.attributes["href"]);
 				if (isFileLink)
-					tag.attributes["onclick"] = $"window.location.href='{tag.attributes["href"]}';return false;";
+					tag.attributes["target"] = "_blank";
 			}
 
 			public override void OnPrepareImage(HtmlTag tag, bool TitledImage)

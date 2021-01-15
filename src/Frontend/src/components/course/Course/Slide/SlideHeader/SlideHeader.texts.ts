@@ -1,5 +1,5 @@
 import React from "react";
-import getPluralForm from "src/utils/getPluralForm.js";
+import getPluralForm from "src/utils/getPluralForm";
 
 export default {
 	getSlideScore: (score: number, maxScore: number, showZeroScore = false): React.ReactNode =>

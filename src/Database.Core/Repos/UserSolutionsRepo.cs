@@ -103,19 +103,6 @@ namespace Database.Repos
 			return submission;
 		}
 
-		public async Task RemoveSubmission(UserExerciseSubmission submission)
-		{
-			if (submission.Likes != null)
-				db.SolutionLikes.RemoveRange(submission.Likes);
-			if (submission.AutomaticChecking != null)
-				db.AutomaticExerciseCheckings.Remove(submission.AutomaticChecking);
-			if (submission.ManualCheckings != null)
-				db.ManualExerciseCheckings.RemoveRange(submission.ManualCheckings);
-
-			db.UserExerciseSubmissions.Remove(submission);
-			await db.SaveChangesAsync();
-		}
-
 		///<returns>(likesCount, isLikedByThisUsed)</returns>
 		public async Task<Tuple<int, bool>> Like(int solutionId, string userId)
 		{

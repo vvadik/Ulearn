@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { accountPath } from "src/consts/routes";
-import getPluralForm from "src/utils/getPluralForm.js";
+import getPluralForm from "src/utils/getPluralForm";
 
 export default {
 	title: 'Ура!',

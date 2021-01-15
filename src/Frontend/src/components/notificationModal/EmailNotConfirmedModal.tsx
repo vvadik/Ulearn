@@ -1,18 +1,22 @@
-import React from "react";
+import React  from "react";
 import NotificationModal from "src/components/notificationModal/NotificationModal";
-import { withCookies } from "react-cookie";
+import { ReactCookieProps, withCookies } from "react-cookie";
 
 const sendEmailPath = '/Account/SendConfirmationEmail';
 const emailNotConfirmedCookieName = 'emailNotConfirmed';
 
-function EmailNotConfirmedModal({ cookies, }) {
+function EmailNotConfirmedModal({ cookies }: ReactCookieProps): React.ReactElement<ReactCookieProps> | null {
+	if(!cookies) {
+		return null;
+	}
+
 	const hasCookie = cookies.get(emailNotConfirmedCookieName);
 
 	const close = () => {
 		const date = new Date();
 		date.setDate(date.getDate() + 1);
 		cookies.set(emailNotConfirmedCookieName, true, { expires: date });
-	}
+	};
 
 	return (
 		<React.Fragment>

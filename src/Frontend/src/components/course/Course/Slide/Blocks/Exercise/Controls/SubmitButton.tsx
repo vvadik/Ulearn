@@ -1,11 +1,13 @@
 import React from "react";
 import { Button, Tooltip } from "ui";
 
+import cn from 'classnames';
+
 import styles from './Controls.less';
 
 import texts from "../Exercise.texts";
 
-interface Props {
+export interface Props {
 	valueChanged: boolean,
 	submissionLoading: boolean,
 
@@ -16,7 +18,7 @@ function SubmitButton(props: Props): React.ReactElement {
 	const { valueChanged, submissionLoading, onSendExerciseButtonClicked, } = props;
 
 	return (
-		<span className={ styles.exerciseControls }>
+		<span className={ cn(styles.exerciseControls, styles.sendButton) }>
 				<Tooltip
 					pos={ "bottom center" }
 					trigger={ "hover&focus" }

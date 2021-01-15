@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Database;
 using Database.Models.Quizzes;
 using Database.Repos;
@@ -15,7 +16,7 @@ namespace ManualUtils
 		private const int MaxFillInBlockSize = 8 * 1024;
 
 		// Обновляет пройденные тесты с нулевым баллом
-		public static void UpdateTests(UlearnDb db, string courseId)
+		public static async Task UpdateTests(UlearnDb db, string courseId)
 		{
 			var courseManager = new CourseManager(CourseManager.GetCoursesDirectory());
 			var course = courseManager.GetCourse(courseId);
@@ -61,7 +62,7 @@ namespace ManualUtils
 						db.SaveChanges();
 					}
 
-					visitsRepo.UpdateScoreForVisit(courseId, test, visit.UserId);
+					await visitsRepo.UpdateScoreForVisit(courseId, test, visit.UserId);
 				}
 				Console.WriteLine(test.Id);
 			}

@@ -1,17 +1,17 @@
 import React from "react";
 
-import getPluralForm from "src/utils/getPluralForm.js";
+import getPluralForm from "src/utils/getPluralForm";
 import { SubmissionInfo } from "src/models/exercise";
-import { convertDefaultTimezoneToLocal, getMoment } from "src/utils/momentUtils.js";
+import { convertDefaultTimezoneToLocal, getMoment } from "src/utils/momentUtils";
 import { Language } from "src/consts/languages";
 import { capitalize } from "src/utils/stringUtils";
 
 const texts = {
 	submissions: {
-		newTry: 'Новая попытка',
+		newTry: 'Новая версия',
 		getSubmissionCaption: (submission: SubmissionInfo, selectedSubmissionIsLastSuccess: boolean,
 			waitingForManualChecking: boolean
-		): React.ReactNode => {
+		): string => {
 			const { timestamp, manualCheckingPassed } = submission;
 			const timestampCaption = texts.getSubmissionDate(timestamp);
 			if(manualCheckingPassed) {
@@ -71,8 +71,9 @@ const texts = {
 			hint: 'Начните писать код',
 		},
 		hints: {
-			text: 'Взять подсказку',
+			text: 'Посмотреть подсказку',
 			hint: 'Подсказки закончились',
+			showHintText: 'Показать ещё',
 		},
 
 		reset: {
@@ -95,7 +96,7 @@ const texts = {
 		},
 
 		edit: {
-			text: 'Редактировать',
+			text: 'Редактор кода',
 		},
 
 		showAllCode: {

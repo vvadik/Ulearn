@@ -397,7 +397,6 @@ namespace uLearn.Web.Controllers
 			foreach (var submission in submissions)
 			{
 				submission.LikedAlready = submission.UsersWhoLike.Any(u => u == userId);
-				submission.RemoveSolutionUrl = Url.Action("RemoveSubmission", "Course", new { course.Id, slideId = slide.Id, submissionId = submission.Id });
 			}
 
 			var model = new AcceptedSolutionsPageModel
@@ -495,22 +494,6 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound("No instructor note for this unit");
 			var gitEditUrl = GetGitEditLink(course, instructorNote.File);
 			return View(new IntructorNoteModel(courseId, instructorNote, gitEditUrl));
-		}
-
-		[HttpPost]
-		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		public async Task<ActionResult> RemoveSubmission(string courseId, Guid slideId, int submissionId)
-		{
-			var submission = solutionsRepo.FindSubmissionById(submissionId);
-			if (submission != null)
-			{
-				await solutionsRepo.RemoveSubmission(submission);
-				var course = courseManager.GetCourse(courseId);
-				var slide = course.GetSlideById(slideId, true);
-				await visitsRepo.UpdateScoreForVisit(courseId, slide, submission.UserId);
-			}
-
-			return RedirectToAction("AcceptedSolutions", new { courseId, slideId });
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Tester)]

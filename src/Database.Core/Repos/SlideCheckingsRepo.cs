@@ -16,10 +16,11 @@ namespace Database.Repos
 	public class SlideCheckingsRepo : ISlideCheckingsRepo
 	{
 		private readonly UlearnDb db;
+
 		[ItemCanBeNull]
 		private readonly Lazy<IVisitsRepo> visitsRepo;
 
-		public SlideCheckingsRepo(UlearnDb db, [CanBeNull]IServiceProvider serviceProvider)
+		public SlideCheckingsRepo(UlearnDb db, [CanBeNull] IServiceProvider serviceProvider)
 		{
 			this.db = db;
 			visitsRepo = new Lazy<IVisitsRepo>(() => serviceProvider?.GetRequiredService<IVisitsRepo>());
@@ -86,7 +87,7 @@ namespace Database.Repos
 			using (var transaction = startTransaction ? db.Database.BeginTransaction() : null)
 			{
 				var checkings = (await GetSlideCheckingsByUser<T>(courseId, slideId, userId)
-					.ToListAsync())
+						.ToListAsync())
 					.Where(c => !c.IsChecked && !c.IsLocked)
 					.ToList();
 				foreach (var checking in checkings)
@@ -119,9 +120,9 @@ namespace Database.Repos
 		public async Task<bool> IsSlidePassed(string courseId, Guid slideId, string userId)
 		{
 			return await GetSlideCheckingsByUser<ManualQuizChecking>(courseId, slideId, userId).AnyAsync() ||
-				await GetSlideCheckingsByUser<AutomaticQuizChecking>(courseId, slideId, userId).AnyAsync() ||
-				await GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId).AnyAsync() ||
-				await GetSlideCheckingsByUser<AutomaticExerciseChecking>(courseId, slideId, userId).AnyAsync(c => c.IsRightAnswer);
+					await GetSlideCheckingsByUser<AutomaticQuizChecking>(courseId, slideId, userId).AnyAsync() ||
+					await GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId).AnyAsync() ||
+					await GetSlideCheckingsByUser<AutomaticExerciseChecking>(courseId, slideId, userId).AnyAsync(c => c.IsRightAnswer);
 		}
 
 		#region Slide Score Calculating
@@ -183,11 +184,11 @@ namespace Database.Repos
 			if (submissionBefore != null)
 				query = query.Where(c => c.Submission.Timestamp < submissionBefore);
 			var checkedScoresAndPercents = (await query
-				.Select(c => new { c.Score, c.Percent, CheckingTimestamp = c.Timestamp, SubmissionTimestamp = c.Submission.Timestamp })
-				.OrderBy(c => c.SubmissionTimestamp)
-				.ThenBy(c => c.CheckingTimestamp)
-				.Select(c => new { c.Score, c.Percent })
-				.ToListAsync())
+					.Select(c => new { c.Score, c.Percent, CheckingTimestamp = c.Timestamp, SubmissionTimestamp = c.Submission.Timestamp })
+					.OrderBy(c => c.SubmissionTimestamp)
+					.ThenBy(c => c.CheckingTimestamp)
+					.Select(c => new { c.Score, c.Percent })
+					.ToListAsync())
 				.Select(c => (c.Score, c.Percent))
 				.ToList();
 			return checkedScoresAndPercents;
@@ -203,7 +204,7 @@ namespace Database.Repos
 				.Where(s => slides.Contains(s.Key))
 				.Select(g =>
 				{
-					var checkedScoresAndPercents = g.Select(c => (c.Score, c.Percent )).ToList();
+					var checkedScoresAndPercents = g.Select(c => (c.Score, c.Percent)).ToList();
 					var slide = course.GetSlideById(g.Key, false) as ExerciseSlide;
 					var (score, percent) = GetScoreAndPercentByScoresAndPercents(slide, checkedScoresAndPercents);
 					return (g.Key, score, percent.Value);
@@ -212,8 +213,8 @@ namespace Database.Repos
 
 		public async Task<int> GetUserScoreForQuizSlide(string courseId, Guid slideId, string userId)
 		{
-			var manualScore = await GetSlideCheckingsByUser<ManualQuizChecking>(courseId, slideId, userId).Select(c => c.Score).DefaultIfEmpty(0).MaxAsync();
-			var automaticScore = await GetSlideCheckingsByUser<AutomaticQuizChecking>(courseId, slideId, userId).Select(c => c.Score).DefaultIfEmpty(0).MaxAsync();
+			var manualScore = await GetSlideCheckingsByUser<ManualQuizChecking>(courseId, slideId, userId).MaxAsync(c => (int?)c.Score) ?? 0;
+			var automaticScore = await GetSlideCheckingsByUser<AutomaticQuizChecking>(courseId, slideId, userId).MaxAsync(c => (int?)c.Score) ?? 0;
 			return automaticScore + manualScore;
 		}
 
@@ -256,6 +257,7 @@ namespace Database.Repos
 				else
 					query = query.Where(c => options.UserIds.Contains(c.UserId));
 			}
+
 			return query;
 		}
 
@@ -319,9 +321,9 @@ namespace Database.Repos
 		public async Task MarkManualExerciseCheckingAsCheckedBeforeThis(ManualExerciseChecking queueItem)
 		{
 			var itemsForMark = (await db.Set<ManualExerciseChecking>()
-				.Include(c => c.Submission)
-				.Where(c => c.CourseId == queueItem.CourseId && c.UserId == queueItem.UserId && c.SlideId == queueItem.SlideId && c.Timestamp < queueItem.Timestamp)
-				.ToListAsync())
+					.Include(c => c.Submission)
+					.Where(c => c.CourseId == queueItem.CourseId && c.UserId == queueItem.UserId && c.SlideId == queueItem.SlideId && c.Timestamp < queueItem.Timestamp)
+					.ToListAsync())
 				.OrderBy(c => c.Submission.Timestamp)
 				.ThenBy(c => c.Timestamp);
 			int? percent = 0;
@@ -344,14 +346,15 @@ namespace Database.Repos
 					changed = true;
 				}
 			}
-			if(changed)
+
+			if (changed)
 				await db.SaveChangesAsync();
 		}
 
 		public async Task ProhibitFurtherExerciseManualChecking(string courseId, string userId, Guid slideId)
 		{
 			var checkings = await db.ManualExerciseCheckings
-				.Where(c => c.CourseId == courseId && c.UserId == userId &&  c.SlideId == slideId && c.ProhibitFurtherManualCheckings)
+				.Where(c => c.CourseId == courseId && c.UserId == userId && c.SlideId == slideId && c.ProhibitFurtherManualCheckings)
 				.ToListAsync();
 			if (checkings.Count == 0)
 				return;
@@ -457,8 +460,8 @@ namespace Database.Repos
 		public async Task<Dictionary<int, List<ExerciseCodeReview>>> GetExerciseCodeReviewForCheckings(IEnumerable<int> checkingsIds)
 		{
 			return (await db.ExerciseCodeReviews
-				.Where(r => r.ExerciseCheckingId.HasValue && checkingsIds.Contains(r.ExerciseCheckingId.Value) && !r.IsDeleted)
-				.ToListAsync())
+					.Where(r => r.ExerciseCheckingId.HasValue && checkingsIds.Contains(r.ExerciseCheckingId.Value) && !r.IsDeleted)
+					.ToListAsync())
 				.GroupBy(r => r.ExerciseCheckingId)
 				.ToDictionary(g => g.Key.Value, g => g.ToList());
 		}
@@ -473,10 +476,12 @@ namespace Database.Repos
 							!r.IsDeleted)
 				.Select(r => new { r.Comment, r.ExerciseChecking.Timestamp })
 				.GroupBy(r => r.Comment)
-				.Select(g => new { 
+				.Select(g => new
+				{
 					g.Key,
 					Count = g.Count(),
-					Timestamp = g.Max(r => r.Timestamp) })
+					Timestamp = g.Max(r => r.Timestamp)
+				})
 				.OrderByDescending(g => g.Count)
 				.ThenByDescending(g => g.Timestamp)
 				.Take(count)
@@ -489,17 +494,17 @@ namespace Database.Repos
 		{
 			var excludeCommentsSet = excludeComments.ToHashSet();
 			var result = (await db.ExerciseCodeReviews.Include(r => r.ExerciseChecking)
-				.Where(r => r.ExerciseChecking.CourseId == courseId &&
-							r.ExerciseChecking.SlideId == slideId &&
-							r.AuthorId != userId &&
-							!r.HiddenFromTopComments &&
-							!r.IsDeleted)
-				.GroupBy(r => r.Comment)
-				.Select(g => new { g.Key, Count = g.Count() })
-				.OrderByDescending(g => g.Count)
-				.Take(count * 2)
-				.Select(g => g.Key)
-				.ToListAsync())
+					.Where(r => r.ExerciseChecking.CourseId == courseId &&
+								r.ExerciseChecking.SlideId == slideId &&
+								r.AuthorId != userId &&
+								!r.HiddenFromTopComments &&
+								!r.IsDeleted)
+					.GroupBy(r => r.Comment)
+					.Select(g => new { g.Key, Count = g.Count() })
+					.OrderByDescending(g => g.Count)
+					.Take(count * 2)
+					.Select(g => g.Key)
+					.ToListAsync())
 				.Where(c => !excludeCommentsSet.Contains(c))
 				.Take(count)
 				.ToList();
@@ -510,7 +515,7 @@ namespace Database.Repos
 		{
 			return (await db.ManualExerciseCheckings
 					.Where(c => c.CourseId == courseId && userIds.Contains(c.UserId) && !c.IsChecked)
-					.Select(c => new {c.UserId, c.SlideId})
+					.Select(c => new { c.UserId, c.SlideId })
 					.Distinct()
 					.ToListAsync())
 				.GroupBy(c => c.UserId)
@@ -521,7 +526,7 @@ namespace Database.Repos
 		{
 			return (await db.ManualExerciseCheckings
 					.Where(c => c.CourseId == courseId && userIds.Contains(c.UserId) && c.ProhibitFurtherManualCheckings)
-					.Select(c => new {c.UserId, c.SlideId})
+					.Select(c => new { c.UserId, c.SlideId })
 					.Distinct()
 					.ToListAsync())
 				.GroupBy(c => c.UserId)
@@ -531,11 +536,11 @@ namespace Database.Repos
 		public async Task HideFromTopCodeReviewComments(string courseId, Guid slideId, string userId, string comment)
 		{
 			var reviews = await db.ExerciseCodeReviews.Include(r => r.ExerciseChecking)
-				.Where(r => r.ExerciseChecking.CourseId == courseId 
-					&& r.ExerciseChecking.SlideId == slideId
-					&& r.AuthorId == userId
-					&& r.Comment == comment
-					&& !r.IsDeleted)
+				.Where(r => r.ExerciseChecking.CourseId == courseId
+							&& r.ExerciseChecking.SlideId == slideId
+							&& r.AuthorId == userId
+							&& r.Comment == comment
+							&& !r.IsDeleted)
 				.ToListAsync();
 
 			foreach (var review in reviews)
@@ -582,11 +587,17 @@ namespace Database.Repos
 			return await db.ExerciseCodeReviewComments
 				.Include(c => c.Author)
 				.Where(c =>
-					c.Review.ExerciseChecking.CourseId == courseId
-					&& c.Review.ExerciseChecking.SlideId == slideId
-					&& c.Review.ExerciseChecking.UserId == userId
-					&& !c.IsDeleted
-					&& !c.Review.IsDeleted)
+					(
+						c.Review.ExerciseChecking.CourseId == courseId
+						&& c.Review.ExerciseChecking.SlideId == slideId
+						&& c.Review.ExerciseChecking.UserId == userId
+						&& !c.Review.IsDeleted
+						||
+						c.Review.Submission.CourseId == courseId
+						&& c.Review.Submission.SlideId == slideId
+						&& c.Review.Submission.UserId == userId
+					) && !c.IsDeleted
+				)
 				.ToListAsync();
 		}
 

@@ -1,8 +1,15 @@
 import { SlideUserProgress } from "./userProgress";
 import { CourseInfo } from "./course";
-import { SubmissionInfo } from "./exercise";
-import {CourseAccessType, CourseRoleType, SystemAccessType} from "../consts/accessType";
+import {
+	AutomaticExerciseCheckingProcessStatus, AutomaticExerciseCheckingResult, ExerciseAutomaticCheckingResponse,
+	ReviewCommentResponse,
+	ReviewInfo,
+	RunSolutionResponse,
+	SubmissionInfo
+} from "./exercise";
+import { CourseAccessType, CourseRoleType, SystemAccessType } from "../consts/accessType";
 import { AccountProblemType } from "../consts/accountProblemType";
+import { Language } from "../consts/languages";
 
 interface RootState {
 	userProgress: UserProgressState;
@@ -22,7 +29,9 @@ interface CourseState {
 }
 
 interface SlidesState {
-	submissionsByCourses: { [courseId: string]: { [slideId: string]: { [submissionId: number]: SubmissionInfo } } }
+	submissionsByCourses: { [courseId: string]: { [slideId: string]: { [submissionId: number]: SubmissionInfo } } },
+	submissionError: string,
+	lastCheckingResponse: RunSolutionResponse,
 	// TODO не все поля
 }
 
@@ -45,4 +54,22 @@ interface AccountState {
 	avatarUrl: string | null;
 }
 
-export { RootState, UserProgressState, CourseState, AccountState, };
+interface ReviewCommentResponseRedux extends ReviewCommentResponse {
+	isDeleted: boolean,
+	isLoading: boolean,
+}
+
+interface ReviewInfoRedux extends ReviewInfo {
+	comments: ReviewCommentResponseRedux[];
+}
+
+interface ExerciseAutomaticCheckingResponseRedux extends ExerciseAutomaticCheckingResponse {
+	reviews: ReviewInfoRedux[] | null;
+}
+
+interface SubmissionInfoRedux extends SubmissionInfo {
+	automaticChecking: ExerciseAutomaticCheckingResponseRedux | null; // null если задача не имеет автоматических тестов, это не отменяет возможности ревью.
+	manualCheckingReviews: ReviewInfoRedux[];
+}
+
+export { RootState, UserProgressState, CourseState, AccountState, SubmissionInfoRedux, ReviewInfoRedux, };

@@ -33,7 +33,7 @@ namespace ManualUtils
 			//await FindExternalSolutionsPlagiarism.PrepareResults();
 
 			//Users.PrintCourseAdmins(db);
-			//ScoresUpdater.UpdateTests(db, "java-rtf");
+			//await ScoresUpdater.UpdateTests(db, "java-rtf");
 			//GetMostSimilarSubmission(adb);
 			//ParsePairWeightsFromLogs();
 			//GetBlackAndWhiteLabels(db, adb);
