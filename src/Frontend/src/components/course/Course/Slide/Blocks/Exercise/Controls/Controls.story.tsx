@@ -12,7 +12,7 @@ const defaultProps = {
 	valueChanged: false,
 	submissionLoading: false,
 
-	hints: [],
+	hints: ['123'],
 	showedHintsCount: 0,
 
 	showOutput: false,
@@ -42,7 +42,8 @@ const ListTemplate: Story<{ items: { props: typeof defaultProps, header: string 
 					/>
 					{ props.hints.length !== 0 &&
 					<Controls.ShowHintButton
-						hints={ props.hints }
+						onAllHintsShowed={()=>{}}
+						renderedHints={ props.hints }
 					/> }
 					{ props.isEditable && <Controls.ResetButton onResetButtonClicked={ props.resetCodeAndCache }/> }
 					{ (!props.isEditable && props.hasOutput) && <Controls.OutputButton
