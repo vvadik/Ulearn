@@ -53,7 +53,7 @@ const fullSizeBlockTypes = {
 interface Props {
 	courseId: string,
 	slideId: string,
-	slideBlocks: Block<BlockTypes>[],
+	slideBlocks?: Block<BlockTypes>[],
 	slideLoading: boolean,
 	loadSlide: (courseId: string, slideId: string,) => void,
 	showHiddenBlocks: boolean,
@@ -295,7 +295,7 @@ const mapStateToProps = (state: RootState, { courseId, slideId, }: MatchType) =>
 		courseId,
 		slideId,
 		slideLoading,
-		slideBlocks: [],
+		slideBlocks: undefined,
 	};
 
 	const coursesSlides = slidesByCourses[courseId];
