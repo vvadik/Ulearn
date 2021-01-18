@@ -20,7 +20,7 @@ export interface LoadUserProgressFailAction {
 }
 
 export interface UserProgressUpdateAction {
-	type: typeof USER__PROGRESS_UPDATE
+	type: typeof USER__PROGRESS_UPDATE,
 	courseId: string,
 	slideId: string,
 	fieldsToUpdate: Partial<SlideUserProgress>,

@@ -22,8 +22,6 @@ namespace Database.Repos
 			bool hasAutomaticChecking,
 			AutomaticExerciseCheckingStatus? status = AutomaticExerciseCheckingStatus.Waiting);
 
-		Task RemoveSubmission(UserExerciseSubmission submission);
-
 		///<returns>(likesCount, isLikedByThisUsed)</returns>
 		Task<Tuple<int, bool>> Like(int solutionId, string userId);
 

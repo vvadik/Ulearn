@@ -8,7 +8,7 @@ import {
 	SolutionRunStatus,
 	SubmissionInfo
 } from "src/models/exercise";
-import getPluralForm from "src/utils/getPluralForm.js";
+import getPluralForm from "src/utils/getPluralForm";
 import { SubmissionColor } from "../ExerciseUtils";
 
 interface ExerciseFormHeaderProps {
@@ -150,7 +150,7 @@ class ExerciseFormHeader extends React.Component<ExerciseFormHeaderProps> {
 		if(prohibitFurtherManualChecking && selectedSubmissionIsLastSuccess) {
 			return texts.noTestsProhibitFurtherReview;
 		}
-		return null;
+		return texts.notCheckedAtAll;
 	}
 }
 

@@ -1,7 +1,6 @@
 using Database.Models;
 using Database.Repos;
 using Database.Repos.Comments;
-using Database.Repos.CourseRoles;
 using Database.Repos.Flashcards;
 using Database.Repos.Groups;
 using Database.Repos.SystemAccessesRepo;
@@ -65,7 +64,6 @@ namespace Database.Di
 
 			/* Others */
 			services.AddScoped<ICourseRolesRepo, CourseRolesRepo>();
-			services.AddScoped<ICourseRoleUsersFilter, CourseRoleUsersFilter>();
 			services.AddScoped<ICoursesRepo, CoursesRepo>();
 			services.AddScoped<ITempCoursesRepo, TempCoursesRepo>();
 			services.AddScoped<ISlideCheckingsRepo, SlideCheckingsRepo>();

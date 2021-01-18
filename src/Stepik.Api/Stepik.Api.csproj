@@ -8,7 +8,7 @@
 		<ProjectReference Include="..\Core\Core.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-	  <PackageReference Include="System.Collections.Immutable" Version="1.7.0" />
+	  <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
 	  <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.6.0" />
 	  <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="4.6.0" />
 	</ItemGroup>

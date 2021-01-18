@@ -9,9 +9,6 @@ namespace Database.Repos.Users
 	{
 		[ItemCanBeNull]
 		Task<ApplicationUser> FindUserByIdAsync(string userId);
-
-		Task<List<UserRolesInfo>> GetCourseInstructorsAsync(string courseId, int limit = 50);
-		Task<List<UserRolesInfo>> GetCourseAdminsAsync(string courseId, int limit = 50);
 		Task<List<string>> GetSysAdminsIdsAsync();
 		Task ChangeTelegram(string userId, long chatId, string chatTitle);
 		Task ConfirmEmail(string userId, bool isConfirmed = true);

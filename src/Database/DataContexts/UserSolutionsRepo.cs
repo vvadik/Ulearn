@@ -24,7 +24,7 @@ namespace Database.DataContexts
 {
 	public class UserSolutionsRepo
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(UserSolutionsRepo));
+		private static ILog log => LogProvider.Get().ForContext(typeof(UserSolutionsRepo));
 		private readonly ULearnDb db;
 		private readonly TextsRepo textsRepo;
 		private readonly VisitsRepo visitsRepo;
@@ -102,19 +102,6 @@ namespace Database.DataContexts
 			await db.SaveChangesAsync();
 
 			return submission;
-		}
-
-		public async Task RemoveSubmission(UserExerciseSubmission submission)
-		{
-			if (submission.Likes != null)
-				db.SolutionLikes.RemoveRange(submission.Likes);
-			if (submission.AutomaticChecking != null)
-				db.AutomaticExerciseCheckings.Remove(submission.AutomaticChecking);
-			if (submission.ManualCheckings != null)
-				db.ManualExerciseCheckings.RemoveRange(submission.ManualCheckings);
-
-			db.UserExerciseSubmissions.Remove(submission);
-			await db.SaveChangesAsync();
 		}
 
 		///<returns>(likesCount, isLikedByThisUsed)</returns>

@@ -12,7 +12,7 @@ namespace Database.DataContexts
 {
 	public class VisitsRepo
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(VisitsRepo));
+		private static ILog log => LogProvider.Get().ForContext(typeof(VisitsRepo));
 
 		private readonly ULearnDb db;
 		private readonly SlideCheckingsRepo slideCheckingsRepo;

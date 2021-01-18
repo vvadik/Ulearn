@@ -168,6 +168,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			{
 				Submissions = submissions,
 				CodeReviewComments = codeReviewComments,
+				SlideFile = context.Slide.Info.SlideFile,
 				AttemptsStatistics = new ExerciseAttemptsStatistics
 				{
 					AttemptedUsersCount = exerciseUsersCount,

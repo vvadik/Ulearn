@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Database;
 using Database.Models;
-using Database.Repos.CourseRoles;
+using Database.Repos;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
 using Ulearn.Common.Api.Models.Responses;
@@ -18,17 +17,15 @@ namespace Ulearn.Web.Api.Controllers.Users
 	[Route("/users")]
 	public class UsersController : BaseController
 	{
-		private readonly ICourseRoleUsersFilter courseRoleUsersFilter;
 		private readonly IUserSearcher userSearcher;
 		private readonly ICourseRolesRepo courseRolesRepo;
 
 		public UsersController(IWebCourseManager courseManager, UlearnDb db,
-			IUsersRepo usersRepo, ICourseRoleUsersFilter courseRoleUsersFilter, IUserSearcher userSearcher, ICourseRolesRepo courseRolesRepo)
+			IUsersRepo usersRepo, IUserSearcher userSearcher, ICourseRolesRepo courseRolesRepo)
 			: base(courseManager, db, usersRepo)
 		{
 			this.userSearcher = userSearcher;
 			this.courseRolesRepo = courseRolesRepo;
-			this.courseRoleUsersFilter = courseRoleUsersFilter ?? throw new ArgumentNullException(nameof(courseRoleUsersFilter));
 		}
 
 		/// <summary>
@@ -118,7 +115,7 @@ namespace Ulearn.Web.Api.Controllers.Users
 				}
 			}
 
-			var instructors = await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, null, true).ConfigureAwait(false);
+			var instructors = await courseRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, null, true).ConfigureAwait(false);
 			var currentUserIsInstructor = instructors.Contains(User.GetUserId());
 			return new UsersSearchResponse
 			{

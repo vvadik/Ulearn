@@ -38,29 +38,33 @@ namespace AntiPlagiarism.Web.Database.Repos
 
 		public async Task<List<MostSimilarSubmissions>> GetMostSimilarSubmissionsByTaskAsync(int clientId, Guid taskId)
 		{
-			var resultsWithRepeatingAuthors = await db.MostSimilarSubmissions
-				.Where(s => s.Submission.ClientId == clientId && s.Submission.TaskId == taskId)
-				.Select(s => new
-				{
-					SubmissionId = s.Submission.ClientSubmissionId,
-					SimilarSubmissionId = s.SimilarSubmission.ClientSubmissionId,
-					s.Weight,
-					s.Submission.AuthorId
-				})
-				.ToListAsync();
-
-			return resultsWithRepeatingAuthors
-				.GroupBy(t => t.AuthorId)
-				.Select(g =>
-				{
-					var max = g.MaxBy(s => s.Weight);
-					return new MostSimilarSubmissions
+			using (var scope = new TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions { IsolationLevel = IsolationLevel.ReadUncommitted }, TransactionScopeAsyncFlowOption.Enabled))
+			{
+				var resultsWithRepeatingAuthors = await db.MostSimilarSubmissions
+					.Where(s => s.Submission.ClientId == clientId && s.Submission.TaskId == taskId)
+					.Select(s => new
 					{
-						SubmissionId = max.SubmissionId,
-						SimilarSubmissionId = max.SimilarSubmissionId,
-						Weight = max.Weight
-					};
-				}).ToList();
+						SubmissionId = s.Submission.ClientSubmissionId,
+						SimilarSubmissionId = s.SimilarSubmission.ClientSubmissionId,
+						s.Weight,
+						s.Submission.AuthorId
+					})
+					.ToListAsync();
+				scope.Complete();
+
+				return resultsWithRepeatingAuthors
+					.GroupBy(t => t.AuthorId)
+					.Select(g =>
+					{
+						var max = g.MaxBy(s => s.Weight);
+						return new MostSimilarSubmissions
+						{
+							SubmissionId = max.SubmissionId,
+							SimilarSubmissionId = max.SimilarSubmissionId,
+							Weight = max.Weight
+						};
+					}).ToList();
+			}
 		}
 	}
 }

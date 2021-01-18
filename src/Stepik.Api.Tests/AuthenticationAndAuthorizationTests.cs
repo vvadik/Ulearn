@@ -11,8 +11,7 @@ namespace Stepik.Api.Tests
 	{
 		private const int correctAccessTokenLength = 30;
 		private const string myFullName = "Андрей Гейн";
-
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(AuthenticationAndAuthorizationTests));
+		private static ILog log => LogProvider.Get().ForContext(typeof(AuthenticationAndAuthorizationTests));
 
 		[SetUp]
 		public async Task SetUp()

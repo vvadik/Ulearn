@@ -8,7 +8,6 @@ using Database.Models;
 using Database.Models.Comments;
 using Database.Repos;
 using Database.Repos.Comments;
-using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;

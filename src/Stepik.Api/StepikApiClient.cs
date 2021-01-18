@@ -22,7 +22,7 @@ namespace Stepik.Api
 		private const string tokenUrl = "https://stepik.org/oauth2/token/";
 		private const string tokenGrantType = "authorization_code";
 
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(StepikApiClient));
+		private static ILog log => LogProvider.Get().ForContext(typeof(StepikApiClient));
 		private readonly StepikApiOptions options;
 		private readonly HttpClient httpClient;
 

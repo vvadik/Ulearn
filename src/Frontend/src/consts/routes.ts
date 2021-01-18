@@ -1,3 +1,5 @@
+import { buildQuery } from "../utils";
+
 export const coursePath = "course";
 export const flashcards = "flashcards";
 export const flashcardsPreview = "preview";
@@ -12,6 +14,8 @@ export const acceptedSolutions = "acceptedsolutions";
 export const resetStudentsLimits = "/students/reset-limits";
 export const accountPath = '/account/manage';
 export const signalrWS = 'ws';
+export const login = 'login';
+export const register = '/account/register';
 
 export function constructPathToSlide(courseId: string, slideId: string): string {
 	return `/${ coursePath }/${ courseId }/${ slideId }`;
@@ -37,4 +41,8 @@ export function constructPathToStudentSubmissions(courseId: string, slideId: str
 
 export function constructPathToFlashcardsPreview(courseId: string,): string {
 	return `/${ coursePath }/${ courseId }/${ flashcards }/${ flashcardsPreview }`;
+}
+
+export function constructLinkWithReturnUrl(link: string, returnUrl?: string): string {
+	return `/${ link }${ buildQuery({ returnUrl: returnUrl || window.location.pathname }) }`;
 }

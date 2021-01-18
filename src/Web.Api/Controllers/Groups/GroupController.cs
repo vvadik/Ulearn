@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Repos;
-using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
@@ -36,7 +35,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		private readonly IGroupsCreatorAndCopier groupsCreatorAndCopier;
 		private readonly IUnitsRepo unitsRepo;
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(GroupController));
+		private static ILog log => LogProvider.Get().ForContext(typeof(GroupController));
 
 		public GroupController(IWebCourseManager courseManager, UlearnDb db,
 			IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, INotificationsRepo notificationsRepo,

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using JetBrains.Annotations;
@@ -8,6 +9,7 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Web.Api.Controllers.Slides;
 using Ulearn.Web.Api.Models.Responses.Exercise;
+using Ulearn.Core;
 
 namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 {
@@ -28,7 +30,7 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 
 		[NotNull]
 		[DataMember]
-		public string[] Hints { get; set; }
+		public string[] RenderedHints { get; set; }
 
 		[NotNull]
 		[DataMember]
@@ -68,7 +70,7 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 				LanguageInfo = null;
 			}
 
-			Hints = exerciseBlock.Hints.ToArray();
+			RenderedHints = exerciseBlock.Hints.Select(h => RenderHtmlWithHint(h, context.SlideFile)).ToArray();
 			ExerciseInitialCode = exerciseBlock.ExerciseInitialCode.RemoveEmptyLinesFromStart().TrimEnd().EnsureEnoughLines(4);
 			HideSolutions = exerciseBlock.HideShowSolutionsButton;
 			ExpectedOutput = exerciseBlock.HideExpectedOutputOnError ? null : exerciseBlock.ExpectedOutput?.NormalizeEoln();
@@ -77,6 +79,11 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 				.EmptyIfNull()
 				.Select(s => SubmissionInfo.Build(s, reviewId2Comments))
 				.ToList();
+		}
+
+		private string RenderHtmlWithHint(string hintMd, FileInfo slideFile)
+		{
+			return hintMd.RenderMarkdown(slideFile);
 		}
 	}
 }

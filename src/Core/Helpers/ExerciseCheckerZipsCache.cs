@@ -22,6 +22,7 @@ namespace Ulearn.Core.Helpers
 		private static readonly UlearnConfiguration configuration;
 		private static readonly HashSet<string> coursesLockedForDelete;
 		private static readonly ConcurrentDictionary<string, int> courseToFileLocksNumber;
+		private static ILog log => LogProvider.Get().ForContext(typeof(ExerciseCheckerZipsCache));
 
 		static ExerciseCheckerZipsCache()
 		{
@@ -92,9 +93,7 @@ namespace Ulearn.Core.Helpers
 			}
 			catch (Exception ex)
 			{
-				LogProvider.Get()
-					.ForContext(typeof(ExerciseCheckerZipsCache))
-					.Warn(ex, $"Exception in SaveFileOnDisk courseId {zipFile.FullName}");
+				log.Warn(ex, $"Exception in SaveFileOnDisk courseId {zipFile.FullName}");
 			}
 		}
 
@@ -130,9 +129,7 @@ namespace Ulearn.Core.Helpers
 				zip.Save(resultStream);
 			}
 			var result = resultStream.ToArray();
-			LogProvider.Get()
-				.ForContext(typeof(ExerciseCheckerZipsCache))
-				.Info($"Добавил код студента в zip-архив с упражнением: курс {courseId}, слайд «{slide?.Title}» ({slide?.Id}) elapsed {sw.ElapsedMilliseconds} ms");
+			log.Info($"Добавил код студента в zip-архив с упражнением: курс {courseId}, слайд «{slide?.Title}» ({slide?.Id}) elapsed {sw.ElapsedMilliseconds} ms");
 			return result;
 		}
 
@@ -141,9 +138,7 @@ namespace Ulearn.Core.Helpers
 			if (isDisabled)
 				return;
 
-			LogProvider.Get()
-				.ForContext(typeof(ExerciseCheckerZipsCache))
-				.Info($"Очищаю папку со сгенерированными zip-архивами для упражнений из курса {courseId}");
+			log.Info($"Очищаю папку со сгенерированными zip-архивами для упражнений из курса {courseId}");
 
 			var courseDirectory = cacheDirectory.GetSubdirectory(courseId);
 			courseDirectory.EnsureExists();

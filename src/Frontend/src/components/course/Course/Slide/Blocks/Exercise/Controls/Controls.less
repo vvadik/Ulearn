@@ -1,5 +1,8 @@
 @import "../../../../courseVariables";
 
+@hintsLeftPadding: 16px;
+@maxHintsWrapperWidthMultiplier: 0.66;
+
 .exerciseControlsContainer {
   display: inline-flex;
   align-items: baseline;
@@ -19,12 +22,50 @@
   cursor: pointer;
 }
 
+.sendButton {
+  order: -1;
+}
+
 .exerciseControlsIcon {
   margin-right: 4px;
 }
 
+.hintsWrapper {
+  max-width: calc(100vw - 130px); //130px is distance from left edge to hints left border
+  font-size: 16px;
+  line-height: 24px;
+
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-left: @hintsLeftPadding;
+}
+
+.hintsWrapper li {
+  position: relative;
+
+  list-style-type: none;
+}
+
+.hintsWrapper li:not(:last-child) {
+  margin-bottom: 6px;
+}
+
+.hintBulb {
+  position: absolute;
+  left: -@hintsLeftPadding - 2px;
+
+  font-size: 14px;
+  line-height: 20px;
+  color: @accentColor;
+}
+
 .noHintsLeft {
   color: @disabledColor;
+}
+
+.noHintsLeft:focus, .noHintsLeft:hover {
+  color: @disabledColor;
+  text-decoration: none;
 }
 
 .statistics {
@@ -33,4 +74,27 @@
   margin-right: 0;
   margin-left: auto;
   order: 1;
+}
+
+@media (min-width: @minTabletWidth) {
+  .hintsWrapper {
+    max-width: @tabletSlideWidth * @maxHintsWrapperWidthMultiplier;
+    padding-left: @hintsLeftPadding + 2px;
+  }
+
+  .hintBulb{
+    left: -@hintsLeftPadding - 4px;
+  }
+}
+
+@media (min-width: @minLaptopWidth) {
+  .hintsWrapper {
+    max-width: @laptopSlideWidth * @maxHintsWrapperWidthMultiplier;
+  }
+}
+
+@media (min-width: @minDesktopWidth) {
+  .hintsWrapper {
+    max-width: @desktopSlideWidth * @maxHintsWrapperWidthMultiplier;
+  }
 }

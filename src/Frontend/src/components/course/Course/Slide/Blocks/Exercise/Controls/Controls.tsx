@@ -1,58 +1,42 @@
-import React from "react";
+import React, { ReactElement } from "react";
 
-import classNames from "classnames";
-import { isMobile, isTablet, } from "src/utils/getDeviceType.js";
+import { isMobile, isTablet, } from "src/utils/getDeviceType";
 
-import ShowAfterDelay from "src/components/ShowAfterDelay/ShowAfterDelay";
-import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent.js";
-import { Button, ThemeContext, Tooltip, Modal } from "ui";
-import { DocumentLite, EyeOpened, Lightbulb, Refresh } from "icons";
-import { darkTheme } from 'ui/internal/ThemePlayground/darkTheme';
+import { ThemeContext } from "ui";
+import SubmitButton from "./SubmitButton";
+import ShowHintButton from "./ShowHintButton";
+import OutputButton from "./OutputButton";
+import ResetButton from "./ResetButton";
+import StatisticsHint from "./StatisticsHint";
+import AcceptedSolutionsButton from "./AcceptedSolutionsButton";
+import { darkFlat } from "src/uiTheme";
+
+import ShowControlsTextContext from "./ShowControlsTextContext";
 
 import styles from './Controls.less';
 
-import texts from "../Exercise.texts";
-
 interface Props {
-	countOfHints: number,
-	hideSolutions: boolean,
-	isShowAcceptedSolutionsAvailable: boolean,
-	isEditable: boolean,
-	valueChanged: boolean,
-	submissionLoading: boolean,
-	hasOutput: boolean,
-	showOutput: boolean,
-	attemptsStatistics: {
-		attemptedUsersCount: number,
-		usersWithRightAnswerCount: number,
-		lastSuccessAttemptDate?: string,
-	},
-	acceptedSolutionsUrl: string,
-	showedHintsCount: number,
-
-	onsSendExerciseButtonClicked: () => void,
-	onResetButtonClicked: () => void,
-	onShowOutputButtonClicked: () => void,
-	onVisitAcceptedSolutions: () => void,
-	showHint: () => void,
+	children: React.ReactNode[],
 }
 
 interface State {
 	resizeTimeout?: NodeJS.Timeout,
 	showControlsText: boolean,
-	showAcceptedSolutionsWarning: boolean,
-	showAcceptedSolutions: boolean,
 }
 
 const isControlsTextSuits = (): boolean => !isMobile() && !isTablet();
 
-
 class Controls extends React.Component<Props, State> {
+	public static SubmitButton = SubmitButton;
+	public static ShowHintButton = ShowHintButton;
+	public static ResetButton = ResetButton;
+	public static OutputButton = OutputButton;
+	public static StatisticsHint = StatisticsHint;
+	public static AcceptedSolutionsButton = AcceptedSolutionsButton;
+
 	state = {
 		resizeTimeout: undefined,
 		showControlsText: isControlsTextSuits(),
-		showAcceptedSolutionsWarning: false,
-		showAcceptedSolutions: false,
 	};
 
 	componentDidMount = (): void => {
@@ -82,211 +66,67 @@ class Controls extends React.Component<Props, State> {
 	};
 
 	render = (): React.ReactNode => {
-		const {
-			countOfHints, hideSolutions, isShowAcceptedSolutionsAvailable,
-			isEditable, hasOutput, showedHintsCount,
-		} = this.props;
-		const { showAcceptedSolutions, } = this.state;
+		const { showControlsText, } = this.state;
+		const [submit, hint, reset, output, statistics, acceptedSolutions] = this.parseChildren();
 
 		return (
 			<div className={ styles.exerciseControlsContainer }>
-				{ this.renderSubmitSolutionButton() }
-				<ThemeContext.Provider value={ darkTheme }>
-					{ countOfHints > 0 && this.renderShowHintButton() }
-					{ isEditable && this.renderResetButton() }
-					{ !isEditable && hasOutput && this.renderShowOutputButton() }
-					{ this.renderShowStatisticsHint() }
-				</ThemeContext.Provider>
-				{ !hideSolutions
-				&& (countOfHints === showedHintsCount || isShowAcceptedSolutionsAvailable)
-				&& this.renderShowAcceptedSolutionsButton()
-				}
-				{ showAcceptedSolutions && this.renderAcceptedSolutions() }
+				<ShowControlsTextContext.Provider value={ showControlsText }>
+					{ hint }
+					<ThemeContext.Provider value={ darkFlat }>
+						{ submit }
+						{ reset }
+						{ output }
+						{ statistics }
+					</ThemeContext.Provider>
+					{ acceptedSolutions }
+				</ShowControlsTextContext.Provider>
 			</div>
 		);
 	};
 
-	renderSubmitSolutionButton = (): React.ReactNode => {
-		const { valueChanged, submissionLoading, onsSendExerciseButtonClicked, } = this.props;
+	parseChildren = ()
+		: [typeof SubmitButton?,
+		typeof ShowHintButton?,
+		typeof ResetButton?,
+		typeof OutputButton?,
+		typeof StatisticsHint?,
+		typeof AcceptedSolutionsButton?
+	] => {
+		const childArray = this.props.children;
+		let submit: typeof SubmitButton | undefined = undefined;
+		let hint: typeof ShowHintButton | undefined = undefined;
+		let reset: typeof ResetButton | undefined = undefined;
+		let output: typeof OutputButton | undefined = undefined;
+		let stat: typeof StatisticsHint | undefined = undefined;
+		let solutions: typeof AcceptedSolutionsButton | undefined = undefined;
 
-		return (
-			<span className={ styles.exerciseControls }>
-				<Tooltip pos={ "bottom center" } trigger={ "hover&focus" }
-						 render={ this.renderSubmitCodeHint }>
-							<Button
-								loading={ submissionLoading }
-								use={ "primary" }
-								disabled={ !valueChanged }
-								onClick={ onsSendExerciseButtonClicked }>
-								{ texts.controls.submitCode.text }
-							</Button>
-				</Tooltip>
-			</span>
-		);
-	};
-
-	renderSubmitCodeHint = (): React.ReactNode => {
-		const { valueChanged } = this.props;
-
-		return valueChanged ? null : <span>{ texts.controls.submitCode.hint }</span>;
-	};
-
-	renderShowHintButton = (): React.ReactNode => {
-		const { showControlsText, } = this.state;
-		const { countOfHints, showHint, showedHintsCount, } = this.props;
-
-		const noHintsLeft = showedHintsCount === countOfHints;
-		const hintClassName = classNames(styles.exerciseControls, { [styles.noHintsLeft]: noHintsLeft });
-
-		return (
-			<span className={ hintClassName } onClick={ showHint }>
-				<Tooltip pos={ "bottom center" } trigger={ "hover&focus" }
-						 render={ () => noHintsLeft ? <span>{ texts.controls.hints.hint }</span> : null }>
-					<span className={ styles.exerciseControlsIcon }>
-						<Lightbulb/>
-					</span>
-					{ showControlsText && texts.controls.hints.text }
-				</Tooltip>
-			</span>
-		);
-	};
-
-	renderResetButton = (): React.ReactNode => {
-		const { showControlsText, } = this.state;
-		const { onResetButtonClicked, } = this.props;
-
-		return (
-			<span className={ styles.exerciseControls } onClick={ onResetButtonClicked }>
-				<span className={ styles.exerciseControlsIcon }>
-					<Refresh/>
-				</span>
-				{ showControlsText && texts.controls.reset.text }
-			</span>
-		);
-	};
-
-	renderShowOutputButton = (): React.ReactNode => {
-		const { showControlsText, } = this.state;
-		const { showOutput, onShowOutputButtonClicked, } = this.props;
-
-		return (
-			<span className={ styles.exerciseControls } onClick={ onShowOutputButtonClicked }>
-				<span className={ styles.exerciseControlsIcon }>
-					<DocumentLite/>
-				</span>
-				{ showControlsText && (showOutput ? texts.controls.output.hide : texts.controls.output.show) }
-			</span>
-		);
-	};
-
-	renderShowStatisticsHint = (): React.ReactNode => {
-		const {
-			attemptedUsersCount,
-			usersWithRightAnswerCount,
-			lastSuccessAttemptDate,
-		} = this.props.attemptsStatistics;
-		const statisticsClassName = classNames(styles.exerciseControls, styles.statistics);
-
-		return (
-			<span className={ statisticsClassName }>
-					<Tooltip pos={ "bottom right" } trigger={ "hover&focus" } render={
-						() =>
-							<span>
-								{ texts.controls.statistics.buildStatistics(attemptedUsersCount,
-									usersWithRightAnswerCount, lastSuccessAttemptDate) }
-							</span>
-					}>
-						{ texts.controls.statistics.buildShortText(usersWithRightAnswerCount) }
-					</Tooltip>
-				</span>
-		);
-	};
-
-	renderShowAcceptedSolutionsButton = (): React.ReactNode => {
-		const { showAcceptedSolutionsWarning, showControlsText, } = this.state;
-
-		return (
-			<span className={ styles.exerciseControls } onClick={ this.showAcceptedSolutionsWarning }>
-					<Tooltip
-						onCloseClick={ this.hideAcceptedSolutionsWarning }
-						pos={ "bottom left" }
-						trigger={ showAcceptedSolutionsWarning ? "opened" : "closed" }
-						render={ this.renderAcceptedSolutionsHint }>
-						<span className={ styles.exerciseControlsIcon }>
-							<EyeOpened/>
-						</span>
-						{ showControlsText && texts.controls.acceptedSolutions.text }
-					</Tooltip>
-				</span>
-		);
-	};
-
-	showAcceptedSolutionsWarning = (): void => {
-		const { isShowAcceptedSolutionsAvailable } = this.props;
-
-		if(isShowAcceptedSolutionsAvailable) {
-			this.showAcceptedSolutions();
-		} else {
-			this.setState({
-				showAcceptedSolutionsWarning: true,
-			});
+		for (const child of childArray) {
+			const reactElement = child as ReactElement;
+			if(reactElement) {
+				switch (reactElement.type) {
+					case SubmitButton:
+						submit = child as typeof SubmitButton;
+						break;
+					case ShowHintButton:
+						hint = child as typeof ShowHintButton;
+						break;
+					case ResetButton:
+						reset = child as typeof ResetButton;
+						break;
+					case OutputButton:
+						output = child as typeof OutputButton;
+						break;
+					case StatisticsHint:
+						stat = child as typeof StatisticsHint;
+						break;
+					case AcceptedSolutionsButton:
+						solutions = child as typeof AcceptedSolutionsButton;
+						break;
+				}
+			}
 		}
-	};
-
-	renderAcceptedSolutionsHint = (): React.ReactNode => {
-		return (
-			<span>
-				{ texts.controls.acceptedSolutions.buildWarning() }
-				<Button use={ "danger" } onClick={ this.showAcceptedSolutions }>
-					{ texts.controls.acceptedSolutions.continue }
-				</Button>
-			</span>);
-	};
-
-	hideAcceptedSolutionsWarning = (): void => {
-		this.setState({
-			showAcceptedSolutionsWarning: false,
-		});
-	};
-
-	showAcceptedSolutions = (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-		const { onVisitAcceptedSolutions, } = this.props;
-
-		onVisitAcceptedSolutions();
-
-		this.setState({
-			showAcceptedSolutions: true,
-		});
-
-		if(e) {
-			e.stopPropagation();
-		}
-
-		this.hideAcceptedSolutionsWarning();
-	};
-
-	closeAcceptedSolutions = (): void => {
-		this.setState({
-			showAcceptedSolutions: false,
-		});
-	};
-
-	renderAcceptedSolutions = (): React.ReactNode => {
-		const { acceptedSolutionsUrl, } = this.props;
-
-		return (
-			<ShowAfterDelay>
-				<Modal onClose={ this.closeAcceptedSolutions }>
-					<Modal.Header>
-						{ texts.acceptedSolutions.title }
-					</Modal.Header>
-					<Modal.Body>
-						{ texts.acceptedSolutions.content }
-						<DownloadedHtmlContent url={ acceptedSolutionsUrl }/>
-					</Modal.Body>
-				</Modal>
-			</ShowAfterDelay>
-		);
+		return [submit, hint, reset, output, stat, solutions];
 	};
 }
 

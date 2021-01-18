@@ -1,4 +1,4 @@
-import { convertDefaultTimezoneToLocal } from "src/utils/momentUtils.js";
+import { convertDefaultTimezoneToLocal } from "src/utils/momentUtils";
 
 export default {
 	sendButton: 'Ответить',

@@ -28,8 +28,8 @@ namespace Ulearn.Common
 						if(isExcluded)
 							continue;
 						var fullPath = Path.Combine(pathToDirectory, filePath);
-						var directoryPathInArchive = new FileInfo(Path.DirectorySeparatorChar + filePath).DirectoryName;
-						zip.AddFile(fullPath, directoryPathInArchive);
+						var bytes = File.ReadAllBytes(fullPath);
+						zip.UpdateEntry(filePath, bytes);
 					}
 				}
 				foreach (var zipUpdateData in filesToUpdateOrCreate.EmptyIfNull())

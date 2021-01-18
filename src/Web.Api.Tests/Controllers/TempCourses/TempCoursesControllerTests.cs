@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using Database.Repos;
-using Database.Repos.CourseRoles;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;

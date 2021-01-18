@@ -9,7 +9,7 @@ namespace AntiPlagiarism.Api.ModelBinders
 {
 	public class JsonModelBinder : IModelBinder
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(JsonModelBinder));
+		private static ILog log => LogProvider.Get().ForContext(typeof(JsonModelBinder));
 
 		public async Task BindModelAsync(ModelBindingContext bindingContext)
 		{

@@ -32,7 +32,7 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize]
 	public class QuizController : Controller
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(QuizController));
+		private static ILog log => LogProvider.Get().ForContext(typeof(QuizController));
 
 		private const int defaultMaxTriesCount = 2;
 		public const int InfinityTriesCount = int.MaxValue - 1;
@@ -381,7 +381,8 @@ namespace uLearn.Web.Controllers
 
 		private IEnumerable<QuizInfoForDb> CreateQuizInfoForDb(IsTrueBlock isTrueBlock, IGrouping<string, QuizAnswer> data)
 		{
-			var isTrue = isTrueBlock.IsRight(data.First().ItemId);
+			// Здесь двойной баг. В запросе из браузера текст преедается в ItemId, а не Text, поэтому работает. В базу правильно: ItemId всегда null, а значение в Text
+			var isTrue = isTrueBlock.IsRight(data.First().ItemId); 
 			var blockScore = isTrue ? isTrueBlock.MaxScore : 0;
 			return new List<QuizInfoForDb>
 			{

@@ -27,6 +27,7 @@ namespace CourseToolHotReloader
 	internal class Config : IConfig
 	{
 		private readonly string pathToConfigFile = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "config.json");
+		private static ILog log => LogProvider.Get().ForContext(typeof(Config));
 
 		public Config()
 		{
@@ -66,7 +67,7 @@ namespace CourseToolHotReloader
 			}
 			catch (JsonException ex)
 			{
-				LogProvider.Get().Error(ex, "ReadConfig error");
+				log.Error(ex, "ReadConfig error");
 				ConsoleWorker.WriteError("Не удалось прочитать файл с настройками CourseToolHotReloader. config.json создан с настройками по умолчанию в папке с исполнямыми файлами CourseToolHotReloader");
 				CreateNewConfigFile();
 				return ReadConfig();

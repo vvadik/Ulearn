@@ -36,7 +36,7 @@ function setExerciseVersion(versionId, showOutput) {
 	$.get(url, function(data) {
 		var $submission = $('.exercise__submission');
 		$loadingPanel.hide();
-		$submission.html($(data).html());
+		$submission.html($(data).filter('.exercise__submission').html());
 
 		initCodeEditor($submission);
 		$submission.find('.select-auto-width').each(function() {

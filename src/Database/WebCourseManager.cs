@@ -12,7 +12,7 @@ namespace Database
 {
 	public class WebCourseManager : CourseManager
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(WebCourseManager));
+		private static ILog log => LogProvider.Get().ForContext(typeof(WebCourseManager));
 		public static readonly WebCourseManager Instance = new WebCourseManager();
 
 		private readonly Dictionary<string, Guid> loadedCourseVersions = new Dictionary<string, Guid>();

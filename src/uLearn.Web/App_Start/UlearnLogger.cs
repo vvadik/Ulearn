@@ -16,8 +16,7 @@ namespace uLearn.Web
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 			var log = LoggerSetup.Setup(configuration.HostLog, configuration.GraphiteServiceName, false)
 				.WithProperty("user", () => new HttpContextUserNameProvider().ToString())
-				.WithProperty("address", () => new HttpContextAddressProvider().ToString())
-				.WithProperty("threadId", () => Environment.CurrentManagedThreadId);
+				.WithProperty("address", () => new HttpContextAddressProvider().ToString());
 			Log.Logger = new LoggerConfiguration()
 				.WriteTo.Sink(new VostokSink(log))
 				.CreateLogger();

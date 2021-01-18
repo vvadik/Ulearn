@@ -42,9 +42,7 @@ namespace Ulearn.VideoAnnotations.Web.Controllers
 				}
 			}
 
-			if (!annotations.TryGetValue(parameters.VideoId, out var annotation))
-				return NotFound(new ErrorResponse($"Annotation for video {parameters.VideoId} not found in document {parameters.GoogleDocId}"));
-
+			var annotation = annotations.GetValueOrDefault(parameters.VideoId);
 			return new AnnotationsResponse
 			{
 				Annotation = annotation,

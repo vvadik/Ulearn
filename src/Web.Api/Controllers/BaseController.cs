@@ -6,7 +6,6 @@ using Database;
 using Database.Models;
 using Database.Models.Comments;
 using Database.Repos;
-using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
 using Database.Repos.Users;
 using JetBrains.Annotations;
@@ -32,7 +31,7 @@ namespace Ulearn.Web.Api.Controllers
 	[Produces("application/json")]
 	public class BaseController : Controller
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(BaseController));
+		private static ILog log => LogProvider.Get().ForContext(typeof(BaseController));
 		protected readonly IWebCourseManager courseManager;
 		protected readonly UlearnDb db;
 		protected readonly IUsersRepo usersRepo;

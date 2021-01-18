@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Database.Models;
-using Database.Repos.CourseRoles;
+using Database.Repos;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -23,7 +23,7 @@ namespace Ulearn.Web.Api.Authorization
 	{
 		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IUsersRepo usersRepo;
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(CourseRoleAuthorizationHandler));
+		private static ILog log => LogProvider.Get().ForContext(typeof(CourseRoleAuthorizationHandler));
 
 		public CourseRoleAuthorizationHandler(ICourseRolesRepo courseRolesRepo, IUsersRepo usersRepo)
 		{

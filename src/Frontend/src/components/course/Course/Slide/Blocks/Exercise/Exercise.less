@@ -1,6 +1,5 @@
 @import "../../../courseVariables";
 
-@hintsLeftPadding: 22px;
 @modalZIndex: 10;
 @congratsModalWidth: 443px;
 
@@ -116,34 +115,6 @@
   margin-bottom: 35px;
 }
 
-.hintsWrapper {
-  font-size: 16px;
-  line-height: 24px;
-
-  margin-top: 25px;
-  margin-bottom: 0;
-  padding-left: @hintsLeftPadding;
-}
-
-.hintsWrapper li {
-  position: relative;
-
-  list-style-type: none;
-}
-
-.hintsWrapper li:not(:last-child) {
-  margin-bottom: 16px;
-}
-
-.hintBulb {
-  position: absolute;
-  left: -@hintsLeftPadding;
-
-  font-size: 14px;
-  line-height: 20px;
-  color: @accentColor;
-}
-
 .reviewWrapper {
   position: relative;
   display: flex;
@@ -234,11 +205,11 @@
   }
 
   //next 2 classes are overriding styles for autocompletion in code mirror to default. Darcula is theme we're using, its adding background color and coloring text.
-  .CodeMirror-hints.darcula {
+  ul.CodeMirror-hints.darcula {
     background-color: @white !important;
   }
 
-  .CodeMirror-hints.darcula .CodeMirror-hint-active {
+  ul.CodeMirror-hints.darcula .CodeMirror-hint-active {
     background-color: @blue !important;
     color: @white !important;
   }

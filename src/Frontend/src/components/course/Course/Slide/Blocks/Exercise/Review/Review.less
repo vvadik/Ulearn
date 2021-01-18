@@ -1,7 +1,7 @@
 @import "../../../../courseVariables";
 
 @minCommentWidth: 260px;
-@borderRadius: 8px;
+@borderRadius: 2px;
 
 .reviewsContainer {
   min-width: @minCommentWidth;
@@ -12,7 +12,6 @@
 
   padding-inline-start: 0;
 
-  overflow: hidden;
   list-style: none;
 
   background-color: @lightYellow;
@@ -32,9 +31,8 @@
   max-width: calc(@minCommentWidth - 18px);
 
   background: @white;
-  box-shadow: 0 6px 6px -6px @black;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
 
-  border: 1px solid rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
   border-radius: @borderRadius;
 
@@ -114,7 +112,7 @@
   line-height: 20px;
   color: #333;
 
-  word-break: break-all;
+  word-break: break-word;
   word-wrap: break-word;
 
   background-color: #f5f5f5;
@@ -123,7 +121,7 @@
 }
 
 .commentText {
-  word-break: break-all;
+  word-break: break-word;
   margin-bottom: 0;
 
   &:not(:last-child) {

@@ -22,7 +22,7 @@ namespace Database.DataContexts
 		private const int maxNotificationsSendingFails = 15;
 		public static TimeSpan sendNotificationsDelayAfterCreating = TimeSpan.FromMinutes(1);
 
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(NotificationsRepo));
+		private static ILog log => LogProvider.Get().ForContext(typeof(NotificationsRepo));
 
 		private readonly ULearnDb db;
 		private readonly UnitsRepo unitsRepo;

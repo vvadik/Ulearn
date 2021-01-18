@@ -1,7 +1,4 @@
 ﻿@* Generator: MvcHelper GeneratePrettyNames: true DisableLinePragmas: true *@
-@using Database.Extensions
-@using Database.Models
-@using uLearn
 @using uLearn.Web.Views.Course
 @using Ulearn.Core
 @using Ulearn.Core.Courses.Slides.Blocks
@@ -19,17 +16,6 @@
 				<i class="glyphicon glyphicon-heart"></i>
 				<span class="likes-counter">@solution.UsersWhoLike.Count</span>
 			</button>
-
-			@if (model.User.HasAccessFor(model.CourseId, CourseRole.Instructor))
-			{
-				<form action="@( solution.RemoveSolutionUrl)" method="POST" novalidate="novalidate">
-					<button class="btn btn-danger">
-						<i class="glyphicon glyphicon-remove"></i>
-						Удалить решение
-					</button>
-				</form>
-			}
-
 			@SlideHtml.Block(code, null, null)
 		</div>
 	}

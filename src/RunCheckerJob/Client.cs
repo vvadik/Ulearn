@@ -19,7 +19,7 @@ namespace RunCheckerJob
 		private readonly HttpClient httpClient;
 		private const string instanceIdEnvironmentVariableName = "WEBSITE_INSTANCE_ID";
 		private const string arrAffinityCookieName = "ARRAffinity";
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(Client));
+		private static ILog log => LogProvider.Get().ForContext(typeof(Client));
 		private readonly string agentName;
 
 		private static readonly JsonSerializerSettings jsonSerializerSettings = JsonConfig.GetSettings(typeof(RunnerSubmission));

@@ -32,7 +32,7 @@ namespace Ulearn.Web.Api.Controllers.Runner
 		private readonly MetricSender metricSender;
 		private readonly WebApiConfiguration configuration;
 		private readonly List<IResultObserver> resultObservers;
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(VisitsRepo));
+		private static ILog log => LogProvider.Get().ForContext(typeof(VisitsRepo));
 
 		public RunnerController(IWebCourseManager courseManager, UlearnDb db, IOptions<WebApiConfiguration> options,
 			IUsersRepo usersRepo, IUserSolutionsRepo userSolutionsRepo, ISlideCheckingsRepo slideCheckingsRepo,

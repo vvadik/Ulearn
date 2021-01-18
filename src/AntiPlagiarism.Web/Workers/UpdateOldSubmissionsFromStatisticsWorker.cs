@@ -12,7 +12,7 @@ namespace AntiPlagiarism.Web.Workers
 	{
 		private readonly IServiceScopeFactory serviceScopeFactory;
 		private readonly AntiPlagiarismConfiguration configuration;
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(UpdateOldSubmissionsFromStatisticsWorker));
+		private static ILog log => LogProvider.Get().ForContext(typeof(UpdateOldSubmissionsFromStatisticsWorker));
 // ReSharper disable once NotAccessedField.Local
 		private readonly Timer timer;
 

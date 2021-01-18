@@ -15,7 +15,7 @@ namespace RunCsJob
 {
 	public class Program : ProgramBase
 	{
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(Program));
+		private static ILog log => LogProvider.Get().ForContext(typeof(Program));
 		private const string serviceName = "runcsjob";
 		private readonly CsSandboxRunnerClient csSandboxRunnerClient;
 

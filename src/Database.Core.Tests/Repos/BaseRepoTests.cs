@@ -21,7 +21,7 @@ namespace Database.Core.Tests.Repos
 		protected UlearnDb db;
 		protected IServiceProvider serviceProvider;
 		protected UlearnUserManager userManager;
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(BaseRepoTests));
+		private static ILog log => LogProvider.Get().ForContext(typeof(BaseRepoTests));
 
 		[SetUp]
 		public virtual void SetUp()

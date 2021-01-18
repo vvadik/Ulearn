@@ -1,11 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\Microsoft.Net.Compilers.3.7.0\build\Microsoft.Net.Compilers.props" Condition="Exists('..\packages\Microsoft.Net.Compilers.3.7.0\build\Microsoft.Net.Compilers.props')" />
-  <Import Project="..\packages\Microsoft.CodeAnalysis.Analyzers.3.0.0\build\Microsoft.CodeAnalysis.Analyzers.props" Condition="Exists('..\packages\Microsoft.CodeAnalysis.Analyzers.3.0.0\build\Microsoft.CodeAnalysis.Analyzers.props')" />
+  <Import Project="..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.2\build\Microsoft.CodeAnalysis.Analyzers.props" Condition="Exists('..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.2\build\Microsoft.CodeAnalysis.Analyzers.props')" />
+  <Import Project="..\packages\Microsoft.Net.Compilers.3.8.0\build\Microsoft.Net.Compilers.props" Condition="Exists('..\packages\Microsoft.Net.Compilers.3.8.0\build\Microsoft.Net.Compilers.props')" />
   <Import Project="..\packages\ApprovalTests.4.5.2\build\ApprovalTests.props" Condition="Exists('..\packages\ApprovalTests.4.5.2\build\ApprovalTests.props')" />
   <Import Project="..\packages\EntityFramework.6.3.0\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.3.0\build\EntityFramework.props')" />
   <Import Project="..\packages\NUnit.3.10.0\build\NUnit.props" Condition="Exists('..\packages\NUnit.3.10.0\build\NUnit.props')" />
-  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -38,6 +37,9 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Use64BitIISExpress />
     <LangVersion>default</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GeneratedMSBuildEditorConfigFile>$(IntermediateOutputPath)$(MSBuildProjectName).GeneratedMSBuildEditorConfig.editorconfig</GeneratedMSBuildEditorConfigFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -238,27 +240,28 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Build, Version=15.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\packages\Microsoft.Build.16.6.0\lib\net472\Microsoft.Build.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Build.16.8.0\lib\net472\Microsoft.Build.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Build.Framework, Version=15.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\packages\Microsoft.Build.Framework.16.6.0\lib\net472\Microsoft.Build.Framework.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Build.Framework.16.8.0\lib\net472\Microsoft.Build.Framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Build.Utilities.Core, Version=15.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\packages\Microsoft.Build.Utilities.Core.16.5.0\lib\net472\Microsoft.Build.Utilities.Core.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Build.Utilities.Core.16.8.0\lib\net472\Microsoft.Build.Utilities.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.CodeAnalysis, Version=3.7.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <HintPath>..\packages\Microsoft.CodeAnalysis.Common.3.7.0\lib\netstandard2.0\Microsoft.CodeAnalysis.dll</HintPath>
+    <Reference Include="Microsoft.CodeAnalysis, Version=3.8.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.Common.3.8.0\lib\netstandard2.0\Microsoft.CodeAnalysis.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.CodeAnalysis.CSharp, Version=3.7.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.3.7.0\lib\netstandard2.0\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+    <Reference Include="Microsoft.CodeAnalysis.CSharp, Version=3.8.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.3.8.0\lib\netstandard2.0\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=2.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
+    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=3.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.DotNet.PlatformAbstractions, Version=3.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
@@ -440,8 +443,8 @@
       <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Collections.Immutable, Version=1.2.5.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\packages\System.Collections.Immutable.1.7.0\lib\netstandard2.0\System.Collections.Immutable.dll</HintPath>
+    <Reference Include="System.Collections.Immutable, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <HintPath>..\packages\System.Collections.Immutable.5.0.0\lib\net461\System.Collections.Immutable.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.ComponentModel.Annotations, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -603,36 +606,36 @@
       <HintPath>..\packages\Vostok.ClusterClient.Context.0.1.4\lib\netstandard2.0\Vostok.ClusterClient.Context.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vostok.ClusterClient.Core, Version=0.1.17.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Vostok.ClusterClient.Core.0.1.17\lib\netstandard2.0\Vostok.ClusterClient.Core.dll</HintPath>
+    <Reference Include="Vostok.ClusterClient.Core, Version=0.1.22.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.ClusterClient.Core.0.1.22\lib\netstandard2.0\Vostok.ClusterClient.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Vostok.ClusterClient.Datacenters, Version=0.1.2.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\packages\Vostok.ClusterClient.Datacenters.0.1.2\lib\netstandard2.0\Vostok.ClusterClient.Datacenters.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vostok.ClusterClient.Topology.CC, Version=0.1.1.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Vostok.ClusterClient.Topology.CC.0.1.1\lib\netstandard2.0\Vostok.ClusterClient.Topology.CC.dll</HintPath>
+    <Reference Include="Vostok.ClusterClient.Topology.CC, Version=0.1.2.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.ClusterClient.Topology.CC.0.1.2\lib\netstandard2.0\Vostok.ClusterClient.Topology.CC.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vostok.ClusterClient.Tracing, Version=0.1.1.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Vostok.ClusterClient.Tracing.0.1.1\lib\netstandard2.0\Vostok.ClusterClient.Tracing.dll</HintPath>
+    <Reference Include="Vostok.ClusterClient.Tracing, Version=0.1.2.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.ClusterClient.Tracing.0.1.2\lib\netstandard2.0\Vostok.ClusterClient.Tracing.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vostok.ClusterClient.Transport, Version=0.1.12.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Vostok.ClusterClient.Transport.0.1.12\lib\netstandard2.0\Vostok.ClusterClient.Transport.dll</HintPath>
+    <Reference Include="Vostok.ClusterClient.Transport, Version=0.1.17.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.ClusterClient.Transport.0.1.17\lib\netstandard2.0\Vostok.ClusterClient.Transport.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vostok.ClusterConfig.Client, Version=0.1.8.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Vostok.ClusterConfig.Client.0.1.8\lib\netstandard2.0\Vostok.ClusterConfig.Client.dll</HintPath>
+    <Reference Include="Vostok.ClusterConfig.Client, Version=0.1.9.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.ClusterConfig.Client.0.1.9\lib\netstandard2.0\Vostok.ClusterConfig.Client.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Vostok.ClusterConfig.Client.Abstractions, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\packages\Vostok.ClusterConfig.Client.Abstractions.0.1.0\lib\netstandard2.0\Vostok.ClusterConfig.Client.Abstractions.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vostok.Configuration, Version=0.1.14.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Vostok.Configuration.0.1.14\lib\netstandard2.0\Vostok.Configuration.dll</HintPath>
+    <Reference Include="Vostok.Configuration, Version=0.1.24.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Configuration.0.1.24\lib\netstandard2.0\Vostok.Configuration.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Vostok.Configuration.Abstractions, Version=0.1.9.0, Culture=neutral, PublicKeyToken=null">
@@ -643,16 +646,16 @@
       <HintPath>..\packages\Vostok.Configuration.Logging.0.1.1\lib\netstandard2.0\Vostok.Configuration.Logging.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vostok.Configuration.Sources, Version=0.1.9.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Vostok.Configuration.Sources.0.1.9\lib\netstandard2.0\Vostok.Configuration.Sources.dll</HintPath>
+    <Reference Include="Vostok.Configuration.Sources, Version=0.1.13.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Configuration.Sources.0.1.13\lib\netstandard2.0\Vostok.Configuration.Sources.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Vostok.Configuration.Sources.ClusterConfig, Version=0.1.6.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\packages\Vostok.Configuration.Sources.ClusterConfig.0.1.6\lib\netstandard2.0\Vostok.Configuration.Sources.ClusterConfig.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vostok.Context, Version=0.1.3.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Vostok.Context.0.1.3\lib\netstandard2.0\Vostok.Context.dll</HintPath>
+    <Reference Include="Vostok.Context, Version=0.1.4.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Context.0.1.4\lib\netstandard2.0\Vostok.Context.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Vostok.Datacenters, Version=0.1.4.0, Culture=neutral, PublicKeyToken=null">
@@ -663,12 +666,12 @@
       <HintPath>..\packages\Vostok.Datacenters.Kontur.1.0.36\lib\netstandard2.0\Vostok.Datacenters.Kontur.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vostok.Hercules.Client, Version=0.1.10.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Vostok.Hercules.Client.0.1.10\lib\netstandard2.0\Vostok.Hercules.Client.dll</HintPath>
+    <Reference Include="Vostok.Hercules.Client, Version=0.1.12.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Hercules.Client.0.1.12\lib\netstandard2.0\Vostok.Hercules.Client.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vostok.Hercules.Client.Abstractions, Version=0.1.4.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Vostok.Hercules.Client.Abstractions.0.1.4\lib\netstandard2.0\Vostok.Hercules.Client.Abstractions.dll</HintPath>
+    <Reference Include="Vostok.Hercules.Client.Abstractions, Version=0.1.7.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Hercules.Client.Abstractions.0.1.7\lib\netstandard2.0\Vostok.Hercules.Client.Abstractions.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Vostok.Logging.Abstractions, Version=1.0.18.0, Culture=neutral, PublicKeyToken=null">
@@ -679,8 +682,8 @@
       <HintPath>..\packages\Vostok.Logging.Formatting.1.0.5\lib\netstandard2.0\Vostok.Logging.Formatting.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vostok.Logging.Hercules, Version=0.1.2.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Vostok.Logging.Hercules.0.1.2\lib\netstandard2.0\Vostok.Logging.Hercules.dll</HintPath>
+    <Reference Include="Vostok.Logging.Hercules, Version=0.1.4.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Logging.Hercules.0.1.4\lib\netstandard2.0\Vostok.Logging.Hercules.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Vostok.Logging.Serilog, Version=1.0.2.0, Culture=neutral, PublicKeyToken=null">
@@ -691,32 +694,32 @@
       <HintPath>..\packages\Vostok.Logging.Tracing.0.1.5\lib\netstandard2.0\Vostok.Logging.Tracing.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vostok.Metrics, Version=0.2.11.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Vostok.Metrics.0.2.11\lib\netstandard2.0\Vostok.Metrics.dll</HintPath>
+    <Reference Include="Vostok.Metrics, Version=0.2.16.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Metrics.0.2.16\lib\netstandard2.0\Vostok.Metrics.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vostok.Metrics.Hercules, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Vostok.Metrics.Hercules.0.1.0\lib\netstandard2.0\Vostok.Metrics.Hercules.dll</HintPath>
+    <Reference Include="Vostok.Metrics.Hercules, Version=0.1.2.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Metrics.Hercules.0.1.2\lib\netstandard2.0\Vostok.Metrics.Hercules.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vostok.Telemetry.Kontur, Version=1.0.39.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Vostok.Telemetry.Kontur.1.0.39\lib\netstandard2.0\Vostok.Telemetry.Kontur.dll</HintPath>
+    <Reference Include="Vostok.Telemetry.Kontur, Version=1.0.52.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Telemetry.Kontur.1.0.52\lib\netstandard2.0\Vostok.Telemetry.Kontur.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Vostok.Tracing, Version=0.1.1.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\packages\Vostok.Tracing.0.1.1\lib\netstandard2.0\Vostok.Tracing.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vostok.Tracing.Abstractions, Version=0.1.2.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Vostok.Tracing.Abstractions.0.1.2\lib\netstandard2.0\Vostok.Tracing.Abstractions.dll</HintPath>
+    <Reference Include="Vostok.Tracing.Abstractions, Version=0.1.4.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Tracing.Abstractions.0.1.4\lib\netstandard2.0\Vostok.Tracing.Abstractions.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vostok.Tracing.Extensions, Version=0.1.2.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Vostok.Tracing.Extensions.0.1.2\lib\netstandard2.0\Vostok.Tracing.Extensions.dll</HintPath>
+    <Reference Include="Vostok.Tracing.Extensions, Version=0.1.4.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Tracing.Extensions.0.1.4\lib\netstandard2.0\Vostok.Tracing.Extensions.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vostok.Tracing.Hercules, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Vostok.Tracing.Hercules.0.1.0\lib\netstandard2.0\Vostok.Tracing.Hercules.dll</HintPath>
+    <Reference Include="Vostok.Tracing.Hercules, Version=0.1.3.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Tracing.Hercules.0.1.3\lib\netstandard2.0\Vostok.Tracing.Hercules.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Vostok.Tracing.Kontur, Version=1.0.14.0, Culture=neutral, PublicKeyToken=null">
@@ -1636,8 +1639,8 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
-    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.2\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.2\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>
@@ -1675,7 +1678,6 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
-  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="CompileFrontend" BeforeTargets="BeforeBuild;OctoPack">
     <Exec Command="npm run build" WorkingDirectory="..\Frontend" />
     <Exec Command="if not exist static mkdir static" WorkingDirectory="$(MSBuildProjectDirectory)" />
@@ -1688,10 +1690,7 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.1\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.Net.Compilers.3.7.0\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Net.Compilers.3.7.0\build\Microsoft.Net.Compilers.props'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Web.WebJobs.Publish.2.0.0\build\Microsoft.Web.WebJobs.Publish.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Web.WebJobs.Publish.2.0.0\build\Microsoft.Web.WebJobs.Publish.targets'))" />
     <Error Condition="!Exists('..\packages\OctoPack.3.6.4\build\OctoPack.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OctoPack.3.6.4\build\OctoPack.targets'))" />
     <Error Condition="!Exists('..\packages\NUnit.3.10.0\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit.3.10.0\build\NUnit.props'))" />
@@ -1700,8 +1699,10 @@
     <Error Condition="!Exists('..\packages\EmptyFiles.0.11.0\build\EmptyFiles.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EmptyFiles.0.11.0\build\EmptyFiles.targets'))" />
     <Error Condition="!Exists('..\packages\ApprovalTests.4.5.2\build\ApprovalTests.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ApprovalTests.4.5.2\build\ApprovalTests.props'))" />
     <Error Condition="!Exists('..\packages\ApprovalTests.4.5.2\build\ApprovalTests.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ApprovalTests.4.5.2\build\ApprovalTests.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.0\build\Microsoft.CodeAnalysis.Analyzers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeAnalysis.Analyzers.3.0.0\build\Microsoft.CodeAnalysis.Analyzers.props'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.0\build\Microsoft.CodeAnalysis.Analyzers.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeAnalysis.Analyzers.3.0.0\build\Microsoft.CodeAnalysis.Analyzers.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Net.Compilers.3.8.0\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Net.Compilers.3.8.0\build\Microsoft.Net.Compilers.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.2\build\Microsoft.CodeAnalysis.Analyzers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.2\build\Microsoft.CodeAnalysis.Analyzers.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.2\build\Microsoft.CodeAnalysis.Analyzers.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.2\build\Microsoft.CodeAnalysis.Analyzers.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\build\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\build\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets'))" />
   </Target>
   <Import Project="..\packages\Microsoft.Web.WebJobs.Publish.1.0.13\tools\webjobs.targets" Condition="Exists('..\packages\Microsoft.Web.WebJobs.Publish.1.0.13\tools\webjobs.targets')" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
@@ -1710,7 +1711,8 @@
   <Import Project="..\packages\EntityFramework.6.3.0\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.3.0\build\EntityFramework.targets')" />
   <Import Project="..\packages\EmptyFiles.0.11.0\build\EmptyFiles.targets" Condition="Exists('..\packages\EmptyFiles.0.11.0\build\EmptyFiles.targets')" />
   <Import Project="..\packages\ApprovalTests.4.5.2\build\ApprovalTests.targets" Condition="Exists('..\packages\ApprovalTests.4.5.2\build\ApprovalTests.targets')" />
-  <Import Project="..\packages\Microsoft.CodeAnalysis.Analyzers.3.0.0\build\Microsoft.CodeAnalysis.Analyzers.targets" Condition="Exists('..\packages\Microsoft.CodeAnalysis.Analyzers.3.0.0\build\Microsoft.CodeAnalysis.Analyzers.targets')" />
+  <Import Project="..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.2\build\Microsoft.CodeAnalysis.Analyzers.targets" Condition="Exists('..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.2\build\Microsoft.CodeAnalysis.Analyzers.targets')" />
+  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\build\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\build\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

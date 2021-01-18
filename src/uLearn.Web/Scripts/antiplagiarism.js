@@ -63,7 +63,7 @@ function fetchAntiPlagiarismStatus($plagiarismStatus) {
 
 				/* Set 0 points */
 				var $exerciseScore = $('.exercise__score');
-				$exerciseScore.find('[data-value="0"]:not(.active)').click();
+				$exerciseScore.find('[data-percent="0"]:not(.active)').click();
 
 				/* Prohibit further review */
 				var $prohibitFurtherReview = $('#prohibitFurtherReview');

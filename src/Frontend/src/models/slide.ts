@@ -1,3 +1,6 @@
+import BlockTypes from "../components/course/Course/Slide/blockTypes";
+import { ReactNode } from "react";
+
 interface ShortSlideInfo {
 	id: string;
 	title: string;
@@ -20,4 +23,35 @@ enum SlideType {
 	PreviewFlashcards = "previewFlashcards",
 }
 
-export { ShortSlideInfo, SlideType }
+interface Block<T extends BlockTypes> {
+	$type: T,
+	key: number,
+	hide: boolean,
+}
+
+interface SpoilerBlock extends Block<BlockTypes.spoiler> {
+	blocks: Block<BlockTypes>[],
+	blocksId: string,
+	isPreviousBlockHidden: boolean,
+	renderedBlocks: ReactNode[],
+}
+
+interface TexBlock extends Block<BlockTypes.tex> {
+	content: string,
+	lines: string[],
+}
+
+interface VideoBlock extends Block<BlockTypes.video> {
+	autoplay: boolean,
+	openAnnotation: boolean,
+	annotationWithoutBottomPaddings: boolean,
+}
+
+interface ExerciseBlock extends Block<BlockTypes.exercise> {
+	slideId: string,
+	courseId: string,
+	forceInitialCode: boolean,
+	maxScore: number,
+}
+
+export { ShortSlideInfo, SlideType, Block, SpoilerBlock, TexBlock, VideoBlock, ExerciseBlock, };

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Repos;
-using Database.Repos.CourseRoles;
 using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNet.Identity;
@@ -41,7 +40,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		private readonly IStyleErrorsRepo styleErrorsRepo;
 		private readonly MetricSender metricSender;
 		private readonly ErrorsBot errorsBot = new ErrorsBot();
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(ExerciseController));
+		private static ILog log => LogProvider.Get().ForContext(typeof(ExerciseController));
 
 		public ExerciseController(IWebCourseManager courseManager, UlearnDb db, MetricSender metricSender,
 			IUsersRepo usersRepo, IUserSolutionsRepo userSolutionsRepo, ICourseRolesRepo courseRolesRepo, IVisitsRepo visitsRepo,
@@ -237,7 +236,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		public static async Task<bool> SendToReviewAndUpdateScore(UserExerciseSubmission submissionNoTracking,
 			IWebCourseManager courseManager, ISlideCheckingsRepo slideCheckingsRepo, IGroupsRepo groupsRepo, IVisitsRepo visitsRepo, MetricSender metricSender)
 		{
-			var userId = submissionNoTracking.User.Id;
+			var userId = submissionNoTracking.UserId;
 			var courseId = submissionNoTracking.CourseId;
 			var course = await courseManager.GetCourseAsync(courseId);
 			var exerciseSlide = course.FindSlideById(submissionNoTracking.SlideId, true) as ExerciseSlide; // SlideId проверен в вызывающем методе 

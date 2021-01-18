@@ -13,7 +13,7 @@ namespace uLearn.Web
 	{
 		private readonly ErrorsBot errorsBot;
 
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(ErrorLogModule));
+		private static ILog log => LogProvider.Get().ForContext(typeof(ErrorLogModule));
 
 		private static readonly List<string> ignorableForTelegramChannelSubstrings = new List<string>
 		{

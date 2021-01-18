@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Repos;
-using Database.Repos.CourseRoles;
 using Database.Repos.Users;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authorization;
@@ -27,7 +26,7 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly ITempCoursesRepo tempCoursesRepo;
 		private readonly ICourseRolesRepo courseRolesRepo;
 		public bool DontCheckBaseCourseExistsOnCreate = false; // Для тестрирования
-		private readonly ILog log = LogProvider.Get().ForContext(typeof(TempCourseController));
+		private static ILog log => LogProvider.Get().ForContext(typeof(TempCourseController));
 
 		public TempCourseController(IWebCourseManager courseManager, UlearnDb db, [CanBeNull] IUsersRepo usersRepo, ITempCoursesRepo tempCoursesRepo, ICourseRolesRepo courseRolesRepo)
 			: base(courseManager, db, usersRepo)

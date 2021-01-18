@@ -1,17 +1,17 @@
 import React from "react";
 
-import getPluralForm from "src/utils/getPluralForm.js";
+import getPluralForm from "src/utils/getPluralForm";
 import { SubmissionInfo } from "src/models/exercise";
-import { convertDefaultTimezoneToLocal, getMoment } from "src/utils/momentUtils.js";
+import { convertDefaultTimezoneToLocal, getMoment } from "src/utils/momentUtils";
 import { Language, LanguageLaunchInfo } from "src/consts/languages";
 import { capitalize } from "src/utils/stringUtils";
 
 const texts = {
 	submissions: {
-		newTry: 'Новая попытка',
+		newTry: 'Новая версия',
 		getSubmissionCaption: (submission: SubmissionInfo, selectedSubmissionIsLastSuccess: boolean,
 			waitingForManualChecking: boolean
-		): React.ReactNode => {
+		): string => {
 			const { timestamp, manualCheckingPassed } = submission;
 			const timestampCaption = texts.getSubmissionDate(timestamp);
 			if(manualCheckingPassed) {
@@ -28,7 +28,7 @@ const texts = {
 		if (languageInfos !== null && languageInfos[capitalizeLanguage] !== undefined)
 			return languageInfos[capitalizeLanguage];
 		return {
-			compiler: language === Language.CSharp ? "C#" : capitalize(language),
+			compiler: language === Language.cSharp ? "C#" : capitalize(language),
 			compileCommand: "",
 			runCommand: ""
 		};
@@ -76,8 +76,9 @@ const texts = {
 			hint: 'Начните писать код',
 		},
 		hints: {
-			text: 'Взять подсказку',
+			text: 'Посмотреть подсказку',
 			hint: 'Подсказки закончились',
+			showHintText: 'Показать ещё',
 		},
 
 		reset: {
@@ -100,7 +101,7 @@ const texts = {
 		},
 
 		edit: {
-			text: 'Редактировать',
+			text: 'Редактор кода',
 		},
 
 		showAllCode: {
