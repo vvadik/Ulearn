@@ -1,30 +1,58 @@
 import React from 'react';
 
-import YouTube from 'react-youtube';
+import YouTube, { Options } from 'react-youtube';
 import { BlocksWrapper, Text, } from "src/components/course/Course/Slide/Blocks";
 import { ArrowChevronUp, ArrowChevronDown, } from "@skbkontur/react-icons";
 import { Link } from "@skbkontur/react-ui";
 
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { withCookies } from 'react-cookie';
+import { Cookies, withCookies } from 'react-cookie';
 
 import styles from './Video.less';
 
 const videoCookieName = 'youtube-video-rate';
 
-class Video extends React.Component {
-	constructor(props) {
+interface AnnotationFragment {
+	text: string,
+	offset: string,
+}
+
+interface Annotation {
+	text: string,
+	fragments: AnnotationFragment[],
+}
+
+interface Props {
+	autoplay: boolean,
+	annotation: Annotation,
+	openAnnotation: boolean,
+	googleDocLink: string,
+	annotationWithoutBottomPaddings: boolean,
+	videoId: string,
+	className: string,
+	containerClassName: string,
+	hide: boolean,
+	cookies: Cookies,
+}
+
+interface State {
+	showedAnnotation: boolean,
+}
+
+class Video extends React.Component<Props, State> {
+	private ytPlayer: YT.Player | null = null;
+
+	constructor(props: Props) {
 		super(props);
 
 		const { openAnnotation, } = this.props;
 
 		this.state = {
 			showedAnnotation: openAnnotation,
-		}
+		};
 	}
 
-	componentDidUpdate(prevProps, prevState, snapshot) {
+	componentDidUpdate(prevProps: Props) {
 		if(prevProps.openAnnotation !== this.props.openAnnotation) {
 			this.setState({ showedAnnotation: this.props.openAnnotation });
 		}
@@ -37,14 +65,14 @@ class Video extends React.Component {
 	}
 
 	render() {
-		const { videoId, className, containerClassName, autoplay, googleDocLink, isHidden, } = this.props;
+		const { videoId, className, containerClassName, autoplay, googleDocLink, hide, } = this.props;
 
 		const containerClassNames = classNames(styles.videoContainer, { [containerClassName]: containerClassName });
 		const frameClassNames = classNames(styles.frame, { [className]: className });
 
-		const opts = {
+		const opts: Options = {
 			playerVars: {
-				autoplay,
+				autoplay: autoplay ? 1 : 0,
 				/* Disable related videos */
 				rel: 0,
 			},
@@ -60,7 +88,7 @@ class Video extends React.Component {
 					onReady={ this.onReady }
 					onPlaybackRateChange={ this.onPlaybackRateChange }
 				/>
-				{ isHidden && <BlocksWrapper isHidden isBlock withoutBottomPaddings={ !!googleDocLink }>
+				{ hide && <BlocksWrapper hide isBlock withoutBottomPaddings={ !!googleDocLink }>
 					<Text className={ styles.withoutBottomMargins }>
 						<p>Видео выше скрыто</p>
 					</Text>
@@ -71,29 +99,29 @@ class Video extends React.Component {
 	}
 
 
-	onReady = (event) => {
+	onReady = (event: { target: YT.Player }): void => {
 		const { cookies } = this.props;
 
 		this.ytPlayer = event.target;
 		const rate = parseFloat(cookies.get(videoCookieName) || '1');
 		this.ytPlayer.setPlaybackRate(rate);
-	}
+	};
 
-	onPlaybackRateChange = ({ data }) => {
+	onPlaybackRateChange = (event: { target: YT.Player, data: number }) => {
 		const { cookies } = this.props;
 
-		cookies.set(videoCookieName, data);
-	}
+		cookies.set(videoCookieName, event.data);
+	};
 
 	renderAnnotation = () => {
 		const { showedAnnotation } = this.state;
-		const { annotation, googleDocLink, isHidden, annotationWithoutBottomPaddings } = this.props;
+		const { annotation, googleDocLink, hide, annotationWithoutBottomPaddings } = this.props;
 
 		return (
 			<BlocksWrapper
 				withoutEyeHint
 				withoutBottomPaddings={ annotationWithoutBottomPaddings }
-				isHidden={ isHidden }
+				hide={ hide }
 				isBlock
 				className={ styles.withoutBottomMargins }>
 				<Text>
@@ -108,9 +136,9 @@ class Video extends React.Component {
 				</Text>
 			</BlocksWrapper>
 		);
-	}
+	};
 
-	renderAnnotationContent = (showedAnnotation, annotation, googleDocLink) => {
+	renderAnnotationContent = (showedAnnotation: boolean, annotation: Annotation, googleDocLink: string) => {
 		const titleClassName = showedAnnotation ? styles.opened : styles.closed;
 
 		return (
@@ -128,7 +156,8 @@ class Video extends React.Component {
 					<p>{ annotation.text }</p>
 					{ annotation.fragments.map(({ text, offset }) => {
 						const [hours, minutes, seconds] = offset.split(':');
-						const [hoursAsInt, minutesAsInt, secondsAsInt] = [hours, minutes, seconds].map(t => Number.parseInt(t));
+						const [hoursAsInt, minutesAsInt, secondsAsInt] = [hours, minutes, seconds].map(
+							t => Number.parseInt(t));
 						const timeInSeconds = hoursAsInt * 60 * 60 + minutesAsInt * 60 + secondsAsInt;
 						return (
 							<p key={ offset }>
@@ -139,7 +168,7 @@ class Video extends React.Component {
 								</Link>
 								{ ` — ${ text }` }
 							</p>
-						)
+						);
 					})
 					}
 					<p>
@@ -150,29 +179,17 @@ class Video extends React.Component {
 				}
 			</React.Fragment>
 		);
-	}
+	};
 
 	toggleAnnotation = () => {
 		this.setState({
 			showedAnnotation: !this.state.showedAnnotation,
 		});
-	}
+	};
 
-	setVideoTime = (seconds) => {
-		this.ytPlayer.seekTo(seconds);
-	}
+	setVideoTime = (seconds: number) => {
+		this.ytPlayer?.seekTo(seconds, true);
+	};
 }
-
-Video.propTypes = {
-	autoplay: PropTypes.bool,
-	annotation: PropTypes.object,
-	openAnnotation: PropTypes.bool,
-	googleDocLink: PropTypes.string,
-	annotationWithoutBottomPaddings: PropTypes.bool,
-	videoId: PropTypes.string.isRequired,
-	className: PropTypes.string,
-	containerClassName: PropTypes.string,
-}
-
 
 export default withCookies(Video);

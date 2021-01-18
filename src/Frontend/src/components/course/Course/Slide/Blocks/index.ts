@@ -1,5 +1,5 @@
 import Video from "./Video/Video";
-import Exercise from "./Exercise/Exercise.page.tsx";
+import Exercise from "./Exercise/Exercise.page";
 import StaticCode from "./Exercise/StaticCode";
 import Text from "./Text/Text";
 import Image from "./Image/Image";
@@ -14,4 +14,4 @@ export {
 	Image,
 	BlocksWrapper,
 	Spoiler,
-}
+};

@@ -1,21 +1,27 @@
-import React from "react";
+import React, { createRef, RefObject } from "react";
 
-import PropTypes from 'prop-types';
 import classNames from "classnames";
 import translateCode from "src/codeTranslator/translateCode";
 import scrollToView from "src/utils/scrollToView";
 
 import styles from "./Text.less";
 
-class Text extends React.Component {
-	constructor(props) {
-		super(props);
-		this.textContainer = null;
-	}
+interface Props {
+	className?: string,
+	content?: string,
+}
 
-	componentDidMount() {
+class Text extends React.Component<Props> {
+	private textContainer: RefObject<HTMLDivElement> = createRef();
+
+	componentDidMount(): void {
 		this.translateTex();
-		const anchors = Array.from(this.textContainer.getElementsByTagName('a'));
+
+		if(!this.textContainer.current) {
+			return;
+		}
+
+		const anchors = Array.from(this.textContainer.current.getElementsByTagName('a'));
 		const hashAnchorsLinks = anchors.filter(a => a.hash);
 
 		const hashInUrl = window.location.hash;
@@ -36,31 +42,33 @@ class Text extends React.Component {
 		}
 	}
 
-	scrollToHashAnchor = (hash) => {
-		window.history.pushState(null, null, hash);
+	scrollToHashAnchor = (hash: string): void => {
+		window.history.pushState(null, '', hash);
 
 		const anchors = document.querySelectorAll(`a[name=${ hash.replace('#', '') }]`);
 		if(anchors.length > 0) {
 			scrollToView({ current: anchors[0] });
 		}
-	}
+	};
 
-	componentDidUpdate(prevProps, prevState, snapshot) {
+	componentDidUpdate(prevProps: Props): void {
 		if(prevProps.content !== this.props.content) {
 			this.translateTex();
 		}
 	}
 
-	translateTex = () => {
-		translateCode(this.textContainer, {}, { codeMirror: true });
-	}
+	translateTex = (): void => {
+		if(this.textContainer.current) {
+			translateCode(this.textContainer.current);
+		}
+	};
 
-	render() {
+	render(): React.ReactNode {
 		const { content, className, children, } = this.props;
 		if(content) {
 			return (
 				<div
-					ref={ ref => this.textContainer = ref }
+					ref={ this.textContainer }
 					className={ classNames(styles.text, className) }
 					dangerouslySetInnerHTML={ { __html: content } }
 				/>
@@ -68,17 +76,12 @@ class Text extends React.Component {
 		}
 		return (
 			<div
-				ref={ ref => this.textContainer = ref }
+				ref={ this.textContainer }
 				className={ classNames(styles.text, className) }>
 				{ children }
 			</div>
 		);
 	}
-}
-
-Text.propTypes = {
-	className: PropTypes.string,
-	content: PropTypes.string,
 }
 
 

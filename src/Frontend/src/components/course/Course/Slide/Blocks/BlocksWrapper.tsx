@@ -5,15 +5,31 @@ import { EyeClosed } from "icons";
 
 import classNames from "classnames";
 
-import PropTypes from "prop-types";
-
 import styles from "./BlocksWrapper.less";
 
 const hiddenHintText = "Студенты не видят этот блок";
 
-function BlocksWrapper({ children, className, isBlock, isHidden, withoutBottomPaddings, withoutTopPaddings, withoutEyeHint, }) {
-	const isHiddenBlock = isBlock && isHidden;
-	const isHiddenSlide = !isBlock && isHidden;
+interface Props {
+	className?: string,
+	isBlock?: boolean,
+	withoutBottomPaddings?: boolean,
+	withoutTopPaddings?: boolean,
+	withoutEyeHint?: boolean,
+	hide?: boolean,
+	children?: React.ReactNode,
+}
+
+function BlocksWrapper({
+	children,
+	className,
+	isBlock,
+	hide,
+	withoutBottomPaddings,
+	withoutTopPaddings,
+	withoutEyeHint,
+}: Props): React.ReactElement {
+	const isHiddenBlock = isBlock && hide;
+	const isHiddenSlide = !isBlock && hide;
 
 	const wrapperClassNames = classNames(
 		styles.wrapper,
@@ -44,16 +60,6 @@ function BlocksWrapper({ children, className, isBlock, isHidden, withoutBottomPa
 			</div>
 		);
 	}
-}
-
-
-BlocksWrapper.propTypes = {
-	className: PropTypes.string,
-	isBlock: PropTypes.bool,
-	withoutBottomPaddings: PropTypes.bool,
-	withoutTopPaddings: PropTypes.bool,
-	withoutEyeHint: PropTypes.bool,
-	isHidden: PropTypes.bool,
 }
 
 export default BlocksWrapper;

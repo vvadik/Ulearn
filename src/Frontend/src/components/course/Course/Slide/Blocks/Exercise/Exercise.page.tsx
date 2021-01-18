@@ -8,13 +8,8 @@ import { RootState } from "src/models/reduxState";
 
 import { userProgressUpdateAction } from "src/actions/userProgress";
 import { sendCode, addReviewComment, deleteReviewComment, } from "src/actions/course.js";
-import { Language } from "../../../../../../consts/languages";
-
-
-interface MatchType {
-	courseId: string,
-	slideId: string,
-}
+import { Language } from "src/consts/languages";
+import MatchType from "src/consts/router";
 
 const mapStateToProps = (state: RootState, { courseId, slideId, }: MatchType) => {
 	const { slides, account, userProgress } = state;

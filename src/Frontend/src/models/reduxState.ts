@@ -10,6 +10,8 @@ import {
 import { CourseAccessType, CourseRoleType, SystemAccessType } from "../consts/accessType";
 import { AccountProblemType } from "../consts/accountProblemType";
 import { Language } from "../consts/languages";
+import BlockTypes from "../components/course/Course/Slide/blockTypes";
+import { Block } from "./slide";
 
 interface RootState {
 	userProgress: UserProgressState;
@@ -29,9 +31,11 @@ interface CourseState {
 }
 
 interface SlidesState {
-	submissionsByCourses: { [courseId: string]: { [slideId: string]: { [submissionId: number]: SubmissionInfo } } },
+	submissionsByCourses: { [courseId: string]: { [slideId: string]: { [submissionId: number]: SubmissionInfoRedux } } },
 	submissionError: string,
 	lastCheckingResponse: RunSolutionResponse,
+	slidesByCourses: { [courseId: string]: { [slideId: string]: Block<BlockTypes>[] } },
+	slideLoading: boolean,
 	// TODO не все поля
 }
 

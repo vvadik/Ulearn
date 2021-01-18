@@ -17,12 +17,12 @@ interface Props {
 	language: Language,
 	code: string,
 	className: string,
-	isHidden: boolean,
+	hide: boolean,
 }
 
-function StaticCode({ language, code, className, isHidden, }: Props): React.ReactNode {
+function StaticCode({ language, code, className, hide, }: Props): React.ReactNode {
 	const lines = code.split('\n');
-	const [collapseEditor, showAllCode] = useState(isHidden && lines.length > 20);
+	const [collapseEditor, showAllCode] = useState(hide && lines.length > 20);
 
 	const opts = {
 		mode: CodeMirror.loadLanguageStyles(language),

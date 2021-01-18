@@ -8,6 +8,7 @@ import IControlWithText from "./IControlWithText";
 import { darkFlat } from "src/uiTheme";
 
 import ShowControlsTextContext from "./ShowControlsTextContext";
+import { isMobile } from "src/utils/getDeviceType";
 
 import styles from './Controls.less';
 
@@ -24,14 +25,15 @@ function ShowHintButton({
 }: Props): React.ReactElement {
 	const [{ showedHintsCount, isTooltipOpened }, setState] = useState(
 		{ showedHintsCount: 1, isTooltipOpened: false, });
+	const hintPosition = isMobile() ? "bottom center" : "bottom left";
 
 	return (
 		<span className={ styles.exerciseControls } onClick={ showTooltip }>
 			<span className={ styles.exerciseControlsIcon }>
 				<Tooltip
 					onCloseRequest={ closeTooltip }
-					allowedPositions={ ["bottom left"] }
-					pos={ "bottom left" }
+					allowedPositions={ [hintPosition] }
+					pos={ hintPosition }
 					trigger={ isTooltipOpened ? "opened" : "closed" }
 					render={ renderHints }
 				>
