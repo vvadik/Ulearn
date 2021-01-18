@@ -33,7 +33,7 @@ import 'codemirror/addon/hint/show-hint.css';
 import 'codemirror/addon/hint/javascript-hint';
 import 'codemirror/addon/hint/anyword-hint';
 import 'codemirror/theme/darcula.css';
-import './CodeMirrorAutocompleteExtension';
+import registerCodeMirrorHelpers from "./CodeMirrorAutocompleteExtension";
 
 import styles from './Exercise.less';
 
@@ -263,6 +263,7 @@ class Exercise extends React.Component<Props, State> {
 	}
 
 	overrideCodeMirrorAutocomplete = (): void => {
+		registerCodeMirrorHelpers();
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore because autocomplete will be added by js addon script
 		CodeMirror.commands.autocomplete = (cm: Editor) => {

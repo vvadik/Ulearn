@@ -1,12 +1,14 @@
-import CodeMirror from 'codemirror/lib/codemirror';
+import CodeMirror, { Editor, Position, Token } from 'codemirror';
 
-function forEach(arr, f) {
+function forEach<T>(arr: Array<T>, f: (_: T) => void) {
 	let i = 0;
 	const e = arr.length;
-	for (; i < e; ++i) f(arr[i]);
+	for (; i < e; ++i) {
+		f(arr[i]);
+	}
 }
 
-function arrayContains(arr, item) {
+function arrayContains<T>(arr: Array<T>, item: T) {
 	if(!Array.prototype.indexOf) {
 		let i = arr.length;
 		while (i--) {
@@ -19,22 +21,28 @@ function arrayContains(arr, item) {
 	return arr.indexOf(item) !== -1;
 }
 
-function scriptHint(editor, _keywords, getToken) {
-	let context = [];
+function scriptHint(editor: Editor, _keywords: string[], getToken: (_: Editor, __: Position) => Token) {
+	const context: Token[] = [];
 // Find the token at the cursor
 	const cur = editor.getCursor();
-	let token = getToken(editor, cur), tprop = token;
+	let token = getToken(editor, cur);
+	//	tprop = token as unknown as Record<string, unknown>;
 	// If it's not a 'word-style' token, ignore the token.
 
 	if(!/^[\w$_]*$/.test(token.string)) {
-		token = tprop = {
+		/*	tprop = {
+				start: cur.ch, end: cur.ch, string: "", state: token.state,
+				className: token.string === ":" ? "python-type" : null,
+			};*/
+		token = {
+			type: null,
 			start: cur.ch, end: cur.ch, string: "", state: token.state,
-			className: token.string === ":" ? "python-type" : null
 		};
 	}
 
-	if(!context)
-	context.push(tprop);
+	if(context) {
+		context.push(token);
+	}
 
 	let completionList = getCompletions(token, context);
 	completionList = completionList.sort();
@@ -46,7 +54,7 @@ function scriptHint(editor, _keywords, getToken) {
 	};
 }
 
-function pythonHint(editor) {
+export default function pythonHint(editor: Editor): unknown {
 	return scriptHint(editor, pythonKeywordsU, function (e, cur) {
 		return e.getTokenAt(cur);
 	});
@@ -56,7 +64,7 @@ function pythonHint(editor) {
 const pythonKeywords = "and del from not while as elif global or with assert else if pass yield"
 	+ "break except import print class exec in raise continue finally is return def for lambda try";
 const pythonKeywordsL = pythonKeywords.split(" ");
-var pythonKeywordsU = pythonKeywords.toUpperCase().split(" ");
+const pythonKeywordsU = pythonKeywords.toUpperCase().split(" ");
 
 const pythonBuiltins = "abs divmod input open staticmethod all enumerate int ord str "
 	+ "any eval isinstance pow sum basestring execfile issubclass print super"
@@ -69,14 +77,16 @@ const pythonBuiltins = "abs divmod input open staticmethod all enumerate int ord
 const pythonBuiltinsL = pythonBuiltins.split(" ").join("() ").split(" ");
 const pythonBuiltinsU = pythonBuiltins.toUpperCase().split(" ").join("() ").split(" ");
 
-function getCompletions(token, context) {
-	const found = [], start = token.string;
+function getCompletions(token: Token, context: Token[]) {
+	const found: string [] = [], start = token.string;
 
-	function maybeAdd(str) {
-		if(str.lastIndexOf(start, 0) === 0 && !arrayContains(found, str)) found.push(str);
+	function maybeAdd(str: string) {
+		if(str.lastIndexOf(start, 0) === 0 && !arrayContains(found, str)) {
+			found.push(str);
+		}
 	}
 
-	function gatherCompletions(_obj) {
+	function gatherCompletions(_obj: Record<string, unknown>) {
 		forEach(pythonBuiltinsL, maybeAdd);
 		forEach(pythonBuiltinsU, maybeAdd);
 		forEach(pythonKeywordsL, maybeAdd);
@@ -89,16 +99,23 @@ function getCompletions(token, context) {
 		const obj = context.pop();
 		let base;
 
-		if(obj.type === "variable")
+		if(!obj) {
+			return found;
+		}
+		if(obj.type === "variable") {
 			base = obj.string;
-		else if(obj.type === "variable-3")
+		} else if(obj.type === "variable-3") {
 			base = ":" + obj.string;
+		}
 
-		while (base != null && context.length)
+		while (base != null && context.length > 0) {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
 			base = base[context.pop().string];
-		if(base != null) gatherCompletions(base);
+		}
+		if(base != null) {
+			gatherCompletions(base);
+		}
 	}
 	return found;
 }
-
-CodeMirror.registerHelper("hint", "python", pythonHint);
