@@ -11,8 +11,13 @@ import LoginForContinue from "src/components/notificationModal/LoginForContinue"
 import { ThemeContext } from "ui";
 
 import classNames from 'classnames';
+import moment from "moment";
 
-import { exerciseSolutions, loadFromCache, saveToCache } from "src/utils/localStorageManager";
+import {
+	exerciseSolutions,
+	loadFromCache,
+	saveToCache,
+} from "src/utils/localStorageManager";
 
 import { Language } from "src/consts/languages";
 import { constructPathToAcceptedSolutions, } from "src/consts/routes";
@@ -45,10 +50,8 @@ import {
 	IsFirstRightAnswer, SubmissionColor,
 	SubmissionIsLast,
 } from "./ExerciseUtils";
+import { convertDefaultTimezoneToLocal } from "src/utils/momentUtils";
 
-const editThemeName = 'darcula';
-const defaultThemeName = 'default';
-const newTry = { id: -1 };
 
 interface ExerciseBlockProps {
 	languages: Language[],
@@ -138,7 +141,25 @@ interface State {
 	selfChecks: SelfCheckup[],
 }
 
+interface ExerciseCode {
+	value: string,
+	time: string,
+}
+
+function saveExerciseCodeToCache(id: string, value: string, time: string): void {
+	saveToCache<ExerciseCode>(exerciseSolutions, id, { value, time });
+}
+
+function loadExerciseCodeFromCache(id: string): ExerciseCode | undefined {
+	return loadFromCache<ExerciseCode>(exerciseSolutions, id);
+}
+
 class Exercise extends React.Component<Props, State> {
+	private readonly editThemeName = 'darcula';
+	private readonly defaultThemeName = 'default';
+	private readonly newTry = { id: -1 };
+	private readonly lastSubmissionIndex = 0;
+
 	constructor(props: Props) {
 		super(props);
 		const { exerciseInitialCode, submissions, languages, renderedHints, } = props;
@@ -189,7 +210,7 @@ class Exercise extends React.Component<Props, State> {
 		const { slideId, submissions, } = this.props;
 
 		if(submissions.length > 0) {
-			this.loadSubmissionToState(submissions[0]);
+			this.loadSubmissionToState(submissions[this.lastSubmissionIndex]);
 		} else {
 			this.loadCodeFromCache(slideId);
 		}
@@ -312,7 +333,7 @@ class Exercise extends React.Component<Props, State> {
 			lineNumbers: true,
 			scrollbarStyle: 'null',
 			lineWrapping: true,
-			theme: isEditable ? editThemeName : defaultThemeName,
+			theme: isEditable ? this.editThemeName : this.defaultThemeName,
 			readOnly: !isEditable || !isAuthenticated,
 			matchBrackets: true,
 			tabSize: 4,
@@ -472,7 +493,7 @@ class Exercise extends React.Component<Props, State> {
 		const { waitingForManualChecking } = this.props.slideProgress;
 
 		const lastSuccessSubmission = GetLastSuccessSubmission(submissions);
-		const items = [[newTry.id, texts.submissions.newTry], ...submissions.map((submission) => {
+		const items = [[this.newTry.id, texts.submissions.newTry], ...submissions.map((submission) => {
 			const caption = texts.submissions
 				.getSubmissionCaption(submission, lastSuccessSubmission === submission, waitingForManualChecking);
 			return [submission.id, caption];
@@ -484,7 +505,7 @@ class Exercise extends React.Component<Props, State> {
 					<Select
 						width={ '100%' }
 						items={ items }
-						value={ currentSubmission?.id || newTry.id }
+						value={ currentSubmission?.id || this.newTry.id }
 						onValueChange={ this.onSubmissionsSelectValueChange }
 					/>
 				</ThemeContext.Provider>
@@ -495,7 +516,7 @@ class Exercise extends React.Component<Props, State> {
 	onSubmissionsSelectValueChange = (id: unknown): void => {
 		const { submissions, } = this.props;
 
-		if(id === newTry.id) {
+		if(id === this.newTry.id) {
 			this.loadNewTry();
 		}
 		this.loadSubmissionToState(submissions.find(s => s.id === id));
@@ -1016,15 +1037,32 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	saveCodeToCache = (slideId: string, value: string): void => {
-		saveToCache(exerciseSolutions, slideId, value);
+		saveExerciseCodeToCache(slideId, value, moment().format());
 	};
 
 	loadCodeFromCache = (slideId: string): void => {
-		const code = loadFromCache(exerciseSolutions, slideId);
-		if(code !== undefined) {
+		const { submissions } = this.props;
+		const { value } = this.state;
+
+		const code = loadExerciseCodeFromCache(slideId);
+
+		if(code) {
+			let newValue = code.value;
+
+			if(submissions.length > 0) {
+				const lastSubmission = submissions[this.lastSubmissionIndex];
+				const lastSubmissionTime = convertDefaultTimezoneToLocal(lastSubmission.timestamp);
+				const codeFromCacheTime = moment(code.time);
+
+				if(lastSubmissionTime.diff(codeFromCacheTime, 'seconds') >= 0) { //if last submission is newer then last saved
+					this.saveCodeToCache(slideId, value);
+					newValue = value;
+				}
+			}
+
 			this.resetCode();
 			this.setState({
-				value: code,
+				value: newValue,
 			});
 		}
 	};
