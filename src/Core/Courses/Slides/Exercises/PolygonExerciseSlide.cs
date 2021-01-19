@@ -81,11 +81,10 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 			return new HtmlBlock($"<div class=\"tex\">{processedBody}</div>");
 		}
 
-		private static HtmlBlock GetLinkOnPdf(string courseId, string slideId)
+		private static MarkdownBlock GetLinkOnPdf(string courseId, string slideId)
 		{
 			var link = $"/Exercise/GetPdf?courseId={courseId}&slideId={slideId}";
-			var tag = $"<a href=\"{link}\">Скачать PDF</a><p></p><p></p>";
-			return new HtmlBlock(tag);
+			return new MarkdownBlock($"[Скачать условия задачи в формате PDF]({link})");
 
 		}
 	}
