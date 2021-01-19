@@ -99,8 +99,8 @@ def remove_region_on_solution(filename):
     with open(filename, 'r') as f:
         data = f.read()
 
-    data = data.replace("#pragma region Task", "")
-    data = data.replace("#pragma endregion Task", "")
+    data = re.sub('(#|\/\/)\s*(pragma\s+)?region\s+Task', '', data)
+    data = re.sub('(#|\/\/)\s*(pragma\s+)?endregion\s+Task', '', data)
 
     with open(filename, 'w') as f:
         f.write(data)
