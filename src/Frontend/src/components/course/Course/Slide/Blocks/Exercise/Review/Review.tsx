@@ -46,7 +46,7 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 		super(props);
 
 		this.state = {
-			comments: this.getCommentsOrderByStart(props.reviews)
+			comments: this.getCommentsOrderByStart([...props.reviews])
 				.map(r => ({
 					margin: 0,
 					review: r,

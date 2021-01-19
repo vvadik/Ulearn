@@ -15,7 +15,7 @@ export const resetStudentsLimits = "/students/reset-limits";
 export const accountPath = '/account/manage';
 export const signalrWS = 'ws';
 export const login = 'login';
-export const register = '/account/register';
+export const register = 'account/register';
 
 export function constructPathToSlide(courseId: string, slideId: string): string {
 	return `/${ coursePath }/${ courseId }/${ slideId }`;

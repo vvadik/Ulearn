@@ -1,5 +1,8 @@
 import BlockTypes from "../components/course/Course/Slide/blockTypes";
 import { ReactNode } from "react";
+import { Language } from "../consts/languages";
+import { SubmissionInfoRedux } from "./reduxState";
+import { AttemptsStatistics } from "./exercise";
 
 interface ShortSlideInfo {
 	id: string;
@@ -54,4 +57,15 @@ interface ExerciseBlock extends Block<BlockTypes.exercise> {
 	maxScore: number,
 }
 
-export { ShortSlideInfo, SlideType, Block, SpoilerBlock, TexBlock, VideoBlock, ExerciseBlock, };
+interface ExerciseBlockProps {
+	languages: Language[],
+	languageNames: EnumDictionary<Language, string> | null,
+	renderedHints: string[],
+	exerciseInitialCode: string,
+	hideSolutions: boolean,
+	expectedOutput: string,
+	submissions: SubmissionInfoRedux[],
+	attemptsStatistics: AttemptsStatistics
+}
+
+export { ShortSlideInfo, SlideType, Block, SpoilerBlock, TexBlock, VideoBlock, ExerciseBlock, ExerciseBlockProps, };

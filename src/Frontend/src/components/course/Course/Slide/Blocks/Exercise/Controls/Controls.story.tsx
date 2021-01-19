@@ -2,6 +2,7 @@ import React from "react";
 import type { Story } from "@storybook/react";
 
 import Controls from "./Controls";
+import texts from "../Exercise.texts";
 
 const defaultProps = {
 	isEditable: false,
@@ -36,13 +37,13 @@ const ListTemplate: Story<{ items: { props: typeof defaultProps, header: string 
 				<p>{ header }</p>
 				<Controls>
 					<Controls.SubmitButton
-						valueChanged={ props.valueChanged }
-						submissionLoading={ props.submissionLoading }
-						onSendExerciseButtonClicked={ props.onSendExerciseButtonClicked }
+						isLoading={ props.submissionLoading }
+						onClick={ props.onSendExerciseButtonClicked }
+						text={ props.isEditable ? texts.controls.submitCode.text : texts.controls.submitCode.redactor }
 					/>
 					{ props.hints.length !== 0 &&
 					<Controls.ShowHintButton
-						onAllHintsShowed={()=>{}}
+						onAllHintsShowed={ () => null }
 						renderedHints={ props.hints }
 					/> }
 					{ props.isEditable && <Controls.ResetButton onResetButtonClicked={ props.resetCodeAndCache }/> }
