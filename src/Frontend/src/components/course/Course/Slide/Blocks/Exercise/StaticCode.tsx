@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { ReactElement, useState } from 'react';
 import { UnControlled, } from "react-codemirror2";
 import { Hint, Toast } from "ui";
 import { Copy } from "icons";
@@ -20,7 +20,7 @@ interface Props {
 	hide: boolean,
 }
 
-function StaticCode({ language, code, className, hide, }: Props): React.ReactNode {
+function StaticCode({ language, code, className, hide, }: Props): React.ReactElement<Props> {
 	const lines = code.split('\n');
 	const [collapseEditor, showAllCode] = useState(hide && lines.length > 20);
 
