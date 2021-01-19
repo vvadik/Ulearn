@@ -406,7 +406,6 @@ class Exercise extends React.Component<Props, State> {
 						options={ opts }
 						value={ value }
 					/>
-					{ !isEditable && this.renderEditButton(isReview) }
 					{ exerciseCodeDoc && isReview &&
 					<Review
 						userId={ author.id }
@@ -422,9 +421,9 @@ class Exercise extends React.Component<Props, State> {
 				{/* TODO not included in current release !isEditable && currentSubmission && this.renderOverview(currentSubmission)*/ }
 				{ isAuthenticated && <Controls>
 					<Controls.SubmitButton
-						valueChanged={ valueChanged }
-						submissionLoading={ submissionLoading }
-						onSendExerciseButtonClicked={ this.sendExercise }
+						isLoading={ submissionLoading }
+						onClick={ isEditable ? this.sendExercise : this.loadNewTry }
+						text={ isEditable ? texts.controls.submitCode.text : texts.controls.submitCode.redactor }
 					/>
 					{ renderedHints.length !== 0 &&
 					<Controls.ShowHintButton
@@ -827,15 +826,6 @@ class Exercise extends React.Component<Props, State> {
 	}, {
 		className,
 	});
-
-	renderEditButton = (isReview: boolean): React.ReactElement => {
-		return (
-			<div className={ classNames(styles.editButton, { [styles.editButtonWithReviews]: isReview }) }
-				 onClick={ this.loadNewTry }>
-				{ texts.controls.edit.text }
-			</div>
-		);
-	};
 
 	resetCodeAndCache = (): void => {
 		const { slideId, exerciseInitialCode, } = this.props;
