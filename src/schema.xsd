@@ -166,12 +166,12 @@
 	</xs:complexType>
 	
 	<xs:complexType name="PolygonSlide">
-		<xs:sequence>
-			<xs:element name="scoring" type="ExerciseScoring" minOccurs="0" maxOccurs="1" />
-			<xs:element name="polygonPath" type="xs:string" maxOccurs="unbounded" minOccurs="0"/>
-			<xs:element name="markdown" type="MarkdownBlock" />
+		<xs:all>
+			<xs:element name="scoring" type="ExerciseScoring" minOccurs="0"/>
+			<xs:element name="polygonPath" type="xs:string"/>
+			<xs:element name="markdown" type="MarkdownBlock" minOccurs="0"/>
 			<xs:element name="exercise.polygon" type="PolygonExercise" />
-		</xs:sequence>
+		</xs:all>
 		<xs:attribute name="id" type="NonEmptyString" use="required">
 			<xs:annotation>
 				<xs:documentation xml:lang="en">Slide's id, should be guid</xs:documentation>
