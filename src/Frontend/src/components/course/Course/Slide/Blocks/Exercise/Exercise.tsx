@@ -268,9 +268,10 @@ class Exercise extends React.Component<Props, State> {
 				if((!automaticChecking || automaticChecking.result === CheckingResult.RightAnswer)
 					&& IsFirstRightAnswer(submissions, submission)) {
 					this.openModal({
+						type: ModalType.congrats,
 						score: lastCheckingResponse.score,
 						waitingForManualChecking: lastCheckingResponse.waitingForManualChecking,
-					} as CongratsModalData);
+					});
 				}
 			}
 		} else if(currentSubmission) {
@@ -362,7 +363,7 @@ class Exercise extends React.Component<Props, State> {
 			value, currentSubmission,
 			isEditable, exerciseCodeDoc, modalData,
 			currentReviews, showOutput, selectedReviewId, visibleCheckingResponse,
-			submissionLoading, valueChanged, isAllHintsShowed,
+			submissionLoading, isAllHintsShowed,
 		} = this.state;
 
 		const isReview = !isEditable && currentReviews.length > 0;
@@ -611,7 +612,7 @@ class Exercise extends React.Component<Props, State> {
 		});
 	};
 
-	openModal = (data: ModalData<ModalType> | null): void => {
+	openModal = <T extends ModalData<ModalType>>(data: T | null): void => {
 		this.setState({
 			modalData: data,
 		});
