@@ -23,13 +23,13 @@ import { Language } from "src/consts/languages";
 import { constructPathToAcceptedSolutions, } from "src/consts/routes";
 import {
 	AutomaticExerciseCheckingResult as CheckingResult,
-	AutomaticExerciseCheckingProcessStatus as ProcessStatus,
 	SolutionRunStatus,
 	RunSolutionResponse,
-	AttemptsStatistics, ReviewInfo,
+	ReviewInfo,
 } from "src/models/exercise";
 import { AccountState, ReviewInfoRedux, SubmissionInfoRedux } from "src/models/reduxState";
 import { SlideUserProgress } from "src/models/userProgress";
+import { ExerciseBlockProps } from "src/models/slide";
 
 import CodeMirror, { Doc, Editor, EditorChange, EditorConfiguration, TextMarker } from "codemirror";
 import 'codemirror/addon/edit/matchbrackets';
@@ -51,18 +51,6 @@ import {
 	SubmissionIsLast,
 } from "./ExerciseUtils";
 import { convertDefaultTimezoneToLocal } from "src/utils/momentUtils";
-
-
-interface ExerciseBlockProps {
-	languages: Language[],
-	languageNames: EnumDictionary<Language, string> | null,
-	renderedHints: string[],
-	exerciseInitialCode: string,
-	hideSolutions: boolean,
-	expectedOutput: string,
-	submissions: SubmissionInfoRedux[],
-	attemptsStatistics: AttemptsStatistics
-}
 
 interface DispatchFunctionsProps {
 	sendCode: (courseId: string, slideId: string, value: string, language: Language) => unknown;
