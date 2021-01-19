@@ -62,6 +62,8 @@ class ExerciseFormHeader extends React.Component<ExerciseFormHeaderProps> {
 		const { waitingForManualChecking, prohibitFurtherManualChecking, selectedSubmissionIsLastSuccess } = this.props;
 		const { automaticChecking, manualCheckingPassed, } = selectedSubmission;
 		if(automaticChecking) {
+			if (automaticChecking.output === CheckingResult.RuntimeError)
+				automaticChecking.result = CheckingResult.RuntimeError;
 			switch (automaticChecking.processStatus) {
 				case ProcessStatus.Done:
 					switch (automaticChecking.result) {
@@ -70,6 +72,8 @@ class ExerciseFormHeader extends React.Component<ExerciseFormHeaderProps> {
 								prohibitFurtherManualChecking, manualCheckingPassed, !!selectedSubmissionIsLastSuccess);
 						case CheckingResult.CompilationError:
 							return texts.compilationError;
+						case CheckingResult.RuntimeError:
+							return texts.runtimeError;
 						case CheckingResult.WrongAnswer:
 							return texts.wrongAnswer;
 						case CheckingResult.NotChecked:

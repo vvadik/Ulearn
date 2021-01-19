@@ -20,6 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Common\Common.csproj" />
 		<ProjectReference Include="..\Database.Core\Database.Core.csproj" />
 		<ProjectReference Include="..\Web.Api\Web.Api.csproj" />
 	</ItemGroup>

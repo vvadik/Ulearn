@@ -61,7 +61,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 			if (exerciseBlocksCount == 0)
 			{
 				throw new CourseLoadingException(
-					$"Не найдено блоков с упражнениями (<exercise.file>, <exercise.csproj> или <exercise.universal>) в слайде «{Title}», " +
+					$"Не найдено блоков с упражнениями (<exercise.file>, <exercise.csproj>, <exercise.universal> или <exercise.polygon>) в слайде «{Title}», " +
 					"для которого использован внешний тег <slide.exercise>. Если вы хотите создать обычный слайд без упражнения, используйте тег <slide>");
 			}
 

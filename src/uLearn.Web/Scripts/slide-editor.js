@@ -150,6 +150,14 @@ function initCodeEditor($parent) {
                 return { mode: "text/html", hint: CodeMirror.hint.html };
             case "java":
                 return { mode: "text/x-java", hint: CodeMirror.hint.java };
+			case "c":
+				return { mode: "text/x-c", hint: CodeMirror.hint.c };
+			case "cpp":
+				return { mode: "text/x-c++src", hint: CodeMirror.hint.cpp };
+			case "jsx":
+				return { mode: "text/jsx", hint: CodeMirror.hint.jsx };
+			case "haskell":
+				return { mode: "text/x-haskell", hint: CodeMirror.hint.haskell };
             default:
                 return { mode: "text/" + langId, hint: null };
         }

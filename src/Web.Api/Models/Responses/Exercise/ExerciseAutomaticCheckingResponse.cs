@@ -20,7 +20,8 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 		NotChecked,
 		CompilationError,
 		RightAnswer,
-		WrongAnswer
+		WrongAnswer,
+		RuntimeError
 	}
 
 	[DataContract]

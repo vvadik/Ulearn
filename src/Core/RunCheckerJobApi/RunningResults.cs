@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Runtime.Serialization;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 
 namespace Ulearn.Core.RunCheckerJobApi
 {
@@ -51,6 +52,9 @@ namespace Ulearn.Core.RunCheckerJobApi
 		[DataMember]
 		[CanBeNull]
 		public List<StyleError> StyleErrors { get; set; }
+
+		[DataMember]
+		public int TestNumber;
 
 		[IgnoreDataMember]
 		private readonly int? timeLimit;
@@ -106,6 +110,10 @@ namespace Ulearn.Core.RunCheckerJobApi
 					return output;
 				case Verdict.TimeLimit:
 					return output + "\n Ваше решение не успело пройти все тесты" + (timeLimit == null ? null : $" за {timeLimit} секунд"); // TODO: Окончание слова секунд сейчас рассчитано на числа, кратные 10.
+				case Verdict.WrongAnswer:
+					return output + "\n Неправильный ответ";
+				case Verdict.RuntimeError:
+					return output + "\n Ошибка времени выполнения";
 				default:
 					return output + "\n" + Verdict;
 			}

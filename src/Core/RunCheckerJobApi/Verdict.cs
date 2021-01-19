@@ -13,6 +13,7 @@
 		SandboxError = 5, // Означает ошибку чеккера при проверке, как внутри сандбокса, так и при работе самого RunCheckerJob
 		OutputLimit = 6,
 		TimeLimit = 7,
-		MemoryLimit = 8
+		MemoryLimit = 8,
+		WrongAnswer = 9
 	}
 }

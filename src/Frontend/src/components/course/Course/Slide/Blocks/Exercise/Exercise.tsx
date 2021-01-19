@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Controlled, } from "react-codemirror2";
-import { Checkbox, FLAT_THEME, Select, Toast, } from "ui";
+import { Checkbox, FLAT_THEME, Select, Toast, Tooltip } from "ui";
 import { Review } from "./Review/Review";
 import { CongratsModal } from "./CongratsModal/CongratsModal";
 import { ExerciseOutput, HasOutput } from "./ExerciseOutput/ExerciseOutput";
@@ -19,7 +19,7 @@ import {
 	saveToCache,
 } from "src/utils/localStorageManager";
 
-import { Language } from "src/consts/languages";
+import { Language, LanguageLaunchInfo } from "src/consts/languages";
 import { constructPathToAcceptedSolutions, } from "src/consts/routes";
 import {
 	AutomaticExerciseCheckingResult as CheckingResult,
@@ -50,6 +50,20 @@ import {
 	IsFirstRightAnswer, SubmissionColor,
 	SubmissionIsLast,
 } from "./ExerciseUtils";
+const editThemeName = 'darcula';
+const defaultThemeName = 'default';
+const newTry = { id: -1 };
+
+interface ExerciseBlockProps {
+	languages: Language[],
+	languageInfos: EnumDictionary<string, LanguageLaunchInfo> | null,
+	renderedHints: string[],
+	exerciseInitialCode: string,
+	hideSolutions: boolean,
+	expectedOutput: string,
+	submissions: SubmissionInfoRedux[],
+	attemptsStatistics: AttemptsStatistics
+}
 import { convertDefaultTimezoneToLocal } from "src/utils/momentUtils";
 
 interface DispatchFunctionsProps {
@@ -512,25 +526,50 @@ class Exercise extends React.Component<Props, State> {
 
 	renderLanguageSelect = (): React.ReactElement => {
 		const { language } = this.state;
-		const { languages, languageNames } = this.props;
-
+		const { languages, languageInfo: languageInfos } = this.props;
+		debugger;
 		const items = languages.map((l) => {
-			return [l, texts.getLanguageCaption(l, languageNames)];
+			return [l, texts.getLanguageLaunchInfo(l, languageInfos).compiler];
 		});
-
+		debugger;
 		return (
 			<div className={ styles.select }>
 				<ThemeContext.Provider value={ FLAT_THEME }>
-					<Select
-						width={ '100%' }
-						items={ items }
-						value={ language }
-						onValueChange={ this.onLanguageSelectValueChange }
-					/>
+					<Tooltip render={this.renderTooltip}>
+						<Select
+							width={ '100%' }
+							items={ items }
+							value={ language }
+							onValueChange={ this.onLanguageSelectValueChange }
+						/>
+					</Tooltip>
 				</ThemeContext.Provider>
 			</div>
 		);
 	};
+
+	renderTooltip = () => {
+		const { language } = this.state;
+		const { languageInfo: languageInfos } = this.props;
+		debugger;
+		const languageLaunchInfo = texts.getLanguageLaunchInfo(language, languageInfos);
+		return (
+			<div>
+				{languageLaunchInfo.compileCommand && (
+					<>
+						<h5>Компиляция: </h5>
+						<p>{languageLaunchInfo.compileCommand}</p>
+					</>
+				)}
+				{languageLaunchInfo.runCommand && (
+					<>
+						<h5>Запуск: </h5>
+						<p>{languageLaunchInfo.runCommand}</p>
+					</>
+				)}
+			</div>
+		);
+	}
 
 	onLanguageSelectValueChange = (l: unknown): void => {
 		this.setState({ language: l as Language });

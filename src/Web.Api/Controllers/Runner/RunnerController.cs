@@ -15,6 +15,7 @@ using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Metrics;
 using Ulearn.Core.RunCheckerJobApi;
 using Ulearn.Web.Api.Controllers.Slides;
@@ -101,25 +102,34 @@ namespace Ulearn.Web.Api.Controllers.Runner
 			}
 
 			log.Info($"Собираю для отправки в RunCsJob решение {submission.Id}");
+			var slide = (await courseManager.FindCourseAsync(submission.CourseId))?.FindSlideById(submission.SlideId, true);
 
-			var exerciseSlide = (await courseManager.FindCourseAsync(submission.CourseId))?.FindSlideById(submission.SlideId, true) as ExerciseSlide;
-			if (exerciseSlide == null)
-				return new FileRunnerSubmission
-				{
-					Id = submission.Id.ToString(),
-					Code = "// no slide anymore",
-					Input = "",
-					NeedRun = true
-				};
+			if (slide is ExerciseSlide exerciseSlide)
+			{
+				log.Info($"Ожидаю, если курс {submission.CourseId} заблокирован");
+				courseManager.WaitWhileCourseIsLocked(submission.CourseId);
+				log.Info($"Курс {submission.CourseId} разблокирован");
 
-			log.Info($"Ожидаю, если курс {submission.CourseId} заблокирован");
-			courseManager.WaitWhileCourseIsLocked(submission.CourseId);
-			log.Info($"Курс {submission.CourseId} разблокирован");
+				if (exerciseSlide is PolygonExerciseSlide)
+					return ((PolygonExerciseBlock)exerciseSlide.Exercise).CreateSubmission(
+						submission.Id.ToString(),
+						submission.SolutionCode.Text,
+						submission.Language
+					);
 
-			return exerciseSlide.Exercise.CreateSubmission(
-				submission.Id.ToString(),
-				submission.SolutionCode.Text
-			);
+				return exerciseSlide.Exercise.CreateSubmission(
+					submission.Id.ToString(),
+					submission.SolutionCode.Text
+				);
+			}
+
+			return new FileRunnerSubmission
+			{
+				Id = submission.Id.ToString(),
+				Code = "// no slide anymore",
+				Input = "",
+				NeedRun = true
+			};
 		}
 
 		/// <summary>

@@ -96,7 +96,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				return NotFound(new ErrorResponse("Slide not found"));
 
 			var result = await CheckSolution(
-				courseId, exerciseSlide, code, User.Identity.GetUserId(), User.Identity.Name,
+				courseId, exerciseSlide, code, language, User.Identity.GetUserId(), User.Identity.Name,
 				waitUntilChecked: true, saveSubmissionOnCompileErrors: false
 			).ConfigureAwait(false);
 
@@ -120,7 +120,15 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			return result;
 		}
 
-		private async Task<RunSolutionResponse> CheckSolution(string courseId, ExerciseSlide exerciseSlide, string userCode, string userId, string userName, bool waitUntilChecked, bool saveSubmissionOnCompileErrors)
+		private async Task<RunSolutionResponse> CheckSolution(string courseId, 
+			ExerciseSlide exerciseSlide,
+			string userCode, 
+			Language language,
+			string userId,
+			string userName,
+			bool waitUntilChecked, 
+			bool saveSubmissionOnCompileErrors
+			)
 		{
 			var exerciseMetricId = GetExerciseMetricId(courseId, exerciseSlide);
 			metricSender.SendCount("exercise.try");
@@ -143,9 +151,9 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			}
 
 			var compilationErrorMessage = buildResult.HasErrors ? buildResult.ErrorMessage : null;
-			var submissionLanguage = exerciseBlock.Language.Value;
 			var submissionSandbox = (exerciseBlock as UniversalExerciseBlock)?.DockerImageName;
-			var hasAutomaticChecking = submissionLanguage.HasAutomaticChecking() && (submissionLanguage == Language.CSharp || exerciseBlock is UniversalExerciseBlock);
+			var hasAutomaticChecking = language.HasAutomaticChecking() && (language == Language.CSharp || exerciseBlock is UniversalExerciseBlock) 
+				|| exerciseBlock is PolygonExerciseBlock && PolygonExerciseBlock.LanguagesInfo.ContainsKey(language);
 			var automaticCheckingStatus = hasAutomaticChecking
 				? buildResult.HasErrors
 					? AutomaticExerciseCheckingStatus.Done
@@ -160,7 +168,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				userId,
 				"uLearn",
 				GenerateSubmissionName(exerciseSlide, userName),
-				submissionLanguage,
+				language,
 				submissionSandbox,
 				hasAutomaticChecking,
 				automaticCheckingStatus

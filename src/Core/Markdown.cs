@@ -106,7 +106,7 @@ namespace Ulearn.Core
 
 		private class ExtendedMarkdownDeep : MarkdownDeep.Markdown
 		{
-			private readonly Regex fileLinkRegex = new Regex(@".*(StudentZip.*|\.(zip|pdf)$)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+			private readonly Regex fileLinkRegex = new Regex(@".*(StudentZip.*|GetPdf.*|\.(zip|pdf)$)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 			public override void OnPrepareLink(HtmlTag tag)
 			{
 				base.OnPrepareLink(tag);

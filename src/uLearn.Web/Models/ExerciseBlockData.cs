@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
 using Database.Models;
+using Ulearn.Common;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 
@@ -58,6 +60,14 @@ namespace uLearn.Web.Models
 		public ManualExerciseChecking ManualChecking { get; set; }
 		public List<string> TopUserReviewComments { get; set; }
 		public List<string> TopOtherUsersReviewComments { get; set; }
+		public Language? Language
+		{
+			get
+			{
+				var lastSubmission = Submissions.OrderByDescending(s => s.Timestamp).FirstOrDefault();
+				return lastSubmission?.Language ?? Slide.Exercise.Language;
+			}
+		}
 	}
 
 	public enum ExerciseReviewState
