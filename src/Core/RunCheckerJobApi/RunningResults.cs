@@ -53,6 +53,9 @@ namespace Ulearn.Core.RunCheckerJobApi
 		[CanBeNull]
 		public List<StyleError> StyleErrors { get; set; }
 
+		[DataMember]
+		public int TestNumber;
+
 		[IgnoreDataMember]
 		private readonly int? timeLimit;
 
@@ -60,9 +63,6 @@ namespace Ulearn.Core.RunCheckerJobApi
 		{
 		}
 
-		public int TestNumber;
-
-		[JsonConstructor]
 		public RunningResults(string id, Verdict verdict, int? timeLimit = null, string compilationOutput = "", string output = "", string error = "", float? points = null, List<StyleError> styleErrors = null)
 		{
 			Id = id;
