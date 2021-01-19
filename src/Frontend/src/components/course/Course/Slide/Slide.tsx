@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Video, Exercise, Text, Image, BlocksWrapper, Spoiler, StaticCode, } from "./Blocks";
+import { BlocksWrapper, Exercise, Image, Spoiler, StaticCode, Text, Video, } from "./Blocks";
 import CourseLoader from "src/components/course/Course/CourseLoader/CourseLoader.js";
 
 import { loadSlide } from "src/actions/course.js";
@@ -8,10 +8,7 @@ import { connect } from "react-redux";
 import classNames from 'classnames';
 import queryString from "query-string";
 
-import {
-	Block, ExerciseBlock,
-	ShortSlideInfo, SpoilerBlock, TexBlock, VideoBlock,
-} from "src/models/slide";
+import { Block, ExerciseBlock, ShortSlideInfo, SpoilerBlock, TexBlock, VideoBlock, } from "src/models/slide";
 import { RootState } from "src/models/reduxState";
 import MatchType from "src/consts/router";
 import BlockTypes from "src/components/course/Course/Slide/blockTypes";
@@ -176,7 +173,6 @@ class Slide extends React.Component<Props> {
 
 		for (const [i, block] of slideBlocks.entries()) {
 			const type = block.$type;
-			// eslint-disable-next-line default-case
 			switch (type) {
 				case BlockTypes.tex: {
 					const texBlock = block as TexBlock;
@@ -264,11 +260,9 @@ class Slide extends React.Component<Props> {
 		hide = false,
 		...props
 	}: Block<BlockTypes>): BlockToRender => {
-		const typeInLowerCase = $type.toLowerCase() as BlockTypes;
-
 		return {
-			Block: mapTypeToBlock[typeInLowerCase],
-			fullSizeBlock: fullSizeBlockTypes[typeInLowerCase],
+			Block: mapTypeToBlock[$type],
+			fullSizeBlock: fullSizeBlockTypes[$type],
 			hide,
 			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 			// @ts-ignore
@@ -276,7 +270,7 @@ class Slide extends React.Component<Props> {
 		};
 	};
 
-	mapBlockToComponent = ({ Block, props, }: BlockToRender, index: number,
+	mapBlockToComponent = ({ Block, props, hide, }: BlockToRender, index: number,
 		arr: BlockToRender[]
 	) => {
 		const className = classNames(
@@ -285,7 +279,7 @@ class Slide extends React.Component<Props> {
 		);
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		return <Block key={ index } className={ className } { ...props }/>;
+		return <Block key={ index } className={ className } hide={ hide } { ...props }/>;
 	};
 }
 

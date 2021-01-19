@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from 'react';
+import React, { useState } from 'react';
 import { UnControlled, } from "react-codemirror2";
 import { Hint, Toast } from "ui";
 import { Copy } from "icons";
