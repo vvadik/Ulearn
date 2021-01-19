@@ -13,6 +13,7 @@ namespace AntiPlagiarism.Web.Extensions
 			{
 				AntiplagiarismId = submission.Id,
 				TaskId = submission.TaskId,
+				Language = submission.Language,
 				AuthorId = submission.AuthorId,
 				Code = submission.ProgramText.TrimStart(),
 				AdditionalInfo = submission.AdditionalInfo,

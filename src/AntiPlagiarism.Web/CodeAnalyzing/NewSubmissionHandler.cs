@@ -45,8 +45,8 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 				return false;
 			try
 			{
-				if (await NeedToRecalculateTaskStatistics(handledSubmission.ClientId, handledSubmission.TaskId).ConfigureAwait(false))
-					await CalculateTaskStatisticsParametersAsync(handledSubmission.ClientId, handledSubmission.TaskId).ConfigureAwait(false);
+				if (await NeedToRecalculateTaskStatistics(handledSubmission.ClientId, handledSubmission.TaskId, handledSubmission.Language).ConfigureAwait(false))
+					await CalculateTaskStatisticsParametersAsync(handledSubmission.ClientId, handledSubmission.TaskId, handledSubmission.Language).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
@@ -72,12 +72,12 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 		   Если он равен, например, 1000, то параметры будут пересчитываться после каждого тысячного решения по этой задаче.
 		   Если решений пока меньше 1000, то параметры будут пересчитываться после 1-го, 2-го, 4-го, 8-го, 16-го, 32-го решения и так далее.
 		 */
-		private async Task<bool> NeedToRecalculateTaskStatistics(int clientId, Guid taskId)
+		private async Task<bool> NeedToRecalculateTaskStatistics(int clientId, Guid taskId, Language language)
 		{
-			var submissionsCount = await submissionsRepo.GetSubmissionsCountAsync(clientId, taskId).ConfigureAwait(false);
-			var oldSubmissionsCount = (await tasksRepo.FindTaskStatisticsParametersAsync(taskId).ConfigureAwait(false))?.SubmissionsCount ?? 0;
+			var submissionsCount = await submissionsRepo.GetSubmissionsCountAsync(clientId, taskId, language).ConfigureAwait(false);
+			var oldSubmissionsCount = (await tasksRepo.FindTaskStatisticsParametersAsync(taskId, language).ConfigureAwait(false))?.SubmissionsCount ?? 0;
 			var recalculateStatisticsAfterSubmissionsCount = configuration.AntiPlagiarism.StatisticsAnalyzing.RecalculateStatisticsAfterSubmissionsCount;
-			log.Info($"Определяю, надо ли пересчитать статистические параметры задачи (TaskStatisticsParameters, параметры Mean и Deviation), задача {taskId}. " +
+			log.Info($"Определяю, надо ли пересчитать статистические параметры задачи (TaskStatisticsParameters, параметры Mean и Deviation), задача {taskId}, язык {language}. " +
 									$"Старое количество решений {oldSubmissionsCount}, новое {submissionsCount}, параметр recalculateStatisticsAfterSubmisionsCount={recalculateStatisticsAfterSubmissionsCount}.");
 
 			if (submissionsCount < recalculateStatisticsAfterSubmissionsCount)
@@ -93,7 +93,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 		}
 
 		/// <returns>List of weights (numbers from [0, 1)) used for calculating mean and deviation for this task</returns>
-		public async Task<List<double>> CalculateTaskStatisticsParametersAsync(int clientId, Guid taskId)
+		public async Task<List<double>> CalculateTaskStatisticsParametersAsync(int clientId, Guid taskId, Language language)
 		{
 			/* Create local repo for preventing memory leaks */
 			using (var scope = serviceScopeFactory.CreateScope())
@@ -102,16 +102,17 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 				var tasksRepo = scope.ServiceProvider.GetService<ITasksRepo>();
 				var statisticsParametersFinder = scope.ServiceProvider.GetService<StatisticsParametersFinder>();
 
-				log.Info($"Пересчитываю статистические параметры задачи (TaskStatisticsParameters) по задаче {taskId}");
-				var lastAuthorsIds = await localSubmissionsRepo.GetLastAuthorsByTaskAsync(clientId, taskId, configuration.AntiPlagiarism.StatisticsAnalyzing.CountOfLastAuthorsForCalculatingMeanAndDeviation).ConfigureAwait(false);
-				var lastSubmissions = await localSubmissionsRepo.GetLastSubmissionsByAuthorsForTaskAsync(clientId, taskId, lastAuthorsIds).ConfigureAwait(false);
-				var currentSubmissionsCount = await localSubmissionsRepo.GetSubmissionsCountAsync(clientId, taskId).ConfigureAwait(false);
+				log.Info($"Пересчитываю статистические параметры задачи (TaskStatisticsParameters) по задаче {taskId} на языке {language}");
+				var lastAuthorsIds = await localSubmissionsRepo.GetLastAuthorsByTaskAsync(clientId, taskId, language, configuration.AntiPlagiarism.StatisticsAnalyzing.CountOfLastAuthorsForCalculatingMeanAndDeviation).ConfigureAwait(false);
+				var lastSubmissions = await localSubmissionsRepo.GetLastSubmissionsByAuthorsForTaskAsync(clientId, taskId, language, lastAuthorsIds).ConfigureAwait(false);
+				var currentSubmissionsCount = await localSubmissionsRepo.GetSubmissionsCountAsync(clientId, taskId, language).ConfigureAwait(false);
 
 				var (taskStatisticsSourceData, statisticsParameters) = await statisticsParametersFinder.FindStatisticsParametersAsync(lastSubmissions).ConfigureAwait(false);
-				log.Info($"Новые статистические параметры задачи (TaskStatisticsParameters) по задаче {taskId}: Mean={statisticsParameters.Mean}, Deviation={statisticsParameters.Deviation}");
+				log.Info($"Новые статистические параметры задачи (TaskStatisticsParameters) по задаче {taskId} на языке {language}: Mean={statisticsParameters.Mean}, Deviation={statisticsParameters.Deviation}");
 				statisticsParameters.TaskId = taskId;
 				statisticsParameters.SubmissionsCount = currentSubmissionsCount;
 				statisticsParameters.Timestamp = DateTime.Now;
+				statisticsParameters.Language = language;
 
 				await tasksRepo.SaveTaskStatisticsParametersAsync(statisticsParameters, taskStatisticsSourceData).ConfigureAwait(false);
 

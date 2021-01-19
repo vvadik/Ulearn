@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using JetBrains.Annotations;
+using Ulearn.Common;
 
 namespace AntiPlagiarism.Web.Database.Models
 {
@@ -9,6 +10,8 @@ namespace AntiPlagiarism.Web.Database.Models
 	{
 		[Key]
 		public Guid TaskId { get; set; }
+		[Key]
+		public Language Language { get; set; }
 
 		public double Mean { get; set; }
 

@@ -6,6 +6,7 @@ using System.Transactions;
 using AntiPlagiarism.Api.Models.Results;
 using AntiPlagiarism.Web.Database.Models;
 using Microsoft.EntityFrameworkCore;
+using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Extensions;
 
@@ -14,7 +15,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 	public interface IMostSimilarSubmissionsRepo
 	{
 		Task SaveMostSimilarSubmissionAsync(MostSimilarSubmission mostSimilarSubmission);
-		Task<List<MostSimilarSubmissions>> GetMostSimilarSubmissionsByTaskAsync(int clientId, Guid taskId);
+		Task<List<MostSimilarSubmissions>> GetMostSimilarSubmissionsByTaskAsync(int clientId, Guid taskId, Language language);
 	}
 
 	public class MostSimilarSubmissionsRepo : IMostSimilarSubmissionsRepo
@@ -36,12 +37,12 @@ namespace AntiPlagiarism.Web.Database.Repos
 			}
 		}
 
-		public async Task<List<MostSimilarSubmissions>> GetMostSimilarSubmissionsByTaskAsync(int clientId, Guid taskId)
+		public async Task<List<MostSimilarSubmissions>> GetMostSimilarSubmissionsByTaskAsync(int clientId, Guid taskId, Language language)
 		{
 			using (var scope = new TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions { IsolationLevel = IsolationLevel.ReadUncommitted }, TransactionScopeAsyncFlowOption.Enabled))
 			{
 				var resultsWithRepeatingAuthors = await db.MostSimilarSubmissions
-					.Where(s => s.Submission.ClientId == clientId && s.Submission.TaskId == taskId)
+					.Where(s => s.Submission.ClientId == clientId && s.Submission.TaskId == taskId && s.Submission.Language == language)
 					.Select(s => new
 					{
 						SubmissionId = s.Submission.ClientSubmissionId,

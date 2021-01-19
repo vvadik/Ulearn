@@ -154,10 +154,10 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 					suspicionSubmissionIds.Contains(o.SubmissionId)
 			)).GroupBy(o => o.SnippetId).ToDictionary(kvp => kvp.Key, kvp => kvp.ToList());
 
-			var snippetsStatistics = await snippetsRepo.GetSnippetsStatisticsAsync(submission.ClientId, submission.TaskId, snippetsIds).ConfigureAwait(false);
+			var snippetsStatistics = await snippetsRepo.GetSnippetsStatisticsAsync(submission.ClientId, submission.TaskId, submission.Language, snippetsIds).ConfigureAwait(false);
 
 			var matchedSnippets = new DefaultDictionary<int, List<MatchedSnippet>>();
-			var authorsCount = await submissionsRepo.GetAuthorsCountAsync(submission.ClientId, submission.TaskId, submissionInfluenceLimitInMonths).ConfigureAwait(false);
+			var authorsCount = await submissionsRepo.GetAuthorsCountAsync(submission.ClientId, submission.TaskId, submission.Language, submissionInfluenceLimitInMonths).ConfigureAwait(false);
 			foreach (var snippetOccurrence in snippetsOccurrences)
 			{
 				var otherOccurrences = allOtherOccurrences.GetOrDefault(snippetOccurrence.SnippetId, new List<SnippetOccurence>());

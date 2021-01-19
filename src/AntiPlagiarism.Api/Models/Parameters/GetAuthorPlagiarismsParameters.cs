@@ -2,6 +2,7 @@
 using AntiPlagiarism.Api.Defaults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Ulearn.Common;
 
 namespace AntiPlagiarism.Api.Models.Parameters
 {
@@ -14,6 +15,10 @@ namespace AntiPlagiarism.Api.Models.Parameters
 		[BindRequired]
 		[FromQuery(Name = "task_id")]
 		public Guid TaskId { get; set; }
+		
+		[BindRequired]
+		[FromQuery(Name = "language")]
+		public Language Language { get; set; }
 
 		[FromQuery(Name = "last_submissions_count")]
 		public int LastSubmissionsCount { get; set; } = GetAuthorPlagiarismsDefaults.LastSubmissionsCount;
