@@ -1,7 +1,5 @@
-import katex from 'katex';
-
 import "katex/dist/katex.min.css";
-import renderMathInElement from 'katex/dist/contrib/auto-render'
+import renderMathInElement from 'katex/dist/contrib/auto-render.js';
 
 export default function translateTextToKatex(element: HTMLElement, additionalSettings: Record<string, unknown>): void {
 	const text = element.innerText;
@@ -11,19 +9,20 @@ export default function translateTextToKatex(element: HTMLElement, additionalSet
 		renderMathInElement(
 			element,
 			{
-				delimiters: [
-					{left: "$$", right: "$$", display: true},
-					{left: "\\[", right: "\\]", display: true},
-					{left: "$", right: "$", display: false},
-					{left: "\\(", right: "\\)", display: false}
-				]
+				...additionalSettings,
+				...defaultSetting,
 			}
 		);
 	}
 }
 
 const defaultSetting = {
-	throwOnError: false,
+	delimiters: [
+		{ left: "$$", right: "$$", display: true },
+		{ left: "\\[", right: "\\]", display: true },
+		{ left: "$", right: "$", display: false },
+		{ left: "\\(", right: "\\)", display: false }
+	],
 };
 
 const katexTransformed = 'katex';

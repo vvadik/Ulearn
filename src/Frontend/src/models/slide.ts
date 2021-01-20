@@ -1,6 +1,6 @@
 import BlockTypes from "../components/course/Course/Slide/blockTypes";
 import { ReactNode } from "react";
-import { Language } from "../consts/languages";
+import { Language, LanguageLaunchInfo } from "../consts/languages";
 import { SubmissionInfoRedux } from "./reduxState";
 import { AttemptsStatistics } from "./exercise";
 
@@ -59,7 +59,7 @@ interface ExerciseBlock extends Block<BlockTypes.exercise> {
 
 interface ExerciseBlockProps {
 	languages: Language[],
-	languageNames: EnumDictionary<Language, string> | null,
+	languageInfo: EnumDictionary<Language, LanguageLaunchInfo> | null,
 	renderedHints: string[],
 	exerciseInitialCode: string,
 	hideSolutions: boolean,

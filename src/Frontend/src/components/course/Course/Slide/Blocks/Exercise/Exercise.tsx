@@ -50,20 +50,7 @@ import {
 	IsFirstRightAnswer, SubmissionColor,
 	SubmissionIsLast,
 } from "./ExerciseUtils";
-const editThemeName = 'darcula';
-const defaultThemeName = 'default';
-const newTry = { id: -1 };
 
-interface ExerciseBlockProps {
-	languages: Language[],
-	languageInfos: EnumDictionary<string, LanguageLaunchInfo> | null,
-	renderedHints: string[],
-	exerciseInitialCode: string,
-	hideSolutions: boolean,
-	expectedOutput: string,
-	submissions: SubmissionInfoRedux[],
-	attemptsStatistics: AttemptsStatistics
-}
 import { convertDefaultTimezoneToLocal } from "src/utils/momentUtils";
 
 interface DispatchFunctionsProps {
@@ -526,16 +513,14 @@ class Exercise extends React.Component<Props, State> {
 
 	renderLanguageSelect = (): React.ReactElement => {
 		const { language } = this.state;
-		const { languages, languageInfo: languageInfos } = this.props;
-		debugger;
+		const { languages, languageInfo } = this.props;
 		const items = languages.map((l) => {
-			return [l, texts.getLanguageLaunchInfo(l, languageInfos).compiler];
+			return [l, texts.getLanguageLaunchInfo(l, languageInfo).compiler];
 		});
-		debugger;
 		return (
 			<div className={ styles.select }>
 				<ThemeContext.Provider value={ FLAT_THEME }>
-					<Tooltip render={this.renderTooltip}>
+					<Tooltip render={ this.renderTooltip }>
 						<Select
 							width={ '100%' }
 							items={ items }
@@ -548,28 +533,27 @@ class Exercise extends React.Component<Props, State> {
 		);
 	};
 
-	renderTooltip = () => {
+	renderTooltip = (): React.ReactElement => {
 		const { language } = this.state;
-		const { languageInfo: languageInfos } = this.props;
-		debugger;
-		const languageLaunchInfo = texts.getLanguageLaunchInfo(language, languageInfos);
+		const { languageInfo } = this.props;
+		const languageLaunchInfo = texts.getLanguageLaunchInfo(language, languageInfo);
 		return (
 			<div>
-				{languageLaunchInfo.compileCommand && (
+				{ languageLaunchInfo.compileCommand && (
 					<>
 						<h5>Компиляция: </h5>
-						<p>{languageLaunchInfo.compileCommand}</p>
+						<p>{ languageLaunchInfo.compileCommand }</p>
 					</>
-				)}
-				{languageLaunchInfo.runCommand && (
+				) }
+				{ languageLaunchInfo.runCommand && (
 					<>
 						<h5>Запуск: </h5>
-						<p>{languageLaunchInfo.runCommand}</p>
+						<p>{ languageLaunchInfo.runCommand }</p>
 					</>
-				)}
+				) }
 			</div>
 		);
-	}
+	};
 
 	onLanguageSelectValueChange = (l: unknown): void => {
 		this.setState({ language: l as Language });
@@ -764,11 +748,11 @@ class Exercise extends React.Component<Props, State> {
 			case ModalType.congrats: {
 				const { score, waitingForManualChecking, } = modalData as CongratsModalData;
 				return (
-					score && waitingForManualChecking &&
+					score &&
 					<CongratsModal
 						showAcceptedSolutions={ !waitingForManualChecking && !hideSolutions }
 						score={ score }
-						waitingForManualChecking={ waitingForManualChecking }
+						waitingForManualChecking={ waitingForManualChecking || false }
 						onClose={ this.closeModal }
 					/>
 				);
