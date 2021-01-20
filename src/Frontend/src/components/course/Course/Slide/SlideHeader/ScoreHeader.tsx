@@ -55,14 +55,14 @@ const ScoreHeaderInternal = (props: PropsFromRedux & ScoreHeaderProps) => {
 				{ texts.getSlideScore(score, maxScore, !isSkipped) }
 			</span>
 			{ message && <span className={ styles.headerStatusText }>{ message }</span> }
-			{ showStudentSubmissions && <a onClick={ () => showModal(true) } className={ styles.headerLinkText }>
+			{ showStudentSubmissions && <a onClick={ openModal } className={ styles.headerLinkText }>
 				{ texts.showAcceptedSolutionsText }
 			</a> }
 			{ isModalShowed &&
 			<DownloadedHtmlContent
 				url={ constructPathToStudentSubmissions(courseId, slideId) }
 				injectInWrapperAfterContentReady={ (html: React.ReactNode) =>
-					<Modal width={ modalWidth } onClose={ () => showModal(false) }>
+					<Modal width={ modalWidth } onClose={ closeModal }>
 						<Modal.Header>
 							<h2>
 								{ texts.showAcceptedSolutionsHeaderText }
@@ -75,6 +75,14 @@ const ScoreHeaderInternal = (props: PropsFromRedux & ScoreHeaderProps) => {
 			}
 		</div>
 	);
+
+	function closeModal() {
+		showModal(false);
+	}
+
+	function openModal() {
+		showModal(true);
+	}
 };
 
 interface ScoreHeaderProps {
