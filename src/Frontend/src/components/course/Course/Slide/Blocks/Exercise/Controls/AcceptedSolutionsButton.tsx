@@ -2,7 +2,6 @@ import React, { createRef, RefObject } from "react";
 
 import { Button, Modal, Tooltip } from "ui";
 import { EyeOpened } from "icons";
-import ShowAfterDelay from "src/components/ShowAfterDelay/ShowAfterDelay";
 import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent.js";
 import IControlWithText from "./IControlWithText";
 
@@ -102,17 +101,19 @@ export default class AcceptedSolutionsButton
 		const { acceptedSolutionsUrl, } = this.props;
 
 		return (
-			<ShowAfterDelay>
-				<Modal onClose={ this.closeAcceptedSolutions }>
-					<Modal.Header>
-						{ texts.acceptedSolutions.title }
-					</Modal.Header>
-					<Modal.Body>
-						{ texts.acceptedSolutions.content }
-						<DownloadedHtmlContent url={ acceptedSolutionsUrl }/>
-					</Modal.Body>
-				</Modal>
-			</ShowAfterDelay>
+			<DownloadedHtmlContent
+				url={ acceptedSolutionsUrl }
+				injectInWrapperAfterContentReady={ (html: React.ReactNode) =>
+					<Modal onClose={ this.closeAcceptedSolutions }>
+						<Modal.Header>
+							{ texts.acceptedSolutions.title }
+						</Modal.Header>
+						<Modal.Body>
+							{ texts.acceptedSolutions.content }
+							{ html }
+						</Modal.Body>
+					</Modal> }
+			/>
 		);
 	};
 }
