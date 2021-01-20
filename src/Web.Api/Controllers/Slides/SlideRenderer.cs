@@ -133,7 +133,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 
 		private static async Task<IEnumerable<IApiSlideBlock>> RenderBlock(MarkdownBlock mb, SlideRenderContext context)
 		{
-			var renderedMarkdown = mb.RenderMarkdown(context.CourseId, context.Slide.Id, context.BaseUrl);
+			var renderedMarkdown = mb.RenderMarkdown(context.CourseId, context.Slide, context.BaseUrl);
 			var parsedBlocks = ParseBlocksFromMarkdown(renderedMarkdown);
 			if (mb.Hide)
 				parsedBlocks.ForEach(b => b.Hide = true);

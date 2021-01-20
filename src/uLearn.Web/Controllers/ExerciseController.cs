@@ -553,13 +553,10 @@ namespace uLearn.Web.Controllers
 		}
 
 		[System.Web.Mvc.AllowAnonymous]
-		public ActionResult StudentZip(string courseId, Guid? slideId)
+		public ActionResult StudentZip(string courseId, Guid slideId)
 		{
-			if (!slideId.HasValue)
-				return HttpNotFound();
-
 			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
-			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId.Value, isInstructor);
+			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId, isInstructor);
 			if (!(slide is ExerciseSlide))
 				return HttpNotFound();
 
