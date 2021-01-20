@@ -84,10 +84,6 @@
     font-size: @tabletFontSize;
   }
 
-  .exerciseControls {
-    font-size: @tabletFontSize;
-  }
-
   .hintsWrapper {
     max-width: @tabletSlideWidth * @maxHintsWrapperWidthMultiplier;
     padding-left: @hintsLeftPadding + 2px;
@@ -107,5 +103,9 @@
 @media (min-width: @minDesktopWidth) {
   .hintsWrapper {
     max-width: @desktopSlideWidth * @maxHintsWrapperWidthMultiplier;
+  }
+
+  .exerciseControls {
+    font-size: @tabletFontSize;
   }
 }
