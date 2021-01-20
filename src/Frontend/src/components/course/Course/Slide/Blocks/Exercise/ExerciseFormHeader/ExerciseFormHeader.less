@@ -10,7 +10,7 @@
   font-style: normal;
   font-weight: normal;
 
-  font-size: 16px;
+  font-size: @mobileFontSize;
   line-height: 22px;
 
   border-radius: 8px 8px 0 0;
@@ -33,4 +33,22 @@
   .header;
   background: @accentColor;
   color: @white;
+}
+
+@media (min-width: @minTabletWidth) {
+  .header {
+    font-size: @tabletFontSize;
+  }
+
+  .successHeader {
+    font-size: @tabletFontSize;
+  }
+
+  .errorHeader {
+    font-size: @tabletFontSize;
+  }
+
+  .needImprovementsHeader {
+    font-size: @tabletFontSize;
+  }
 }

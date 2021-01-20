@@ -10,7 +10,7 @@
 }
 
 .exerciseControls {
-  font-size: 16px;
+  font-size: @mobileFontSize;
   line-height: 22px;
   color: @linkColor;
   user-select: none;
@@ -27,6 +27,7 @@
 }
 
 .exerciseControlsIcon {
+  font-size: @tabletFontSize;
   margin-right: 4px;
 }
 
@@ -44,6 +45,8 @@
   position: relative;
 
   list-style-type: none;
+
+  font-size: @mobileFontSize;
 }
 
 .hintsWrapper li:not(:last-child) {
@@ -54,7 +57,7 @@
   position: absolute;
   left: -@hintsLeftPadding - 2px;
 
-  font-size: 14px;
+  font-size: @tabletFontSize;
   line-height: 20px;
   color: @accentColor;
 }
@@ -77,12 +80,20 @@
 }
 
 @media (min-width: @minTabletWidth) {
+  .hintsWrapper li {
+    font-size: @tabletFontSize;
+  }
+
+  .exerciseControls {
+    font-size: @tabletFontSize;
+  }
+
   .hintsWrapper {
     max-width: @tabletSlideWidth * @maxHintsWrapperWidthMultiplier;
     padding-left: @hintsLeftPadding + 2px;
   }
 
-  .hintBulb{
+  .hintBulb {
     left: -@hintsLeftPadding - 4px;
   }
 }
