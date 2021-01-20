@@ -11,20 +11,25 @@ import LoginForContinue from "src/components/notificationModal/LoginForContinue"
 import { ThemeContext } from "ui";
 
 import classNames from 'classnames';
+import moment from "moment";
 
-import { exerciseSolutions, loadFromCache, saveToCache } from "src/utils/localStorageManager";
+import {
+	exerciseSolutions,
+	loadFromCache,
+	saveToCache,
+} from "src/utils/localStorageManager";
 
 import { Language, LanguageLaunchInfo } from "src/consts/languages";
 import { constructPathToAcceptedSolutions, } from "src/consts/routes";
 import {
 	AutomaticExerciseCheckingResult as CheckingResult,
-	AutomaticExerciseCheckingProcessStatus as ProcessStatus,
 	SolutionRunStatus,
 	RunSolutionResponse,
-	AttemptsStatistics, ReviewInfo,
+	ReviewInfo,
 } from "src/models/exercise";
 import { AccountState, ReviewInfoRedux, SubmissionInfoRedux } from "src/models/reduxState";
 import { SlideUserProgress } from "src/models/userProgress";
+import { ExerciseBlockProps } from "src/models/slide";
 
 import CodeMirror, { Doc, Editor, EditorChange, EditorConfiguration, TextMarker } from "codemirror";
 import 'codemirror/addon/edit/matchbrackets';
@@ -46,20 +51,7 @@ import {
 	SubmissionIsLast,
 } from "./ExerciseUtils";
 
-const editThemeName = 'darcula';
-const defaultThemeName = 'default';
-const newTry = { id: -1 };
-
-interface ExerciseBlockProps {
-	languages: Language[],
-	languageInfos: EnumDictionary<string, LanguageLaunchInfo> | null,
-	renderedHints: string[],
-	exerciseInitialCode: string,
-	hideSolutions: boolean,
-	expectedOutput: string,
-	submissions: SubmissionInfoRedux[],
-	attemptsStatistics: AttemptsStatistics
-}
+import { convertDefaultTimezoneToLocal } from "src/utils/momentUtils";
 
 interface DispatchFunctionsProps {
 	sendCode: (courseId: string, slideId: string, value: string, language: Language) => unknown;
@@ -138,7 +130,25 @@ interface State {
 	selfChecks: SelfCheckup[],
 }
 
+interface ExerciseCode {
+	value: string,
+	time: string,
+}
+
+function saveExerciseCodeToCache(id: string, value: string, time: string): void {
+	saveToCache<ExerciseCode>(exerciseSolutions, id, { value, time });
+}
+
+function loadExerciseCodeFromCache(id: string): ExerciseCode | undefined {
+	return loadFromCache<ExerciseCode>(exerciseSolutions, id);
+}
+
 class Exercise extends React.Component<Props, State> {
+	private readonly editThemeName = 'darcula';
+	private readonly defaultThemeName = 'default';
+	private readonly newTry = { id: -1 };
+	private readonly lastSubmissionIndex = 0;
+
 	constructor(props: Props) {
 		super(props);
 		const { exerciseInitialCode, submissions, languages, renderedHints, } = props;
@@ -189,7 +199,7 @@ class Exercise extends React.Component<Props, State> {
 		const { slideId, submissions, } = this.props;
 
 		if(submissions.length > 0) {
-			this.loadSubmissionToState(submissions[0]);
+			this.loadSubmissionToState(submissions[this.lastSubmissionIndex]);
 		} else {
 			this.loadCodeFromCache(slideId);
 		}
@@ -247,9 +257,10 @@ class Exercise extends React.Component<Props, State> {
 				if((!automaticChecking || automaticChecking.result === CheckingResult.RightAnswer)
 					&& IsFirstRightAnswer(submissions, submission)) {
 					this.openModal({
+						type: ModalType.congrats,
 						score: lastCheckingResponse.score,
 						waitingForManualChecking: lastCheckingResponse.waitingForManualChecking,
-					} as CongratsModalData);
+					});
 				}
 			}
 		} else if(currentSubmission) {
@@ -312,7 +323,7 @@ class Exercise extends React.Component<Props, State> {
 			lineNumbers: true,
 			scrollbarStyle: 'null',
 			lineWrapping: true,
-			theme: isEditable ? editThemeName : defaultThemeName,
+			theme: isEditable ? this.editThemeName : this.defaultThemeName,
 			readOnly: !isEditable || !isAuthenticated,
 			matchBrackets: true,
 			tabSize: 4,
@@ -341,7 +352,7 @@ class Exercise extends React.Component<Props, State> {
 			value, currentSubmission,
 			isEditable, exerciseCodeDoc, modalData,
 			currentReviews, showOutput, selectedReviewId, visibleCheckingResponse,
-			submissionLoading, valueChanged, isAllHintsShowed,
+			submissionLoading, isAllHintsShowed,
 		} = this.state;
 
 		const isReview = !isEditable && currentReviews.length > 0;
@@ -385,7 +396,6 @@ class Exercise extends React.Component<Props, State> {
 						options={ opts }
 						value={ value }
 					/>
-					{ !isEditable && this.renderEditButton(isReview) }
 					{ exerciseCodeDoc && isReview &&
 					<Review
 						userId={ author.id }
@@ -401,9 +411,9 @@ class Exercise extends React.Component<Props, State> {
 				{/* TODO not included in current release !isEditable && currentSubmission && this.renderOverview(currentSubmission)*/ }
 				{ isAuthenticated && <Controls>
 					<Controls.SubmitButton
-						valueChanged={ valueChanged }
-						submissionLoading={ submissionLoading }
-						onSendExerciseButtonClicked={ this.sendExercise }
+						isLoading={ submissionLoading }
+						onClick={ isEditable ? this.sendExercise : this.loadNewTry }
+						text={ isEditable ? texts.controls.submitCode.text : texts.controls.submitCode.redactor }
 					/>
 					{ renderedHints.length !== 0 &&
 					<Controls.ShowHintButton
@@ -472,7 +482,7 @@ class Exercise extends React.Component<Props, State> {
 		const { waitingForManualChecking } = this.props.slideProgress;
 
 		const lastSuccessSubmission = GetLastSuccessSubmission(submissions);
-		const items = [[newTry.id, texts.submissions.newTry], ...submissions.map((submission) => {
+		const items = [[this.newTry.id, texts.submissions.newTry], ...submissions.map((submission) => {
 			const caption = texts.submissions
 				.getSubmissionCaption(submission, lastSuccessSubmission === submission, waitingForManualChecking);
 			return [submission.id, caption];
@@ -484,7 +494,7 @@ class Exercise extends React.Component<Props, State> {
 					<Select
 						width={ '100%' }
 						items={ items }
-						value={ currentSubmission?.id || newTry.id }
+						value={ currentSubmission?.id || this.newTry.id }
 						onValueChange={ this.onSubmissionsSelectValueChange }
 					/>
 				</ThemeContext.Provider>
@@ -495,7 +505,7 @@ class Exercise extends React.Component<Props, State> {
 	onSubmissionsSelectValueChange = (id: unknown): void => {
 		const { submissions, } = this.props;
 
-		if(id === newTry.id) {
+		if(id === this.newTry.id) {
 			this.loadNewTry();
 		}
 		this.loadSubmissionToState(submissions.find(s => s.id === id));
@@ -503,16 +513,14 @@ class Exercise extends React.Component<Props, State> {
 
 	renderLanguageSelect = (): React.ReactElement => {
 		const { language } = this.state;
-		const { languages, languageInfo: languageInfos } = this.props;
-		debugger;
+		const { languages, languageInfo } = this.props;
 		const items = languages.map((l) => {
-			return [l, texts.getLanguageLaunchInfo(l, languageInfos).compiler];
+			return [l, texts.getLanguageLaunchInfo(l, languageInfo).compiler];
 		});
-		debugger;
 		return (
 			<div className={ styles.select }>
 				<ThemeContext.Provider value={ FLAT_THEME }>
-					<Tooltip render={this.renderTooltip}>
+					<Tooltip render={ this.renderTooltip }>
 						<Select
 							width={ '100%' }
 							items={ items }
@@ -525,28 +533,27 @@ class Exercise extends React.Component<Props, State> {
 		);
 	};
 
-	renderTooltip = () => {
+	renderTooltip = (): React.ReactElement => {
 		const { language } = this.state;
-		const { languageInfo: languageInfos } = this.props;
-		debugger;
-		const languageLaunchInfo = texts.getLanguageLaunchInfo(language, languageInfos);
+		const { languageInfo } = this.props;
+		const languageLaunchInfo = texts.getLanguageLaunchInfo(language, languageInfo);
 		return (
 			<div>
-				{languageLaunchInfo.compileCommand && (
+				{ languageLaunchInfo.compileCommand && (
 					<>
 						<h5>Компиляция: </h5>
-						<p>{languageLaunchInfo.compileCommand}</p>
+						<p>{ languageLaunchInfo.compileCommand }</p>
 					</>
-				)}
-				{languageLaunchInfo.runCommand && (
+				) }
+				{ languageLaunchInfo.runCommand && (
 					<>
 						<h5>Запуск: </h5>
-						<p>{languageLaunchInfo.runCommand}</p>
+						<p>{ languageLaunchInfo.runCommand }</p>
 					</>
-				)}
+				) }
 			</div>
 		);
-	}
+	};
 
 	onLanguageSelectValueChange = (l: unknown): void => {
 		this.setState({ language: l as Language });
@@ -616,7 +623,7 @@ class Exercise extends React.Component<Props, State> {
 		});
 	};
 
-	openModal = (data: ModalData<ModalType> | null): void => {
+	openModal = <T extends ModalData<ModalType>>(data: T | null): void => {
 		this.setState({
 			modalData: data,
 		});
@@ -741,11 +748,11 @@ class Exercise extends React.Component<Props, State> {
 			case ModalType.congrats: {
 				const { score, waitingForManualChecking, } = modalData as CongratsModalData;
 				return (
-					score && waitingForManualChecking &&
+					score &&
 					<CongratsModal
 						showAcceptedSolutions={ !waitingForManualChecking && !hideSolutions }
 						score={ score }
-						waitingForManualChecking={ waitingForManualChecking }
+						waitingForManualChecking={ waitingForManualChecking || false }
 						onClose={ this.closeModal }
 					/>
 				);
@@ -831,15 +838,6 @@ class Exercise extends React.Component<Props, State> {
 	}, {
 		className,
 	});
-
-	renderEditButton = (isReview: boolean): React.ReactElement => {
-		return (
-			<div className={ classNames(styles.editButton, { [styles.editButtonWithReviews]: isReview }) }
-				 onClick={ this.loadNewTry }>
-				{ texts.controls.edit.text }
-			</div>
-		);
-	};
 
 	resetCodeAndCache = (): void => {
 		const { slideId, exerciseInitialCode, } = this.props;
@@ -1041,15 +1039,32 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	saveCodeToCache = (slideId: string, value: string): void => {
-		saveToCache(exerciseSolutions, slideId, value);
+		saveExerciseCodeToCache(slideId, value, moment().format());
 	};
 
 	loadCodeFromCache = (slideId: string): void => {
-		const code = loadFromCache(exerciseSolutions, slideId);
-		if(code !== undefined) {
+		const { submissions } = this.props;
+		const { value } = this.state;
+
+		const code = loadExerciseCodeFromCache(slideId);
+
+		if(code) {
+			let newValue = code.value;
+
+			if(submissions.length > 0) {
+				const lastSubmission = submissions[this.lastSubmissionIndex];
+				const lastSubmissionTime = convertDefaultTimezoneToLocal(lastSubmission.timestamp);
+				const codeFromCacheTime = moment(code.time);
+
+				if(lastSubmissionTime.diff(codeFromCacheTime, 'seconds') >= 0) { //if last submission is newer then last saved
+					this.saveCodeToCache(slideId, value);
+					newValue = value;
+				}
+			}
+
 			this.resetCode();
 			this.setState({
-				value: code,
+				value: newValue,
 			});
 		}
 	};

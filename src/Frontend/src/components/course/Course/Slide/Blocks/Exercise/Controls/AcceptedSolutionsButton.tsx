@@ -1,8 +1,7 @@
-import React from "react";
+import React, { createRef, RefObject } from "react";
 
 import { Button, Modal, Tooltip } from "ui";
 import { EyeOpened } from "icons";
-import ShowAfterDelay from "src/components/ShowAfterDelay/ShowAfterDelay";
 import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent.js";
 import IControlWithText from "./IControlWithText";
 
@@ -14,7 +13,6 @@ import texts from "../Exercise.texts";
 
 
 interface State {
-	showAcceptedSolutionsWarning: boolean,
 	showAcceptedSolutions: boolean,
 }
 
@@ -27,21 +25,22 @@ export interface Props extends IControlWithText {
 
 export default class AcceptedSolutionsButton
 	extends React.Component<Props, State> {
+	private tooltip: RefObject<Tooltip> = createRef();
+
 	state = {
-		showAcceptedSolutionsWarning: false,
 		showAcceptedSolutions: false,
 	};
 
 	render = (): React.ReactNode => {
-		const { showAcceptedSolutionsWarning, showAcceptedSolutions, } = this.state;
+		const { showAcceptedSolutions, } = this.state;
 
 		return (
 			<React.Fragment>
 				<span className={ styles.exerciseControls } onClick={ this.showAcceptedSolutionsWarning }>
 					<Tooltip
-						onCloseClick={ this.hideAcceptedSolutionsWarning }
+						ref={ this.tooltip }
 						pos={ "bottom left" }
-						trigger={ showAcceptedSolutionsWarning ? "opened" : "closed" }
+						trigger={ 'click' }
 						render={ this.renderAcceptedSolutionsHint }>
 						<span className={ styles.exerciseControlsIcon }>
 							<EyeOpened/>
@@ -63,10 +62,6 @@ export default class AcceptedSolutionsButton
 
 		if(isShowAcceptedSolutionsAvailable) {
 			this.showAcceptedSolutions();
-		} else {
-			this.setState({
-				showAcceptedSolutionsWarning: true,
-			});
 		}
 	};
 
@@ -78,12 +73,6 @@ export default class AcceptedSolutionsButton
 					{ texts.controls.acceptedSolutions.continue }
 				</Button>
 			</span>);
-	};
-
-	hideAcceptedSolutionsWarning = (): void => {
-		this.setState({
-			showAcceptedSolutionsWarning: false,
-		});
 	};
 
 	showAcceptedSolutions = (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
@@ -99,7 +88,7 @@ export default class AcceptedSolutionsButton
 			e.stopPropagation();
 		}
 
-		this.hideAcceptedSolutionsWarning();
+		this.tooltip.current?.hide();
 	};
 
 	closeAcceptedSolutions = (): void => {
@@ -112,17 +101,19 @@ export default class AcceptedSolutionsButton
 		const { acceptedSolutionsUrl, } = this.props;
 
 		return (
-			<ShowAfterDelay>
-				<Modal onClose={ this.closeAcceptedSolutions }>
-					<Modal.Header>
-						{ texts.acceptedSolutions.title }
-					</Modal.Header>
-					<Modal.Body>
-						{ texts.acceptedSolutions.content }
-						<DownloadedHtmlContent url={ acceptedSolutionsUrl }/>
-					</Modal.Body>
-				</Modal>
-			</ShowAfterDelay>
+			<DownloadedHtmlContent
+				url={ acceptedSolutionsUrl }
+				injectInWrapperAfterContentReady={ (html: React.ReactNode) =>
+					<Modal onClose={ this.closeAcceptedSolutions }>
+						<Modal.Header>
+							{ texts.acceptedSolutions.title }
+						</Modal.Header>
+						<Modal.Body>
+							{ texts.acceptedSolutions.content }
+							{ html }
+						</Modal.Body>
+					</Modal> }
+			/>
 		);
 	};
 }

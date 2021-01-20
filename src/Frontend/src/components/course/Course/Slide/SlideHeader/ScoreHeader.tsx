@@ -9,7 +9,6 @@ import { RootState } from "src/models/reduxState";
 
 import Course from '../../Course.js';
 import DownloadedHtmlContent from 'src/components/common/DownloadedHtmlContent.js';
-import ShowAfterDelay from "src/components/ShowAfterDelay/ShowAfterDelay";
 import { Modal } from "@skbkontur/react-ui";
 
 import texts from "./SlideHeader.texts";
@@ -50,30 +49,42 @@ const ScoreHeaderInternal = (props: PropsFromRedux & ScoreHeaderProps) => {
 
 	const maxModalWidth = window.innerWidth - 40;
 	const modalWidth: undefined | number = maxModalWidth > 880 ? 880 : maxModalWidth; //TODO пока что это мок, в будущем width будет другой
+	const anyTryUsed = isSkipped || hasReviewedSubmissions || waitingForManualChecking;
+	
 	return (
 		<div className={ styles.header }>
 			<span className={ classNames(styles.headerText, styles.scoreTextWeight, styles.scoreTextColor) }>
-				{ texts.getSlideScore(score, maxScore, !isSkipped) }
+				{ texts.getSlideScore(score, maxScore, anyTryUsed) }
 			</span>
 			{ message && <span className={ styles.headerStatusText }>{ message }</span> }
-			{ showStudentSubmissions && <a onClick={ () => showModal(true) } className={ styles.headerLinkText }>
+			{ showStudentSubmissions && <a onClick={ openModal } className={ styles.headerLinkText }>
 				{ texts.showAcceptedSolutionsText }
 			</a> }
 			{ isModalShowed &&
-			<ShowAfterDelay>
-				<Modal width={ modalWidth } onClose={ () => showModal(false) }>
-					<Modal.Header>
-						<h2>
-							{ texts.showAcceptedSolutionsHeaderText }
-						</h2>
-					</Modal.Header>
-					<Modal.Body>
-						<DownloadedHtmlContent url={ constructPathToStudentSubmissions(courseId, slideId) }/>
-					</Modal.Body>
-				</Modal>
-			</ShowAfterDelay> }
+			<DownloadedHtmlContent
+				url={ constructPathToStudentSubmissions(courseId, slideId) }
+				injectInWrapperAfterContentReady={ (html: React.ReactNode) =>
+					<Modal width={ modalWidth } onClose={ closeModal }>
+						<Modal.Header>
+							<h2>
+								{ texts.showAcceptedSolutionsHeaderText }
+							</h2>
+						</Modal.Header>
+						<Modal.Body>
+							{ html }
+						</Modal.Body>
+					</Modal> }/>
+			}
 		</div>
 	);
+
+	function closeModal() {
+		showModal(false);
+	}
+
+	function openModal() {
+		showModal(true);
+	}
 };
 
 interface ScoreHeaderProps {

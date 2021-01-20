@@ -73,6 +73,7 @@ const texts = {
 	controls: {
 		submitCode: {
 			text: 'Отправить',
+			redactor: 'Открыть редактор',
 			hint: 'Начните писать код',
 		},
 		hints: {
@@ -98,10 +99,6 @@ const texts = {
 				<br/>
 			</React.Fragment>,
 			continue: 'Всё равно посмотреть',
-		},
-
-		edit: {
-			text: 'Редактор кода',
 		},
 
 		showAllCode: {

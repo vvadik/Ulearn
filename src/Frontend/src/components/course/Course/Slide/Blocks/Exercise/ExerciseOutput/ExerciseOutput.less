@@ -31,7 +31,7 @@
   font-family: @defaultFonts;
   font-style: normal;
   font-weight: normal;
-  font-size: 16px;
+  font-size: @mobileFontSize;
   line-height: 22px;
 }
 
@@ -56,7 +56,7 @@
 }
 
 .outputParagraph {
-  font-size: 14px;
+  font-size: 12px;
   line-height: 20px;
   white-space: pre-wrap;
   word-break: break-all;
@@ -87,6 +87,7 @@
   th, td {
     width: 50%;
   }
+
   th:first-child, td:first-child {
     width: auto;
     white-space: nowrap;
@@ -111,14 +112,14 @@
   font-style: normal;
   font-weight: normal;
 
-  font-size: 16px;
+  font-size: 12px;
   line-height: 22px;
 }
 
 .outputTable > tbody > tr > td {
   font-family: @monoFonts;
-  font-size: 14px;
-  line-height: 20px;
+  font-size: 10px;
+  line-height: 1.42;
 }
 
 .outputTable > tbody > tr > td > span {
@@ -131,4 +132,22 @@
 
 .outputNotMatchColor {
   background-color: @lightRed
+}
+
+@media (min-width: @minTabletWidth) {
+  .outputHeader {
+    font-size: @tabletFontSize;
+  }
+
+  .outputParagraph {
+    font-size: @mobileFontSize;
+  }
+
+  .outputTable > thead > tr > th {
+    font-size: @tabletFontSize;
+  }
+
+  .outputTable > tbody > tr > td {
+    font-size: @mobileFontSize;
+  }
 }
