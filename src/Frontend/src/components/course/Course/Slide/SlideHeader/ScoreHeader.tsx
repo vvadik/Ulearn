@@ -49,10 +49,12 @@ const ScoreHeaderInternal = (props: PropsFromRedux & ScoreHeaderProps) => {
 
 	const maxModalWidth = window.innerWidth - 40;
 	const modalWidth: undefined | number = maxModalWidth > 880 ? 880 : maxModalWidth; //TODO пока что это мок, в будущем width будет другой
+	const anyTryUsed = isSkipped || hasReviewedSubmissions || waitingForManualChecking;
+	
 	return (
 		<div className={ styles.header }>
 			<span className={ classNames(styles.headerText, styles.scoreTextWeight, styles.scoreTextColor) }>
-				{ texts.getSlideScore(score, maxScore, !isSkipped) }
+				{ texts.getSlideScore(score, maxScore, anyTryUsed) }
 			</span>
 			{ message && <span className={ styles.headerStatusText }>{ message }</span> }
 			{ showStudentSubmissions && <a onClick={ openModal } className={ styles.headerLinkText }>
