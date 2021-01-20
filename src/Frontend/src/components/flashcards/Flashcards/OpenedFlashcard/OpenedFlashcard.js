@@ -6,7 +6,7 @@ import Results from "../Results/Results";
 
 import styles from "./openedFlashcard.less";
 
-import translateCode from "../../../../codeTranslator/translateCode";
+import translateCode from "src/codeTranslator/translateCode";
 import { Link } from "react-router-dom";
 
 class OpenedFlashcard extends Component {

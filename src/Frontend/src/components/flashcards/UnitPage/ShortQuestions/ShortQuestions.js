@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 import { Toggle } from "ui";
 
-import translateCode from "../../../../codeTranslator/translateCode";
+import translateCode from "src/codeTranslator/translateCode";
 
 import styles from './shortQuestions.less';
 

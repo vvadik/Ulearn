@@ -1,5 +1,5 @@
 import translateTextareaToCode from 'src/codeTranslator/codemirror';
-import translateTextToKatex from 'src/codeTranslator/katex';
+import { translateTextToKatex, translateTexInHtml } from 'src/codeTranslator/katex';
 
 export default function translateCode(
 	element: HTMLElement,
@@ -35,6 +35,13 @@ const translators = [
 		selector: (element: HTMLElement) => element.querySelectorAll('.tex') as NodeListOf<HTMLElement>,
 		translateFunction: (element: HTMLElement, additionalSettings = {}) => {
 			translateTextToKatex(element, additionalSettings);
+		},
+	},
+	{
+		id: 'katex-html',
+		selector: (element: HTMLElement) => element.querySelectorAll('.tex-html') as NodeListOf<HTMLElement>,
+		translateFunction: (element: HTMLElement, additionalSettings = {}) => {
+			translateTexInHtml(element, additionalSettings);
 		},
 	},
 ];
