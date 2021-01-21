@@ -64,7 +64,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 				yield return RenderFromHtml(htmlData, cssData);
 			}
 
-			var pdfLink = Path.Combine(PolygonPath, "statements/.pdf/russian/problem.pdf");
+			var pdfLink = PolygonPath + "/statements/.pdf/russian/problem.pdf";
 			yield return new MarkdownBlock($"[Скачать условия задачи в формате PDF]({pdfLink})");
 		}
 		private static SlideBlock RenderFromHtml(string html, string css)
