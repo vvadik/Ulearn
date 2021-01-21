@@ -1017,44 +1017,43 @@ class Exercise extends React.Component<Props, State> {
 		exerciseCodeDoc.indexFromPos({ line: review.finishLine, ch: review.finishPosition })
 		- exerciseCodeDoc.indexFromPos({ line: review.startLine, ch: review.startPosition });
 
-	static loadLanguageStyles = (language: string): string => {
+	static loadLanguageStyles = (language: Language): string => {
 		switch (language.toLowerCase()) {
-			case 'csharp':
+			case Language.cSharp:
 				require('codemirror/mode/clike/clike');
 				return `text/x-csharp`;
-			case 'java':
+			case Language.java:
 				require('codemirror/mode/clike/clike');
 				return `text/x-java`;
-
-			case 'javascript':
+			case Language.javaScript:
 				require('codemirror/mode/javascript/javascript');
 				return `text/javascript`;
-			case 'typescript':
+			case Language.typeScript:
 				require('codemirror/mode/javascript/javascript');
 				return `text/typescript`;
-			case 'jsx':
+			case Language.jsx:
 				require('codemirror/mode/jsx/jsx');
 				return `text/jsx`;
 
-			case 'python2':
+			case Language.python2:
 				require('codemirror/mode/python/python');
 				return `text/x-python`;
-			case 'python3':
+			case Language.python3:
 				require('codemirror/mode/python/python');
 				return `text/x-python`;
 
-			case 'css':
+			case Language.css:
 				require('codemirror/mode/css/css');
 				return `text/css`;
 
-			case 'haskell':
+			case Language.haskell:
 				require('codemirror/mode/haskell/haskell');
 				return `text/x-haskell`;
 
-			case 'c':
+			case Language.c:
 				require('codemirror/mode/clike/clike');
 				return `text/x-c`;
-			case 'cpp':
+			case Language.cpp:
 				require('codemirror/mode/clike/clike');
 				return `text/x-c++src`;
 
