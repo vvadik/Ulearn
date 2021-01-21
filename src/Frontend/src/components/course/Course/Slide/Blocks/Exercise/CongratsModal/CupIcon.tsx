@@ -1,6 +1,6 @@
 import React from "react";
 
-function CupIcon() {
+function CupIcon(): React.ReactElement {
 	return (<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
 		<path
 			d="M24 70.8569C24 67.701 26.5584 65.1426 29.7143 65.1426H50.2857C53.4416 65.1426 56 67.701 56 70.8569V73.1426H24V70.8569Z"
