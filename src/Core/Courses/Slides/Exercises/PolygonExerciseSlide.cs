@@ -29,22 +29,21 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 			var statementsFilePath = Path.Combine(statementsPath, "russian", "problem-properties.json");
 			var json = File.ReadAllText(statementsFilePath);
 			var statements = JsonConvert.DeserializeObject<Statements>(json);
-			
+
 			Blocks = GetBlocksProblem(statementsPath, context.CourseId, Id)
 				.Concat(Blocks.Where(block => !(block is MarkdownBlock)))
 				.ToArray();
 			Title = statements.Name;
-			
+
 			var polygonExercise = Blocks.Single(block => block is PolygonExerciseBlock) as PolygonExerciseBlock;
 			polygonExercise!.ExerciseDirPath = Path.Combine(PolygonPath);
-			
+
 			var pathTests = Path.Combine(context.Unit.Directory.FullName, PolygonPath, "tests");
 			var countTests = Directory.GetFiles(pathTests)
 				.Count(filename => Regex.IsMatch(filename, @"\d+[^a]$"));
 			polygonExercise.MsPerTest = statements.TimeLimit;
 			polygonExercise.TimeLimit = statements.TimeLimit * countTests; // TimeLimit тут в мс
 
-				
 			base.BuildUp(context);
 		}
 
@@ -65,7 +64,8 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 				yield return RenderFromHtml(htmlData, cssData);
 			}
 
-			yield return GetLinkOnPdf(courseId, slideId.ToString());
+			var pdfLink = Path.Combine(PolygonPath, "statements/.pdf/russian/problem.pdf");
+			yield return new MarkdownBlock($"[Скачать условия задачи в формате PDF]({pdfLink})");
 		}
 		private static SlideBlock RenderFromHtml(string html, string css)
 		{
@@ -79,13 +79,6 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 				.Replace("$$$$$$", "$$")
 				.Replace("$$$", "$");
 			return new HtmlBlock($"<div class=\"tex\">{processedBody}</div>");
-		}
-
-		private static MarkdownBlock GetLinkOnPdf(string courseId, string slideId)
-		{
-			var link = $"/Exercise/GetPdf?courseId={courseId}&slideId={slideId}";
-			return new MarkdownBlock($"[Скачать условия задачи в формате PDF]({link})");
-
 		}
 	}
 
