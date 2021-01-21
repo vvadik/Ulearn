@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { createRef, RefObject } from 'react';
 
 import { Controlled, } from "react-codemirror2";
 import { Checkbox, FLAT_THEME, Select, Toast, Tooltip } from "ui";
@@ -19,7 +19,7 @@ import {
 	saveToCache,
 } from "src/utils/localStorageManager";
 
-import { Language, LanguageLaunchInfo } from "src/consts/languages";
+import { Language, } from "src/consts/languages";
 import { constructPathToAcceptedSolutions, } from "src/consts/routes";
 import {
 	AutomaticExerciseCheckingResult as CheckingResult,
@@ -126,6 +126,7 @@ interface State {
 
 	editor: null | Editor,
 	exerciseCodeDoc: null | Doc,
+	savedPositionOfExercise: DOMRect | undefined,
 
 	selfChecks: SelfCheckup[],
 }
@@ -148,6 +149,7 @@ class Exercise extends React.Component<Props, State> {
 	private readonly defaultThemeName = 'default';
 	private readonly newTry = { id: -1 };
 	private readonly lastSubmissionIndex = 0;
+	private wrapper: RefObject<HTMLDivElement> = createRef();
 
 	constructor(props: Props) {
 		super(props);
@@ -173,6 +175,7 @@ class Exercise extends React.Component<Props, State> {
 
 			editor: null,
 			exerciseCodeDoc: null,
+			savedPositionOfExercise: undefined,
 
 			selfChecks: texts.checkups.self.checks.map((ch, i) => ({
 				text: ch,
@@ -308,7 +311,7 @@ class Exercise extends React.Component<Props, State> {
 		const opts = this.codeMirrorOptions;
 
 		return (
-			<div className={ classNames(styles.wrapper, className) }>
+			<div className={ classNames(styles.wrapper, className) } ref={ this.wrapper }>
 				{ this.renderControlledCodeMirror(opts) }
 			</div>
 		);
@@ -392,6 +395,7 @@ class Exercise extends React.Component<Props, State> {
 						onBeforeChange={ this.onBeforeChange }
 						editorDidMount={ this.onEditorMount }
 						onCursorActivity={ this.onCursorActivity }
+						onUpdate={ this.scrollToBottomBorderIfNeeded }
 						className={ editorClassName }
 						options={ opts }
 						value={ value }
@@ -602,7 +606,8 @@ class Exercise extends React.Component<Props, State> {
 					visibleCheckingResponse: undefined,
 					currentReviews: [],
 				}, () =>
-					this.setCurrentSubmission(submission)
+					this.setCurrentSubmission(submission,
+					)
 			);
 		}
 	};
@@ -847,7 +852,8 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	resetCode = (): void => {
-		const { exerciseInitialCode } = this.props;
+		const { exerciseInitialCode, } = this.props;
+		const savedPositionOfExercise = this.wrapper.current?.getBoundingClientRect();
 
 		this.clearAllTextMarkers();
 		this.setState({
@@ -857,8 +863,28 @@ class Exercise extends React.Component<Props, State> {
 			currentSubmission: null,
 			visibleCheckingResponse: undefined,
 			currentReviews: [],
-			showOutput: false
+			showOutput: false,
+			savedPositionOfExercise,
 		});
+	};
+
+	scrollToBottomBorderIfNeeded = (): void => {
+		const { savedPositionOfExercise } = this.state;
+
+		const newPositionOfExercise = this.wrapper.current?.getBoundingClientRect();
+		if(savedPositionOfExercise && newPositionOfExercise) {
+			if(savedPositionOfExercise.top < 0 && savedPositionOfExercise.bottom > newPositionOfExercise.bottom) {
+				window.scrollTo({
+					left: 0,
+					top: window.pageYOffset - (savedPositionOfExercise.bottom - newPositionOfExercise.bottom),
+					behavior: "auto",
+				});
+
+				this.setState({
+					savedPositionOfExercise: undefined,
+				});
+			}
+		}
 	};
 
 	clearAllTextMarkers = (): void => {
@@ -1061,7 +1087,6 @@ class Exercise extends React.Component<Props, State> {
 					newValue = value;
 				}
 			}
-
 			this.resetCode();
 			this.setState({
 				value: newValue,
