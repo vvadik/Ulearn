@@ -106,14 +106,6 @@ namespace Ulearn.Core
 
 		private class ExtendedMarkdownDeep : MarkdownDeep.Markdown
 		{
-			private readonly Regex fileLinkRegex = new Regex(@".*(StudentZip|GetPdf).*", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-			public override void OnPrepareLink(HtmlTag tag)
-			{
-				base.OnPrepareLink(tag);
-				var isFileLink = fileLinkRegex.IsMatch(tag.attributes["href"]);
-				if (isFileLink)
-					tag.attributes["onClick"] = $"window.downloadFile(\'{tag.attributes["href"]}\');return false;";
-			}
 			public override void OnPrepareImage(HtmlTag tag, bool TitledImage)
 			{
 				base.OnPrepareImage(tag, TitledImage);
