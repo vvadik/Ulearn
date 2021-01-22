@@ -16,7 +16,6 @@ export default function translateTextareaToCode(
 	const language = (lang || Language.cSharp) as Language;
 
 	const nodeElement = document.createElement('div');
-
 	textarea.parentNode?.replaceChild(nodeElement, textarea);
 	ReactDOM.render((
 			<StaticCode

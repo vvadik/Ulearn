@@ -7,7 +7,7 @@ import { Button, } from "ui";
 import Flashcards from "../Flashcards/Flashcards";
 
 import styles from './courseFlashcardsPage.less';
-import { guides } from '../consts';
+import { guides as defaultGuides } from '../consts';
 import CourseLoader from "src/components/course/Course/CourseLoader/CourseLoader";
 
 class CourseFlashcardsPage extends Component {
@@ -29,7 +29,7 @@ class CourseFlashcardsPage extends Component {
 
 	render() {
 		const { showFlashcards } = this.state;
-		const { courseId, flashcardsLoading, flashcards, infoByUnits, sendFlashcardRate } = this.props;
+		const { courseId, flashcardsLoading, flashcards, infoByUnits, sendFlashcardRate, guides = defaultGuides } = this.props;
 
 		if(!flashcards || flashcardsLoading) {
 			return (<CourseLoader/>);
@@ -118,6 +118,7 @@ CourseFlashcardsPage.propTypes = {
 			}),
 		),
 	})),
+	guides: PropTypes.arrayOf(PropTypes.string),
 
 	loadFlashcards: PropTypes.func,
 	sendFlashcardRate: PropTypes.func,
