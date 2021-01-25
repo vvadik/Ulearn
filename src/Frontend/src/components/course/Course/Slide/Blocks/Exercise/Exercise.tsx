@@ -542,7 +542,7 @@ class Exercise extends React.Component<Props, State> {
 	renderLanguageLaunchInfoTooltip = (): React.ReactElement => {
 		return (
 			<ThemeContext.Provider value={ darkFlat }>
-				<Tooltip trigger="click" render={ this.renderLanguageLaunchInfoTooltipContent }>
+				<Tooltip trigger={ "click" } render={ this.renderLanguageLaunchInfoTooltipContent }>
 					<span className={ styles.launchInfoHelpIcon }>
 						<HelpLite/>
 					</span>
