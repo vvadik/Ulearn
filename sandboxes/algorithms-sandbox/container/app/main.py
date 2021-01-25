@@ -56,7 +56,7 @@ class TaskCodeRunner:
 
 def check(source_code_run_info, code_filename):
     runner = TaskCodeRunner(source_code_run_info)
-    for number_test, test_filename in enumerate(sorted(filter(lambda x: not x.endswith(SUFFIX_ANSWER_FILENAME), listdir(TEST_DIRECTORY))), 1):
+    for number_test, test_filename in enumerate(sorted(filter(lambda x: not x.endswith(SUFFIX_ANSWER_FILENAME) and x != ".gitkeep", listdir(TEST_DIRECTORY))), 1):
         try:
             runner.run_test(code_filename, path_join(TEST_DIRECTORY, test_filename))
             process = Popen([path_join('.', 'check'),
