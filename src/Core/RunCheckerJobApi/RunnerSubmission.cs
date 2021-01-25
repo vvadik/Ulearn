@@ -11,7 +11,7 @@ namespace Ulearn.Core.RunCheckerJobApi
 		public string Id { get; set; }
 
 		[DataMember]
-		public int TimeLimit { get; set; } = 10;
+		public double TimeLimit { get; set; } = 10;
 
 		public override string ToString()
 		{

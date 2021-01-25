@@ -84,7 +84,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public bool HideShowSolutionsButton { get; set; }
 
 		[XmlElement("timeLimit")]
-		public int TimeLimit { get; set; } = 10; // Пока работает только для universalExerciseBlock
+		public double TimeLimit { get; set; } = 10; // Пока работает только для universalExerciseBlock и polygonExerciseBlock
 
 		[XmlIgnore]
 		public List<string> HintsMd

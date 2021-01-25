@@ -62,10 +62,6 @@ namespace Ulearn.Common
 		[XmlEnum("c")]
 		[Lexer("c")]
 		C = 11,
-		
-		[XmlEnum("any")]
-		[Lexer("any")]
-		Any = 12,
 
 		[XmlEnum("text")]
 		[Lexer("text")]
@@ -97,8 +93,7 @@ namespace Ulearn.Common
 			{ ".hs", Language.Haskell },
 			{ ".c", Language.C },
 			{ ".cpp", Language.Cpp },
-			{ ".txt", Language.Text },
-			{ ".any", Language.Any }
+			{ ".txt", Language.Text }
 		};
 
 		public static Language GuessByExtension(string extension)

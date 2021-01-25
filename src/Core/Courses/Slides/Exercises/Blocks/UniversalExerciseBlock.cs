@@ -26,7 +26,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public string ExerciseDirPath { get; set; }
 
 		[XmlElement("userCodeFile")]
-		public virtual string UserCodeFilePath { get; set; }
+		public string UserCodeFilePath { get; set; }
 
 		[XmlElement("solutionFilePath")]
 		public string SolutionFilePath { get; set; } // По умолчанию используется UserCodeFilePath
@@ -156,7 +156,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			if (correctSolution != null)
 			{
 				yield return new MarkdownBlock("### Решение") { Hide = true };
-				yield return new CodeBlock(GetCorrectSolution(), Language) { Hide = true };
+				yield return new CodeBlock(correctSolution, Language) { Hide = true };
 			}
 		}
 

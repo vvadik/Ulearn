@@ -1,5 +1,6 @@
 from subprocess import Popen, PIPE, TimeoutExpired, DEVNULL
 from os import listdir, rename
+import shutil
 from os.path import join as path_join
 from sys import argv
 import re
@@ -7,7 +8,6 @@ from SourceCodeRunInfo import get_run_info_by_language_name, ISourceCodeRunInfo
 from verdict import Verdict
 from exceptions import *
 
-SOLUTION_FILENAME = 'Program.any'
 TEST_DIRECTORY = 'tests'
 TEMPORARY_FILENAME = 'Program'
 SUFFIX_ANSWER_FILENAME = '.a'
@@ -114,16 +114,17 @@ def get_code_filename(old_filename, source_code_run_info):
 
 
 language = argv[1].lower()
-time_limit = int(argv[2]) / 1000
-
-def main():
-    TaskCodeRunner(get_run_info_by_language_name('cpp')).build('check.cpp', 'check')  # Скомпилировали чеккер
-
-    run_info = get_run_info_by_language_name(language)
-    solution_filename_by_language = get_code_filename(SOLUTION_FILENAME, run_info)
-    rename(SOLUTION_FILENAME, solution_filename_by_language)
-    remove_region_on_solution(solution_filename_by_language)
-    result = check(run_info, solution_filename_by_language)
-    print(result)
-
-main()
+time_limit = float(argv[2].replace(',', '.'))
+solution_filename = argv[3]
+rename(path_join('solutions', solution_filename), 'Program.any')
+solution_filename = 'Program.any'
+shutil.rmtree('solutions')
+out = Popen(['free'], stdout=PIPE).communicate()
+print(out[0].decode())
+TaskCodeRunner(get_run_info_by_language_name('cpp')).build('check.cpp', 'check')  # Скомпилировали чеккер
+run_info = get_run_info_by_language_name(language)
+solution_filename_by_language = get_code_filename(solution_filename, run_info)
+rename(solution_filename, solution_filename_by_language)
+remove_region_on_solution(solution_filename_by_language)
+result = check(run_info, solution_filename_by_language)
+print(result)

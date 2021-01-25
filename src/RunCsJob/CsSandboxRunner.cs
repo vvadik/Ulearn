@@ -24,7 +24,7 @@ namespace RunCsJob
 		public TimeSpan CompilationTimeLimit => TimeSpan.FromSeconds(10);
 		public TimeSpan IdleTimeLimit => TimeSpan.FromSeconds(TestingTimeLimit.TotalSeconds * 2);
 
-		public CsSandboxRunnerSettings(int timeLimit)
+		public CsSandboxRunnerSettings(double timeLimit)
 		{
 			TestingTimeLimit = TimeSpan.FromSeconds(Math.Min(timeLimit, 100));
 		}
