@@ -55,16 +55,15 @@ function StaticCode({
 				value={ value }
 			/>
 			{ collapseEditor &&
-			<React.Fragment>
-				<div className={ styles.showAllCodeButton } onClick={ showAllCodeButtonClicked }>
-					{ texts.controls.showAllCode.text }
-				</div>
-				<div className={ styles.copyCodeButton } onClick={ copyCodeButtonClicked }>
-					<Hint text={ texts.controls.copyCode.text }>
-						<Copy size={ 20 }/>
-					</Hint>
-				</div>
-			</React.Fragment>
+			<div className={ styles.showAllCodeButton } onClick={ showAllCodeButtonClicked }>
+				{ texts.controls.showAllCode.text }
+			</div>
+			}
+			{ hide && <div className={ styles.copyCodeButton } onClick={ copyCodeButtonClicked }>
+				<Hint text={ texts.controls.copyCode.text }>
+					<Copy size={ 20 }/>
+				</Hint>
+			</div>
 			}
 		</div>
 	);
