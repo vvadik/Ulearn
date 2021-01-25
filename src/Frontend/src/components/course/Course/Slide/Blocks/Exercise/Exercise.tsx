@@ -212,7 +212,15 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	componentDidUpdate(prevProps: Props): void {
-		const { lastCheckingResponse, courseId, slideId, submissions, forceInitialCode, submissionError, } = this.props;
+		const {
+			lastCheckingResponse,
+			courseId,
+			slideId,
+			submissions,
+			forceInitialCode,
+			submissionError,
+			slideProgress,
+		} = this.props;
 		const { currentSubmission, submissionLoading, showOutput, selectedReviewId, } = this.state;
 
 		if(submissionError && submissionError !== prevProps.submissionError) {
@@ -261,6 +269,7 @@ class Exercise extends React.Component<Props, State> {
 				const { automaticChecking } = submission;
 
 				if((!automaticChecking || automaticChecking.result === CheckingResult.RightAnswer)
+					&& !slideProgress.isSkipped
 					&& IsFirstRightAnswer(submissions, submission)) {
 					this.openModal({
 						type: ModalType.congrats,
@@ -438,7 +447,7 @@ class Exercise extends React.Component<Props, State> {
 					{ (!hideSolutions && (isAllHintsShowed || isAcceptedSolutionsWillNotDiscardScore))
 					&& <Controls.AcceptedSolutionsButton
 						acceptedSolutionsUrl={ constructPathToAcceptedSolutions(courseId, slideId) }
-						onVisitAcceptedSolutions={ this.onVisitAcceptedSolutions }
+						onVisitAcceptedSolutions={ this.openAcceptedSolutionsModal }
 						isShowAcceptedSolutionsAvailable={ isAcceptedSolutionsWillNotDiscardScore }
 					/> }
 				</Controls>
@@ -636,6 +645,9 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	openAcceptedSolutionsModal = (): void => {
+		const { courseId, slideId, visitAcceptedSolutions, } = this.props;
+
+		visitAcceptedSolutions(courseId, slideId);
 		this.openModal({ type: ModalType.acceptedSolutions });
 	};
 
@@ -762,10 +774,10 @@ class Exercise extends React.Component<Props, State> {
 				return (
 					score &&
 					<CongratsModal
-						showAcceptedSolutions={ showAcceptedSolutions }
+						showAcceptedSolutions={ showAcceptedSolutions ? this.openAcceptedSolutionsModal : undefined }
 						score={ score }
 						waitingForManualChecking={ waitingForManualChecking || false }
-						onClose={ showAcceptedSolutions ? this.openAcceptedSolutionsModal : this.closeModal }
+						onClose={ this.closeModal }
 					/>
 				);
 			}
@@ -934,13 +946,6 @@ class Exercise extends React.Component<Props, State> {
 		this.setState({
 			showOutput: !showOutput
 		});
-	};
-
-	onVisitAcceptedSolutions = (): void => {
-		const { courseId, slideId, visitAcceptedSolutions, } = this.props;
-
-		visitAcceptedSolutions(courseId, slideId);
-		this.openAcceptedSolutionsModal();
 	};
 
 	closeModal = (): void => {
