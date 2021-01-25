@@ -119,8 +119,6 @@ solution_filename = argv[3]
 rename(path_join('solutions', solution_filename), 'Program.any')
 solution_filename = 'Program.any'
 shutil.rmtree('solutions')
-out = Popen(['free'], stdout=PIPE).communicate()
-print(out[0].decode())
 TaskCodeRunner(get_run_info_by_language_name('cpp')).build('check.cpp', 'check')  # Скомпилировали чеккер
 run_info = get_run_info_by_language_name(language)
 solution_filename_by_language = get_code_filename(solution_filename, run_info)
