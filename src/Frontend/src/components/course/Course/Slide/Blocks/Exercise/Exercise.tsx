@@ -52,6 +52,8 @@ import {
 } from "./ExerciseUtils";
 
 import { convertDefaultTimezoneToLocal } from "src/utils/momentUtils";
+import Icon, { HelpLite } from "icons";
+import { darkFlat } from "../../../../../../uiTheme";
 
 interface DispatchFunctionsProps {
 	sendCode: (courseId: string, slideId: string, value: string, language: Language) => unknown;
@@ -159,7 +161,7 @@ class Exercise extends React.Component<Props, State> {
 
 			isEditable: submissions.length === 0,
 
-			language: languages[0],
+			language: languages.sort()[0],
 
 			modalData: null,
 
@@ -383,7 +385,8 @@ class Exercise extends React.Component<Props, State> {
 		return (
 			<React.Fragment>
 				{ submissions.length !== 0 && this.renderSubmissionsSelect() }
-				{ languages.length > 1 && (submissions.length > 0 || isEditable) && this.renderLanguageSelect() }
+				{ languages.length > 1 && (submissions.length > 0 || isEditable) && this.renderLanguageSelect()}
+				{ languages.length > 1 && (submissions.length > 0 || isEditable) && this.renderLanguageLaunchInfoTooltip()}
 				{ !isEditable && this.renderHeader(submissionColor, selectedSubmissionIsLast,
 					selectedSubmissionIsLastSuccess) }
 				{ modalData && this.renderModal(modalData) }
@@ -514,44 +517,44 @@ class Exercise extends React.Component<Props, State> {
 	renderLanguageSelect = (): React.ReactElement => {
 		const { language } = this.state;
 		const { languages, languageInfo } = this.props;
-		const items = languages.map((l) => {
+		const items = languages.sort().map((l) => {
 			return [l, texts.getLanguageLaunchInfo(l, languageInfo).compiler];
 		});
 		return (
 			<div className={ styles.select }>
 				<ThemeContext.Provider value={ FLAT_THEME }>
-					<Tooltip render={ this.renderTooltip }>
-						<Select
-							width={ '100%' }
-							items={ items }
-							value={ language }
-							onValueChange={ this.onLanguageSelectValueChange }
-						/>
-					</Tooltip>
+					<Select
+						width={ '100%' }
+						items={ items }
+						value={ language }
+						onValueChange={ this.onLanguageSelectValueChange }
+					/>
 				</ThemeContext.Provider>
 			</div>
 		);
 	};
 
-	renderTooltip = (): React.ReactElement => {
+	renderLanguageLaunchInfoTooltip = (): React.ReactElement => {
 		const { language } = this.state;
 		const { languageInfo } = this.props;
 		const languageLaunchInfo = texts.getLanguageLaunchInfo(language, languageInfo);
+		function renderLine(name: string, value: string) {
+			return value && (<><h5>{name}</h5><p>{value}</p></>)
+		}
 		return (
-			<div>
-				{ languageLaunchInfo.compileCommand && (
-					<>
-						<h5>Компиляция: </h5>
-						<p>{ languageLaunchInfo.compileCommand }</p>
-					</>
-				) }
-				{ languageLaunchInfo.runCommand && (
-					<>
-						<h5>Запуск: </h5>
-						<p>{ languageLaunchInfo.runCommand }</p>
-					</>
-				) }
-			</div>
+			<ThemeContext.Provider value={ darkFlat }>
+				<Tooltip trigger="click" render={() => (
+					<div>
+						{ renderLine("Операционная система: ", "Ubuntu 20.04 x86_64")}
+						{ renderLine("Компиляция: ", languageLaunchInfo.compileCommand) }
+						{ renderLine("Запуск: ", languageLaunchInfo.runCommand) }
+					</div>
+				) }>
+					<span className={styles.launchInfoHelpIcon}>
+						<HelpLite/>
+					</span>
+				</Tooltip>
+			</ThemeContext.Provider>
 		);
 	};
 
