@@ -1,25 +1,20 @@
 import React, { createRef, RefObject } from 'react';
 
 import { Controlled, } from "react-codemirror2";
-import { Checkbox, FLAT_THEME, Select, Toast, Tooltip, ThemeContext, } from "ui";
+import { Checkbox, FLAT_THEME, Select, ThemeContext, Toast, Tooltip, } from "ui";
 import { Review } from "./Review/Review";
 import { CongratsModal } from "./CongratsModal/CongratsModal";
 import { ExerciseOutput, HasOutput } from "./ExerciseOutput/ExerciseOutput";
 import { ExerciseFormHeader } from "./ExerciseFormHeader/ExerciseFormHeader";
 import Controls from "./Controls/Controls";
 import LoginForContinue from "src/components/notificationModal/LoginForContinue";
-import { HelpLite } from "icons";
 
 import { darkFlat } from "src/uiTheme";
 
 import classNames from 'classnames';
 import moment from "moment";
 
-import {
-	exerciseSolutions,
-	loadFromCache,
-	saveToCache,
-} from "src/utils/localStorageManager";
+import { exerciseSolutions, loadFromCache, saveToCache, } from "src/utils/localStorageManager";
 import { convertDefaultTimezoneToLocal } from "src/utils/momentUtils";
 import {
 	GetLastSuccessSubmission,
@@ -34,9 +29,10 @@ import { Language, } from "src/consts/languages";
 import { constructPathToAcceptedSolutions, } from "src/consts/routes";
 import {
 	AutomaticExerciseCheckingResult as CheckingResult,
-	SolutionRunStatus,
-	RunSolutionResponse,
+	AutomaticExerciseCheckingResult,
 	ReviewInfo,
+	RunSolutionResponse,
+	SolutionRunStatus,
 } from "src/models/exercise";
 import { AccountState, ReviewInfoRedux, SubmissionInfoRedux } from "src/models/reduxState";
 import { SlideUserProgress } from "src/models/userProgress";
@@ -385,8 +381,9 @@ class Exercise extends React.Component<Props, State> {
 		const hasOutput = currentSubmission
 			&& HasOutput(visibleCheckingResponse?.message, currentSubmission.automaticChecking,
 				expectedOutput);
-		const isShowAcceptedSolutionsAvailable = submissions.length > 0 || slideProgress.isSkipped;
-
+		const isAcceptedSolutionsWillNotDiscardScore = submissions.filter(
+			s => s.automaticChecking?.result === AutomaticExerciseCheckingResult.RightAnswer).length > 0 || slideProgress.isSkipped;
+		
 		return (
 			<React.Fragment>
 				{ submissions.length !== 0 && this.renderSubmissionsSelect() }
@@ -435,11 +432,11 @@ class Exercise extends React.Component<Props, State> {
 						onShowOutputButtonClicked={ this.toggleOutput }
 					/> }
 					<Controls.StatisticsHint attemptsStatistics={ attemptsStatistics }/>
-					{ (!hideSolutions && (isAllHintsShowed || isShowAcceptedSolutionsAvailable))
+					{ (!hideSolutions && (isAllHintsShowed || isAcceptedSolutionsWillNotDiscardScore))
 					&& <Controls.AcceptedSolutionsButton
 						acceptedSolutionsUrl={ constructPathToAcceptedSolutions(courseId, slideId) }
 						onVisitAcceptedSolutions={ this.onVisitAcceptedSolutions }
-						isShowAcceptedSolutionsAvailable={ isShowAcceptedSolutionsAvailable }
+						isShowAcceptedSolutionsAvailable={ isAcceptedSolutionsWillNotDiscardScore }
 					/> }
 				</Controls>
 				}
@@ -544,9 +541,9 @@ class Exercise extends React.Component<Props, State> {
 	renderLanguageLaunchInfoTooltip = (): React.ReactElement => {
 		return (
 			<ThemeContext.Provider value={ darkFlat }>
-				<Tooltip trigger={ "click" } render={ this.renderLanguageLaunchInfoTooltipContent }>
+				<Tooltip trigger={ "hover" } render={ this.renderLanguageLaunchInfoTooltipContent }>
 					<span className={ styles.launchInfoHelpIcon }>
-						<HelpLite/>
+						Как компилируется код?
 					</span>
 				</Tooltip>
 			</ThemeContext.Provider>
