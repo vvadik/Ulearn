@@ -169,7 +169,6 @@ class Slide extends React.Component<Props> {
 		const { slideId, courseId, showHiddenBlocks, slideInfo } = this.props;
 		const { autoplay } = queryString.parse(window.location.search);
 		const { maxScore } = slideInfo;
-		let firstVideoBlock = true;
 
 		for (const [i, block] of slideBlocks.entries()) {
 			const type = block.$type;
@@ -201,7 +200,7 @@ class Slide extends React.Component<Props> {
 				case BlockTypes.video: {
 					const videoBlock = block as VideoBlock;
 
-					if(firstVideoBlock) {
+					if(i === 0) {
 						if(autoplay) {
 							videoBlock.autoplay = !!autoplay; //autoplay for first video on slide
 						}
@@ -209,8 +208,6 @@ class Slide extends React.Component<Props> {
 						if(slideBlocks.length === 1) {
 							videoBlock.openAnnotation = true; // only video on slide => open annotation
 						}
-
-						firstVideoBlock = false;
 					}
 
 					videoBlock.annotationWithoutBottomPaddings = !block.hide &&
