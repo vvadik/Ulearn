@@ -1,14 +1,16 @@
 import React, { createRef, RefObject } from 'react';
 
 import { Controlled, } from "react-codemirror2";
-import { Checkbox, FLAT_THEME, Select, Toast, Tooltip } from "ui";
+import { Checkbox, FLAT_THEME, Select, Toast, Tooltip, ThemeContext, } from "ui";
 import { Review } from "./Review/Review";
 import { CongratsModal } from "./CongratsModal/CongratsModal";
 import { ExerciseOutput, HasOutput } from "./ExerciseOutput/ExerciseOutput";
 import { ExerciseFormHeader } from "./ExerciseFormHeader/ExerciseFormHeader";
 import Controls from "./Controls/Controls";
 import LoginForContinue from "src/components/notificationModal/LoginForContinue";
-import { ThemeContext } from "ui";
+import { HelpLite } from "icons";
+
+import { darkFlat } from "src/uiTheme";
 
 import classNames from 'classnames';
 import moment from "moment";
@@ -18,6 +20,15 @@ import {
 	loadFromCache,
 	saveToCache,
 } from "src/utils/localStorageManager";
+import { convertDefaultTimezoneToLocal } from "src/utils/momentUtils";
+import {
+	GetLastSuccessSubmission,
+	GetSubmissionColor,
+	HasSuccessSubmission,
+	IsFirstRightAnswer,
+	SubmissionColor,
+	SubmissionIsLast,
+} from "./ExerciseUtils";
 
 import { Language, } from "src/consts/languages";
 import { constructPathToAcceptedSolutions, } from "src/consts/routes";
@@ -43,17 +54,7 @@ import registerCodeMirrorHelpers from "./CodeMirrorAutocompleteExtension";
 import styles from './Exercise.less';
 
 import texts from './Exercise.texts';
-import {
-	GetLastSuccessSubmission,
-	GetSubmissionColor,
-	HasSuccessSubmission,
-	IsFirstRightAnswer, SubmissionColor,
-	SubmissionIsLast,
-} from "./ExerciseUtils";
 
-import { convertDefaultTimezoneToLocal } from "src/utils/momentUtils";
-import Icon, { HelpLite } from "icons";
-import { darkFlat } from "../../../../../../uiTheme";
 
 interface DispatchFunctionsProps {
 	sendCode: (courseId: string, slideId: string, value: string, language: Language) => unknown;
@@ -388,8 +389,8 @@ class Exercise extends React.Component<Props, State> {
 		return (
 			<React.Fragment>
 				{ submissions.length !== 0 && this.renderSubmissionsSelect() }
-				{ languages.length > 1 && (submissions.length > 0 || isEditable) && this.renderLanguageSelect()}
-				{ languages.length > 1 && (submissions.length > 0 || isEditable) && this.renderLanguageLaunchInfoTooltip()}
+				{ languages.length > 1 && (submissions.length > 0 || isEditable) && this.renderLanguageSelect() }
+				{ languages.length > 1 && (submissions.length > 0 || isEditable) && this.renderLanguageLaunchInfoTooltip() }
 				{ !isEditable && this.renderHeader(submissionColor, selectedSubmissionIsLast,
 					selectedSubmissionIsLastSuccess) }
 				{ modalData && this.renderModal(modalData) }
@@ -539,27 +540,22 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	renderLanguageLaunchInfoTooltip = (): React.ReactElement => {
-		const { language } = this.state;
-		const { languageInfo } = this.props;
-		const languageLaunchInfo = texts.getLanguageLaunchInfo(language, languageInfo);
-		function renderLine(name: string, value: string) {
-			return value && (<><h5>{name}</h5><p>{value}</p></>)
-		}
 		return (
 			<ThemeContext.Provider value={ darkFlat }>
-				<Tooltip trigger="click" render={() => (
-					<div>
-						{ renderLine("Операционная система: ", "Ubuntu 20.04 x86_64")}
-						{ renderLine("Компиляция: ", languageLaunchInfo.compileCommand) }
-						{ renderLine("Запуск: ", languageLaunchInfo.runCommand) }
-					</div>
-				) }>
-					<span className={styles.launchInfoHelpIcon}>
+				<Tooltip trigger="click" render={ this.renderLanguageLaunchInfoTooltipContent }>
+					<span className={ styles.launchInfoHelpIcon }>
 						<HelpLite/>
 					</span>
 				</Tooltip>
 			</ThemeContext.Provider>
 		);
+	};
+
+	renderLanguageLaunchInfoTooltipContent = (): React.ReactNode => {
+		const { language } = this.state;
+		const { languageInfo } = this.props;
+
+		return texts.getLanguageLaunchMarkup(texts.getLanguageLaunchInfo(language, languageInfo));
 	};
 
 	onLanguageSelectValueChange = (l: unknown): void => {
