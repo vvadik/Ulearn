@@ -9,6 +9,7 @@ import AnyPage from 'src/pages/AnyPage';
 import UnitFlashcardsPage from 'src/pages/course/UnitFlashcardsPage';
 import CourseFlashcardsPage from 'src/pages/course/CourseFlashcardsPage';
 import PreviewUnitPageFromAllCourse from "src/components/flashcards/UnitPage/PreviewUnitPageFromAllCourse";
+import SlideHeader from "./Slide/SlideHeader/SlideHeader.tsx";
 import { BlocksWrapper } from "src/components/course/Course/Slide/Blocks";
 import CommentsView from "src/components/comments/CommentsView/CommentsView";
 import Slide from './Slide/Slide';
@@ -27,7 +28,6 @@ import { ScoringGroupsIds } from 'src/consts/scoringGroup';
 import classnames from 'classnames';
 
 import styles from "./Course.less"
-import SlideHeader from "./Slide/SlideHeader/SlideHeader.tsx";
 
 const slideNavigationButtonTitles = {
 	next: "Далее",
@@ -283,7 +283,7 @@ class Course extends Component {
 
 	renderSlide() {
 		const { pageInfo: { isNavigationVisible, isReview, }, user, courseId, isStudentMode, } = this.props;
-		const { currentSlideInfo, currentSlideId, currentCourseId, Page, title, } = this.state;
+		const { currentSlideInfo, currentSlideId, currentCourseId, Page, title, openUnit, } = this.state;
 
 		const wrapperClassName = classnames(
 			styles.rootWrapper,
@@ -313,6 +313,7 @@ class Course extends Component {
 						isHiddenSlide={ slideInfo && slideInfo.hide }
 						slideType={ slideInfo && slideInfo.type }
 						userRoles={ userRoles }
+						openUnitId={ openUnit?.id }
 					/> }
 					{
 						Page === Slide

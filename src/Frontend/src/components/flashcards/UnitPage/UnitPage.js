@@ -104,7 +104,7 @@ class UnitPage extends Component {
 					<Guides guides={ guides }/>
 				</div>);
 		}
-		console.log(UnitPage.mapFlashcardsToQuestionWithAnswers(unitFlashcards));
+
 		return (
 			<footer className={ styles.footer }>
 				<div className={ styles.progressBarContainer }>

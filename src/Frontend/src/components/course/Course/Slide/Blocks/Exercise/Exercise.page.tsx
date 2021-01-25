@@ -9,9 +9,9 @@ import { RootState } from "src/models/reduxState";
 import { userProgressUpdateAction } from "src/actions/userProgress";
 import { sendCode, addReviewComment, deleteReviewComment, } from "src/actions/course.js";
 import { Language } from "src/consts/languages";
-import MatchType from "src/consts/router";
+import { MatchParams } from "src/consts/router";
 
-const mapStateToProps = (state: RootState, { courseId, slideId, }: MatchType) => {
+const mapStateToProps = (state: RootState, { courseId, slideId, }: MatchParams) => {
 	const { slides, account, userProgress } = state;
 	const { submissionsByCourses, submissionError, lastCheckingResponse, } = slides;
 	const slideProgress = userProgress?.progress[courseId]?.[slideId] || {};

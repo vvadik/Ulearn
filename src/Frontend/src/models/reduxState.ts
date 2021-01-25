@@ -1,7 +1,7 @@
 import { SlideUserProgress } from "./userProgress";
 import { CourseInfo } from "./course";
 import {
-	AutomaticExerciseCheckingProcessStatus, AutomaticExerciseCheckingResult, ExerciseAutomaticCheckingResponse,
+	ExerciseAutomaticCheckingResponse,
 	ReviewCommentResponse,
 	ReviewInfo,
 	RunSolutionResponse,
@@ -9,9 +9,9 @@ import {
 } from "./exercise";
 import { CourseAccessType, CourseRoleType, SystemAccessType } from "../consts/accessType";
 import { AccountProblemType } from "../consts/accountProblemType";
-import { Language } from "../consts/languages";
 import BlockTypes from "../components/course/Course/Slide/blockTypes";
 import { Block } from "./slide";
+import { Flashcard, UnitFlashcardsInfo } from "./flashcards";
 
 interface RootState {
 	userProgress: UserProgressState;
@@ -27,6 +27,10 @@ interface UserProgressState {
 
 interface CourseState {
 	fullCoursesInfo: { [courseId: string]: CourseInfo }
+
+	flashcardsByCourses: { [courseId: string]: { [flashcardId: string]: Flashcard } }
+	flashcardsByUnits: { [unitId: string]: UnitFlashcardsInfo };
+	flashcardsLoading: boolean,
 	// TODO не все поля
 }
 

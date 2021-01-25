@@ -1,6 +1,4 @@
-import { string } from "prop-types";
-
-export function getQueryStringParameter(name: string, url: string): string | null {
+export function getQueryStringParameter(name: string, url?: string): string | null {
 	if(!url) {
 		url = window.location.href;
 	}
@@ -15,6 +13,8 @@ export function getQueryStringParameter(name: string, url: string): string | nul
 	}
 	return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
+
+//query params should be explained in MatchParams in src/consts/router.tx
 
 export function buildQuery(
 	params?: Record<string, unknown>,

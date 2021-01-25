@@ -39,8 +39,11 @@ export function constructPathToStudentSubmissions(courseId: string, slideId: str
 	return `/${ exerciseStudentSubmissions }?courseId=${ courseId }&slideId=${ slideId }`;
 }
 
-export function constructPathToFlashcardsPreview(courseId: string,): string {
-	return `/${ coursePath }/${ courseId }/${ flashcards }/${ flashcardsPreview }`;
+export function constructPathToFlashcardsPreview(courseId: string, openUnitId?: string): string {
+	const unitIdQuery = buildQuery({ unitId: openUnitId });
+	const url = `/${ coursePath }/${ courseId }/${ flashcards }/${ flashcardsPreview }`;
+
+	return unitIdQuery ? url + unitIdQuery : url;
 }
 
 export function constructLinkWithReturnUrl(link: string, returnUrl?: string): string {

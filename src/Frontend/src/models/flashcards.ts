@@ -12,6 +12,16 @@ interface Flashcard {
 	theorySlides: TheorySlideInfo[],
 }
 
+interface UnitFlashcardsInfo {
+	unitId: string,
+	unitTitle: string,
+	unlocked: boolean,
+	flashcardsIds: string[],
+	unratedFlashcardsCount: number,
+	cardsCount: number,
+	flashcardsSlideSlug: string,
+}
+
 interface TheorySlideInfo {
 	slug: string,
 	title: string,
@@ -22,4 +32,4 @@ interface QuestionWithAnswer {
 	answer: string,
 }
 
-export { Flashcard, TheorySlideInfo, QuestionWithAnswer, };
+export { Flashcard, UnitFlashcardsInfo, TheorySlideInfo, QuestionWithAnswer, };

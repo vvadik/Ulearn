@@ -10,7 +10,7 @@ import queryString from "query-string";
 
 import { Block, ExerciseBlock, ShortSlideInfo, SpoilerBlock, TexBlock, VideoBlock, } from "src/models/slide";
 import { RootState } from "src/models/reduxState";
-import MatchType from "src/consts/router";
+import { MatchParams } from "src/consts/router";
 import BlockTypes from "src/components/course/Course/Slide/blockTypes";
 import { Dispatch } from "redux";
 
@@ -280,7 +280,7 @@ class Slide extends React.Component<Props> {
 	};
 }
 
-const mapStateToProps = (state: RootState, { courseId, slideId, }: MatchType) => {
+const mapStateToProps = (state: RootState, { courseId, slideId, }: MatchParams) => {
 	const { slides, } = state;
 	const { slidesByCourses, slideLoading } = slides;
 
