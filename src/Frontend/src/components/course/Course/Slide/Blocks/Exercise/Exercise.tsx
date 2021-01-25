@@ -1,13 +1,14 @@
 import React, { createRef, RefObject } from 'react';
 
 import { Controlled, } from "react-codemirror2";
-import { Checkbox, FLAT_THEME, Select, ThemeContext, Toast, Tooltip, } from "ui";
+import { Checkbox, FLAT_THEME, Modal, Select, ThemeContext, Toast, Tooltip, } from "ui";
 import { Review } from "./Review/Review";
 import { CongratsModal } from "./CongratsModal/CongratsModal";
 import { ExerciseOutput, HasOutput } from "./ExerciseOutput/ExerciseOutput";
 import { ExerciseFormHeader } from "./ExerciseFormHeader/ExerciseFormHeader";
 import Controls from "./Controls/Controls";
 import LoginForContinue from "src/components/notificationModal/LoginForContinue";
+import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent.js";
 
 import { darkFlat } from "src/uiTheme";
 
@@ -84,6 +85,8 @@ interface Props extends ExerciseBlockProps, DispatchFunctionsProps, FromSlidePro
 enum ModalType {
 	congrats,
 	loginForContinue,
+	acceptedSolutions,
+	studentsSubmissions,
 }
 
 interface ModalData<T extends ModalType> {
@@ -383,7 +386,7 @@ class Exercise extends React.Component<Props, State> {
 				expectedOutput);
 		const isAcceptedSolutionsWillNotDiscardScore = submissions.filter(
 			s => s.automaticChecking?.result === AutomaticExerciseCheckingResult.RightAnswer).length > 0 || slideProgress.isSkipped;
-		
+
 		return (
 			<React.Fragment>
 				{ submissions.length !== 0 && this.renderSubmissionsSelect() }
@@ -632,6 +635,10 @@ class Exercise extends React.Component<Props, State> {
 		});
 	};
 
+	openAcceptedSolutionsModal = (): void => {
+		this.openModal({ type: ModalType.acceptedSolutions });
+	};
+
 	getReviewsWithTextMarkers = (submission: SubmissionInfoRedux): ReviewInfoWithMarker[] => {
 		const { exerciseCodeDoc } = this.state;
 		const reviews = this.getAllReviewsFromSubmission(submission);
@@ -745,18 +752,20 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	renderModal = (modalData: ModalData<ModalType>): React.ReactNode => {
-		const { hideSolutions, } = this.props;
+		const { hideSolutions, courseId, slideId, } = this.props;
 
 		switch (modalData.type) {
 			case ModalType.congrats: {
 				const { score, waitingForManualChecking, } = modalData as CongratsModalData;
+				const showAcceptedSolutions = !waitingForManualChecking && !hideSolutions;
+
 				return (
 					score &&
 					<CongratsModal
-						showAcceptedSolutions={ !waitingForManualChecking && !hideSolutions }
+						showAcceptedSolutions={ showAcceptedSolutions }
 						score={ score }
 						waitingForManualChecking={ waitingForManualChecking || false }
-						onClose={ this.closeModal }
+						onClose={ showAcceptedSolutions ? this.openAcceptedSolutionsModal : this.closeModal }
 					/>
 				);
 			}
@@ -766,6 +775,24 @@ class Exercise extends React.Component<Props, State> {
 						onClose={ this.closeModal }
 					/>
 				);
+			}
+			case ModalType.studentsSubmissions:
+				break;
+			case ModalType.acceptedSolutions: {
+				return (
+					<DownloadedHtmlContent
+						url={ constructPathToAcceptedSolutions(courseId, slideId) }
+						injectInWrapperAfterContentReady={ (html: React.ReactNode) =>
+							<Modal onClose={ this.closeModal }>
+								<Modal.Header>
+									{ texts.acceptedSolutions.title }
+								</Modal.Header>
+								<Modal.Body>
+									{ texts.acceptedSolutions.content }
+									{ html }
+								</Modal.Body>
+							</Modal> }
+					/>);
 			}
 		}
 	};
@@ -913,6 +940,7 @@ class Exercise extends React.Component<Props, State> {
 		const { courseId, slideId, visitAcceptedSolutions, } = this.props;
 
 		visitAcceptedSolutions(courseId, slideId);
+		this.openAcceptedSolutionsModal();
 	};
 
 	closeModal = (): void => {

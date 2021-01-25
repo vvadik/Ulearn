@@ -51,7 +51,7 @@ class CongratsModal extends React.Component<CongratsModalProps> {
 
 					<div className={ styles.closeButtonWrapper }>
 						<button className={ styles.closeButton }
-								onClick={ showAcceptedSolutions ? this.onCloseClick : onClose }>
+								onClick={ onClose }>
 							{ showAcceptedSolutions ? texts.closeButtonForAcceptedSolutions : texts.closeButton }
 						</button>
 					</div>
@@ -64,11 +64,6 @@ class CongratsModal extends React.Component<CongratsModalProps> {
 		return (
 			<div className={ styles.scoreTextWrapper }>+{ score }</div>
 		);
-	};
-
-	private onCloseClick = () => {
-		const { onClose, } = this.props;
-		onClose();
 	};
 
 	private renderSelfCheckContent = () => {
