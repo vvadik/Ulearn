@@ -137,10 +137,11 @@ interface State {
 interface ExerciseCode {
 	value: string,
 	time: string,
+	language: Language,
 }
 
-function saveExerciseCodeToCache(id: string, value: string, time: string): void {
-	saveToCache<ExerciseCode>(exerciseSolutions, id, { value, time });
+function saveExerciseCodeToCache(id: string, value: string, time: string, language: Language): void {
+	saveToCache<ExerciseCode>(exerciseSolutions, id, { value, time, language });
 }
 
 function loadExerciseCodeFromCache(id: string): ExerciseCode | undefined {
@@ -520,7 +521,7 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	renderLanguageSelect = (): React.ReactElement => {
-		const { language } = this.state;
+		const { language, isEditable, } = this.state;
 		const { languages, languageInfo } = this.props;
 		const items = languages.sort().map((l) => {
 			return [l, texts.getLanguageLaunchInfo(l, languageInfo).compiler];
@@ -529,6 +530,7 @@ class Exercise extends React.Component<Props, State> {
 			<div className={ styles.select }>
 				<ThemeContext.Provider value={ FLAT_THEME }>
 					<Select
+						disabled={ !isEditable }
 						width={ '100%' }
 						items={ items }
 						value={ language }
@@ -1063,12 +1065,14 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	saveCodeToCache = (slideId: string, value: string): void => {
-		saveExerciseCodeToCache(slideId, value, moment().format());
+		const { language, } = this.state;
+
+		saveExerciseCodeToCache(slideId, value, moment().format(), language);
 	};
 
 	loadCodeFromCache = (slideId: string): void => {
 		const { submissions } = this.props;
-		const { value } = this.state;
+		const { value, language } = this.state;
 
 		const code = loadExerciseCodeFromCache(slideId);
 
@@ -1088,6 +1092,7 @@ class Exercise extends React.Component<Props, State> {
 			this.resetCode();
 			this.setState({
 				value: newValue,
+				language: code.language ? code.language : language,
 			});
 		}
 	};
