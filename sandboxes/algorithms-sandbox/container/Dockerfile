@@ -1,7 +1,9 @@
-FROM ubuntu:20.10
+FROM ubuntu:20.04
 
 ENV NVM_DIR /usr/local/nvm
 ENV NODE_VERSION 14.15.3
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=Europe/Ekaterinburg
 
 RUN apt update && apt -y upgrade && apt install -y wget && apt -y install curl \
 	# Python 3.8
@@ -14,7 +16,7 @@ RUN apt update && apt -y upgrade && apt install -y wget && apt -y install curl \
 	&& apt update && apt install -y apt-transport-https && apt install -y dotnet-sdk-5.0 \
   	&& apt install -y apt-transport-https && apt install -y dotnet-runtime-5.0 \
 	# Java
-	&& apt install -y openjdk-8-jdk \
+	&& apt install -y openjdk-14-jdk \
 	# JavaScript
 	&& curl --silent -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.2/install.sh | bash \
     && . $NVM_DIR/nvm.sh \
