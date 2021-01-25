@@ -21,7 +21,7 @@ import styles from './Navigation.less';
 const mobileNavigationMenuWidth = 250;//250 is @mobileNavigationMenuWidth, its mobile nav menu width
 
 class Navigation extends Component {
-	touchDistanceTolerance = 5;
+	touchDistanceTolerance = 10;
 
 	constructor(props) {
 		super(props);

@@ -3,11 +3,11 @@ import translateTextToKatex from 'src/codeTranslator/katex';
 
 export default function translateCode(
 	element: HTMLElement,
-	settings: { [id: string]: Record<string, unknown> } = {},
-	excludeTranslatorsByIds: { [id: string]: boolean } = {}
+	settings: { [id: string]: { settings: Record<string, unknown>, config: Record<string, unknown> } } = {},
+	excludeTranslators: { [id: string]: boolean } = {},
 ): void {
 	for (const { id, selector, translateFunction } of translators) {
-		if(excludeTranslatorsByIds[id]) {
+		if(excludeTranslators[id]) {
 			continue;
 		}
 		const elements = selector(element);
@@ -16,7 +16,6 @@ export default function translateCode(
 			if(element.style.display === 'none') {
 				continue;
 			}
-
 			translateFunction(element, settings[id]);
 		}
 	}
@@ -26,7 +25,9 @@ const translators = [
 	{
 		id: 'codeMirror',
 		selector: (element: HTMLElement) => element.querySelectorAll('.code') as NodeListOf<HTMLElement>,
-		translateFunction: (element: HTMLElement, additionalSettings = {}) => {
+		translateFunction: (element: HTMLElement,
+			additionalSettings?: { settings: Record<string, unknown>, config: Record<string, unknown> }
+		) => {
 			translateTextareaToCode(element as HTMLTextAreaElement, additionalSettings);
 		},
 	},

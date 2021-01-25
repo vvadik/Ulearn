@@ -29,6 +29,16 @@ interface UnitInfo {
 	additionalScores: UnitScoringGroupInfo[];
 }
 
+interface InfoByUnit {
+	unitId: string,
+	unitTitle: string,
+	unlocked: boolean,
+	flashcardsIds: string[],
+	unratedFlashcardsCount: number,
+	cardsCount: number,
+	flashcardsSlideSlug: string,
+}
+
 interface AbstractScoringGroupInfo {
 	id: string;
 	name: string;
@@ -42,5 +52,4 @@ interface UnitScoringGroupInfo extends AbstractScoringGroupInfo {
 	maxAdditionalScore: number;
 }
 
-
-export { CourseInfo, ScoringGroup, UnitInfo, UnitScoringGroupInfo }
+export { CourseInfo, ScoringGroup, UnitInfo, UnitScoringGroupInfo, InfoByUnit };

@@ -6,7 +6,8 @@ import Results from "../Results/Results";
 
 import styles from "./openedFlashcard.less";
 
-import translateCode from "../../../../codeTranslator/translateCode";
+import translateCode from "src/codeTranslator/translateCode";
+import { settingsForFlashcards } from "src/codeTranslator/codemirror";
 import { Link } from "react-router-dom";
 
 class OpenedFlashcard extends Component {
@@ -20,7 +21,7 @@ class OpenedFlashcard extends Component {
 
 	componentDidMount() {
 		document.addEventListener('keyup', this.handleKeyUp);
-		translateCode(this.modal);
+		translateCode(this.modal, { 'codeMirror': settingsForFlashcards });
 	}
 
 	componentWillUnmount() {
@@ -28,7 +29,7 @@ class OpenedFlashcard extends Component {
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
-		translateCode(this.modal);
+		translateCode(this.modal, { 'codeMirror': settingsForFlashcards });
 	}
 
 	handleKeyUp = (e) => {

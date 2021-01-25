@@ -6,6 +6,8 @@ import {
 	AutomaticExerciseCheckingResult,
 	SolutionRunStatus,
 } from "src/models/exercise";
+import { Language } from "src/consts/languages";
+
 import { SubmissionColor } from "../ExerciseUtils";
 
 const Template: Story<ExerciseFormHeaderProps> = (args) => <ExerciseFormHeader { ...args } />;
@@ -21,15 +23,16 @@ const submissionInfo = {
 		reviews: null
 	},
 	manualCheckingPassed: false,
-	manualCheckingReviews: []
-}
+	manualCheckingReviews: [],
+	language: Language.cSharp
+};
 
 export const Editable = Template.bind({});
 Editable.args = {
 	solutionRunStatus: null,
 	selectedSubmission: submissionInfo,
 	score: 10
-}
+};
 
 export default {
 	title: 'Exercise/ExerciseFromHeader',

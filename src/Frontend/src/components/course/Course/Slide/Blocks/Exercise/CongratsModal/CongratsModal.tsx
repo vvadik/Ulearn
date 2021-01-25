@@ -3,7 +3,7 @@ import React from "react";
 import styles from "./CongratsModal.less";
 
 import texts from "./CongratsModal.texts";
-import CupIcon from "./CupIcon.js";
+import CupIcon from "./CupIcon";
 
 interface CongratsModalProps {
 	onClose: () => void,
