@@ -1,4 +1,4 @@
-import { NAVIGATION__TOGGLE } from "../consts/actions";
+import { NAVIGATION__TOGGLE } from "src/consts/actions";
 
 const toggleNavigationAction = () => ({
 	type: NAVIGATION__TOGGLE,

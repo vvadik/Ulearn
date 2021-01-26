@@ -4,7 +4,7 @@ import {
 	COURSES__EXERCISE_ADD_REVIEW_COMMENT,
 	COURSES__EXERCISE_DELETE_REVIEW_COMMENT,
 	START, SUCCESS, FAIL,
-} from '../consts/actions';
+} from 'src/consts/actions';
 import blockTypes from "src/components/course/Course/Slide/blockTypes";
 
 const initialCoursesSlidesState = {

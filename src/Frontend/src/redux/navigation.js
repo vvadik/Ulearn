@@ -1,6 +1,6 @@
 import {
 	NAVIGATION__TOGGLE,
-} from '../consts/actions';
+} from 'src/consts/actions';
 
 const initialState = {
 	opened: false,

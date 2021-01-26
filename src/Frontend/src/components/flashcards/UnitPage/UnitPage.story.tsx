@@ -2,7 +2,7 @@ import React from "react";
 import UnitPage from "./UnitPage.js";
 import { flashcards, guides, infoByUnits, } from "src/components/flashcards/storyData";
 import { RateTypes } from "src/consts/rateTypes";
-import { Flashcard } from "../../../models/flashcards";
+import { Flashcard } from "src/models/flashcards";
 
 export default {
 	title: "Cards/UnitPage",

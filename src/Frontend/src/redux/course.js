@@ -7,9 +7,9 @@ import {
 	COURSES__SLIDE_READY,
 	START, SUCCESS, FAIL,
 	COURSES__COURSE_LOAD_ERRORS,
-} from '../consts/actions';
-import { RateTypes } from "../consts/rateTypes";
-import { flashcards as flashcardsSlideType } from "../consts/routes";
+} from 'src/consts/actions';
+import { RateTypes } from "src/consts/rateTypes";
+import { flashcards as flashcardsSlideType } from "src/consts/routes";
 
 const initialCoursesState = {
 	courseById: {},

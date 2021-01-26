@@ -1,7 +1,7 @@
 import api from "./index";
-import { commentPoliciesPath, commentsPath, constructPathToComment } from "../consts/routes";
-import { buildQuery } from "../utils";
-import { convertCamelCaseToSnakeCase } from "../utils/caseConverter";
+import { commentPoliciesPath, commentsPath, constructPathToComment } from "src/consts/routes";
+import { buildQuery } from "src/utils";
+import { convertCamelCaseToSnakeCase } from "src/utils/caseConverter";
 
 export function getComments(courseId, slideId, forInstructors, offset, count) {
 	const query = buildQuery({ courseId, slideId, forInstructors, count, offset }, convertCamelCaseToSnakeCase);

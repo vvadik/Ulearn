@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from 'prop-types';
 
 import { Link } from "react-router-dom";
-import { flashcards, constructPathToSlide } from '../../../../../consts/routes';
+import { flashcards, constructPathToSlide } from 'src/consts/routes';
 
 import classnames from 'classnames';
 

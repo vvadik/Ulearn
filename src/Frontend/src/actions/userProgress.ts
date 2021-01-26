@@ -1,7 +1,7 @@
 import { Dispatch } from "redux";
 
-import { getUserProgressInCourse, updateUserProgressInCourse } from '../api/userProgress';
-import { SlideUserProgress, UsersProgressResponse } from "../models/userProgress";
+import { getUserProgressInCourse, updateUserProgressInCourse } from 'src/api/userProgress';
+import { SlideUserProgress, UsersProgressResponse } from "src/models/userProgress";
 import {
 	LoadUserProgressFailAction,
 	LoadUserProgressStartAction,

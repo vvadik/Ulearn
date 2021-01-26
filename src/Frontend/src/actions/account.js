@@ -1,6 +1,6 @@
 import {
 	ACCOUNT__USER_HIJACK,
-} from '../consts/actions';
+} from 'src/consts/actions';
 
 const userProgressHijackAction = (isHijacked) => ({
 	type: ACCOUNT__USER_HIJACK,

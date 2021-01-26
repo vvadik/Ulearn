@@ -10,7 +10,7 @@ import {
 	COURSES__EXERCISE_ADD_REVIEW_COMMENT,
 	COURSES__EXERCISE_DELETE_REVIEW_COMMENT,
 	START, SUCCESS, FAIL,
-} from "../consts/actions";
+} from "src/consts/actions";
 
 import { userProgressUpdateAction } from "./userProgress";
 import { getCourse, getCourseErrors } from 'src/api/courses';
@@ -18,7 +18,7 @@ import { getSlideBlocks, submitCode, } from "src/api/slides";
 import {
 	getFlashcards,
 	putFlashcardStatus,
-} from '../api/flashcards';
+} from 'src/api/flashcards';
 import { sendCodeReviewComment, deleteCodeReviewComment, } from "src/api/exercise";
 import { SolutionRunStatus } from "src/models/exercise.ts";
 

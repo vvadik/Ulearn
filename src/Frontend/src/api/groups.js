@@ -1,4 +1,4 @@
-import api from "../api/"
+import api from "src/api"
 import { resetStudentsLimits } from "src/consts/routes";
 
 // Groups

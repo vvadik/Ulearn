@@ -1,4 +1,4 @@
-import { RateTypes } from "../../../../consts/rateTypes";
+import { RateTypes } from "src/consts/rateTypes";
 
 const { notRated, } = RateTypes;
 

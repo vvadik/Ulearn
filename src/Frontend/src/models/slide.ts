@@ -1,6 +1,6 @@
 import BlockTypes from "../components/course/Course/Slide/blockTypes";
 import { ReactNode } from "react";
-import { Language } from "../consts/languages";
+import { Language } from "src/consts/languages";
 import { SubmissionInfoRedux } from "./reduxState";
 import { AttemptsStatistics } from "./exercise";
 

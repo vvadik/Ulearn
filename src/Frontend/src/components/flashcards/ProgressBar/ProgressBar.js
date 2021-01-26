@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from "prop-types";
 
 import classNames from 'classnames';
-import { RateTypes } from '../../../consts/rateTypes';
+import { RateTypes } from 'src/consts/rateTypes';
 
 import styles from './progressBar.less'
 

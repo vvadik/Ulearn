@@ -157,7 +157,7 @@ class Exercise extends React.Component<Props, State> {
 	constructor(props: Props) {
 		super(props);
 		const { exerciseInitialCode, submissions, languages, renderedHints, defaultLanguage } = props;
-		debugger;
+
 		this.state = {
 			value: exerciseInitialCode,
 			valueChanged: false,
