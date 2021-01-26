@@ -645,9 +645,11 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	openAcceptedSolutionsModal = (): void => {
-		const { courseId, slideId, visitAcceptedSolutions, } = this.props;
+		const { courseId, slideId, visitAcceptedSolutions, submissions, } = this.props;
 
-		visitAcceptedSolutions(courseId, slideId);
+		if(!HasSuccessSubmission(submissions)) {
+			visitAcceptedSolutions(courseId, slideId);
+		}
 		this.openModal({ type: ModalType.acceptedSolutions });
 	};
 
