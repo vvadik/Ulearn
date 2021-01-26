@@ -18,10 +18,11 @@ interface SlideHeaderProps {
 	isHiddenSlide: boolean,
 	userRoles: UserRoles,
 	slideType: SlideType,
+	openUnitId?: string,
 }
 
 const SlideHeader: React.FC<SlideHeaderProps> = (props) => {
-	const { courseId, slideId, isHiddenSlide, slideType, userRoles, } = props;
+	const { courseId, slideId, isHiddenSlide, slideType, userRoles, openUnitId, } = props;
 	if(isHiddenSlide) {
 		return <HiddenSlideHeader/>;
 	}
@@ -29,8 +30,9 @@ const SlideHeader: React.FC<SlideHeaderProps> = (props) => {
 		return <ScoreHeader courseId={ courseId } slideId={ slideId }/>;
 	}
 
-	if(slideType === SlideType.Flashcards || slideType === SlideType.CourseFlashcards && isCourseAdmin(userRoles)) {
-		return <FlashcardsSlideHeader pathToFlashcardsSlide={ constructPathToFlashcardsPreview(courseId) }/>;
+	if((slideType === SlideType.Flashcards || slideType === SlideType.CourseFlashcards) && isCourseAdmin(userRoles)) {
+		return <FlashcardsSlideHeader
+			pathToFlashcardsSlide={ constructPathToFlashcardsPreview(courseId, openUnitId) }/>;
 	}
 
 	return null;

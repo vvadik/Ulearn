@@ -1,31 +1,39 @@
 import React, { createRef, RefObject } from 'react';
 
 import { Controlled, } from "react-codemirror2";
-import { Checkbox, FLAT_THEME, Select, Toast, Tooltip } from "ui";
+import { Checkbox, FLAT_THEME, Modal, Select, ThemeContext, Toast, Tooltip, } from "ui";
 import { Review } from "./Review/Review";
 import { CongratsModal } from "./CongratsModal/CongratsModal";
 import { ExerciseOutput, HasOutput } from "./ExerciseOutput/ExerciseOutput";
 import { ExerciseFormHeader } from "./ExerciseFormHeader/ExerciseFormHeader";
 import Controls from "./Controls/Controls";
 import LoginForContinue from "src/components/notificationModal/LoginForContinue";
-import { ThemeContext } from "ui";
+import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent.js";
+
+import { darkFlat } from "src/uiTheme";
 
 import classNames from 'classnames';
 import moment from "moment";
 
+import { exerciseSolutions, loadFromCache, saveToCache, } from "src/utils/localStorageManager";
+import { convertDefaultTimezoneToLocal } from "src/utils/momentUtils";
 import {
-	exerciseSolutions,
-	loadFromCache,
-	saveToCache,
-} from "src/utils/localStorageManager";
+	GetLastSuccessSubmission,
+	GetSubmissionColor,
+	HasSuccessSubmission,
+	IsFirstRightAnswer,
+	SubmissionColor,
+	SubmissionIsLast,
+} from "./ExerciseUtils";
 
 import { Language, } from "src/consts/languages";
 import { constructPathToAcceptedSolutions, } from "src/consts/routes";
 import {
 	AutomaticExerciseCheckingResult as CheckingResult,
-	SolutionRunStatus,
-	RunSolutionResponse,
+	AutomaticExerciseCheckingResult,
 	ReviewInfo,
+	RunSolutionResponse,
+	SolutionRunStatus,
 } from "src/models/exercise";
 import { AccountState, ReviewInfoRedux, SubmissionInfoRedux } from "src/models/reduxState";
 import { SlideUserProgress } from "src/models/userProgress";
@@ -43,17 +51,7 @@ import registerCodeMirrorHelpers from "./CodeMirrorAutocompleteExtension";
 import styles from './Exercise.less';
 
 import texts from './Exercise.texts';
-import {
-	GetLastSuccessSubmission,
-	GetSubmissionColor,
-	HasSuccessSubmission,
-	IsFirstRightAnswer, SubmissionColor,
-	SubmissionIsLast,
-} from "./ExerciseUtils";
 
-import { convertDefaultTimezoneToLocal } from "src/utils/momentUtils";
-import Icon, { HelpLite } from "icons";
-import { darkFlat } from "../../../../../../uiTheme";
 
 interface DispatchFunctionsProps {
 	sendCode: (courseId: string, slideId: string, value: string, language: Language) => unknown;
@@ -87,6 +85,8 @@ interface Props extends ExerciseBlockProps, DispatchFunctionsProps, FromSlidePro
 enum ModalType {
 	congrats,
 	loginForContinue,
+	acceptedSolutions,
+	studentsSubmissions,
 }
 
 interface ModalData<T extends ModalType> {
@@ -136,10 +136,11 @@ interface State {
 interface ExerciseCode {
 	value: string,
 	time: string,
+	language: Language,
 }
 
-function saveExerciseCodeToCache(id: string, value: string, time: string): void {
-	saveToCache<ExerciseCode>(exerciseSolutions, id, { value, time });
+function saveExerciseCodeToCache(id: string, value: string, time: string, language: Language): void {
+	saveToCache<ExerciseCode>(exerciseSolutions, id, { value, time, language });
 }
 
 function loadExerciseCodeFromCache(id: string): ExerciseCode | undefined {
@@ -211,7 +212,15 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	componentDidUpdate(prevProps: Props): void {
-		const { lastCheckingResponse, courseId, slideId, submissions, forceInitialCode, submissionError, } = this.props;
+		const {
+			lastCheckingResponse,
+			courseId,
+			slideId,
+			submissions,
+			forceInitialCode,
+			submissionError,
+			slideProgress,
+		} = this.props;
 		const { currentSubmission, submissionLoading, showOutput, selectedReviewId, } = this.state;
 
 		if(submissionError && submissionError !== prevProps.submissionError) {
@@ -260,6 +269,7 @@ class Exercise extends React.Component<Props, State> {
 				const { automaticChecking } = submission;
 
 				if((!automaticChecking || automaticChecking.result === CheckingResult.RightAnswer)
+					&& !slideProgress.isSkipped
 					&& IsFirstRightAnswer(submissions, submission)) {
 					this.openModal({
 						type: ModalType.congrats,
@@ -383,13 +393,14 @@ class Exercise extends React.Component<Props, State> {
 		const hasOutput = currentSubmission
 			&& HasOutput(visibleCheckingResponse?.message, currentSubmission.automaticChecking,
 				expectedOutput);
-		const isShowAcceptedSolutionsAvailable = submissions.length > 0 || slideProgress.isSkipped;
+		const isAcceptedSolutionsWillNotDiscardScore = submissions.filter(
+			s => s.automaticChecking?.result === AutomaticExerciseCheckingResult.RightAnswer).length > 0 || slideProgress.isSkipped;
 
 		return (
 			<React.Fragment>
 				{ submissions.length !== 0 && this.renderSubmissionsSelect() }
-				{ languages.length > 1 && (submissions.length > 0 || isEditable) && this.renderLanguageSelect()}
-				{ languages.length > 1 && (submissions.length > 0 || isEditable) && this.renderLanguageLaunchInfoTooltip()}
+				{ languages.length > 1 && (submissions.length > 0 || isEditable) && this.renderLanguageSelect() }
+				{ languages.length > 1 && (submissions.length > 0 || isEditable) && this.renderLanguageLaunchInfoTooltip() }
 				{ !isEditable && this.renderHeader(submissionColor, selectedSubmissionIsLast,
 					selectedSubmissionIsLastSuccess) }
 				{ modalData && this.renderModal(modalData) }
@@ -433,11 +444,11 @@ class Exercise extends React.Component<Props, State> {
 						onShowOutputButtonClicked={ this.toggleOutput }
 					/> }
 					<Controls.StatisticsHint attemptsStatistics={ attemptsStatistics }/>
-					{ (!hideSolutions && (isAllHintsShowed || isShowAcceptedSolutionsAvailable))
+					{ (!hideSolutions && (isAllHintsShowed || isAcceptedSolutionsWillNotDiscardScore))
 					&& <Controls.AcceptedSolutionsButton
 						acceptedSolutionsUrl={ constructPathToAcceptedSolutions(courseId, slideId) }
-						onVisitAcceptedSolutions={ this.onVisitAcceptedSolutions }
-						isShowAcceptedSolutionsAvailable={ isShowAcceptedSolutionsAvailable }
+						onVisitAcceptedSolutions={ this.openAcceptedSolutionsModal }
+						isShowAcceptedSolutionsAvailable={ isAcceptedSolutionsWillNotDiscardScore }
 					/> }
 				</Controls>
 				}
@@ -519,7 +530,7 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	renderLanguageSelect = (): React.ReactElement => {
-		const { language } = this.state;
+		const { language, isEditable, } = this.state;
 		const { languages, languageInfo } = this.props;
 		const items = languages.sort().map((l) => {
 			return [l, texts.getLanguageLaunchInfo(l, languageInfo).compiler];
@@ -528,6 +539,7 @@ class Exercise extends React.Component<Props, State> {
 			<div className={ styles.select }>
 				<ThemeContext.Provider value={ FLAT_THEME }>
 					<Select
+						disabled={ !isEditable }
 						width={ '100%' }
 						items={ items }
 						value={ language }
@@ -539,27 +551,22 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	renderLanguageLaunchInfoTooltip = (): React.ReactElement => {
-		const { language } = this.state;
-		const { languageInfo } = this.props;
-		const languageLaunchInfo = texts.getLanguageLaunchInfo(language, languageInfo);
-		function renderLine(name: string, value: string) {
-			return value && (<><h5>{name}</h5><p>{value}</p></>)
-		}
 		return (
 			<ThemeContext.Provider value={ darkFlat }>
-				<Tooltip trigger="click" render={() => (
-					<div>
-						{ renderLine("Операционная система: ", "Ubuntu 20.04 x86_64")}
-						{ renderLine("Компиляция: ", languageLaunchInfo.compileCommand) }
-						{ renderLine("Запуск: ", languageLaunchInfo.runCommand) }
-					</div>
-				) }>
-					<span className={styles.launchInfoHelpIcon}>
-						<HelpLite/>
+				<Tooltip trigger={ "hover" } render={ this.renderLanguageLaunchInfoTooltipContent }>
+					<span className={ styles.launchInfoHelpIcon }>
+						Как компилируется код?
 					</span>
 				</Tooltip>
 			</ThemeContext.Provider>
 		);
+	};
+
+	renderLanguageLaunchInfoTooltipContent = (): React.ReactNode => {
+		const { language } = this.state;
+		const { languageInfo } = this.props;
+
+		return texts.getLanguageLaunchMarkup(texts.getLanguageLaunchInfo(language, languageInfo));
 	};
 
 	onLanguageSelectValueChange = (l: unknown): void => {
@@ -635,6 +642,13 @@ class Exercise extends React.Component<Props, State> {
 		this.setState({
 			modalData: data,
 		});
+	};
+
+	openAcceptedSolutionsModal = (): void => {
+		const { courseId, slideId, visitAcceptedSolutions, } = this.props;
+
+		visitAcceptedSolutions(courseId, slideId);
+		this.openModal({ type: ModalType.acceptedSolutions });
 	};
 
 	getReviewsWithTextMarkers = (submission: SubmissionInfoRedux): ReviewInfoWithMarker[] => {
@@ -750,15 +764,17 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	renderModal = (modalData: ModalData<ModalType>): React.ReactNode => {
-		const { hideSolutions, } = this.props;
+		const { hideSolutions, courseId, slideId, } = this.props;
 
 		switch (modalData.type) {
 			case ModalType.congrats: {
 				const { score, waitingForManualChecking, } = modalData as CongratsModalData;
+				const showAcceptedSolutions = !waitingForManualChecking && !hideSolutions;
+
 				return (
 					score &&
 					<CongratsModal
-						showAcceptedSolutions={ !waitingForManualChecking && !hideSolutions }
+						showAcceptedSolutions={ showAcceptedSolutions ? this.openAcceptedSolutionsModal : undefined }
 						score={ score }
 						waitingForManualChecking={ waitingForManualChecking || false }
 						onClose={ this.closeModal }
@@ -771,6 +787,24 @@ class Exercise extends React.Component<Props, State> {
 						onClose={ this.closeModal }
 					/>
 				);
+			}
+			case ModalType.studentsSubmissions:
+				break;
+			case ModalType.acceptedSolutions: {
+				return (
+					<DownloadedHtmlContent
+						url={ constructPathToAcceptedSolutions(courseId, slideId) }
+						injectInWrapperAfterContentReady={ (html: React.ReactNode) =>
+							<Modal onClose={ this.closeModal }>
+								<Modal.Header>
+									{ texts.acceptedSolutions.title }
+								</Modal.Header>
+								<Modal.Body>
+									{ texts.acceptedSolutions.content }
+									{ html }
+								</Modal.Body>
+							</Modal> }
+					/>);
 			}
 		}
 	};
@@ -912,12 +946,6 @@ class Exercise extends React.Component<Props, State> {
 		this.setState({
 			showOutput: !showOutput
 		});
-	};
-
-	onVisitAcceptedSolutions = (): void => {
-		const { courseId, slideId, visitAcceptedSolutions, } = this.props;
-
-		visitAcceptedSolutions(courseId, slideId);
 	};
 
 	closeModal = (): void => {
@@ -1067,12 +1095,14 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	saveCodeToCache = (slideId: string, value: string): void => {
-		saveExerciseCodeToCache(slideId, value, moment().format());
+		const { language, } = this.state;
+
+		saveExerciseCodeToCache(slideId, value, moment().format(), language);
 	};
 
 	loadCodeFromCache = (slideId: string): void => {
 		const { submissions } = this.props;
-		const { value } = this.state;
+		const { value, language } = this.state;
 
 		const code = loadExerciseCodeFromCache(slideId);
 
@@ -1092,6 +1122,7 @@ class Exercise extends React.Component<Props, State> {
 			this.resetCode();
 			this.setState({
 				value: newValue,
+				language: code.language ? code.language : language,
 			});
 		}
 	};

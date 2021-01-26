@@ -214,7 +214,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			if (!hasAutomaticChecking)
 				await SendToReviewAndUpdateScore(updatedSubmissionNoTracking, courseManager, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender);
 
-			var score = (await slideCheckingsRepo.GetExerciseSlideScoreAndPercent(courseId, exerciseSlide, userId)).Score;
+			var score = await visitsRepo.GetScore(courseId, exerciseSlide.Id, userId);
 			var waitingForManualChecking = updatedSubmissionNoTracking.ManualCheckings.Any(c => !c.IsChecked) ? true : (bool?)null;
 			var prohibitFurtherManualChecking = updatedSubmissionNoTracking.ManualCheckings.Any(c => c.ProhibitFurtherManualCheckings);
 			var result = new RunSolutionResponse(SolutionRunStatus.Success)

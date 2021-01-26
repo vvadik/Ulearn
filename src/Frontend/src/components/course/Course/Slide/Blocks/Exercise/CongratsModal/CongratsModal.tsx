@@ -9,7 +9,7 @@ interface CongratsModalProps {
 	onClose: () => void,
 	waitingForManualChecking: boolean,
 	score: number,
-	showAcceptedSolutions: boolean,
+	showAcceptedSolutions?: () => void,
 }
 
 class CongratsModal extends React.Component<CongratsModalProps> {
@@ -44,14 +44,14 @@ class CongratsModal extends React.Component<CongratsModalProps> {
 						{ texts.title }
 					</h2>
 					<section className={ styles.text }>
-						{ texts.getBodyText(waitingForManualChecking, showAcceptedSolutions, score) }
+						{ texts.getBodyText(waitingForManualChecking, !!showAcceptedSolutions, score) }
 					</section>
 
 					{/* this.renderSelfCheckContent() */ }
 
 					<div className={ styles.closeButtonWrapper }>
 						<button className={ styles.closeButton }
-								onClick={ showAcceptedSolutions ? this.onCloseClick : onClose }>
+								onClick={ showAcceptedSolutions ? showAcceptedSolutions : onClose }>
 							{ showAcceptedSolutions ? texts.closeButtonForAcceptedSolutions : texts.closeButton }
 						</button>
 					</div>
@@ -64,11 +64,6 @@ class CongratsModal extends React.Component<CongratsModalProps> {
 		return (
 			<div className={ styles.scoreTextWrapper }>+{ score }</div>
 		);
-	};
-
-	private onCloseClick = () => {
-		const { onClose, } = this.props;
-		onClose();
 	};
 
 	private renderSelfCheckContent = () => {

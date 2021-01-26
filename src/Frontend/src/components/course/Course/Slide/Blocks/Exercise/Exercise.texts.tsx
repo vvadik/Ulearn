@@ -24,10 +24,13 @@ const texts = {
 		},
 	},
 
-	getLanguageLaunchInfo: (language: Language, languageInfos: EnumDictionary<string, LanguageLaunchInfo> | null): LanguageLaunchInfo => {
+	getLanguageLaunchInfo: (language: Language,
+		languageInfos: EnumDictionary<string, LanguageLaunchInfo> | null
+	): LanguageLaunchInfo => {
 		const capitalizeLanguage = capitalize(language);
-		if (languageInfos !== null && languageInfos[capitalizeLanguage] !== undefined)
+		if(languageInfos !== null && languageInfos[capitalizeLanguage] !== undefined) {
 			return languageInfos[capitalizeLanguage];
+		}
 		return {
 			compiler: language === Language.cSharp ? "C#" : capitalize(language),
 			compileCommand: "",
@@ -35,15 +38,24 @@ const texts = {
 		};
 	},
 
+	getLanguageLaunchMarkup: (languageLaunchInfo: LanguageLaunchInfo): React.ReactNode => {
+		function renderLine(name: string, value: string) {
+			return value && (<><h5>{ name }</h5><p>{ value }</p></>);
+		}
+
+		return (
+			<div>
+				{ renderLine("Операционная система: ", "Ubuntu 20.04 x86_64") }
+				{ renderLine("Компиляция: ", languageLaunchInfo.compileCommand) }
+				{ renderLine("Запуск: ", languageLaunchInfo.runCommand) }
+			</div>);
+	},
+
 	acceptedSolutions: {
 		title: 'Решения',
 		content: <p>Изучите решения ваших коллег. Проголосуйте за решения, в которых вы нашли что-то новое для
 			себя.</p>,
 
-	},
-
-	mocks: {
-		headerSuccess: 'Решение отправлено на ревью – 5 баллов. После ревью преподаватель поставит итоговый балл',
 	},
 
 	checkups: {
