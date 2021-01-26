@@ -7,7 +7,7 @@ import { Button, } from "ui";
 import Flashcards from "../Flashcards/Flashcards";
 
 import styles from './courseFlashcardsPage.less';
-import { guides as defaultGuides } from 'src/consts';
+import { guides as defaultGuides } from '../consts';
 import CourseLoader from "src/components/course/Course/CourseLoader/CourseLoader";
 
 class CourseFlashcardsPage extends Component {

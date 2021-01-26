@@ -1,4 +1,4 @@
-import { guides as defaultGuides } from 'src/consts';
+import { guides as defaultGuides } from '../consts';
 
 import { RateTypes } from "src/consts/rateTypes";
 import { Flashcard, QuestionWithAnswer } from "src/models/flashcards";

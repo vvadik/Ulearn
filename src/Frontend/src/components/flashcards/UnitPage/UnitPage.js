@@ -8,7 +8,7 @@ import ProgressBar from "../ProgressBar/ProgressBar";
 import ShortQuestions from "./ShortQuestions/ShortQuestions";
 import Flashcards from "../Flashcards/Flashcards";
 
-import { guides as defaultGuides } from '.src/consts';
+import { guides as defaultGuides } from '../consts';
 import { RateTypes } from "src/consts/rateTypes";
 
 import countFlashcardsStatistics from "../countFlashcardsStatistics";
