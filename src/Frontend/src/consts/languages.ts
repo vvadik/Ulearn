@@ -13,9 +13,3 @@ export enum Language {
 	c = 'c',
 	cpp = 'cpp',
 }
-
-export interface LanguageLaunchInfo {
-	compiler: string;
-	compileCommand: string;
-	runCommand: string;
-}

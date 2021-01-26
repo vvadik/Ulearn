@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 using Ulearn.Common;
 using Ulearn.Core.RunCheckerJobApi;
@@ -48,11 +49,11 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		
 		public override string DockerImageName => "algorithms-sandbox";
 		public override bool NoStudentZip => true;
-		public override string RunCommand => "python3.8 main.py";
 		public override string Region => "Task";
 		public override bool CheckInitialSolution => false;
 		public double TimeLimitPerTest { get; set; }
 		public override string[] PathsToExcludeForChecker => new[] { "statements", "statements-sections" };
+		public Language? DefaultLanguage { get; set; }
 		
 		public RunnerSubmission CreateSubmission(string submissionId, string code, Language language)
 		{
@@ -64,10 +65,10 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			
 			return commandRunnerSubmission;
 		}
-
+		
 		private string RunCommandWithArguments(Language language)
 		{
-			return $"{RunCommand} {language} {TimeLimitPerTest} {UserCodeFilePath.Split('/', '\\')[1]}";
+			return $"python3.8 main.py {language} {TimeLimitPerTest} {UserCodeFilePath.Split('/', '\\')[1]}";
 		}
 	}
 }

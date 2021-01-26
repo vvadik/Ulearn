@@ -1211,6 +1211,7 @@
     <Content Include="Content\notifications.css" />
     <Content Include="Content\notification_settings.css" />
     <Content Include="Content\stepik.css" />
+	<Content Include="Content\problem-statement.css" />
     <Content Include="Content\tablesorter.css" />
     <Content Include="Content\ulearn.css" />
     <Content Include="favicon.ico" />

@@ -3,8 +3,9 @@ import React from "react";
 import getPluralForm from "src/utils/getPluralForm";
 import { SubmissionInfo } from "src/models/exercise";
 import { convertDefaultTimezoneToLocal, getMoment } from "src/utils/momentUtils";
-import { Language, LanguageLaunchInfo } from "src/consts/languages";
+import { Language } from "src/consts/languages";
 import { capitalize } from "src/utils/stringUtils";
+import { LanguageLaunchInfo } from "../../../../../../models/slide";
 
 const texts = {
 	submissions: {

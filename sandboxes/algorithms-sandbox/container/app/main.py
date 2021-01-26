@@ -118,9 +118,8 @@ def get_code_filename(old_filename, source_code_run_info):
 
 language = argv[1].lower()
 time_limit = float(argv[2].replace(',', '.'))
-solution_filename = argv[3]
-rename(path_join('solutions', solution_filename), 'Program.any')
 solution_filename = 'Program.any'
+rename(path_join('solutions', argv[3]), solution_filename)
 shutil.rmtree('solutions')
 TaskCodeRunner(get_run_info_by_language_name('cpp')).build('check.cpp', 'check')  # Скомпилировали чеккер
 run_info = get_run_info_by_language_name(language)

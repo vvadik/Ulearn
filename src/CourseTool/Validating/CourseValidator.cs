@@ -52,11 +52,6 @@ namespace uLearn.CourseTool.Validating
 				{
 					ReportIfEthalonSolutionHasErrorsOrIssues(slide);
 				}
-				else if (slide.Exercise is PolygonExerciseBlock polygonExercise)
-				{
-					var settings = new DockerSandboxRunnerSettings(polygonExercise.DockerImageName, $"{polygonExercise.RunCommand} cpp {polygonExercise.TimeLimitPerTest}", polygonExercise.TimeLimit);
-					new UniversalExerciseValidator(this, settings, slide, polygonExercise).ValidateExercises();
-				}
 				else if (slide.Exercise is UniversalExerciseBlock universalExercise)
 				{
 					var settings = new DockerSandboxRunnerSettings(universalExercise.DockerImageName, universalExercise.RunCommand, universalExercise.TimeLimit);

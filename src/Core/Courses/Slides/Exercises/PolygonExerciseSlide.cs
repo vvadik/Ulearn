@@ -45,6 +45,8 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 				polygonExercise.TimeLimit = problem.TimeLimit * problem.TestCount;
 				polygonExercise.UserCodeFilePath = problem.PathAuthorSolution;
 				polygonExercise.Language = LanguageHelpers.GuessByExtension(new FileInfo(polygonExercise.UserCodeFilePath));
+				polygonExercise.DefaultLanguage = context.CourseSettings.DefaultLanguage;
+				polygonExercise.RunCommand = $"python3.8 main.py {polygonExercise.Language} {polygonExercise.TimeLimitPerTest} {polygonExercise.UserCodeFilePath.Split('/', '\\')[1]}";
 				Title = problem.Title;
 				
 				PrepareSolution(Path.Combine(context.Unit.Directory.FullName, PolygonPath, polygonExercise.UserCodeFilePath));
@@ -67,16 +69,13 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 			{
 				var htmlDirectoryPath = Path.Combine(statementsPath, ".html", "russian");
 				var htmlData = File.ReadAllText(Path.Combine(htmlDirectoryPath, "problem.html"));
-				var cssData = File.ReadAllText(Path.Combine(htmlDirectoryPath, "problem-statement.css"));
-				const string liMarker = "li:before { content: '' !important; }";  
-				yield return new HtmlBlock($"<style>{cssData}\n{liMarker}</style>");
-				yield return RenderFromHtml(htmlData, cssData);
+				yield return RenderFromHtml(htmlData);
 			}
 
 			var pdfLink = PolygonPath + "/statements/.pdf/russian/problem.pdf";
 			yield return new MarkdownBlock($"[Скачать условия задачи в формате PDF]({pdfLink})");
 		}
-		private static SlideBlock RenderFromHtml(string html, string css)
+		private static SlideBlock RenderFromHtml(string html)
 		{
 			var match = new Regex("(<DIV class=[\"']problem-statement['\"]>.*)</BODY>", RegexOptions.Singleline | RegexOptions.IgnoreCase)
 				.Match(html);
@@ -86,7 +85,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 			var processedBody = body
 				.Replace("$$$$$$", "$$")
 				.Replace("$$$", "$");
-			return new HtmlBlock($"<div class=\"tex\">{processedBody}</div>");
+			return new HtmlBlock($"<div class=\"tex problem\">{processedBody}</div>");
 		}
 
 		private static MarkdownBlock GetLinkOnPdf(string courseId, string slideId)

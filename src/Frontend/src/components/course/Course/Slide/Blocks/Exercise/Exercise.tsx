@@ -155,15 +155,15 @@ class Exercise extends React.Component<Props, State> {
 
 	constructor(props: Props) {
 		super(props);
-		const { exerciseInitialCode, submissions, languages, renderedHints, } = props;
-
+		const { exerciseInitialCode, submissions, languages, renderedHints, defaultLanguage } = props;
+		debugger;
 		this.state = {
 			value: exerciseInitialCode,
 			valueChanged: false,
 
 			isEditable: submissions.length === 0,
 
-			language: languages.sort()[0],
+			language: defaultLanguage ?? languages.sort()[0],
 
 			modalData: null,
 
