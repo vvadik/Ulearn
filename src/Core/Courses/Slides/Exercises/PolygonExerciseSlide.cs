@@ -85,7 +85,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 			var processedBody = body
 				.Replace("$$$$$$", "$$")
 				.Replace("$$$", "$");
-			return new HtmlBlock($"<div class=\"tex problem\">{processedBody}</div>");
+			return new HtmlBlock($"<div class=\"math-tex problem\">{processedBody}</div>");
 		}
 
 		private static MarkdownBlock GetLinkOnPdf(string courseId, string slideId)
