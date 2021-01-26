@@ -164,7 +164,7 @@ class Exercise extends React.Component<Props, State> {
 
 			isEditable: submissions.length === 0,
 
-			language: defaultLanguage ?? languages.sort()[0],
+			language: defaultLanguage ?? [...languages].sort()[0],
 
 			modalData: null,
 
@@ -532,7 +532,7 @@ class Exercise extends React.Component<Props, State> {
 	renderLanguageSelect = (): React.ReactElement => {
 		const { language, isEditable, } = this.state;
 		const { languages, languageInfo } = this.props;
-		const items = languages.sort().map((l) => {
+		const items = [...languages].sort().map((l) => {
 			return [l, texts.getLanguageLaunchInfo(l, languageInfo).compiler];
 		});
 		return (
