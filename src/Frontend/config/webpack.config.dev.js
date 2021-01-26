@@ -22,7 +22,7 @@ module.exports = merge(base, {
 	entry: {
 		main: [
 			'./config/polyfills',
-			'./config/sentry',
+			//'./config/sentry', we're rejecting all error coming from localhost, so uncommenting this line will just pollute console on errors
 			'react-dev-utils/webpackHotDevClient',
 			paths.appIndexJs,
 		],
