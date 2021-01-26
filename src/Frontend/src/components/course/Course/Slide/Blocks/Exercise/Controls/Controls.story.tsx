@@ -3,6 +3,7 @@ import type { Story } from "@storybook/react";
 
 import Controls from "./Controls";
 import texts from "../Exercise.texts";
+import { Gapped } from "ui";
 
 const defaultHints: string[] = [];
 
@@ -43,8 +44,8 @@ const hints: string[] = [
 
 const ListTemplate: Story<{ items: { props: typeof defaultProps, header: string }[] }> = ({ items }) => {
 	return <>
-		{ items.map(({ header, props }) =>
-			<>
+		{ items.map(({ header, props }, i) =>
+			<div key={ i }>
 				<p>{ header }</p>
 				<Controls>
 					<Controls.SubmitButton
@@ -70,7 +71,7 @@ const ListTemplate: Story<{ items: { props: typeof defaultProps, header: string 
 						isShowAcceptedSolutionsAvailable={ props.isShowAcceptedSolutionsAvailable }
 					/> }
 				</Controls>
-			</>
+			</div>
 		) }
 	</>;
 };
@@ -110,6 +111,72 @@ AllControls.args = {
 		},
 	]
 };
+
+export const OpenedHints = () => {
+	return (
+		<Controls>
+			<Controls.ShowHintButton
+				showedHintsCountOnStart={ hints.length }
+				onAllHintsShowed={ mockFunc }
+				renderedHints={ hints }
+				showControlsText={ true }
+				subTooltipTrigger={ 'opened' }
+				mainTooltipTrigger={ 'opened' }
+			/>
+		</Controls>
+	);
+};
+
+export const OpenedStatistics= () => {
+	return (
+		<Gapped vertical gap={ 200 }>
+			<Controls>
+				<Controls.StatisticsHint
+					tooltipTrigger={ 'opened' }
+					attemptsStatistics={ {
+						attemptedUsersCount: 50000,
+						usersWithRightAnswerCount: 43125,
+						lastSuccessAttemptDate: '2010-05-12',
+					} }
+				/>
+			</Controls>
+			<Controls>
+				<Controls.StatisticsHint
+					tooltipTrigger={ 'opened' }
+					attemptsStatistics={ {
+						attemptedUsersCount: 100,
+						usersWithRightAnswerCount: 56,
+						lastSuccessAttemptDate: '2020-05-12',
+					} }
+				/>
+			</Controls>
+			<Controls>
+				<Controls.StatisticsHint
+					tooltipTrigger={ 'opened' }
+					attemptsStatistics={ {
+						attemptedUsersCount: 0,
+						usersWithRightAnswerCount: 0,
+					} }
+				/>
+			</Controls>
+		</Gapped>
+	);
+};
+
+
+export const OpenedAcceptedSolutionsButton = () => {
+	return (
+		<Controls>
+			<Controls.AcceptedSolutionsButton
+				tooltipTrigger={ 'opened' }
+				acceptedSolutionsUrl={ '' }
+				onVisitAcceptedSolutions={ mockFunc }
+				isShowAcceptedSolutionsAvailable={ true }
+			/>
+		</Controls>
+	);
+};
+
 
 export default {
 	title: 'Exercise/Controls',

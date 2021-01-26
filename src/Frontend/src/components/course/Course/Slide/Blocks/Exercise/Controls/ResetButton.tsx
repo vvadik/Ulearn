@@ -13,7 +13,7 @@ export interface Props extends IControlWithText {
 	onResetButtonClicked: () => void,
 }
 
-function ResetButton({ onResetButtonClicked, }: Props): React.ReactElement {
+function ResetButton({ onResetButtonClicked, showControlsText, }: Props): React.ReactElement {
 	return (
 		<span className={ styles.exerciseControls } onClick={ onResetButtonClicked }>
 			<span className={ styles.exerciseControlsIcon }>
@@ -21,7 +21,7 @@ function ResetButton({ onResetButtonClicked, }: Props): React.ReactElement {
 			</span>
 			<ShowControlsTextContext.Consumer>
 			{
-				(showControlsText) => showControlsText && texts.controls.reset.text
+				(showControlsTextContext) => (showControlsTextContext || showControlsText) && texts.controls.reset.text
 			}
 			</ShowControlsTextContext.Consumer>
 	</span>

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import cn from "classnames";
 
-import { ThemeContext, Tooltip } from "ui";
+import { ThemeContext, Tooltip, TooltipTrigger } from "ui";
 import { Lightbulb } from "icons";
 import IControlWithText from "./IControlWithText";
 import { darkFlat } from "src/uiTheme";
@@ -15,15 +15,22 @@ import texts from "../Exercise.texts";
 
 export interface Props extends IControlWithText {
 	renderedHints: string[],
+	showedHintsCountOnStart?: number,
+	subTooltipTrigger?: TooltipTrigger,
+	mainTooltipTrigger?: TooltipTrigger,
 	onAllHintsShowed: () => void,
 }
 
 function ShowHintButton({
 	renderedHints,
+	showedHintsCountOnStart,
 	onAllHintsShowed,
+	showControlsText,
+	subTooltipTrigger = "hover&focus",
+	mainTooltipTrigger,
 }: Props): React.ReactElement {
 	const [{ showedHintsCount, isTooltipOpened }, setState] = useState(
-		{ showedHintsCount: 1, isTooltipOpened: false, });
+		{ showedHintsCount: showedHintsCountOnStart ? showedHintsCountOnStart : 1, isTooltipOpened: false, });
 	const hintPosition = "bottom left";
 
 	return (
@@ -33,7 +40,7 @@ function ShowHintButton({
 					onCloseRequest={ closeTooltip }
 					allowedPositions={ [hintPosition] }
 					pos={ hintPosition }
-					trigger={ isTooltipOpened ? "opened" : "closed" }
+					trigger={ mainTooltipTrigger || (isTooltipOpened ? "opened" : "closed") }
 					render={ renderHints }
 				>
 					<Lightbulb/>
@@ -41,7 +48,7 @@ function ShowHintButton({
 			</span>
 			<ShowControlsTextContext.Consumer>
 			{
-				(showControlsText) => showControlsText && texts.controls.hints.text
+				(showControlsTextContext) => (showControlsTextContext || showControlsText) && texts.controls.hints.text
 			}
 			</ShowControlsTextContext.Consumer>
 		</span>
@@ -74,8 +81,9 @@ function ShowHintButton({
 				<ThemeContext.Provider value={ darkFlat }>
 					<Tooltip
 						pos={ "bottom left" }
-						trigger={ "hover&focus" }
+						trigger={ subTooltipTrigger }
 						render={ renderNoHintsLeft }
+						closeButton={ false }
 					>
 						<a onClick={ showHint } className={ hintClassName }>
 							<span>{ texts.controls.hints.showHintText }</span>

@@ -1,7 +1,7 @@
 import React from "react";
 import classNames from "classnames";
 
-import { Tooltip } from "ui";
+import { Tooltip, TooltipTrigger } from "ui";
 
 import { AttemptsStatistics } from "src/models/exercise";
 
@@ -10,10 +10,11 @@ import styles from './Controls.less';
 import texts from "../Exercise.texts";
 
 export interface Props {
-	attemptsStatistics: AttemptsStatistics
+	attemptsStatistics: AttemptsStatistics,
+	tooltipTrigger?: TooltipTrigger,
 }
 
-function StatisticsHint({ attemptsStatistics }: Props): React.ReactElement {
+function StatisticsHint({ attemptsStatistics, tooltipTrigger = "hover&focus", }: Props): React.ReactElement {
 	const {
 		attemptedUsersCount,
 		usersWithRightAnswerCount,
@@ -23,7 +24,8 @@ function StatisticsHint({ attemptsStatistics }: Props): React.ReactElement {
 
 	return (
 		<span className={ statisticsClassName }>
-			<Tooltip pos={ "bottom right" } trigger={ "hover&focus" } render={ renderTooltipContent }>
+			<Tooltip pos={ "bottom right" } closeButton={ false } trigger={ tooltipTrigger }
+					 render={ renderTooltipContent }>
 				{ texts.controls.statistics.buildShortText(usersWithRightAnswerCount) }
 			</Tooltip>
 		</span>
