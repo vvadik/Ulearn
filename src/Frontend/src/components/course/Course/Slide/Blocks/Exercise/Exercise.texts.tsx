@@ -5,7 +5,7 @@ import { SubmissionInfo } from "src/models/exercise";
 import { convertDefaultTimezoneToLocal, getMoment } from "src/utils/momentUtils";
 import { Language } from "src/consts/languages";
 import { capitalize } from "src/utils/stringUtils";
-import { LanguageLaunchInfo } from "../../../../../../models/slide";
+import { LanguageLaunchInfo } from "src/models/slide";
 
 const texts = {
 	submissions: {

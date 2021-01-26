@@ -1,19 +1,21 @@
 import React from "react";
 
+import CupIcon from "./CupIcon";
+
 import styles from "./CongratsModal.less";
 
 import texts from "./CongratsModal.texts";
-import CupIcon from "./CupIcon";
 
 interface CongratsModalProps {
-	onClose: () => void,
 	waitingForManualChecking: boolean,
 	score: number,
+
+	onClose: () => void,
 	showAcceptedSolutions?: () => void,
 }
 
 class CongratsModal extends React.Component<CongratsModalProps> {
-	overlay: HTMLDivElement | null | undefined;
+	overlay: React.RefObject<HTMLDivElement> = React.createRef();
 
 	componentDidMount(): void {
 		document.querySelector('body')
@@ -29,7 +31,7 @@ class CongratsModal extends React.Component<CongratsModalProps> {
 		const { waitingForManualChecking, score, showAcceptedSolutions, onClose, } = this.props;
 
 		return (
-			<div ref={ (ref) => this.overlay = ref }
+			<div ref={ this.overlay }
 				 className={ styles.overlay }
 				 onClick={ this.handleCongratsOverlayClick }>
 				<div className={ styles.modal }>
@@ -81,7 +83,7 @@ class CongratsModal extends React.Component<CongratsModalProps> {
 	};
 
 	private handleCongratsOverlayClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-		if(e.target === this.overlay) {
+		if(e.target === this.overlay.current) {
 			this.props.onClose();
 		}
 	};

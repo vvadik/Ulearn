@@ -7,9 +7,9 @@ import {
 	RunSolutionResponse,
 	SubmissionInfo
 } from "./exercise";
-import { CourseAccessType, CourseRoleType, SystemAccessType } from "../consts/accessType";
-import { AccountProblemType } from "../consts/accountProblemType";
-import BlockTypes from "../components/course/Course/Slide/blockTypes";
+import { CourseAccessType, CourseRoleType, SystemAccessType } from "src/consts/accessType";
+import { AccountProblemType } from "src/consts/accountProblemType";
+import BlockTypes from "src/components/course/Course/Slide/blockTypes";
 import { Block } from "./slide";
 import { Flashcard, UnitFlashcardsInfo } from "./flashcards";
 

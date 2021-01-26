@@ -87,7 +87,7 @@ class InternalUlearnApp extends Component {
 						&& this.isEmailNotConfirmed()
 						&& <EmailNotConfirmedModal account={ this.props.account }/>
 						}
-						<YandexMetrika/>
+						{ this.renderMetricsIfNotDevelopment() }
 					</ErrorBoundary>
 				</ThemeContext.Provider>
 			</BrowserRouter>
@@ -99,6 +99,11 @@ class InternalUlearnApp extends Component {
 		return account.isAuthenticated
 			&& account.accountProblems.length > 0
 			&& account.accountProblems.some(p => p.problemType === AccountProblemType.emailNotConfirmed);
+	}
+
+	renderMetricsIfNotDevelopment = () => {
+		if(process.env.NODE_ENV === 'development') return null;
+		return <YandexMetrika/>;
 	}
 
 	static mapStateToProps(state) {

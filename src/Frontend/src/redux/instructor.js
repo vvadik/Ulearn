@@ -1,6 +1,6 @@
 import {
 	INSTRUCTOR__STUDENT_MODE_TOGGLE,
-} from '../consts/actions';
+} from 'src/consts/actions';
 
 const initialInstructorState = {
 	isStudentMode: false,

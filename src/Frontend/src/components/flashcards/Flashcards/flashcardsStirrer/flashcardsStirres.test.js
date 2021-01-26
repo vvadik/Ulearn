@@ -1,5 +1,5 @@
 import { sortFlashcardsInAuthorsOrderWithRate, getNextFlashcardRandomly } from "./flashcardsStirrer";
-import { RateTypes } from "../../../../consts/rateTypes";
+import { RateTypes } from "src/consts/rateTypes";
 
 import Flashcard from "./flashcardsStirres.test.base";
 

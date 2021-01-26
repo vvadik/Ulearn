@@ -1,4 +1,4 @@
-import { UserProgressState } from "../models/reduxState";
+import { UserProgressState } from "src/models/reduxState";
 
 import {
 	UserProgressActionTypes,

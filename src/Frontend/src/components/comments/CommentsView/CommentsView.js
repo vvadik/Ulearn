@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { userRoles, user } from "../commonPropTypes";
-import api from "../../../api";
+import api from "src/api";
 import { Tabs } from "ui";
 import CommentsList from "../CommentsList/CommentsList";
 

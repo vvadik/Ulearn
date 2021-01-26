@@ -4,7 +4,7 @@ import { EditorConfiguration } from "codemirror";
 
 import StaticCode, { Props } from "src/components/course/Course/Slide/Blocks/Exercise/StaticCode";
 
-import { Language } from "../consts/languages";
+import { Language } from "src/consts/languages";
 
 export default function translateTextareaToCode(
 	textarea: HTMLTextAreaElement,

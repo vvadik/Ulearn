@@ -23,17 +23,19 @@ function StatisticsHint({ attemptsStatistics }: Props): React.ReactElement {
 
 	return (
 		<span className={ statisticsClassName }>
-			<Tooltip pos={ "bottom right" } trigger={ "hover&focus" } render={
-				() =>
-					<span>
-						{ texts.controls.statistics.buildStatistics(attemptedUsersCount,
-							usersWithRightAnswerCount, lastSuccessAttemptDate) }
-					</span>
-			}>
+			<Tooltip pos={ "bottom right" } trigger={ "hover&focus" } render={ renderTooltipContent }>
 				{ texts.controls.statistics.buildShortText(usersWithRightAnswerCount) }
 			</Tooltip>
 		</span>
 	);
+
+	function renderTooltipContent() {
+		return (
+			<span>
+				{ texts.controls.statistics.buildStatistics(attemptedUsersCount,
+					usersWithRightAnswerCount, lastSuccessAttemptDate) }
+			</span>);
+	}
 }
 
 export default StatisticsHint;

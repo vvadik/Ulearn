@@ -1,4 +1,4 @@
-import { buildQuery } from "../utils";
+import { buildQuery } from "src/utils";
 
 export const coursePath = "course";
 export const flashcards = "flashcards";

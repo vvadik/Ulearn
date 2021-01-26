@@ -157,14 +157,14 @@ class Exercise extends React.Component<Props, State> {
 	constructor(props: Props) {
 		super(props);
 		const { exerciseInitialCode, submissions, languages, renderedHints, defaultLanguage } = props;
-		debugger;
+
 		this.state = {
 			value: exerciseInitialCode,
 			valueChanged: false,
 
 			isEditable: submissions.length === 0,
 
-			language: defaultLanguage ?? languages.sort()[0],
+			language: defaultLanguage ?? [...languages].sort()[0],
 
 			modalData: null,
 
@@ -532,7 +532,7 @@ class Exercise extends React.Component<Props, State> {
 	renderLanguageSelect = (): React.ReactElement => {
 		const { language, isEditable, } = this.state;
 		const { languages, languageInfo } = this.props;
-		const items = languages.sort().map((l) => {
+		const items = [...languages].sort().map((l) => {
 			return [l, texts.getLanguageLaunchInfo(l, languageInfo).compiler];
 		});
 		return (
@@ -645,9 +645,11 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	openAcceptedSolutionsModal = (): void => {
-		const { courseId, slideId, visitAcceptedSolutions, } = this.props;
+		const { courseId, slideId, visitAcceptedSolutions, submissions, } = this.props;
 
-		visitAcceptedSolutions(courseId, slideId);
+		if(!HasSuccessSubmission(submissions)) {
+			visitAcceptedSolutions(courseId, slideId);
+		}
 		this.openModal({ type: ModalType.acceptedSolutions });
 	};
 

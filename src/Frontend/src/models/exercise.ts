@@ -1,5 +1,5 @@
 import { ShortUserInfo } from "./users";
-import { Language } from "../consts/languages";
+import { Language } from "src/consts/languages";
 
 export interface RunSolutionResponse extends ProgressUpdate {
 	courseId: string,
