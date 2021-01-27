@@ -5,7 +5,7 @@ import navigationReducer from "./navigation.js";
 import slidesReducer from "./slides.js";
 import accountReducer from "./account.js";
 import notificationsReducer from "./notifications.js";
-import instructorReducer from "./instructor.js";
+import instructorReducer from "./instructor";
 
 const rootReducer = combineReducers({
 	account: accountReducer,
