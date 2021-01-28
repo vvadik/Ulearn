@@ -16,7 +16,7 @@ import ShowControlsTextContext from "./ShowControlsTextContext";
 import styles from './Controls.less';
 
 interface Props {
-	children: React.ReactNode[],
+	children: React.ReactNode[] | React.ReactNode,
 }
 
 interface State {
@@ -93,7 +93,7 @@ class Controls extends React.Component<Props, State> {
 		typeof StatisticsHint?,
 		typeof AcceptedSolutionsButton?
 	] => {
-		const childArray = this.props.children;
+		const childArray = Array.isArray(this.props.children) ? this.props.children : [this.props.children];
 		let submit: typeof SubmitButton | undefined = undefined;
 		let hint: typeof ShowHintButton | undefined = undefined;
 		let reset: typeof ResetButton | undefined = undefined;

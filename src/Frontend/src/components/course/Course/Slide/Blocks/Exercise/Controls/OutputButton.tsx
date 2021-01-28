@@ -17,6 +17,7 @@ export interface Props extends IControlWithText {
 function OutputButton({
 	showOutput,
 	onShowOutputButtonClicked,
+	showControlsText,
 }: Props): React.ReactElement {
 	return (
 		<span className={ styles.exerciseControls } onClick={ onShowOutputButtonClicked }>
@@ -25,7 +26,7 @@ function OutputButton({
 			</span>
 			<ShowControlsTextContext.Consumer>
 			{
-				(showControlsText) => showControlsText && (showOutput ? texts.controls.output.hide : texts.controls.output.show)
+				(showControlsTextContext) => (showControlsTextContext || showControlsText) && (showOutput ? texts.controls.output.hide : texts.controls.output.show)
 			}
 			</ShowControlsTextContext.Consumer>
 		</span>

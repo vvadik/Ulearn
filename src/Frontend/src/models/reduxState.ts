@@ -12,12 +12,14 @@ import { AccountProblemType } from "src/consts/accountProblemType";
 import BlockTypes from "src/components/course/Course/Slide/blockTypes";
 import { Block } from "./slide";
 import { Flashcard, UnitFlashcardsInfo } from "./flashcards";
+import { InstructorState } from "src/redux/instructor";
 
 interface RootState {
 	userProgress: UserProgressState;
 	courses: CourseState;
 	slides: SlidesState;
 	account: AccountState;
+	instructor: InstructorState,
 }
 
 interface UserProgressState {

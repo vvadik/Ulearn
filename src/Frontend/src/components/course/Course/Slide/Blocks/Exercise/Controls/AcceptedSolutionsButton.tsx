@@ -1,6 +1,6 @@
 import React, { createRef, RefObject } from "react";
 
-import { Button, Modal, Tooltip } from "ui";
+import { Button, Modal, Tooltip, TooltipTrigger } from "ui";
 import { EyeOpened } from "icons";
 import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent.js";
 import IControlWithText from "./IControlWithText";
@@ -19,29 +19,31 @@ interface State {
 export interface Props extends IControlWithText {
 	acceptedSolutionsUrl: string,
 	isShowAcceptedSolutionsAvailable: boolean,
+	tooltipTrigger?: TooltipTrigger,
 
 	onVisitAcceptedSolutions: () => void,
 }
 
 export default class AcceptedSolutionsButton
 	extends React.Component<Props, State> {
-	private tooltip: RefObject<Tooltip> = createRef();
+	public tooltip: RefObject<Tooltip> = createRef();
 
 	render = (): React.ReactNode => {
+		const { tooltipTrigger = 'click', showControlsText } = this.props;
 		return (
 			<React.Fragment>
 				<span className={ styles.exerciseControls } onClick={ this.showAcceptedSolutionsWarning }>
 					<Tooltip
 						ref={ this.tooltip }
 						pos={ "bottom left" }
-						trigger={ 'click' }
+						trigger={ tooltipTrigger }
 						render={ this.renderAcceptedSolutionsHint }>
 						<span className={ styles.exerciseControlsIcon }>
 							<EyeOpened/>
 						</span>
 						<ShowControlsTextContext.Consumer>
 						{
-							(showControlsText) => showControlsText && texts.controls.acceptedSolutions.text
+							(showControlsTextContext) => (showControlsText || showControlsTextContext) && texts.controls.acceptedSolutions.text
 						}
 						</ShowControlsTextContext.Consumer>
 					</Tooltip>

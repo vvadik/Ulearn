@@ -9,7 +9,7 @@ import { COURSES__COURSE_ENTERED } from "src/consts/actions";
 import { Tabs, Button, Toast, Link } from "ui";
 import GroupMembers from "src/components/groups/GroupSettingsPage/GroupMembers/GroupMembers";
 import GroupSettings from "src/components/groups/GroupSettingsPage/GroupSettings/GroupSettings";
-import Error404 from "src/components/common/Error/Error404.js";
+import Error404 from "src/components/common/Error/Error404.tsx";
 import styles from "./groupPage.less";
 import { Page } from "../../index";
 
