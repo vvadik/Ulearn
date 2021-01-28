@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -397,6 +397,7 @@ namespace Database.Repos
 			return await db.UserExerciseSubmissions
 				.AsNoTracking()	
 				.Include(s => s.AutomaticChecking).ThenInclude(c => c.Output)
+				.Include(s => s.AutomaticChecking).ThenInclude(c => c.DebugLogs)
 				.Include(s => s.AutomaticChecking).ThenInclude(c => c.CompilationError)
 				.Include(s => s.SolutionCode)
 				.Include(s => s.Reviews).ThenInclude(c => c.Author)
@@ -470,6 +471,9 @@ namespace Database.Repos
 			var compilationErrorHash = (await textsRepo.AddText(result.CompilationOutput)).Hash;
 			var output = result.GetOutput().NormalizeEoln();
 			var outputHash = (await textsRepo.AddText(output)).Hash;
+			
+			var logs = result.GetLogs().NormalizeEoln();
+			var logsHash = (await textsRepo.AddText(logs)).Hash;
 
 			var isWebRunner = checking.CourseId == "web" && checking.SlideId == Guid.Empty;
 			var exerciseSlide = isWebRunner
@@ -495,7 +499,8 @@ namespace Database.Repos
 				Elapsed = DateTime.Now - checking.Timestamp,
 				IsRightAnswer = isRightAnswer,
 				CheckingAgentName = checking.CheckingAgentName,
-				Points = result.Points
+				Points = result.Points,
+				DebugLogsHash = logsHash
 			};
 
 			return newChecking;

@@ -41,6 +41,7 @@ export interface ExerciseAutomaticCheckingResponse {
 	processStatus: AutomaticExerciseCheckingProcessStatus;
 	result: AutomaticExerciseCheckingResult;
 	output: string | null;
+	debugLogs: string | null;
 	reviews: ReviewInfo[] | null;
 }
 

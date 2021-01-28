@@ -101,9 +101,15 @@ namespace Database.Models
 
 		[CanBeNull]
 		public virtual TextBlob Output { get; set; }
+		
+		[CanBeNull]
+		public virtual TextBlob DebugLogs { get; set; }
 
 		[StringLength(40)]
 		public string OutputHash { get; set; }
+		
+		[StringLength(40)]
+		public string DebugLogsHash { get; set; }
 
 		[StringLength(40)]
 		public string ExecutionServiceName { get; set; }

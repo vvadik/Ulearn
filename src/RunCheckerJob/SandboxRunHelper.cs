@@ -43,7 +43,14 @@ namespace RunCheckerJob
 
 			try
 			{
-				return runnerClient.RunContainerAndGetResultInternal(submission, submissionWorkingDirectory);
+				var result = runnerClient.RunContainerAndGetResultInternal(submission, submissionWorkingDirectory);
+				if (result.Logs != null)
+				{
+					foreach (var resultLog in result.Logs)
+						log.Info(resultLog);
+				}
+
+				return result;
 			}
 			catch (Exception ex)
 			{

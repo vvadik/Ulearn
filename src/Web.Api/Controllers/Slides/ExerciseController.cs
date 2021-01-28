@@ -224,6 +224,10 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				ProhibitFurtherManualChecking = prohibitFurtherManualChecking,
 				Submission = SubmissionInfo.Build(updatedSubmissionNoTracking, null)
 			};
+			
+			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, course.Id, CourseRoleType.CourseAdmin).ConfigureAwait(false);
+			if (!isCourseAdmin && result.Submission.AutomaticChecking != null)
+				result.Submission.AutomaticChecking.DebugLogs = null;
 
 			return result;
 		}

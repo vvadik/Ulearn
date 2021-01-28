@@ -155,6 +155,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				.GetAllSubmissionsByUser(context.CourseId, context.Slide.Id, context.UserId)
 				.Include(s => s.AutomaticChecking).ThenInclude(c => c.Output)
 				.Include(s => s.AutomaticChecking).ThenInclude(c => c.CompilationError)
+				.Include(s => s.AutomaticChecking).ThenInclude(c => c.DebugLogs)
 				.Include(s => s.SolutionCode)
 				.Include(s => s.Reviews).ThenInclude(c => c.Author)
 				.Include(s => s.ManualCheckings).ThenInclude(c => c.Reviews).ThenInclude(r => r.Author)

@@ -110,7 +110,8 @@ class ExerciseOutput extends React.Component<OutputTypeProps> {
 
 	static getOutputTypeAndBodyFromAutomaticChecking(automaticChecking: ExerciseAutomaticCheckingResponse): OutputTypeAndBody {
 		let outputType: OutputType;
-		const output = automaticChecking.output;
+		const debugLogs = automaticChecking.debugLogs !== null ? `\nЛоги: \n${automaticChecking.debugLogs}` : "";
+		const output = automaticChecking.output + debugLogs;
 		switch (automaticChecking.processStatus) {
 			case ProcessStatus.Done:
 				outputType = ExerciseOutput.getOutputTypeByCheckingResults(automaticChecking);

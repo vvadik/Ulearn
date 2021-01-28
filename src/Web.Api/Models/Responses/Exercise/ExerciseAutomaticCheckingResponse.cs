@@ -36,6 +36,10 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 		[CanBeNull]
 		[DataMember]
 		public string Output;
+		
+		[CanBeNull]
+		[DataMember]
+		public string DebugLogs;
 
 		[CanBeNull]
 		[DataMember]
@@ -71,6 +75,7 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 			}
 			result.Result = checking.IsRightAnswer ? AutomaticExerciseCheckingResult.RightAnswer : AutomaticExerciseCheckingResult.WrongAnswer;
 			result.Reviews = botReviews;
+			result.DebugLogs = checking.DebugLogs?.Text;
 			return result;
 		}
 
