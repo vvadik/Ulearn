@@ -174,8 +174,10 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				automaticCheckingStatus
 			);
 
+			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin);
+
 			if (buildResult.HasErrors)
-				return new RunSolutionResponse(SolutionRunStatus.Success) { Submission = SubmissionInfo.Build(initialSubmission, null) };
+				return new RunSolutionResponse(SolutionRunStatus.Success) { Submission = SubmissionInfo.Build(initialSubmission, null, isCourseAdmin) };
 
 			var executionTimeout = TimeSpan.FromSeconds(exerciseBlock.TimeLimit * 2 + 5);
 			UserExerciseSubmission updatedSubmissionNoTracking;
@@ -198,7 +200,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				return new RunSolutionResponse(SolutionRunStatus.SubmissionCheckingTimeout)
 				{
 					Message = $"К сожалению, мы не смогли оперативно проверить ваше решение. {message}. Просто подождите и обновите страницу.",
-					Submission = SubmissionInfo.Build(updatedSubmissionNoTracking, null)
+					Submission = SubmissionInfo.Build(updatedSubmissionNoTracking, null, isCourseAdmin)
 				};
 			}
 
@@ -206,7 +208,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			{
 				metricSender.SendCount($"exercise.{exerciseMetricId}.dont_wait_result");
 				// По вовзращаемому значению нельзя отличить от случая, когда никто не взял на проверку
-				return new RunSolutionResponse(SolutionRunStatus.Success) { Submission = SubmissionInfo.Build(initialSubmission, null) };
+				return new RunSolutionResponse(SolutionRunStatus.Success) { Submission = SubmissionInfo.Build(initialSubmission, null, isCourseAdmin) };
 			}
 
 			updatedSubmissionNoTracking = await userSolutionsRepo.FindSubmissionByIdNoTracking(initialSubmission.Id);
@@ -222,13 +224,8 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				Score = score,
 				WaitingForManualChecking = waitingForManualChecking,
 				ProhibitFurtherManualChecking = prohibitFurtherManualChecking,
-				Submission = SubmissionInfo.Build(updatedSubmissionNoTracking, null)
+				Submission = SubmissionInfo.Build(updatedSubmissionNoTracking, null, isCourseAdmin)
 			};
-			
-			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, course.Id, CourseRoleType.CourseAdmin).ConfigureAwait(false);
-			if (!isCourseAdmin && result.Submission.AutomaticChecking != null)
-				result.Submission.AutomaticChecking.DebugLogs = null;
-
 			return result;
 		}
 

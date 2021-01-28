@@ -9,8 +9,6 @@ namespace Database.Migrations
 		{
 			AddColumn("dbo.AutomaticExerciseCheckings", "DebugLogsHash", c => c.String(maxLength: 40));
 			AddForeignKey("dbo.AutomaticExerciseCheckings", "DebugLogsHash", "dbo.TextBlobs", "Hash");
-
-
 		}
 
 		public override void Down()

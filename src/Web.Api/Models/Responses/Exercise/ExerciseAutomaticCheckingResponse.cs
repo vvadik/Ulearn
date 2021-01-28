@@ -36,16 +36,17 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 		[CanBeNull]
 		[DataMember]
 		public string Output;
-		
+
 		[CanBeNull]
 		[DataMember]
-		public string DebugLogs;
+		public string CheckerLogs;
 
 		[CanBeNull]
 		[DataMember]
 		public List<ReviewInfo> Reviews;
 
-		public static ExerciseAutomaticCheckingResponse Build([NotNull] AutomaticExerciseChecking checking, [NotNull]List<ReviewInfo> botReviews)
+		public static ExerciseAutomaticCheckingResponse Build([NotNull] AutomaticExerciseChecking checking,
+			[CanBeNull] List<ReviewInfo> botReviews, bool showCheckerLogs)
 		{
 			var result = new ExerciseAutomaticCheckingResponse
 			{
@@ -75,7 +76,7 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 			}
 			result.Result = checking.IsRightAnswer ? AutomaticExerciseCheckingResult.RightAnswer : AutomaticExerciseCheckingResult.WrongAnswer;
 			result.Reviews = botReviews;
-			result.DebugLogs = checking.DebugLogs?.Text;
+			result.CheckerLogs = showCheckerLogs ? checking.DebugLogs?.Text : null;
 			return result;
 		}
 

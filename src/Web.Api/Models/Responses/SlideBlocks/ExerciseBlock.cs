@@ -61,8 +61,7 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 			var reviewId2Comments = context.CodeReviewComments
 				?.GroupBy(c => c.ReviewId)
 				.ToDictionary(g => g.Key, g => g.AsEnumerable());
-			
-			
+
 			if (exerciseBlock is PolygonExerciseBlock polygonExerciseBlock)
 			{
 				Languages = PolygonExerciseBlock.LanguagesInfo.Keys.ToArray();
@@ -83,7 +82,7 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 			AttemptsStatistics = context.AttemptsStatistics;
 			Submissions = context.Submissions
 				.EmptyIfNull()
-				.Select(s => SubmissionInfo.Build(s, reviewId2Comments))
+				.Select(s => SubmissionInfo.Build(s, reviewId2Comments, context.CanSeeCheckerLogs))
 				.ToList();
 		}
 
