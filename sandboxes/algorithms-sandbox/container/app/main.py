@@ -44,11 +44,12 @@ class TaskCodeRunner:
     def build(self, code_filename: str, result_filename: str):
         command = self.__source_code_run_info.format_build_command(code_filename, result_filename).split()
         log.info(f'Выполняем сборку: {" ".join(command)}')
-        process = Popen(command, stdout=DEVNULL, stderr=PIPE)
-        _, err = process.communicate()
+        process = Popen(command, stdout=PIPE, stderr=PIPE)
+        out, err = process.communicate()
         if process.returncode != 0:
-            log.info(f'Процесс вернул ошибку после сборки: {err.decode()}')
-            raise CompilationException(err.decode())
+            message = f'{out.decode()}\n{err.decode()}'
+            log.info(f'Процесс вернул ошибку после сборки: {message}')
+            raise CompilationException(message)
 
     def run(self, test_file: str):
         command = self.__source_code_run_info.format_run_command(self.__runnable_file)
