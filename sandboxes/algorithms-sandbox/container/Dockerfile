@@ -27,6 +27,8 @@ RUN apt-get install -y openjdk-14-jdk \
 
 ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
 ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
+ENV NODE_REPL_HISTORY ''
+
 
 COPY ./app/ /app/
 
