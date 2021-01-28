@@ -26,8 +26,8 @@ const viewports = {
 	tablet: {
 		name: 'tablet',
 		styles: {
-			width: '800px',
-			height: '600px',
+			width: '768px',
+			height: '1024px',
 		},
 	},
 	mobile: {

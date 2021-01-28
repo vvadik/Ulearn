@@ -165,9 +165,11 @@
         "deviceScaleFactor": 1,
         "mobile": false
       },
-      "chrome.iphone7": {
+      "chrome.phone": {
         "target": "chrome.app",
-        "preset": "iPhone 7"
+        "width": 320,
+        "height": 240,
+        "mobile": true
       }
     }
   }
