@@ -16,7 +16,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 	{
 		[XmlElement("polygonPath")]
 		public string PolygonPath { get; set; }
-		
+
 		
 		public override void Validate(SlideLoadingContext context)
 		{
@@ -24,37 +24,26 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 				throw new CourseLoadingException("В slide.polygon должен находиться атрибут polygonPath");
 			base.Validate(context);
 		}
-		
 
 		public override void BuildUp(SlideLoadingContext context)
 		{
 			var statementsPath = Path.Combine(context.Unit.Directory.FullName, PolygonPath, "statements");
-			
-			
 			Blocks = GetBlocksProblem(statementsPath, context.CourseId, Id)
 				.Concat(Blocks.Where(block => !(block is MarkdownBlock)))
 				.ToArray();
-			
+
 			var polygonExercise = Blocks.Single(block => block is PolygonExerciseBlock) as PolygonExerciseBlock;
 			polygonExercise!.ExerciseDirPath = Path.Combine(PolygonPath);
-			
-			try //todo lgnv: убрать try-catch когда залью на тестовый стенд правильный курс с файлом problem.xml 
-			{
-				var problem = GetProblem(Path.Combine(context.Unit.Directory.FullName, PolygonPath, "problem.xml"), context.CourseSettings.DefaultLanguage);
-				polygonExercise.TimeLimitPerTest = problem.TimeLimit;
-				polygonExercise.TimeLimit = problem.TimeLimit * problem.TestCount;
-				polygonExercise.UserCodeFilePath = problem.PathAuthorSolution;
-				polygonExercise.Language = LanguageHelpers.GuessByExtension(new FileInfo(polygonExercise.UserCodeFilePath));
-				polygonExercise.DefaultLanguage = context.CourseSettings.DefaultLanguage;
-				polygonExercise.RunCommand = $"python3.8 main.py {polygonExercise.Language} {polygonExercise.TimeLimitPerTest} {polygonExercise.UserCodeFilePath.Split('/', '\\')[1]}";
-				Title = problem.Title;
-				
-				PrepareSolution(Path.Combine(context.Unit.Directory.FullName, PolygonPath, polygonExercise.UserCodeFilePath));
-			}
-			catch (Exception e)
-			{
-				Console.WriteLine(e);
-			}
+			var problem = GetProblem(Path.Combine(context.Unit.Directory.FullName, PolygonPath, "problem.xml"), context.CourseSettings.DefaultLanguage);
+			polygonExercise.TimeLimitPerTest = problem.TimeLimit;
+			polygonExercise.TimeLimit = (int)Math.Ceiling(problem.TimeLimit * problem.TestCount);
+			polygonExercise.UserCodeFilePath = problem.PathAuthorSolution;
+			polygonExercise.Language = LanguageHelpers.GuessByExtension(new FileInfo(polygonExercise.UserCodeFilePath));
+			polygonExercise.DefaultLanguage = context.CourseSettings.DefaultLanguage;
+			polygonExercise.RunCommand = $"python3.8 main.py {polygonExercise.Language} {polygonExercise.TimeLimitPerTest} {polygonExercise.UserCodeFilePath.Split('/', '\\')[1]}";
+			Title = problem.Title;
+			PrepareSolution(Path.Combine(context.Unit.Directory.FullName, PolygonPath, polygonExercise.UserCodeFilePath));
+
 			base.BuildUp(context);
 		}
 
@@ -92,7 +81,6 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 		{
 			var link = $"/Exercise/GetPdf?courseId={courseId}&slideId={slideId}";
 			return new MarkdownBlock($"[Скачать условия задачи в формате PDF]({link})");
-
 		}
 
 		private static Problem GetProblem(string pathToXml, Language? defaultLanguage)

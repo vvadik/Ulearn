@@ -10,7 +10,7 @@ namespace RunCheckerJob
 		[NotNull] public string RunCommand;
 		public int MemorySwapLimit; // The amount of combined memory and swap that can be used
 
-		public DockerSandboxRunnerSettings(string sandBoxName, string runCommand, double timeLimit)
+		public DockerSandboxRunnerSettings(string sandBoxName, string runCommand, int timeLimit)
 		{
 			SandBoxName = sandBoxName;
 			RunCommand = runCommand;
