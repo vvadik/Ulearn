@@ -25,7 +25,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 
 		/* .NET XML Serializer doesn't understand nullable fields, so we use this hack to make Language? field */
 		[XmlIgnore]
-		public Language? Language { get; set; }
+		public virtual Language? Language { get; set; }
 
 		#region NullableLanguageHack
 
@@ -84,7 +84,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public bool HideShowSolutionsButton { get; set; }
 
 		[XmlElement("timeLimit")]
-		public int TimeLimit { get; set; } = 10; // Пока работает только для universalExerciseBlock
+		public int TimeLimit { get; set; } = 10; // Пока работает только для universalExerciseBlock и polygonExerciseBlock
 
 		[XmlIgnore]
 		public List<string> HintsMd

@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Vostok.Logging.Abstractions;
+using Newtonsoft.Json;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
@@ -20,6 +21,8 @@ namespace RunCheckerJob
 		private const string arrAffinityCookieName = "ARRAffinity";
 		private static ILog log => LogProvider.Get().ForContext(typeof(Client));
 		private readonly string agentName;
+
+		private static readonly JsonSerializerSettings jsonSerializerSettings = JsonConfig.GetSettings(typeof(RunnerSubmission));
 
 		public Client(string address, string token, string agentName)
 		{
@@ -46,14 +49,14 @@ namespace RunCheckerJob
 
 		public async Task<List<RunnerSubmission>> TryGetSubmission(IEnumerable<string> supportedSandboxes)
 		{
-			var uri = GetUri("GetSubmissions", new[] { "sandboxes", string.Join(",", supportedSandboxes) });
+			var uri = GetUri("runner/get-submissions", new[] { "sandboxes", string.Join(",", supportedSandboxes) });
 			try
 			{
 				log.Info($"Отправляю запрос на {uri}");
-				var response = await httpClient.GetAsync(uri).ConfigureAwait(false);
+				var response = await httpClient.PostAsync(uri, null).ConfigureAwait(false);
 				log.Info($"Получил ответ, код {(int)response.StatusCode} {response.StatusCode}, читаю содержимое");
 				if (response.IsSuccessStatusCode)
-					return (await response.Content.ReadAsJsonAsync<List<RunnerSubmission>>(JsonConfig.GetSettings()).ConfigureAwait(false)).Item1;
+					return (await response.Content.ReadAsJsonAsync<List<RunnerSubmission>>(jsonSerializerSettings).ConfigureAwait(false)).Item1;
 				else
 				{
 					var text = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -70,12 +73,12 @@ namespace RunCheckerJob
 			return new List<RunnerSubmission>();
 		}
 
-		public async void SendResults(List<RunningResults> results)
+		public async void SendResults(params RunningResults[] results)
 		{
-			var uri = GetUri("PostResults");
+			var uri = GetUri("runner/set-result");
 			try
 			{
-				var response = await TrySendResults(results, uri).ConfigureAwait(false);
+				var response = await TrySendResults(uri, results).ConfigureAwait(false);
 
 				if (response.IsSuccessStatusCode)
 					return;
@@ -93,7 +96,7 @@ namespace RunCheckerJob
 			}
 		}
 
-		private Task<HttpResponseMessage> TrySendResults(List<RunningResults> results, string uri)
+		private Task<HttpResponseMessage> TrySendResults(string uri, params RunningResults[] results)
 		{
 			return FuncUtils.TrySeveralTimesAsync(async () => await httpClient.PostAsJsonAsync(uri, results).ConfigureAwait(false), 3);
 		}
@@ -108,7 +111,7 @@ namespace RunCheckerJob
 				query[parameter[0]] = parameter[1];
 			}
 
-			return $"{path}/?{query}";
+			return $"{path}?{query}";
 		}
 	}
 }

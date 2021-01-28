@@ -10,6 +10,7 @@ const mapStateToProps = (state, { match, location, }) => {
 		slideId,
 		isReview,
 		isLti,
+		isAcceptedAlert,
 		isAcceptedSolutions,
 	} = getSlideInfo(location);
 	const courseId = match.params.courseId.toLowerCase();
@@ -28,7 +29,7 @@ const mapStateToProps = (state, { match, location, }) => {
 		slideId,
 		courseInfo,
 		loadedCourseIds,
-		pageInfo: { isNavigationVisible, isReview, isLti, isAcceptedSolutions, },
+		pageInfo: { isNavigationVisible, isReview, isLti, isAcceptedSolutions, isAcceptedAlert, },
 		isSlideReady: state.courses.isSlideReady,
 		units: mapCourseInfoToUnits(courseInfo),
 		user: state.account,

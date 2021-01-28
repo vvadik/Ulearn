@@ -32,8 +32,8 @@ namespace Database.Repos.Groups
 		Task ChangeGroupOwnerAsync(int groupId, string newOwnerId);
 		Task<Group> ArchiveGroupAsync(int groupId, bool isArchived);
 		Task DeleteGroupAsync(int groupId);
-		Task<Group> FindGroupByIdAsync(int groupId, bool noTracking = false);
-		Task<Group> FindGroupByInviteHashAsync(Guid hash, bool noTracking = false);
+		Task<Group> FindGroupByIdAsync(int groupId);
+		Task<Group> FindGroupByInviteHashAsync(Guid hash);
 		Task<List<Group>> GetCourseGroupsAsync(string courseId, bool includeArchived = false);
 		Task<List<Group>> GetMyGroupsFilterAccessibleToUserAsync(string courseId, string userId, bool includeArchived = false);
 		Task EnableInviteLinkAsync(int groupId, bool isEnabled);

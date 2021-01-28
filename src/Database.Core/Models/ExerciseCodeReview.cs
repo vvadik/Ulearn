@@ -14,11 +14,12 @@ namespace Database.Models
 
 		public int? ExerciseCheckingId { get; set; }
 
+		// Заполняется, если не ревью бота, иначе Submission
 		public virtual ManualExerciseChecking ExerciseChecking { get; set; }
 
-		/* This field is used only for reviews not attached to specific ManualExerciseChecking */
 		public int? SubmissionId { get; set; }
 
+		// Заполняется вместо ExerciseChecking для ревью бота
 		public virtual UserExerciseSubmission Submission { get; set; }
 
 		[Required]

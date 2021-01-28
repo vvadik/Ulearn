@@ -7,39 +7,17 @@ import YandexMetrika from "./components/common/YandexMetrika";
 import Header from "./components/common/Header";
 import EmailNotConfirmedModal from "src/components/notificationModal/EmailNotConfirmedModal";
 
-import { emailNotConfirmed } from "src/consts/accountProblems";
-
 import { Provider, connect } from "react-redux";
-import thunkMiddleware from "redux-thunk";
-import { applyMiddleware, createStore, compose, } from "redux";
 
 import Router from "./Router";
 
-import rootReducer from "./redux/reducers";
 import api from "./api";
 import { ThemeContext, Toast } from "ui";
 import theme from "src/uiTheme";
 import queryString from "query-string";
+import configureStore from "src/configureStore";
+import { AccountProblemType } from "src/consts/accountProblemType";
 
-
-function configureStore() {
-	let env = process.env.NODE_ENV || 'development';
-	let isDevelopment = env === 'development';
-
-	let middlewares;
-	if(isDevelopment) {
-		const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-		middlewares = composeEnhancers(applyMiddleware(thunkMiddleware));
-
-	} else {
-		middlewares = applyMiddleware(thunkMiddleware);
-	}
-
-	return createStore(
-		rootReducer,
-		middlewares
-	)
-}
 
 const store = configureStore();
 
@@ -109,7 +87,7 @@ class InternalUlearnApp extends Component {
 						&& this.isEmailNotConfirmed()
 						&& <EmailNotConfirmedModal account={ this.props.account }/>
 						}
-						<YandexMetrika/>
+						{ this.renderMetricsIfNotDevelopment() }
 					</ErrorBoundary>
 				</ThemeContext.Provider>
 			</BrowserRouter>
@@ -120,7 +98,12 @@ class InternalUlearnApp extends Component {
 		const { account } = this.props;
 		return account.isAuthenticated
 			&& account.accountProblems.length > 0
-			&& account.accountProblems.some(p => p.problemType === emailNotConfirmed);
+			&& account.accountProblems.some(p => p.problemType === AccountProblemType.emailNotConfirmed);
+	}
+
+	renderMetricsIfNotDevelopment = () => {
+		if(process.env.NODE_ENV === 'development') return null;
+		return <YandexMetrika/>;
 	}
 
 	static mapStateToProps(state) {

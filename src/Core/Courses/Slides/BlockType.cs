@@ -65,6 +65,9 @@ namespace Ulearn.Core.Courses.Slides
 
 		[XmlEnum("exercise.universal")]
 		UniversalExercise,
+		
+		[XmlEnum("exercise.polygon")]
+		PolygonExercise
 	}
 
 	public static class BlockTypeHelpers

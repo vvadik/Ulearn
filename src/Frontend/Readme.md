@@ -2,15 +2,14 @@
 
 ### Сборки и конфиги
 
-Имеется 3 типа сборки: development, production, courseTool. У каждого типа свой конфиг webpack-а.
+Имеется 3 типа сборки: development, production. У каждого типа свой конфиг webpack-а.
 
 Запуск Node-ом описан в файлах в папке scripts. В dev режиме запускается dev server для работы в браузере, подключается HMR.
 
     "start": "node scripts/start.js", -- dev
     "build": "node scripts/build.js", -- prod
-    "courseToolBuild": "node scripts/courseToolBuild.js", -- courseTool
     
-Конфиги webpack описаны в папке config (webpack.config.(dev||prod||courseTool)). 
+Конфиги webpack описаны в папке config (webpack.config.(dev||prod)). 
 Имеется базовый конфиг webpack.config.base, в котором описаны alias-ы (они нужны, чтобы вместо @skbkontur/react-ui писать ui).
 Так же в этой папке имеются конфиги полифилов, сентри (логгирование ошибок) и т.д.
     
@@ -93,6 +92,23 @@ Actions описаны в src/actions.
 
 <Route component={AnyPage}/>
 ```
+
+### Тесты
+тесты запускаются локально с помощью storybook + loki.
+Для начала надо запустить сторибук, после чего запустить тесты loki.
+```
+npm run storybook
+yarn loki test
+```
+loki/current эталонные скриншоты.
+
+loki/difference не пройденные тесты.
+
+yarn loki approve принять все изменения.
+
+yarn loki test laptop тесты только на определенную платформу.
+
+yarn loki update добавить скриншоты в эталон.
 
 ### Разные вспомогательные штуки  
 

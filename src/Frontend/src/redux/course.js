@@ -7,9 +7,9 @@ import {
 	COURSES__SLIDE_READY,
 	START, SUCCESS, FAIL,
 	COURSES__COURSE_LOAD_ERRORS,
-} from '../consts/actions';
-import { rateTypes } from "../consts/rateTypes";
-import { flashcards as flashcardsSlideType } from "../consts/routes";
+} from 'src/consts/actions';
+import { RateTypes } from "src/consts/rateTypes";
+import { flashcards as flashcardsSlideType } from "src/consts/routes";
 
 const initialCoursesState = {
 	courseById: {},
@@ -97,7 +97,7 @@ export default function courses(state = initialCoursesState, action) {
 				for (const flashcard of flashcards) {
 					courseFlashcards[flashcard.id] = flashcard;
 					flashcardsIds.push(flashcard.id);
-					if(flashcard.rate === rateTypes.notRated) {
+					if(flashcard.rate === RateTypes.notRated) {
 						unratedFlashcardsCount++;
 					}
 				}

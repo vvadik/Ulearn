@@ -89,17 +89,17 @@ namespace Database.Repos.Users
 		}
 
 		[NotNull]
-		public ApplicationUser GetUlearnBotUser()
+		public async Task<ApplicationUser> GetUlearnBotUser()
 		{
-			var user = db.Users.FirstOrDefault(u => u.UserName == UlearnBotUsername);
+			var user = await db.Users.FirstOrDefaultAsync(u => u.UserName == UlearnBotUsername);
 			if (user == null)
 				throw new NotFoundException($"Ulearn bot user (username = {UlearnBotUsername}) not found");
 			return user;
 		}
 
-		public string GetUlearnBotUserId()
+		public async Task<string> GetUlearnBotUserId()
 		{
-			var user = GetUlearnBotUser();
+			var user = await GetUlearnBotUser();
 			return user.Id;
 		}
 

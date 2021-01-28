@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using JetBrains.Annotations;
 using Vostok.Logging.Abstractions;
 using StatsdClient;
 using Ulearn.Core.Configuration;
@@ -16,7 +17,7 @@ namespace Ulearn.Core.Metrics
 		private readonly Statsd statsd;
 		private bool IsEnabled => statsd != null;
 
-		public MetricSender(string service)
+		public MetricSender([CanBeNull] string service)
 		{
 			var connectionString = ApplicationConfiguration.Read<UlearnConfiguration>().StatsdConnectionString;
 			if (string.IsNullOrEmpty(connectionString))
@@ -24,7 +25,7 @@ namespace Ulearn.Core.Metrics
 
 			var config = StatsdConfiguration.CreateFrom(connectionString);
 			prefix = config.Prefix;
-			this.service = service;
+			this.service = service ?? System.Reflection.Assembly.GetExecutingAssembly().GetName().Name.ToLower();
 
 			statsd = CreateStatsd(config);
 		}

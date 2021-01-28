@@ -26,7 +26,7 @@
     <PackageReference Include="Microsoft.AspNet.Identity.EntityFramework" Version="2.2.2" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="NUnit" Version="3.10.0" />
-    <PackageReference Include="System.Collections.Immutable" Version="1.7.0" />
+    <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
     <PackageReference Include="Z.EntityFramework.Plus.EF6" Version="1.12.15" />
   </ItemGroup>
   <ItemGroup>
@@ -890,6 +890,12 @@
     </EmbeddedResource>
     <EmbeddedResource Update="Migrations\202010060950465_ChangeScoreFields.resx">
       <DependentUpon>202010060950465_ChangeScoreFields.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Migrations\202101271856143_AddLogsRunningResult.resx">
+      <DependentUpon>202101271856143_AddLogsRunningResult.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Migrations\202101271914468_AddDebugLogsRunningResult.resx">
+      <DependentUpon>202101271914468_AddDebugLogsRunningResult.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
 </Project>

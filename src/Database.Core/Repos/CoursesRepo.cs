@@ -32,7 +32,7 @@ namespace Database.Repos
 
 		public Task<CourseVersion> GetPublishedCourseVersionAsync(string courseId)
 		{
-			return db.CourseVersions.AsNoTracking()
+			return db.CourseVersions
 				.Where(v => v.CourseId == courseId && v.PublishTime != null)
 				.OrderByDescending(v => v.PublishTime)
 				.FirstOrDefaultAsync();
@@ -92,7 +92,7 @@ namespace Database.Repos
 
 		public async Task<List<CourseVersion>> GetPublishedCourseVersionsAsync()
 		{
-			var courseVersions = await db.CourseVersions.AsNoTracking().ToListAsync().ConfigureAwait(false);
+			var courseVersions = await db.CourseVersions.ToListAsync().ConfigureAwait(false);
 			return courseVersions
 				.GroupBy(v => v.CourseId.ToLower())
 				.Select(g => g.MaxBy(v => v.PublishTime))

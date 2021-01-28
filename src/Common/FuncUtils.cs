@@ -20,7 +20,7 @@ namespace Ulearn.Common
 				}
 				catch (Exception e) when (exceptionType.IsInstanceOfType(e))
 				{
-					log.Error(e, $"Исключение (попытка {tryIndex + 1} из {triesCount}):");
+					log.Warn(e, $"Исключение (попытка {tryIndex + 1} из {triesCount}):");
 					if (tryIndex >= triesCount - 1)
 						throw;
 					log.Warn($"Попробую ещё раз (попытка {tryIndex + 2} из {triesCount})");

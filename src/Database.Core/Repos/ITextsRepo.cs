@@ -7,7 +7,7 @@ namespace Database.Repos
 	public interface ITextsRepo
 	{
 		Task<TextBlob> AddText(string text);
-		TextBlob GetText(string hash);
-		Dictionary<string, string> GetTextsByHashes(IEnumerable<string> hashes);
+		Task<TextBlob> GetText(string hash);
+		Task<Dictionary<string, string>> GetTextsByHashes(IEnumerable<string> hashes);
 	}
 }

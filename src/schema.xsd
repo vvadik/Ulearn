@@ -126,6 +126,7 @@
 	<xs:element name="slide.quiz" type="QuizSlide" />
 	<xs:element name="slide.exercise" type="ExerciseSlide" />
 	<xs:element name="slide.flashcards" type="FlashcardSlide" />
+	<xs:element name="slide.polygon" type="PolygonSlide" />
 
 	<xs:complexType name="Slide">
 		<xs:group ref="SlideInternals" />
@@ -150,7 +151,39 @@
 			<xs:element name="scoring" type="ExerciseScoring" minOccurs="0" maxOccurs="1" />
 			<xs:group ref="SlideInternals" />
 		</xs:sequence>
-		<xs:attributeGroup ref="SlideAttributes" />
+		<xs:attribute name="id" type="NonEmptyString" use="required">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">Slide's id, should be guid</xs:documentation>
+				<xs:documentation xml:lang="ru">Идентификатор слайда, должен быть гуидом</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="hide" type="xs:boolean">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">Side is shown to instructors only</xs:documentation>
+				<xs:documentation xml:lang="ru">Слайд показывается только преподавателям</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	
+	<xs:complexType name="PolygonSlide">
+		<xs:all>
+			<xs:element name="scoring" type="ExerciseScoring" minOccurs="0"/>
+			<xs:element name="polygonPath" type="xs:string"/>
+			<xs:element name="markdown" type="MarkdownBlock" minOccurs="0"/>
+			<xs:element name="exercise.polygon" type="PolygonExercise" />
+		</xs:all>
+		<xs:attribute name="id" type="NonEmptyString" use="required">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">Slide's id, should be guid</xs:documentation>
+				<xs:documentation xml:lang="ru">Идентификатор слайда, должен быть гуидом</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="hide" type="xs:boolean">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">Side is shown to instructors only</xs:documentation>
+				<xs:documentation xml:lang="ru">Слайд показывается только преподавателям</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 	</xs:complexType>
 
 
@@ -318,6 +351,7 @@
 			<xs:element name="exercise.csproj" type="ProjectExercise" />
 			<xs:element name="exercise.file" type="SingleFileExercise" />
 			<xs:element name="exercise.universal" type="UniversalExercise" />
+			<xs:element name="exercise.polygon" type="PolygonExercise" />
 		</xs:choice>
 	</xs:group>
 
@@ -650,6 +684,18 @@
 		</xs:complexContent>
 	</xs:complexType>
 
+	<xs:complexType name="PolygonExercise">
+		<xs:complexContent>
+			<xs:extension base="Include">
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="hint" type="StringWithXmlSpaces" minOccurs="1" maxOccurs="1" />
+					<xs:element name="hideSolutions" type="xs:boolean" minOccurs="1" maxOccurs="1" />
+					<xs:element name="checkForPlagiarism" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+				</xs:choice>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
 	<xs:complexType name="AbstractQuestion">
 		<xs:sequence minOccurs="1" maxOccurs="1">
 			<xs:element name="text" minOccurs="1" maxOccurs="1" type="NonEmptyString">
@@ -874,13 +920,13 @@
 		<xs:attribute name="passedTestsScore" type="xs:int" use="optional">
 			<xs:annotation>
 				<xs:documentation xml:lang="en">Score for correct solution (if all tests passed)</xs:documentation>
-				<xs:documentation xml:lang="ru">Количество баллов за верное решение (если прошли все тесты)</xs:documentation>
+				<xs:documentation xml:lang="ru">Количество баллов, автоматически выдающееся за верное решение (если прошли все тесты). Эти баллы могут быть отобраны на ревью преподавателем</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="codeReviewScore" type="xs:int" use="optional">
 			<xs:annotation>
 				<xs:documentation xml:lang="en">Maximum score for code review</xs:documentation>
-				<xs:documentation xml:lang="ru">Максимальное количество баллов за код-ревью</xs:documentation>
+				<xs:documentation xml:lang="ru">Максимальное количество баллов, которое преподаватель может добавить к баллам за верное решение, на код ревью</xs:documentation>
 			</xs:annotation>
 		</xs:attribute>
 		<xs:attribute name="group" type="NonEmptyString" use="optional">

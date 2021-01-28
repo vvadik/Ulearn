@@ -91,6 +91,7 @@ namespace Ulearn.Core.Configuration
 	{
 		public TelegramConfiguration Telegram { get; set; }
 
+		[CanBeNull]
 		public string BaseUrl { get; set; }
 
 		public string CoursesDirectory { get; set; }

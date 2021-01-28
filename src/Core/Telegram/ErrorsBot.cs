@@ -21,6 +21,12 @@ namespace Ulearn.Core.Telegram
 			metricSender = new MetricSender(serviceName);
 		}
 
+		public ErrorsBot(UlearnConfiguration configuration, MetricSender metricSender)
+		{
+			channel = configuration.Telegram?.Errors?.Channel;
+			this.metricSender = metricSender;
+		}
+
 		public async Task PostToChannelAsync(string message, ParseMode parseMode = ParseMode.Default)
 		{
 			if (!IsBotEnabled)

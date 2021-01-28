@@ -6,7 +6,7 @@ import { courseMenuItemType } from "../../types"
 import { Calendar, EyeClosed, } from "icons";
 import { Hint, } from "ui";
 
-import { getDateDDMMYY } from "src/utils/getMoment";
+import { getDateDDMMYY } from "src/utils/momentUtils";
 import classnames from "classnames";
 
 import styles from "./CourseNavigationItem.less";

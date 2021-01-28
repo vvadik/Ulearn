@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import colorHash from "../../../utils/colorHash";
+import colorHash from "src/utils/colorHash";
 import classNames from 'classnames'
 
 import styles from "./avatar.less";

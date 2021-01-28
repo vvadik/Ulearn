@@ -35,10 +35,10 @@
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.Razor" Version="3.2.7" />
     <PackageReference Include="Microsoft.AspNet.WebPages" Version="3.2.7" />
-    <PackageReference Include="Microsoft.Build" Version="16.5.0" />
-    <PackageReference Include="Microsoft.Build.Framework" Version="16.5.0" />
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.5.0" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.5.0" />
+    <PackageReference Include="Microsoft.Build" Version="16.8.0" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="16.8.0" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.8.0" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.8.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.2" />
@@ -62,7 +62,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="SharpZipLib" Version="1.2.0" />
-    <PackageReference Include="System.Collections.Immutable" Version="1.7.0" />
+    <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
     <PackageReference Include="System.Drawing.Common" Version="4.6.0" />
     <PackageReference Include="UnidecodeSharpCore" Version="2.0.1" />
   </ItemGroup>
@@ -87,12 +87,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="renderer\fonts\*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="static\flexslider-icon.ttf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
@@ -108,47 +102,12 @@
     <Content Include="Hunspellx86.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="renderer\fonts\fontawesome-webfont.svg" />
-    <Content Include="renderer\fonts\glyphicons-halflings-regular.eot" />
-    <Content Include="renderer\fonts\glyphicons-halflings-regular.svg" />
-    <Content Include="renderer\fonts\glyphicons-halflings-regular.ttf" />
-    <Content Include="renderer\fonts\glyphicons-halflings-regular.woff" />
-    <Content Include="renderer\fonts\glyphicons-halflings-regular.woff2" />
-    <Content Include="renderer\reactBuild\static\css\main.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\reactBuild\static\js\main.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\reactBuild\static\js\oldBrowser.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="examples\video.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="renderer\favicon.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\scripts\.gitkeep" />
-    <Content Include="renderer\styles\.gitkeep" />
-    <Content Include="renderer\styles\bundle.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="renderer\scripts\bundle.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="templates\code.html">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="templates\config.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="templates\gallery.html">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="templates\iframe.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\sandboxes\**">
@@ -165,7 +124,6 @@
     <ProjectReference Include="..\CsSandboxer\CsSandboxer.csproj" />
     <ProjectReference Include="..\RunCheckerJob\RunCheckerJob.csproj" />
     <ProjectReference Include="..\RunCsJob\RunCsJob.csproj" />
-    <ProjectReference Include="..\uLearn.Web\uLearn.Web.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="bin\Debug\submissions\Names.csproj-f3d55148\Charts.cs" />
@@ -184,14 +142,5 @@
   </ItemGroup>
   <Target Name="CreateCourseToolZip" BeforeTargets="OctoPack" Condition="$(RunOctoPack)">
     <Exec Command="powershell -NonInteractive -executionpolicy Unrestricted &quot; Compress-Archive -Path '$(TargetDir)*' -DestinationPath '$(TargetDir)CourseTool.zip' -Force&quot;" />
-  </Target>
-  <Target Name="BeforeBuildMigrated" BeforeTargets="PreBuildEvent">
-    <Message Text="### BeforeBuild ###" Importance="high" />
-    <Exec Command="powershell -NonInteractive -executionpolicy Unrestricted &quot; $A = cat $(SolutionDir)uLearn.Web\LibrariesScripts.txt;$B = cat $(SolutionDir)uLearn.Web\UlearnScripts.txt;$A = $A+$B;for ($i = 0; $i -le ($A.length - 1); $i += 1) {$A[$i]='$(SolutionDir)ulearn.Web\'+$A[$i]};cat $A | Out-File -Encoding 'UTF8' -FilePath $(ProjectDir)renderer\scripts\bundle.js; &quot;" />
-    <Exec Command="powershell -NonInteractive -executionpolicy Unrestricted &quot; $A = cat $(SolutionDir)uLearn.Web\UlearnStyles.txt;for ($i = 0; $i -le ($A.length - 1); $i += 1) {$A[$i]='$(SolutionDir)ulearn.Web\'+$A[$i]};cat $A | Out-File -Encoding 'UTF8' -FilePath $(ProjectDir)renderer\styles\bundle.css; &quot;" />
-    <Exec Command="npm run courseToolBuild" WorkingDirectory="..\Frontend" />
-  </Target>
-  <Target Name="AfterBuildMigrated">
-    <Exec Command="powershell -NonInteractive -executionpolicy Unrestricted &quot; Copy-Item -Path '$(ProjectDir)renderer\reactBuild\static\media' -Destination '$(TargetDir)renderer\reactBuild\static\media' -recurse -Force &quot;" />
   </Target>
 </Project>

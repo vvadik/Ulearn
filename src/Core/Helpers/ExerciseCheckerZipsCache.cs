@@ -93,9 +93,7 @@ namespace Ulearn.Core.Helpers
 			}
 			catch (Exception ex)
 			{
-				LogProvider.Get()
-					.ForContext(typeof(ExerciseCheckerZipsCache))
-					.Warn(ex, $"Exception in SaveFileOnDisk courseId {zipFile.FullName}");
+				log.Warn(ex, $"Exception in SaveFileOnDisk courseId {zipFile.FullName}");
 			}
 		}
 

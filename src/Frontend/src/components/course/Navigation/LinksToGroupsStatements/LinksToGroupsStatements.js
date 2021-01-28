@@ -3,8 +3,8 @@ import PropTypes from "prop-types";
 
 import { Link } from "ui";
 
-import { courseStatistics } from "../../../../consts/routes";
-import { buildQuery } from "../../../../utils";
+import { courseStatistics } from "src/consts/routes";
+import { buildQuery } from "src/utils";
 import { groupAsStudentType } from "../types";
 
 import styles from './linkToGroupsStatements.less';

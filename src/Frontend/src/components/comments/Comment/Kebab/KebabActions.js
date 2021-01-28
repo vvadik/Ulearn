@@ -3,16 +3,17 @@ import PropTypes from "prop-types";
 import { comment, userType, userRoles } from "../../commonPropTypes";
 import { Kebab, MenuItem } from "ui";
 import { EyeClosed, Delete, Pin, Edit, DocumentLite, Ok } from "icons";
-import { ACCESSES, SLIDETYPE } from "src/consts/general";
+import { SlideType } from "src/models/slide";
 
 import styles from "./KebabActions.less";
+import { AccessType } from "src/consts/accessType";
 
 export default function KebabActions(props) {
 	const { user, comment, userRoles, url, canModerateComments, actions, slideType, handleCommentBackGround } = props;
-	const canModerate = canModerateComments(userRoles, ACCESSES.editPinAndRemoveComments);
+	const canModerate = canModerateComments(userRoles, AccessType.editPinAndRemoveComments);
 	const canDeleteAndEdit = (user.id === comment.author.id || canModerate);
-	const canSeeSubmissions = (slideType === SLIDETYPE.exercise &&
-		canModerateComments(userRoles, ACCESSES.viewAllStudentsSubmissions));
+	const canSeeSubmissions = (slideType === SlideType.Exercise &&
+		canModerateComments(userRoles, AccessType.viewAllStudentsSubmissions));
 
 	return (
 		<div className={ styles.instructorsActions }>

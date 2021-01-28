@@ -1,6 +1,6 @@
-import { rateTypes } from "../../../../consts/rateTypes";
+import { RateTypes } from "src/consts/rateTypes";
 
-const { notRated, } = rateTypes;
+const { notRated, } = RateTypes;
 
 let idCounter = 0;
 

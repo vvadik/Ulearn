@@ -22,7 +22,7 @@ module.exports = merge(base, {
 	entry: {
 		main: [
 			'./config/polyfills',
-			'./config/sentry',
+			//'./config/sentry', we're rejecting all error coming from localhost, so uncommenting this line will just pollute console on errors
 			'react-dev-utils/webpackHotDevClient',
 			paths.appIndexJs,
 		],
@@ -38,6 +38,9 @@ module.exports = merge(base, {
 		publicPath: publicPath,
 		devtoolModuleFilenameTemplate: info =>
 			path.resolve(info.absoluteResourcePath).replace(/\\/g, '/'),
+	},
+	resolve: {
+		extensions: ['.ts', '.tsx', '.js', '.json']
 	},
 	module: {
 		strictExportPresence: true,
@@ -63,7 +66,7 @@ module.exports = merge(base, {
 						},
 					},
 					{
-						test: /\.(js|jsx|mjs)$/,
+						test: /\.(js|jsx|mjs|ts|tsx)$/,
 						loader: 'babel-loader',
 						include: paths.appSrc,
 						options: {
@@ -75,6 +78,7 @@ module.exports = merge(base, {
 						test: /\.less$/,
 						use: [
 							'style-loader',
+							'@teamsupercell/typings-for-css-modules-loader',
 							{
 								loader: 'css-loader',
 								options: {
@@ -92,6 +96,7 @@ module.exports = merge(base, {
 						test: /\.css$/,
 						use: [
 							'style-loader',
+							'@teamsupercell/typings-for-css-modules-loader',
 							{
 								loader: 'css-loader',
 								options: {
@@ -139,7 +144,7 @@ module.exports = merge(base, {
 		new webpack.HotModuleReplacementPlugin(),
 		new CaseSensitivePathsPlugin(),
 		new WatchMissingNodeModulesPlugin(paths.appNodeModules),
-		new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+		new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/, /\.less\.d\.ts$/, /\.css\.d\.ts$/),
 	],
 	performance: {
 		hints: false,

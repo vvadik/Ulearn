@@ -9,7 +9,7 @@ namespace Database.Repos
 	public class TempCoursesRepo : ITempCoursesRepo
 	{
 		private readonly UlearnDb db;
-		
+
 		public TempCoursesRepo(UlearnDb db)
 		{
 			this.db = db;

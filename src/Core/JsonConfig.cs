@@ -1,22 +1,19 @@
-﻿using System.Linq;
-using System.Reflection;
+﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
-using Ulearn.Core.RunCheckerJobApi;
+using Newtonsoft.Json.Converters;
 
 namespace Ulearn.Core
 {
 	public static class JsonConfig
 	{
-		public static JsonSerializerSettings GetSettings()
+		public static JsonSerializerSettings GetSettings(params Type[] baseTypes)
 		{
 			return new JsonSerializerSettings
 			{
-				SerializationBinder = new DisplayNameSerializationBinder(
-					Assembly
-						.GetAssembly(typeof(RunnerSubmission))
-						.GetTypes()
-						.Where(type => type.IsClass && !type.IsAbstract && type.IsSubclassOf(typeof(RunnerSubmission)))),
 				TypeNameHandling = TypeNameHandling.Auto,
+				SerializationBinder = new DisplayNameSerializationBinder(DisplayNameSerializationBinder.GetSubtypes(baseTypes)),
+				Converters = new List<JsonConverter>{ new StringEnumConverter() }
 			};
 		}
 	}

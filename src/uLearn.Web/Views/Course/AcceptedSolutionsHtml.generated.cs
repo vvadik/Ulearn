@@ -27,9 +27,6 @@ namespace uLearn.Web.Views.Course
     using System.Web.Security;
     using System.Web.UI;
     using System.Web.WebPages;
-    using Database.Extensions;
-    using Database.Models;
-    using uLearn;
     using Ulearn.Core;
     using Ulearn.Core.Courses.Slides.Blocks;
     using uLearn.Web;
@@ -67,9 +64,6 @@ WriteTo(__razor_helper_writer, MvcHtmlString.Create(model.Slide.Exercise.Comment
 
 WriteLiteralTo(__razor_helper_writer, "</p>\r\n");
 
-WriteLiteralTo(__razor_helper_writer, "\t<p>Изучите решения ваших коллег. Проголосуйте за решения, в которых вы нашли что" +
-"-то новое для себя.</p>\r\n");
-
 	foreach (var solution in model.AcceptedSolutions)
 	{
 		var id = "solution_" + solution.Id;
@@ -77,26 +71,26 @@ WriteLiteralTo(__razor_helper_writer, "\t<p>Изучите решения ваш
 
 WriteLiteralTo(__razor_helper_writer, "\t\t<div");
 
-WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\"", 785), Tuple.Create("\"", 793)
-, Tuple.Create(Tuple.Create("", 790), Tuple.Create<System.Object, System.Int32>(id
-, 790), false)
+WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\"", 612), Tuple.Create("\"", 620)
+, Tuple.Create(Tuple.Create("", 617), Tuple.Create<System.Object, System.Int32>(id
+, 617), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t<button");
 
-WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 807), Tuple.Create("\"", 907)
-, Tuple.Create(Tuple.Create("", 815), Tuple.Create("like-left-location", 815), true)
-, Tuple.Create(Tuple.Create(" ", 833), Tuple.Create("btn", 834), true)
-, Tuple.Create(Tuple.Create(" ", 837), Tuple.Create<System.Object, System.Int32>( solution.LikedAlready ? "btn-primary" : "btn-default"
-, 838), false)
-, Tuple.Create(Tuple.Create(" ", 895), Tuple.Create("like-button", 896), true)
+WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 634), Tuple.Create("\"", 734)
+, Tuple.Create(Tuple.Create("", 642), Tuple.Create("like-left-location", 642), true)
+, Tuple.Create(Tuple.Create(" ", 660), Tuple.Create("btn", 661), true)
+, Tuple.Create(Tuple.Create(" ", 664), Tuple.Create<System.Object, System.Int32>( solution.LikedAlready ? "btn-primary" : "btn-default"
+, 665), false)
+, Tuple.Create(Tuple.Create(" ", 722), Tuple.Create("like-button", 723), true)
 );
 
-WriteAttributeTo(__razor_helper_writer, "onclick", Tuple.Create(" onclick=\"", 908), Tuple.Create("\"", 944)
-, Tuple.Create(Tuple.Create("", 918), Tuple.Create("likeSolution(", 918), true)
-                                                                , Tuple.Create(Tuple.Create("", 931), Tuple.Create<System.Object, System.Int32>(solution.Id
-, 931), false)
-, Tuple.Create(Tuple.Create("", 943), Tuple.Create(")", 943), true)
+WriteAttributeTo(__razor_helper_writer, "onclick", Tuple.Create(" onclick=\"", 735), Tuple.Create("\"", 771)
+, Tuple.Create(Tuple.Create("", 745), Tuple.Create("likeSolution(", 745), true)
+                                                                , Tuple.Create(Tuple.Create("", 758), Tuple.Create<System.Object, System.Int32>(solution.Id
+, 758), false)
+, Tuple.Create(Tuple.Create("", 770), Tuple.Create(")", 770), true)
 );
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t\t<i");
@@ -111,36 +105,7 @@ WriteLiteralTo(__razor_helper_writer, ">");
 
               WriteTo(__razor_helper_writer, solution.UsersWhoLike.Count);
 
-WriteLiteralTo(__razor_helper_writer, "</span>\r\n\t\t\t</button>\r\n\r\n");
-
-			
-             if (model.User.HasAccessFor(model.CourseId, CourseRole.Instructor))
-			{
-
-WriteLiteralTo(__razor_helper_writer, "\t\t\t\t<form");
-
-WriteAttributeTo(__razor_helper_writer, "action", Tuple.Create(" action=\"", 1168), Tuple.Create("\"", 1207)
-, Tuple.Create(Tuple.Create("", 1177), Tuple.Create<System.Object, System.Int32>( solution.RemoveSolutionUrl
-, 1177), false)
-);
-
-WriteLiteralTo(__razor_helper_writer, " method=\"POST\"");
-
-WriteLiteralTo(__razor_helper_writer, " novalidate=\"novalidate\"");
-
-WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t\t\t<button");
-
-WriteLiteralTo(__razor_helper_writer, " class=\"btn btn-danger\"");
-
-WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t\t\t\t<i");
-
-WriteLiteralTo(__razor_helper_writer, " class=\"glyphicon glyphicon-remove\"");
-
-WriteLiteralTo(__razor_helper_writer, "></i>\r\n\t\t\t\t\t\tУдалить решение\r\n\t\t\t\t\t</button>\r\n\t\t\t\t</form>\r\n");
-
-			}
-
-WriteLiteralTo(__razor_helper_writer, "\r\n");
+WriteLiteralTo(__razor_helper_writer, "</span>\r\n\t\t\t</button>\r\n");
 
 WriteLiteralTo(__razor_helper_writer, "\t\t\t");
 

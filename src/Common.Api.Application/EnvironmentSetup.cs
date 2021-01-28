@@ -29,8 +29,6 @@ namespace Ulearn.Common.Api
 			var configurationSource = GetConfigurationSource();
 			configurationProvider.SetupSourceFor<UlearnConfiguration>(configurationSource);
 			var ulearnConfiguration = configurationProvider.Get<UlearnConfiguration>();
-			// ReSharper disable once PossibleInvalidOperationException
-			var port = ulearnConfiguration.Port.Value;
 			var environment = ulearnConfiguration.Environment ?? "dev";
 
 			if (!ulearnConfiguration.DisableKonturServices)
@@ -41,9 +39,12 @@ namespace Ulearn.Common.Api
 					.SetApplication(application)
 					.SetEnvironment(environment)
 					.SetInstance(Environment.MachineName.Replace(".", "_").ToLower()))
-				.SetupConfiguration(configurationBuilder => configurationBuilder.AddSecretSource(configurationSource))
-				.SetPort(port)
-				.SetBaseUrlPath(ulearnConfiguration.BaseUrl)
+				.SetupConfiguration(configurationBuilder => configurationBuilder.AddSecretSource(configurationSource));
+			if (ulearnConfiguration.Port != null)
+				builder.SetPort(ulearnConfiguration.Port.Value);
+			if (ulearnConfiguration.BaseUrl != null)
+				builder.SetBaseUrlPath(ulearnConfiguration.BaseUrl);
+			builder	
 				.DisableServiceBeacon()
 				.SetupHerculesSink(sinkBuilder => SetupHerculesSink(sinkBuilder, ulearnConfiguration))
 				.SetupLog((logBuilder, context) => SetupLog(logBuilder, ulearnConfiguration))

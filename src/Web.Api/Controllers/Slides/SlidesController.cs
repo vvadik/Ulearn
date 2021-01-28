@@ -41,7 +41,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		/// Информация о слайде
 		/// </summary>
 		[HttpGet("{courseId}/{slideId}")]
-		public async Task<ActionResult<ApiSlideInfo>> SlideInfo([FromRoute]Course course, [FromRoute]Guid slideId)
+		public async Task<ActionResult<ApiSlideInfo>> SlideInfo([FromRoute] Course course, [FromRoute] Guid slideId)
 		{
 			var isInstructor = await courseRolesRepo.HasUserAccessToAnyCourseAsync(User.GetUserId(), CourseRoleType.Instructor).ConfigureAwait(false);
 			var slide = course?.FindSlideById(slideId, isInstructor);
@@ -55,11 +55,14 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			if (slide == null)
 				return NotFound(new { status = "error", message = "Course or slide not found" });
 
-			var getSlideMaxScoreFunc = await BuildGetSlideMaxScoreFunc(solutionsRepo, userQuizzesRepo, visitsRepo, groupsRepo, course, User.GetUserId());
-			var getGitEditLinkFunc = await BuildGetGitEditLinkFunc(User.GetUserId(), course, courseRolesRepo, coursesRepo);
+			var userId = User.GetUserId();
+			var getSlideMaxScoreFunc = await BuildGetSlideMaxScoreFunc(solutionsRepo, userQuizzesRepo, visitsRepo, groupsRepo, course, userId);
+			var getGitEditLinkFunc = await BuildGetGitEditLinkFunc(userId, course, courseRolesRepo, coursesRepo);
 			var baseUrl = CourseUnitUtils.GetDirectoryRelativeWebPath(slide.Info.SlideFile);
-			var slideRenderContext = new SlideRenderContext(course.Id, slide, baseUrl, !isInstructor,
+
+			var slideRenderContext = new SlideRenderContext(course.Id, slide, UserId, baseUrl, !isInstructor,
 				course.Settings.VideoAnnotationsGoogleDoc, Url);
+
 			return await slideRenderer.BuildSlideInfo(slideRenderContext, getSlideMaxScoreFunc, getGitEditLinkFunc);
 		}
 	}

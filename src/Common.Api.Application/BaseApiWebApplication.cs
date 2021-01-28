@@ -21,6 +21,7 @@ using Vostok.Applications.AspNetCore;
 using Vostok.Applications.AspNetCore.Builders;
 using Vostok.Applications.AspNetCore.Configuration;
 using Vostok.Hosting.Abstractions;
+using Vostok.Logging.Microsoft;
 
 namespace Ulearn.Common.Api
 {
@@ -96,6 +97,7 @@ namespace Ulearn.Common.Api
 
 		protected virtual void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment)
 		{
+			services.AddLogging(builder => builder.AddVostok(hostingEnvironment.Log));
 			ConfigureDi(services);
 			ConfigureMvc(services);
 			ConfigureSwaggerDocumentation(services);

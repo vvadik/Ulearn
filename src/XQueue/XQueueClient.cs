@@ -91,7 +91,7 @@ namespace XQueue
 			}
 			catch (Exception e)
 			{
-				log.Warn( e.InnerException, $"Can't get submission from xqueue {queueName}: {e.Message}");
+				log.Warn( e, $"Can't get submission from xqueue {queueName}: {e.Message}");
 				return null;
 			}
 

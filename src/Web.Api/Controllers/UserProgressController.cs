@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Core.Courses;
 using Ulearn.Web.Api.Models.Parameters;
-using Ulearn.Web.Api.Models.Responses.User;
+using Ulearn.Web.Api.Models.Responses.Users;
 
 namespace Ulearn.Web.Api.Controllers
 {
@@ -74,6 +74,8 @@ namespace Ulearn.Web.Api.Controllers
 			var attempts = await userQuizzesRepo.GetUsedAttemptsCountAsync(course.Id, userIds).ConfigureAwait(false);
 			var waitingQuizSlides = await userQuizzesRepo.GetSlideIdsWaitingForManualCheckAsync(course.Id, userIds).ConfigureAwait(false);
 			var waitingExerciseSlides = await slideCheckingsRepo.GetSlideIdsWaitingForManualExerciseCheckAsync(course.Id, userIds).ConfigureAwait(false);
+			var prohibitFurtherManualCheckingSlides = await slideCheckingsRepo.GetProhibitFurtherManualCheckingSlides(course.Id, userIds).ConfigureAwait(false);
+			var skippedSlides = await visitsRepo.GetSkippedSlides(course.Id, userIds);
 
 			var usersProgress = new Dictionary<string, UserProgress>();
 			foreach (var userId in scores.Keys)
@@ -85,9 +87,11 @@ namespace Ulearn.Web.Api.Controllers
 					{
 						Visited = true,
 						Score = kvp.Value,
+						IsSkipped = skippedSlides.GetValueOrDefault(userId)?.Contains(kvp.Key) ?? false,
 						UsedAttempts = attempts.GetValueOrDefault(userId)?.GetValueOrDefault(kvp.Key) ?? 0,
-						IsWaitingForManualChecking = (waitingExerciseSlides.GetValueOrDefault(userId)?.Contains(kvp.Key) ?? false)
-							|| (waitingQuizSlides.GetValueOrDefault(userId)?.Contains(kvp.Key) ?? false)
+						WaitingForManualChecking = (waitingExerciseSlides.GetValueOrDefault(userId)?.Contains(kvp.Key) ?? false)
+							|| (waitingQuizSlides.GetValueOrDefault(userId)?.Contains(kvp.Key) ?? false),
+						ProhibitFurtherManualChecking = prohibitFurtherManualCheckingSlides.GetValueOrDefault(userId)?.Contains(kvp.Key) ?? false
 					});
 				var userAdditionalScores = additionalScores.GetValueOrDefault(userId);
 					usersProgress[userId] = new UserProgress

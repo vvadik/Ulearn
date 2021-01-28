@@ -8,8 +8,8 @@ import ProgressBar from "../ProgressBar/ProgressBar";
 import ShortQuestions from "./ShortQuestions/ShortQuestions";
 import Flashcards from "../Flashcards/Flashcards";
 
-import { guides } from '../consts';
-import { rateTypes } from "../../../consts/rateTypes";
+import { guides as defaultGuides } from '../consts';
+import { RateTypes } from "src/consts/rateTypes";
 
 import countFlashcardsStatistics from "../countFlashcardsStatistics";
 
@@ -34,7 +34,7 @@ class UnitPage extends Component {
 	static getDerivedStateFromProps(props, state) {
 		const { flashcards, unitId } = props;
 		const unitFlashcards = flashcards.filter(flashcard => flashcard.unitId === unitId);
-		if (JSON.stringify(unitFlashcards) !== JSON.stringify(state.unitFlashcards)) {
+		if(JSON.stringify(unitFlashcards) !== JSON.stringify(state.unitFlashcards)) {
 			return {
 				unitFlashcards,
 				statistics: countFlashcardsStatistics(unitFlashcards),
@@ -47,16 +47,24 @@ class UnitPage extends Component {
 	componentDidMount() {
 		const { courseId, flashcards, loadFlashcards } = this.props;
 
-		if (flashcards.length === 0) {
+		if(flashcards.length === 0) {
 			loadFlashcards(courseId);
 		}
 	}
 
 	render() {
-		const { courseId, unitTitle, flashcards, flashcardsLoading, sendFlashcardRate, unitId, infoByUnits } = this.props;
+		const {
+			courseId,
+			unitTitle,
+			flashcards,
+			flashcardsLoading,
+			sendFlashcardRate,
+			unitId,
+			infoByUnits
+		} = this.props;
 		const { statistics, totalFlashcardsCount, showFlashcards } = this.state;
-		const haveProgress = flashcards && statistics[rateTypes.notRated] !== totalFlashcardsCount;
-		const completedUnit = flashcards && statistics[rateTypes.notRated] === 0;
+		const haveProgress = flashcards && statistics[RateTypes.notRated] !== totalFlashcardsCount;
+		const completedUnit = flashcards && statistics[RateTypes.notRated] === 0;
 		const dataLoaded = flashcards && !flashcardsLoading;
 
 		if(!dataLoaded) {
@@ -88,8 +96,9 @@ class UnitPage extends Component {
 
 	renderFooter(shouldRenderProgress) {
 		const { statistics, totalFlashcardsCount, unitFlashcards } = this.state;
+		const { guides = defaultGuides, } = this.props;
 
-		if (!shouldRenderProgress) {
+		if(!shouldRenderProgress) {
 			return (
 				<div className={ styles.guidesContainer }>
 					<Guides guides={ guides }/>
@@ -128,7 +137,7 @@ class UnitPage extends Component {
 
 	static mapFlashcardsToQuestionWithAnswers(unitFlashcards) {
 		return unitFlashcards
-			.filter(({ rate }) => rate !== rateTypes.notRated)
+			.filter(({ rate }) => rate !== RateTypes.notRated)
 			.map(({ question, answer, }) => ({ question, answer, }));
 	}
 }
@@ -159,6 +168,7 @@ UnitPage.propTypes = {
 		unitId: PropTypes.string,
 		flashcardsSlideSlug: PropTypes.string,
 	})),
+	guides: PropTypes.arrayOf(PropTypes.string),
 
 	loadFlashcards: PropTypes.func,
 	sendFlashcardRate: PropTypes.func,

@@ -5,7 +5,7 @@ import CreateGroupModal from "../CreateGroupModal/CreateGroupModal";
 import CopyGroupModal from "../CopyGroupModal/CopyGroupModal";
 
 import styles from "./groupHeader.less";
-import { Mobile, NotMobile } from "../../../../utils/responsive";
+import { Mobile, NotMobile } from "src/utils/responsive";
 
 const TABS = {
 	active: 'active',

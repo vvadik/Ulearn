@@ -1,48 +1,87 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using JetBrains.Annotations;
-using Newtonsoft.Json;
+using Ulearn.Common.Extensions;
 
 namespace Ulearn.Core.RunCheckerJobApi
 {
+	[DataContract]
 	public class RunningResults
 	{
+		[DataMember]
 		public string Id { get; set; }
 
-		[JsonProperty(Required = Required.Always)]
-		public readonly Verdict Verdict;
+		[DataMember]
+		public Verdict Verdict { get; set; }
 
-		[NotNull] public readonly string CompilationOutput;
+		[IgnoreDataMember]
+		private string compilationOutput;
+		[DataMember]
+		[NotNull]
+		public string CompilationOutput
+		{
+			get => compilationOutput ?? "";
+			set => compilationOutput = value;
+		}
 
+		[IgnoreDataMember]
+		private string output;
 		// Для вывода пользователю используется GetOutput()
-		[NotNull] public readonly string Output; // Для C# это stdout
-		[NotNull] public readonly string Error; // Для C# это stderr
-		public readonly float? Points;
-		public readonly int? TimeLimit;
-		[CanBeNull] public List<StyleError> StyleErrors;
+		[DataMember]
+		[NotNull]
+		public string Output // Для C# это stdout
+		{
+			get => output ?? ""; 
+			set => output = value;
+		}
 
-		[JsonConstructor]
+		[IgnoreDataMember]
+		private string error;
+		[DataMember]
+		[NotNull]
+		public string Error // Для C# это stderr
+		{
+			get => error ?? ""; // Для C# это stdout
+			set => error = value;
+		}
+
+		[DataMember]
+		public float? Points { get; set; }
+
+		[DataMember]
+		[CanBeNull]
+		public List<StyleError> StyleErrors { get; set; }
+		
+		[DataMember]
+		[CanBeNull]
+		public string[] Logs { get; set; }
+
+		[DataMember]
+		public int? TestNumber { get; set; }
+
+		[IgnoreDataMember]
+		private readonly int? timeLimit;
+
+		public RunningResults()
+		{
+		}
+
 		public RunningResults(string id, Verdict verdict, int? timeLimit = null, string compilationOutput = "", string output = "", string error = "", float? points = null, List<StyleError> styleErrors = null)
 		{
 			Id = id;
 			Verdict = verdict;
-			CompilationOutput = compilationOutput ?? "";
-			Output = output ?? "";
-			Error = error ?? "";
+			CompilationOutput = compilationOutput;
+			Output = output;
+			Error = error;
 			Points = points;
-			TimeLimit = timeLimit;
+			this.timeLimit = timeLimit;
 			StyleErrors = styleErrors;
 		}
 
 		public RunningResults(Verdict verdict, int? timeLimit = null, string compilationOutput = "", string output = "", string error = "", float? points = null, List<StyleError> styleErrors = null)
+			: this(null, verdict, timeLimit, compilationOutput, output, error, points, styleErrors)
 		{
-			Verdict = verdict;
-			CompilationOutput = compilationOutput ?? "";
-			Output = output ?? "";
-			Error = error ?? "";
-			Points = points;
-			TimeLimit = timeLimit;
-			StyleErrors = styleErrors;
 		}
 
 		public override string ToString()
@@ -74,10 +113,26 @@ namespace Ulearn.Core.RunCheckerJobApi
 				case Verdict.Ok:
 					return output;
 				case Verdict.TimeLimit:
-					return output + "\n Ваше решение не успело пройти все тесты" + (TimeLimit == null ? null : $" за {TimeLimit} секунд"); // TODO: Окончание слова секунд сейчас рассчитано на числа, кратные 10.
+					return output + TestNumberOutput 
+								  + "\nВаше решение не успело пройти" 
+								  + (TestNumber == null ? " все тесты" : " тест") 
+								  + (timeLimit == null ? null : $" за {timeLimit} " + timeLimit.Value.SelectPluralWordInRussian(RussianPluralizationOptions.Seconds));
+				case Verdict.WrongAnswer:
+					return output + TestNumberOutput +  "\nНеправильный ответ";
+				case Verdict.RuntimeError:
+					return output + TestNumberOutput + "\nПрограмма завершилась с ошибкой";
 				default:
-					return output + "\n" + Verdict;
+					return output + TestNumberOutput + "\n" + Verdict;
 			}
 		}
+
+		public string GetLogs()
+		{
+			return Logs != null 
+				? string.Join("\n", Logs) 
+				: "";
+		}
+
+		private string TestNumberOutput => TestNumber == null ? null : $" \nТест №{TestNumber}";
 	}
 }

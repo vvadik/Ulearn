@@ -28,6 +28,10 @@ namespace ManualUtils
 				.UseSqlServer(configuration.Database);
 			var adb = new AntiPlagiarismDb(aOptionsBuilder.Options);
 
+			//await FindExternalSolutionsPlagiarism.UploadSolutions();
+			//await FindExternalSolutionsPlagiarism.GetRawResults();
+			//await FindExternalSolutionsPlagiarism.PrepareResults();
+
 			//Users.PrintCourseAdmins(db);
 			//await ScoresUpdater.UpdateTests(db, "java-rtf");
 			//GetMostSimilarSubmission(adb);

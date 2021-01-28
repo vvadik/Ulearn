@@ -433,7 +433,7 @@ namespace Stepik.Api
 			switch (block)
 			{
 				case MarkdownBlock markdownBlock:
-					return markdownBlock.RenderMarkdown(courseId, slide.Id, slide.Info.SlideFile, ulearnBaseUrl);
+					return markdownBlock.RenderMarkdown(courseId, slide, slide.Info.SlideFile, ulearnBaseUrl);
 				case CodeBlock codeBlock:
 				{
 					const string codeTemplate = "<pre><code class=\"%LANG%\">%CODE%</code></pre>";

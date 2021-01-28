@@ -23,7 +23,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 	public class CsProjectExerciseBlock : AbstractExerciseBlock, IExerciseCheckerZipBuilder
 	{
 		public const string BuildingTargetFrameworkVersion = "4.7.2";
-		public const string BuildingTargetNetCoreFrameworkVersion = "2.0";
+		public const string BuildingTargetNetCoreFrameworkVersion = "3.1";
 		public const string BuildingToolsVersion = null;
 
 		private static ILog log => LogProvider.Get().ForContext(typeof(CsProjectExerciseBlock));

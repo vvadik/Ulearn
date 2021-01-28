@@ -28,7 +28,7 @@ namespace Web.Api.Tests.Controllers.Slides
 		{
 			Directory.SetCurrentDirectory(TestContext.CurrentContext.TestDirectory);
 			videoAnnotationsClient = Mock.Of<IUlearnVideoAnnotationsClient>();
-			slideRenderer = new SlideRenderer(videoAnnotationsClient);
+			slideRenderer = new SlideRenderer(videoAnnotationsClient, null, null, null);
 			loader = new XmlSlideLoader();
 			courseSettings = new CourseSettings(CourseSettings.DefaultSettings);
 			courseSettings.Scoring.Groups.Add("ScoringGroup1", new ScoringGroup { Id = "ScoringGroup1" });
@@ -57,7 +57,7 @@ namespace Web.Api.Tests.Controllers.Slides
 
 		private IApiSlideBlock[] GetApiSlideBlocks(Slide slide, bool removeHiddenBlocks)
 		{
-			var context = new SlideRenderContext("course", slide, "/TestData", removeHiddenBlocks,
+			var context = new SlideRenderContext("course", slide, "UserId", "/TestData", removeHiddenBlocks,
 				"googleDoc", Mock.Of<IUrlHelper>());
 			return slide.Blocks
 				.SelectMany(b => slideRenderer.ToApiSlideBlocks(b, context).Result)

@@ -63,6 +63,9 @@ namespace AntiPlagiarism.Tests.CodeAnalyzing
 		[TestCase("index.html", Language.Html)]
 		[TestCase("example.java", Language.Java)]
 		[TestCase("example.hs", Language.Haskell)]
+		[TestCase("example.c", Language.C)]
+		[TestCase("example.cpp", Language.Cpp)]
+		[TestCase("example.sql", Language.PgSql)]
 		public void LanguagesTest(string file, Language language)
 		{
 			var code = File.ReadAllText(TestDataDir.GetFile(file).FullName);

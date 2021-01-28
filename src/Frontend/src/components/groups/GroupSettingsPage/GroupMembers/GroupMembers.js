@@ -1,19 +1,19 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import getMoment from "src/utils/getMoment";
+import { getMoment } from "src/utils/momentUtils";
 import { withRouter } from "react-router-dom";
 import api from "src/api";
 import { User, Delete } from "icons";
 import { Kebab, MenuItem, Gapped, Loader, Toast } from "ui";
 import ComboboxInstructorsSearch from "./Combobox/ComboboxInstructorsSearch";
-import Avatar from "../../../common/Avatar/Avatar";
+import Avatar from "src/components/common/Avatar/Avatar";
 import GroupStudents from "./GroupStudents/GroupStudents";
 import InviteBlock from "./InviteBlock/InviteBlock";
 import Profile from './Profile';
-import getGenderForm from "../../../../utils/getGenderForm";
+import getGenderForm from "src/utils/getGenderForm";
 import styles from './groupMembers.less';
 import { Mobile, NotMobile } from "src/utils/responsive";
-import { ROLES } from "src/consts/general";
+import { CourseRoleType } from "src/consts/accessType";
 
 class GroupMembers extends Component {
 
@@ -168,7 +168,7 @@ class GroupMembers extends Component {
 				</Gapped>
 			</MenuItem>
 		];
-		if(group.owner.id === account.id || role === ROLES.courseAdmin || item.grantedBy.id === account.id) {
+		if(group.owner.id === account.id || role === CourseRoleType.courseAdmin || item.grantedBy.id === account.id) {
 			menuItems.push(
 				<MenuItem onClick={ () => this.onRemoveTeacher(item.user) } key="removeTeacher">
 					<Gapped gap={ 5 }>

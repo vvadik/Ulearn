@@ -9,6 +9,13 @@ using Ulearn.Common.Extensions;
 
 namespace Ulearn.Common
 {
+	public class LanguageLaunchInfo
+	{
+		public string Compiler { get; set; }
+		public string CompileCommand { get; set; }
+		public string RunCommand { get; set; }
+	}
+	
 	[JsonConverter(typeof(StringEnumConverter), true)]
 	public enum Language : short
 	{
@@ -47,6 +54,18 @@ namespace Ulearn.Common
 		[XmlEnum("haskell")]
 		[Lexer("haskell")]
 		Haskell = 9,
+		
+		[XmlEnum("cpp")]
+		[Lexer("cpp")]
+		Cpp = 10,
+
+		[XmlEnum("c")]
+		[Lexer("c")]
+		C = 11,
+
+		[XmlEnum("pgsql")]
+		[Lexer("postgresql")]
+		PgSql = 12,
 
 		[XmlEnum("text")]
 		[Lexer("text")]
@@ -76,7 +95,10 @@ namespace Ulearn.Common
 			{ ".ts", Language.TypeScript },
 			{ ".java", Language.Java },
 			{ ".hs", Language.Haskell },
-			{ ".txt", Language.Text },
+			{ ".c", Language.C },
+			{ ".cpp", Language.Cpp },
+			{ ".sql", Language.PgSql },
+			{ ".txt", Language.Text }
 		};
 
 		public static Language GuessByExtension(string extension)

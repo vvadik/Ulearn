@@ -165,7 +165,7 @@
 { @( maxScore == 0 ? "" : string.Format("{0} из {1}", currentScore.PluralizeInRussian(RussianPluralizationOptions.Score), maxScore)) }
 
 @helper Block(MarkdownBlock block, BlockRenderContext context, HtmlHelper Html)
-{ @MvcHtmlString.Create(block.RenderMarkdown(context.Course.Id, context.Slide.Id, context.BaseUrl)) }
+{ @MvcHtmlString.Create(block.RenderMarkdown(context.Course.Id, context.Slide, context.BaseUrl)) }
 
 @helper Block(CodeBlock block, BlockRenderContext context, HtmlHelper Html)
 {
@@ -231,11 +231,17 @@
 					VideoId = block.VideoId
 				}).GetAwaiter().GetResult();
 
-				@ShowVideoAnnotations(annotationsResponse.Annotation, context, Html)
+				if (annotationsResponse.Annotation != null)
+				{
+					@ShowVideoAnnotations(annotationsResponse.Annotation, context, Html)
+				}
+				else
+				{
+					@SuggestAnnotations(context, Html)
+				}
 			}
 			catch (ApiClientException e)
 			{
-				/* Annotations not found. It's ok */
 				@SuggestAnnotations(context, Html)
 			}
 		}

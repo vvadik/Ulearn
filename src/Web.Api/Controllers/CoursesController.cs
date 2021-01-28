@@ -147,7 +147,7 @@ namespace Ulearn.Web.Api.Controllers
 			}
 			else
 			{
-				var group = await groupsRepo.FindGroupByIdAsync(groupId.Value, true).ConfigureAwait(false);
+				var group = await groupsRepo.FindGroupByIdAsync(groupId.Value).ConfigureAwait(false);
 				if (group == null)
 					return NotFound(new ErrorResponse("Group not found"));
 

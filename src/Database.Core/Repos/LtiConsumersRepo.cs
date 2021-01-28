@@ -15,9 +15,9 @@ namespace Database.Repos
 		}
 
 		[CanBeNull]
-		public Task<LtiConsumer> FindAsync(string consumerKey)
+		public async Task<LtiConsumer> Find(string consumerKey)
 		{
-			return db.Consumers.SingleOrDefaultAsync(consumer => consumer.Key == consumerKey);
+			return await db.Consumers.SingleOrDefaultAsync(consumer => consumer.Key == consumerKey);
 		}
 	}
 }

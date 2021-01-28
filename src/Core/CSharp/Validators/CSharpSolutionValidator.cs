@@ -32,7 +32,7 @@ namespace Ulearn.Core.CSharp.Validators
 			new VarInVariableDeclarationValidator(),
 			new BracketValidator(),
 			new RedundantElseValidator(),
-			new SpellingValidator(),
+			new SpellingValidator.SpellingValidator(),
 			new IndentsValidator()
 		};
 

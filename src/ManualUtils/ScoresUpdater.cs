@@ -62,7 +62,7 @@ namespace ManualUtils
 						db.SaveChanges();
 					}
 
-					await visitsRepo.UpdateScoreForVisit(courseId, test.Id, visit.UserId);
+					await visitsRepo.UpdateScoreForVisit(courseId, test, visit.UserId);
 				}
 				Console.WriteLine(test.Id);
 			}

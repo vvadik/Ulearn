@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Principal;
 using System.Threading.Tasks;
-using Database.Extensions;
 using Database.Models;
-using Microsoft.AspNet.Identity;
 using Microsoft.EntityFrameworkCore;
 using Ulearn.Core.Courses;
 
@@ -42,7 +39,12 @@ namespace Database.Repos
 				.ToListAsync());
 			return course.GetUnitsNotSafe().Select(u => u.Id).Where(g => visibleUnitsIds.Contains(g)).ToList();
 		}
-		
+
+		public async Task<bool> IsUnitVisibleForStudents(Course course, Guid unitId)
+		{
+			return (await GetPublishedUnitIdsAsync(course)).Contains(unitId);
+		}
+
 		public async Task<List<UnitAppearance>> GetUnitAppearancesAsync(Course course)
 		{
 			return await db.UnitAppearances

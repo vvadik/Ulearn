@@ -57,6 +57,7 @@ namespace uLearn.CourseTool.Validating
 					var settings = new DockerSandboxRunnerSettings(universalExercise.DockerImageName, universalExercise.RunCommand, universalExercise.TimeLimit);
 					new UniversalExerciseValidator(this, settings, slide, universalExercise).ValidateExercises();
 				}
+				
 			}
 		}
 

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import getMoment from "src/utils/getMoment";
+import { getMoment } from "src/utils/momentUtils";
 import { Checkbox, Gapped } from "ui";
 import { Copy, Trash, UserSettings } from "icons";
 import Avatar from "../../../../common/Avatar/Avatar";

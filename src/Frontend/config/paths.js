@@ -42,7 +42,6 @@ function getServedPath(appPackageJson) {
 module.exports = {
 	dotenv: resolveApp('.env'),
 	appBuild: resolveApp('build'),
-	courseToolBuild: resolveApp('../CourseTool/renderer/reactBuild'),
 	appPublic: resolveApp('public'),
 	appHtml: resolveApp('public/index.html'),
 	appIndexJs: resolveApp('src/index.js'),

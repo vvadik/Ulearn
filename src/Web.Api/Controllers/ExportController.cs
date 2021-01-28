@@ -47,7 +47,7 @@ namespace Ulearn.Web.Api.Controllers
 		[Authorize]
 		public async Task<ActionResult> ExportGroupMembersAsTsv([Required]int groupId, Guid? quizSlideId = null)
 		{
-			var group = await groupsRepo.FindGroupByIdAsync(groupId, true).ConfigureAwait(false);
+			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
 			if (group == null)
 				return StatusCode((int)HttpStatusCode.NotFound, "Group not found");
 

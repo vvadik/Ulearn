@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { userType, userRoles, commentPolicy } from "../commonPropTypes";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
-import { TABS } from "src/consts/general";
 import { debounce } from "debounce";
 import { CommentLite } from "icons";
 import { Toast } from "ui";
@@ -14,6 +13,7 @@ import Stub from "../Stub/Stub";
 import scrollToView from "src/utils/scrollToView";
 
 import styles from "./CommentsList.less";
+import { TabsType } from "src/consts/tabsType";
 
 const defaultCommentsData = {
 	commentsPerPack: 15,
@@ -25,7 +25,7 @@ const defaultCommentsData = {
 function throttle(fn, wait) {
 	let time = Date.now();
 	return function () {
-		if ((time + wait - Date.now()) < 0) {
+		if((time + wait - Date.now()) < 0) {
 			fn();
 			time = Date.now();
 		}
@@ -36,7 +36,7 @@ class CommentsList extends Component {
 	constructor(props) {
 		super(props);
 
-		this.commentsData = {...defaultCommentsData};
+		this.commentsData = { ...defaultCommentsData };
 
 		this.state = {
 			newCommentId: 1,
@@ -67,7 +67,7 @@ class CommentsList extends Component {
 		const { courseId, slideId, forInstructors } = this.props;
 		this.loadComments(courseId, slideId, forInstructors)
 			.then(() => {
-				if (window.location.hash.includes("#comment")) {
+				if(window.location.hash.includes("#comment")) {
 					this.handleScrollToCommentByHashFormUrl();
 				}
 			});
@@ -85,7 +85,7 @@ class CommentsList extends Component {
 
 	componentDidUpdate(prevProps, prevState) {
 		if(this.props.slideId !== prevProps.slideId) {
-			this.commentsData = {...defaultCommentsData};
+			this.commentsData = { ...defaultCommentsData };
 			this.setStateIfMounted({
 				threads: [],
 			});
@@ -106,7 +106,7 @@ class CommentsList extends Component {
 			const thread = threads[i];
 			commentIds.push(thread.id);
 
-			if (!thread.replies) continue;
+			if(!thread.replies) continue;
 
 			for (let j = 0; j < thread.replies.length; j++) {
 				const reply = thread.replies[j];
@@ -118,7 +118,7 @@ class CommentsList extends Component {
 	}
 
 	loadComments = (courseId, slideId, forInstructors, offset, count) => {
-		if (this.state.loadingComments) {
+		if(this.state.loadingComments) {
 			return;
 		}
 
@@ -159,11 +159,12 @@ class CommentsList extends Component {
 		const { threads } = this.state;
 		const newThreads = [...threads];
 		let countOfCommentsToRender = 0;
-		if (repliesToRender.length > 0) {
+		if(repliesToRender.length > 0) {
 			const lastThread = newThreads[newThreads.length - 1];
 			const newReplies = repliesToRender.splice(0, commentsPerPack);
 			countOfCommentsToRender += newReplies.length;
 			lastThread.replies = [...lastThread.replies, ...newReplies];
+			lastThread.replies.sort((r1, r2) => r1.publishTime - r2.publishTime);
 		}
 
 		while (countOfCommentsToRender < commentsPerPack && threadsToRender.length !== 0) {
@@ -172,7 +173,7 @@ class CommentsList extends Component {
 			const threadReplies = thread.replies;
 			let countOfCommentsLeftInPack = commentsPerPack - countOfCommentsToRender;
 
-			if (threadReplies.length > countOfCommentsLeftInPack) {
+			if(threadReplies.length > countOfCommentsLeftInPack) {
 				thread.replies = threadReplies.splice(0, countOfCommentsLeftInPack);
 				countOfCommentsToRender += countOfCommentsLeftInPack;
 				newThreads.push(thread);
@@ -189,7 +190,7 @@ class CommentsList extends Component {
 	}
 
 	setStateIfMounted(updater, callback) {
-		if (this.commentsListRef.current) {
+		if(this.commentsListRef.current) {
 			this.setState(updater, callback);
 		}
 	}
@@ -199,7 +200,7 @@ class CommentsList extends Component {
 
 		const element = document.documentElement;
 		const windowRelativeBottom = element.getBoundingClientRect().bottom;
-		if (windowRelativeBottom < element.clientHeight + scrollDistance) {
+		if(windowRelativeBottom < element.clientHeight + scrollDistance) {
 			this.renderPackOfComments();
 		}
 	};
@@ -207,22 +208,22 @@ class CommentsList extends Component {
 	handleScrollToCommentByHashFormUrl = () => {
 		const { courseId, slideId, forInstructors, handleTabChange } = this.props;
 
-		if (window.location.hash.includes("#comment")) {
+		if(window.location.hash.includes("#comment")) {
 			const startIndex = window.location.hash.indexOf('-') + 1;
 			const commentIdFromHash = +window.location.hash.slice(startIndex);
-			const nameChangesTab = forInstructors ? TABS.allComments : TABS.instructorsComments;
+			const nameChangesTab = forInstructors ? TabsType.allComments : TabsType.instructorsComments;
 
 			const { threadsToRender, repliesToRender } = this.commentsData;
 			const notRenderedComments = [...repliesToRender, ...threadsToRender];
 			const notRenderedCommentIds = this.getAllCommentsIds(notRenderedComments);
 			const allCommentIds = [...this.commentIds, ...notRenderedCommentIds];
 			const indexOfComment = notRenderedCommentIds.indexOf(commentIdFromHash);
-			if (indexOfComment > 0) {
+			if(indexOfComment > 0) {
 				const commentsPerPack = this.commentsData.commentsPerPack;
 				this.commentsData.commentsPerPack = indexOfComment + commentsPerPack;
 				this.renderPackOfComments();
 				this.commentsData.commentsPerPack = commentsPerPack;
-			} else if (!allCommentIds.includes(commentIdFromHash)) {
+			} else if(!allCommentIds.includes(commentIdFromHash)) {
 				handleTabChange(nameChangesTab, false);
 				this.loadComments(courseId, slideId, forInstructors);
 				this.setStateIfMounted({
@@ -237,11 +238,11 @@ class CommentsList extends Component {
 		const { user, courseId, slideId, commentPolicy, key, } = this.props;
 		const replies = threads.reduce((sum, current) => sum + current.replies.length, 0);
 
-		if (this.state.status === "error") {
+		if(this.state.status === "error") {
 			return <Error404/>;
 		}
 
-		if (!courseId || !slideId) {
+		if(!courseId || !slideId) {
 			return null;
 		}
 
@@ -344,7 +345,7 @@ class CommentsList extends Component {
 									reply={ reply }
 									actions={ actions }
 									getUserSolutionsUrl={ this.getUserSolutionsUrl }
-									isSlideReady={isSlideReady}/>
+									isSlideReady={ isSlideReady }/>
 							</section>
 						</CSSTransition>) }
 			</TransitionGroup>
@@ -354,15 +355,15 @@ class CommentsList extends Component {
 	findCommentPosition(id, threads) {
 		for (let i = 0; i < threads.length; i++) {
 			const thread = threads[i];
-			if (thread.id === id) {
+			if(thread.id === id) {
 				return [threads, i];
 			}
 
-			if (!thread.replies) continue;
+			if(!thread.replies) continue;
 
 			for (let j = 0; j < thread.replies.length; j++) {
 				const reply = thread.replies[j];
-				if (reply.id === id) {
+				if(reply.id === id) {
 					return [thread.replies, j];
 				}
 			}
@@ -388,19 +389,19 @@ class CommentsList extends Component {
 	}
 
 	compareThreads(a, b) {
-		if (a.isPinnedToTop && !b.isPinnedToTop) {
+		if(a.isPinnedToTop && !b.isPinnedToTop) {
 			return -1;
 		}
 
-		if (!a.isPinnedToTop && b.isPinnedToTop) {
+		if(!a.isPinnedToTop && b.isPinnedToTop) {
 			return 1;
 		}
 
-		if (a.publishTime > b.publishTime) {
+		if(a.publishTime > b.publishTime) {
 			return -1;
 		}
 
-		if (a.publishTime < b.publishTime) {
+		if(a.publishTime < b.publishTime) {
 			return 1;
 		}
 
@@ -413,7 +414,7 @@ class CommentsList extends Component {
 
 		Object.assign(comment, reducer(comment));
 
-		if (!comment.parentCommentId) {
+		if(!comment.parentCommentId) {
 			threads.sort(this.compareThreads)
 		}
 
@@ -446,7 +447,7 @@ class CommentsList extends Component {
 
 			this.handleScroll(this.lastThreadRef);
 
-			if (forInstructors) {
+			if(forInstructors) {
 				handleInstructorsCommentCount("add");
 			}
 		} catch (e) {
@@ -621,7 +622,7 @@ class CommentsList extends Component {
 		try {
 			this.props.commentsApi.deleteComment(comment.id);
 
-			if (forInstructors && !comment.parentCommentId) {
+			if(forInstructors && !comment.parentCommentId) {
 				handleInstructorsCommentCount("delete");
 			}
 
@@ -631,7 +632,7 @@ class CommentsList extends Component {
 					restoreComment();
 					this.setState({ threads });
 
-					if (forInstructors && !comment.parentCommentId) {
+					if(forInstructors && !comment.parentCommentId) {
 						handleInstructorsCommentCount("add");
 					}
 

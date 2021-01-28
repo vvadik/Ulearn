@@ -6,6 +6,7 @@ using Ulearn.Core.Courses.Slides.Blocks;
 namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 {
 	[DataContract]
+	[DisplayName("spoiler")]
 	public class SpoilerBlockResponse : IApiSlideBlock
 	{
 		[DefaultValue(false)]
@@ -23,9 +24,6 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 
 		[DataMember(Name = "blocks")]
 		public List<IApiSlideBlock> InnerBlocks { get; set; }
-
-		[DataMember(Name = "type")]
-		public string Type { get; set; } = "spoiler";
 
 		public SpoilerBlockResponse(SpoilerBlock spoilerBlock, List<IApiSlideBlock> innerBlocks)
 		{

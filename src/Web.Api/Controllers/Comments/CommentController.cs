@@ -314,7 +314,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 					Comment = comment,
 					LikedUserId = UserId,
 				};
-				await notificationsRepo.AddNotificationAsync(comment.CourseId, notification, UserId).ConfigureAwait(false);
+				await notificationsRepo.AddNotification(comment.CourseId, notification, UserId).ConfigureAwait(false);
 			}
 		}
 	}

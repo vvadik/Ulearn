@@ -21,6 +21,8 @@ import styles from './Navigation.less';
 const mobileNavigationMenuWidth = 250;//250 is @mobileNavigationMenuWidth, its mobile nav menu width
 
 class Navigation extends Component {
+	touchDistanceTolerance = 10;
+
 	constructor(props) {
 		super(props);
 
@@ -116,7 +118,7 @@ class Navigation extends Component {
 		const xDiff = xDown - clientX;
 		const yDiff = yDown - clientY;
 
-		if(Math.abs(xDiff) > Math.abs(yDiff)) {
+		if(Math.abs(xDiff) > this.touchDistanceTolerance && Math.abs(xDiff) > Math.abs(yDiff)) {
 			let diff, ratio;
 			if(navigationOpened) {
 				diff = -xDiff;
@@ -209,7 +211,15 @@ class Navigation extends Component {
 	}
 
 	renderUnitNavigation() {
-		const { unitTitle, courseTitle, onCourseClick, unitItems, nextUnit, groupsAsStudent, unitProgress } = this.props;
+		const {
+			unitTitle,
+			courseTitle,
+			onCourseClick,
+			unitItems,
+			nextUnit,
+			groupsAsStudent,
+			unitProgress
+		} = this.props;
 		const { sideMenuStyle } = this.state;
 
 		return (
@@ -235,7 +245,17 @@ class Navigation extends Component {
 	};
 
 	renderCourseNavigation() {
-		const { courseTitle, description, courseItems, containsFlashcards, courseId, slideId, toggleNavigation, groupsAsStudent, courseProgress } = this.props;
+		const {
+			courseTitle,
+			description,
+			courseItems,
+			containsFlashcards,
+			courseId,
+			slideId,
+			toggleNavigation,
+			groupsAsStudent,
+			courseProgress
+		} = this.props;
 		const { sideMenuStyle } = this.state;
 
 		return (

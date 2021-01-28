@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using uLearn;
+using Ulearn.Common;
 using Ulearn.Core;
 using Ulearn.Core.RunCheckerJobApi;
+using Ulearn.Core.Telegram;
 
 namespace Database.Repos
 {
@@ -15,14 +17,15 @@ namespace Database.Repos
 			string courseId, Guid slideId,
 			string code, string compilationError, string output,
 			string userId, string executionServiceName, string displayName,
-			AutomaticExerciseCheckingStatus status = AutomaticExerciseCheckingStatus.Waiting);
-
-		Task RemoveSubmission(UserExerciseSubmission submission);
+			Language language,
+			string sandbox,
+			bool hasAutomaticChecking,
+			AutomaticExerciseCheckingStatus? status = AutomaticExerciseCheckingStatus.Waiting);
 
 		///<returns>(likesCount, isLikedByThisUsed)</returns>
 		Task<Tuple<int, bool>> Like(int solutionId, string userId);
 
-		IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId, bool includeManualCheckings = true);
+		IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId, bool includeManualAndAutomaticCheckings = true);
 		IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId, IEnumerable<Guid> slidesIds);
 		IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId, IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish);
 		IQueryable<UserExerciseSubmission> GetAllAcceptedSubmissions(string courseId, IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish);
@@ -33,20 +36,21 @@ namespace Database.Repos
 		IQueryable<UserExerciseSubmission> GetAllAcceptedSubmissionsByUser(string courseId, Guid slideId, string userId);
 		IQueryable<UserExerciseSubmission> GetAllSubmissionsByUser(string courseId, Guid slideId, string userId);
 		IQueryable<UserExerciseSubmission> GetAllSubmissionsByUsers(SubmissionsFilterOptions filterOptions);
-		List<AcceptedSolutionInfo> GetBestTrendingAndNewAcceptedSolutions(string courseId, List<Guid> slidesIds);
-		List<AcceptedSolutionInfo> GetBestTrendingAndNewAcceptedSolutions(string courseId, Guid slideId);
-		int GetAcceptedSolutionsCount(string courseId, Guid slideId);
-		bool IsCheckingSubmissionByUser(string courseId, Guid slideId, string userId, DateTime periodStart, DateTime periodFinish);
-		Task<HashSet<Guid>> GetIdOfPassedSlidesAsync(string courseId, string userId);
+		Task<List<AcceptedSolutionInfo>> GetBestTrendingAndNewAcceptedSolutions(string courseId, List<Guid> slidesIds);
+		Task<List<AcceptedSolutionInfo>> GetBestTrendingAndNewAcceptedSolutions(string courseId, Guid slideId);
+		Task<int> GetAcceptedSolutionsCount(string courseId, Guid slideId);
+		Task<bool> IsCheckingSubmissionByUser(string courseId, Guid slideId, string userId, DateTime periodStart, DateTime periodFinish);
+		Task<HashSet<Guid>> GetIdOfPassedSlides(string courseId, string userId);
 		IQueryable<UserExerciseSubmission> GetAllSubmissions(int max, int skip);
-		UserExerciseSubmission FindNoTrackingSubmission(int id);
-		UserExerciseSubmission FindSubmissionById(int id);
-		UserExerciseSubmission FindSubmissionById(string id);
-		List<UserExerciseSubmission> FindSubmissionsByIds(IEnumerable<string> checkingsIds);
-		Task SaveResults(List<RunningResults> results);
-		Task RunAutomaticChecking(UserExerciseSubmission submission, TimeSpan timeout, bool waitUntilChecked);
-		Dictionary<int, string> GetSolutionsForSubmissions(IEnumerable<int> submissionsIds);
+		Task<AutomaticExerciseCheckingStatus?> GetSubmissionAutomaticCheckingStatus(int id);
+		Task<UserExerciseSubmission> FindSubmissionByIdNoTracking(int id);
+		Task<UserExerciseSubmission> FindSubmissionById(string id);
+		Task<List<UserExerciseSubmission>> FindSubmissionsByIds(IEnumerable<int> checkingsIds);
+		Task SaveResult(RunningResults result, Func<UserExerciseSubmission, Task> onSave);
+		Task RunAutomaticChecking(UserExerciseSubmission submission, TimeSpan timeout, bool waitUntilChecked, int priority);
+		Task<Dictionary<int, string>> GetSolutionsForSubmissions(IEnumerable<int> submissionsIds);
 		Task WaitAnyUnhandledSubmissions(TimeSpan timeout);
 		Task WaitUntilSubmissionHandled(TimeSpan timeout, int submissionId);
+		Task<UserExerciseSubmission> GetUnhandledSubmission(string agentName, List<string> sandboxes);
 	}
 }

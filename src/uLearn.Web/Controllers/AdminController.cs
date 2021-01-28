@@ -613,7 +613,7 @@ namespace uLearn.Web.Controllers
 						CheckingQueueItem = c,
 						ContextSlideId = slide.Id,
 						ContextSlideTitle = slide.Title,
-						ContextMaxScore = (slide as ExerciseSlide)?.Scoring.CodeReviewScore ?? slide.MaxScore,
+						ContextMaxScore = (slide as ExerciseSlide)?.Scoring.ScoreWithCodeReview ?? slide.MaxScore,
 						ContextTimestamp = c.Timestamp,
 						ContextReviews = alreadyChecked ? reviews.GetOrDefault(c.Id, new List<ExerciseCodeReview>()) : new List<ExerciseCodeReview>(),
 						ContextExerciseSolution = alreadyChecked && c is ManualExerciseChecking checking ?
