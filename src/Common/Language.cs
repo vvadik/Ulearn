@@ -63,6 +63,10 @@ namespace Ulearn.Common
 		[Lexer("c")]
 		C = 11,
 
+		[XmlEnum("pgsql")]
+		[Lexer("postgresql")]
+		PgSql = 12,
+
 		[XmlEnum("text")]
 		[Lexer("text")]
 		Text = 100,
@@ -93,6 +97,7 @@ namespace Ulearn.Common
 			{ ".hs", Language.Haskell },
 			{ ".c", Language.C },
 			{ ".cpp", Language.Cpp },
+			{ ".sql", Language.PgSql },
 			{ ".txt", Language.Text }
 		};
 

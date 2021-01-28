@@ -12,4 +12,5 @@ export enum Language {
 	jsx = 'jsx',
 	c = 'c',
 	cpp = 'cpp',
+	pgsql = 'pgsql',
 }

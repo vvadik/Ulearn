@@ -1054,41 +1054,45 @@ class Exercise extends React.Component<Props, State> {
 		switch (language.toLowerCase()) {
 			case Language.cSharp:
 				require('codemirror/mode/clike/clike');
-				return `text/x-csharp`;
+				return 'text/x-csharp';
 			case Language.java:
 				require('codemirror/mode/clike/clike');
-				return `text/x-java`;
+				return 'text/x-java';
 			case Language.javaScript:
 				require('codemirror/mode/javascript/javascript');
-				return `text/javascript`;
+				return 'text/javascript';
 			case Language.typeScript:
 				require('codemirror/mode/javascript/javascript');
-				return `text/typescript`;
+				return 'text/typescript';
 			case Language.jsx:
 				require('codemirror/mode/jsx/jsx');
-				return `text/jsx`;
+				return 'text/jsx';
 
 			case Language.python2:
 				require('codemirror/mode/python/python');
-				return `text/x-python`;
+				return 'text/x-python';
 			case Language.python3:
 				require('codemirror/mode/python/python');
-				return `text/x-python`;
+				return 'text/x-python';
 
 			case Language.css:
 				require('codemirror/mode/css/css');
-				return `text/css`;
+				return 'text/css';
 
 			case Language.haskell:
 				require('codemirror/mode/haskell/haskell');
-				return `text/x-haskell`;
+				return 'text/x-haskell';
 
 			case Language.c:
 				require('codemirror/mode/clike/clike');
-				return `text/x-c`;
+				return 'text/x-c';
 			case Language.cpp:
 				require('codemirror/mode/clike/clike');
-				return `text/x-c++src`;
+				return 'text/x-c++src';
+
+			case Language.pgsql:
+				require('codemirror/mode/sql/sql');
+				return 'text/x-pgsql';
 
 			default:
 				require('codemirror/mode/xml/xml');
