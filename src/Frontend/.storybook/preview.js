@@ -5,6 +5,8 @@ import { BrowserRouter } from "react-router-dom";
 import configureStore from "src/configureStore";
 import theme from "src/uiTheme";
 import 'src/common.less';
+import 'moment/locale/ru';
+import "moment-timezone";
 
 import { ThemeContext } from "ui";
 
@@ -26,8 +28,8 @@ const viewports = {
 	tablet: {
 		name: 'tablet',
 		styles: {
-			width: '800px',
-			height: '600px',
+			width: '768px',
+			height: '1024px',
 		},
 	},
 	mobile: {

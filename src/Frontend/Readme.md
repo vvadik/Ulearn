@@ -93,6 +93,23 @@ Actions описаны в src/actions.
 <Route component={AnyPage}/>
 ```
 
+### Тесты
+тесты запускаются локально с помощью storybook + loki.
+Для начала надо запустить сторибук, после чего запустить тесты loki.
+```
+npm run storybook
+yarn loki test
+```
+loki/current эталонные скриншоты.
+
+loki/difference не пройденные тесты.
+
+yarn loki approve принять все изменения.
+
+yarn loki test laptop тесты только на определенную платформу.
+
+yarn loki update добавить скриншоты в эталон.
+
 ### Разные вспомогательные штуки  
 
 Все константы находятся в src/consts.

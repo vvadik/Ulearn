@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Runtime.Serialization;
 using JetBrains.Annotations;
+using Ulearn.Common.Extensions;
 
 namespace Ulearn.Core.RunCheckerJobApi
 {
@@ -115,7 +116,7 @@ namespace Ulearn.Core.RunCheckerJobApi
 					return output + TestNumberOutput 
 								  + "\nВаше решение не успело пройти" 
 								  + (TestNumber == null ? " все тесты" : " тест") 
-								  + (timeLimit == null ? null : $" за {timeLimit} секунд"); // TODO: Окончание слова секунд сейчас рассчитано на числа, кратные 10.
+								  + (timeLimit == null ? null : $" за {timeLimit} " + timeLimit.Value.SelectPluralWordInRussian(RussianPluralizationOptions.Seconds));
 				case Verdict.WrongAnswer:
 					return output + TestNumberOutput +  "\nНеправильный ответ";
 				case Verdict.RuntimeError:

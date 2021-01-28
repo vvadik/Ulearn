@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AngleSharp.Html.Parser;
+using Database.Models;
 using Database.Repos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,14 +26,16 @@ namespace Ulearn.Web.Api.Controllers.Slides
 	{
 		private readonly IUlearnVideoAnnotationsClient videoAnnotationsClient;
 		private readonly IUserSolutionsRepo solutionsRepo;
+		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
 
 		public SlideRenderer(IUlearnVideoAnnotationsClient videoAnnotationsClient,
-			IUserSolutionsRepo solutionsRepo, ISlideCheckingsRepo slideCheckingsRepo)
+			IUserSolutionsRepo solutionsRepo, ISlideCheckingsRepo slideCheckingsRepo, ICourseRolesRepo courseRolesRepo)
 		{
 			this.videoAnnotationsClient = videoAnnotationsClient;
 			this.solutionsRepo = solutionsRepo;
 			this.slideCheckingsRepo = slideCheckingsRepo;
+			this.courseRolesRepo = courseRolesRepo;
 		}
 
 		public ShortSlideInfo BuildShortSlideInfo(string courseId, Slide slide, Func<Slide, int> getSlideMaxScoreFunc, Func<Slide, string> getGitEditLink, IUrlHelper urlHelper)
@@ -164,12 +167,14 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			var exerciseUsersCount = await slideCheckingsRepo.GetExerciseUsersCount(context.CourseId, context.Slide.Id);
 			var exerciseUsersWithRightAnswerCount = await slideCheckingsRepo.GetExerciseUsersWithRightAnswerCount(context.CourseId, context.Slide.Id);
 			var lastSuccessAttemptDate = await slideCheckingsRepo.GetExerciseLastRightAnswerDate(context.CourseId, context.Slide.Id);
+			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourseAsync(context.UserId, context.CourseId, CourseRoleType.CourseAdmin);
 
 			var exerciseSlideRendererContext = new ExerciseSlideRendererContext
 			{
 				Submissions = submissions,
 				CodeReviewComments = codeReviewComments,
 				SlideFile = context.Slide.Info.SlideFile,
+				CanSeeCheckerLogs = isCourseAdmin,
 				AttemptsStatistics = new ExerciseAttemptsStatistics
 				{
 					AttemptedUsersCount = exerciseUsersCount,
