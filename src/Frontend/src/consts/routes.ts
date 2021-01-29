@@ -25,7 +25,7 @@ export function constructPathToAcceptedSolutions(courseId: string, slideId: stri
 	return `/${ coursePath }/${ courseId }/${ acceptedSolutions }?slideId=${ slideId }`;
 }
 
-export function constructPathToComment(commentId: string, isLike: boolean): string {
+export function constructPathToComment(commentId: string, isLike?: boolean): string {
 	const url = `${ commentsPath }/${ commentId }`;
 
 	if(isLike) {

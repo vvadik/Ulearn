@@ -1,5 +1,16 @@
 import { RateTypes } from "src/consts/rateTypes";
 
+export interface FlashcardsByUnits {
+	units: UnitFlashcards[],
+}
+
+export interface UnitFlashcards {
+	unitId: string,
+	unitTitle: string,
+	unlocked: boolean,
+	flashcards: Flashcard[],
+}
+
 interface Flashcard {
 	id: string,
 	question: string,

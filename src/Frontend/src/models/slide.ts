@@ -1,8 +1,7 @@
-import BlockTypes from "../components/course/Course/Slide/blockTypes";
 import { ReactNode } from "react";
 import { Language } from "src/consts/languages";
-import { SubmissionInfoRedux } from "./reduxState";
-import { AttemptsStatistics } from "./exercise";
+import { SubmissionInfoRedux } from "src/models/reduxState";
+import { AttemptsStatistics, SubmissionInfo } from "src/models/exercise";
 
 interface ShortSlideInfo {
 	id: string;
@@ -24,6 +23,16 @@ enum SlideType {
 	Flashcards = "flashcards",
 	CourseFlashcards = "courseFlashcards",
 	PreviewFlashcards = "previewFlashcards",
+}
+
+export enum BlockTypes {
+	video = "youtube",
+	code = "code",
+	text = "html",
+	image = "imageGallery",
+	spoiler = "spoiler",
+	tex = 'tex',
+	exercise = 'exercise',
 }
 
 interface Block<T extends BlockTypes> {
@@ -55,6 +64,7 @@ interface ExerciseBlock extends Block<BlockTypes.exercise> {
 	courseId: string,
 	forceInitialCode: boolean,
 	maxScore: number,
+	submissions?: SubmissionInfo[],//we're moving this field to other state in redux reducer
 }
 
 interface ExerciseBlockProps {
@@ -75,4 +85,14 @@ interface LanguageLaunchInfo {
 	runCommand: string;
 }
 
-export { ShortSlideInfo, SlideType, Block, SpoilerBlock, TexBlock, VideoBlock, ExerciseBlock, ExerciseBlockProps, LanguageLaunchInfo, };
+export {
+	ShortSlideInfo,
+	SlideType,
+	Block,
+	SpoilerBlock,
+	TexBlock,
+	VideoBlock,
+	ExerciseBlock,
+	ExerciseBlockProps,
+	LanguageLaunchInfo,
+};

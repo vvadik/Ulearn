@@ -4,14 +4,14 @@ import connect from "react-redux/es/connect/connect";
 import { Redirect } from 'react-router-dom';
 import { withRouter } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import api from "src/api/index";
-import { COURSES__COURSE_ENTERED } from "src/consts/actions";
+import api from "src/api";
 import { Tabs, Button, Toast, Link } from "ui";
 import GroupMembers from "src/components/groups/GroupSettingsPage/GroupMembers/GroupMembers";
 import GroupSettings from "src/components/groups/GroupSettingsPage/GroupSettings/GroupSettings";
 import Error404 from "src/components/common/Error/Error404.tsx";
 import styles from "./groupPage.less";
 import { Page } from "../../index";
+import { changeCurrentCourseAction } from "src/actions/course";
 
 class GroupPage extends Component {
 
@@ -275,10 +275,7 @@ class GroupPage extends Component {
 
 	static mapDispatchToProps(dispatch) {
 		return {
-			enterToCourse: (courseId) => dispatch({
-				type: COURSES__COURSE_ENTERED,
-				courseId: courseId
-			}),
+			enterToCourse: (courseId) => dispatch(changeCurrentCourseAction(courseId)),
 		}
 	}
 }

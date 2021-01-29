@@ -1,4 +1,4 @@
-import api from "../api/index.js"
+import api from "./index";
 import { UsersProgressResponse } from "src/models/userProgress";
 
 export function getUserProgressInCourse(courseId: string): Promise<UsersProgressResponse> {

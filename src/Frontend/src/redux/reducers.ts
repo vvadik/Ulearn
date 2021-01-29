@@ -1,10 +1,10 @@
 import { combineReducers } from "redux";
-import courseReducer from "./course.js";
+import courseReducer from "./course";
 import userProgressReducer from "./userProgress";
-import navigationReducer from "./navigation.js";
-import slidesReducer from "./slides.js";
-import accountReducer from "./account.js";
-import notificationsReducer from "./notifications.js";
+import navigationReducer from "./navigation";
+import slidesReducer from "./slides";
+import accountReducer from "./account";
+import notificationsReducer from "./notifications";
 import instructorReducer from "./instructor";
 
 const rootReducer = combineReducers({

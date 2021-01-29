@@ -3,15 +3,22 @@ import React from "react";
 import { BlocksWrapper, Exercise, Image, Spoiler, StaticCode, Text, Video, } from "./Blocks";
 import CourseLoader from "src/components/course/Course/CourseLoader/CourseLoader.js";
 
-import { loadSlide } from "src/actions/course.js";
+import { loadSlide } from "src/actions/slides";
 import { connect } from "react-redux";
 import classNames from 'classnames';
 import queryString from "query-string";
 
-import { Block, ExerciseBlock, ShortSlideInfo, SpoilerBlock, TexBlock, VideoBlock, } from "src/models/slide";
+import {
+	Block,
+	BlockTypes,
+	ExerciseBlock,
+	ShortSlideInfo,
+	SpoilerBlock,
+	TexBlock,
+	VideoBlock,
+} from "src/models/slide";
 import { RootState } from "src/models/reduxState";
-import { MatchParams } from "src/consts/router";
-import BlockTypes from "src/components/course/Course/Slide/blockTypes";
+import { MatchParams } from "src/models/router";
 import { Dispatch } from "redux";
 
 import styles from './Slide.less';
@@ -301,7 +308,7 @@ const mapStateToProps = (state: RootState, { courseId, slideId, }: MatchParams) 
 };
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-	loadSlide: (courseId: string, slideId: string) => dispatch(loadSlide(courseId, slideId)),
+	loadSlide: (courseId: string, slideId: string) => loadSlide(courseId, slideId)(dispatch),
 });
 
 

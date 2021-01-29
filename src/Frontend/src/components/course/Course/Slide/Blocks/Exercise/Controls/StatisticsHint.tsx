@@ -2,19 +2,27 @@ import React from "react";
 import classNames from "classnames";
 
 import { Tooltip, TooltipTrigger } from "ui";
+import ShowControlsTextContext from "./ShowControlsTextContext";
 
+import IControlWithText from "./IControlWithText";
 import { AttemptsStatistics } from "src/models/exercise";
 
 import styles from './Controls.less';
 
 import texts from "../Exercise.texts";
+import { DocumentLite, Statistic } from "@skbkontur/react-icons";
 
-export interface Props {
+
+export interface Props extends IControlWithText {
 	attemptsStatistics: AttemptsStatistics,
 	tooltipTrigger?: TooltipTrigger,
 }
 
-function StatisticsHint({ attemptsStatistics, tooltipTrigger = "hover&focus", }: Props): React.ReactElement {
+function StatisticsHint({
+	attemptsStatistics,
+	tooltipTrigger = "hover&focus",
+	showControlsText
+}: Props): React.ReactElement {
 	const {
 		attemptedUsersCount,
 		usersWithRightAnswerCount,
@@ -26,7 +34,15 @@ function StatisticsHint({ attemptsStatistics, tooltipTrigger = "hover&focus", }:
 		<span className={ statisticsClassName }>
 			<Tooltip pos={ "bottom right" } closeButton={ false } trigger={ tooltipTrigger }
 					 render={ renderTooltipContent }>
-				{ texts.controls.statistics.buildShortText(usersWithRightAnswerCount) }
+				<ShowControlsTextContext.Consumer>
+				{
+					(showControlsTextContext) => (showControlsTextContext || showControlsText)
+						? texts.controls.statistics.buildShortText(usersWithRightAnswerCount)
+						: <span className={ styles.exerciseControlsIcon }>
+							<Statistic/>
+						</span>
+				}
+				</ShowControlsTextContext.Consumer>
 			</Tooltip>
 		</span>
 	);

@@ -5,11 +5,11 @@ import connect from "react-redux/es/connect/connect";
 import PropTypes from 'prop-types';
 import api from "src/api";
 import { Page } from "../../index";
-import { COURSES__COURSE_ENTERED } from "src/consts/actions";
 import GroupList from "src/components/groups/GroupMainPage/GroupList/GroupList";
 import GroupHeader from "src/components/groups/GroupMainPage/GroupHeader/GroupHeader";
 import Error404 from "src/components/common/Error/Error404";
 import { Toast } from "ui";
+import { changeCurrentCourseAction } from "src/actions/course";
 
 class GroupListPage extends Component {
 	constructor(props) {
@@ -37,9 +37,9 @@ class GroupListPage extends Component {
 	};
 
 	loadActiveGroups = (courseId) => {
-		const {loadingActive, loadedActive} = this.state;
+		const { loadingActive, loadedActive } = this.state;
 
-		if (loadedActive || loadingActive) {
+		if(loadedActive || loadingActive) {
 			return;
 		}
 
@@ -48,29 +48,29 @@ class GroupListPage extends Component {
 		});
 
 		api.groups.getCourseGroups(courseId)
-		.then(json => {
-			let groups = json.groups;
-			this.setState({
-				loadedActive: true,
-				groups,
-			});
-		})
-		.catch(() => {
-			this.setState({
-				status: 'error',
-			});
-		})
-		.finally(() =>
-			this.setState({
-				loadingActive: false,
+			.then(json => {
+				let groups = json.groups;
+				this.setState({
+					loadedActive: true,
+					groups,
+				});
 			})
-		)
+			.catch(() => {
+				this.setState({
+					status: 'error',
+				});
+			})
+			.finally(() =>
+				this.setState({
+					loadingActive: false,
+				})
+			)
 	};
 
 	loadArchivedGroups = (courseId) => {
-		const {loadingArchived, loadedArchived} = this.state;
+		const { loadingArchived, loadedArchived } = this.state;
 
-		if (loadedArchived || loadingArchived) {
+		if(loadedArchived || loadingArchived) {
 			return;
 		}
 
@@ -79,64 +79,64 @@ class GroupListPage extends Component {
 		});
 
 		api.groups.getCourseArchivedGroups(courseId)
-		.then(json => {
-			let archiveGroups = json.groups;
-			this.setState({
-				loadedArchived: true,
-				archiveGroups,
-			});
-		})
-		.catch(console.error)
-		.finally(() =>
-			this.setState({
-				loadingArchived: false,
+			.then(json => {
+				let archiveGroups = json.groups;
+				this.setState({
+					loadedArchived: true,
+					archiveGroups,
+				});
 			})
-		)
+			.catch(console.error)
+			.finally(() =>
+				this.setState({
+					loadingArchived: false,
+				})
+			)
 	};
 
 	render() {
 		const courseById = this.props.courses.courseById;
 		const course = courseById[this.courseId];
 
-		if (this.state.status === "error") {
-			return <Error404 />;
+		if(this.state.status === "error") {
+			return <Error404/>;
 		}
 
-		if (!course) {
+		if(!course) {
 			return null;
 		}
 
 		return (
 			<Page>
-				<Helmet defer={false}>
-					<title>{`Группы в курсе ${course.title.toLowerCase()}`}</title>
+				<Helmet defer={ false }>
+					<title>{ `Группы в курсе ${ course.title.toLowerCase() }` }</title>
 				</Helmet>
 				<GroupHeader
-					onTabChange={this.onTabChange}
-					filter={this.state.filter}
-					course={course}
-					addGroup={this.addGroup}
-					groups={this.state.groups}
-					ref={this.headerRef}
+					onTabChange={ this.onTabChange }
+					filter={ this.state.filter }
+					course={ course }
+					addGroup={ this.addGroup }
+					groups={ this.state.groups }
+					ref={ this.headerRef }
 				/>
 				<GroupList
-					courseId={this.courseId}
-					groups={this.filteredGroups}
-					deleteGroup={this.deleteGroup}
-					toggleArchived={this.toggleArchived}
-					loading={this.loading}
+					courseId={ this.courseId }
+					groups={ this.filteredGroups }
+					deleteGroup={ this.deleteGroup }
+					toggleArchived={ this.toggleArchived }
+					loading={ this.loading }
 				>
-					{this.state.filter === "archived" && <div>
+					{ this.state.filter === "archived" && <div>
 						У вас нет архивных групп. Когда какая-нибудь группа станет вам больше не&nbsp;нужна,
 						заархивируйте её.
 						Архивные группы будут жить здесь вечно и не&nbsp;помешают вам в&nbsp;текущей работе. Однако если
 						понадобится, вы всегда
 						сможете вернуться к&nbsp;ним.
-					</div>}
-					{this.state.filter === "active" && <div>
+					</div> }
+					{ this.state.filter === "active" && <div>
 						У вас нет активных групп. Создайте группу и пригласите в неё студентов, чтобы видеть их
 						прогресс, проверять их тесты и делать код-ревью их решений.
-					</div>}
+					</div> }
 				</GroupList>
 			</Page>
 		)
@@ -147,7 +147,7 @@ class GroupListPage extends Component {
 			filter: id,
 		});
 
-		if (id === "active") {
+		if(id === "active") {
 			this.loadActiveGroups(this.courseId);
 		} else {
 			this.loadArchivedGroups(this.courseId);
@@ -162,11 +162,11 @@ class GroupListPage extends Component {
 			groups: [newGroup, ...groups],
 		});
 
-		this.props.history.push(`/${this.courseId}/groups/${groupId}`);
+		this.props.history.push(`/${ this.courseId }/groups/${ groupId }`);
 	};
 
 	get filteredGroups() {
-		if (this.state.filter === "archived") {
+		if(this.state.filter === "archived") {
 			return this.state.archiveGroups;
 		} else {
 			return this.state.groups;
@@ -175,18 +175,18 @@ class GroupListPage extends Component {
 
 	deleteGroup = (group, groupsName) => {
 		api.groups.deleteGroup(group.id)
-		.then(() => {
-			Toast.push(`Группа «${group.name}» удалена`);
+			.then(() => {
+				Toast.push(`Группа «${ group.name }» удалена`);
 
-			const updateGroups = this.state[groupsName].filter(g => group.id !== g.id);
+				const updateGroups = this.state[groupsName].filter(g => group.id !== g.id);
 
-			this.setState({
-				[groupsName]: updateGroups,
+				this.setState({
+					[groupsName]: updateGroups,
+				});
+			})
+			.catch((error) => {
+				error.showToast();
 			});
-		})
-		.catch((error) => {
-			error.showToast();
-		});
 	};
 
 	toggleArchived = (group, isArchived) => {
@@ -195,20 +195,20 @@ class GroupListPage extends Component {
 		};
 
 		api.groups.saveGroupSettings(group.id, newSettings)
-		.then(() => {
-			Toast.push(isArchived ? `Группа «${group.name}» заархивирована` : `Группа «${group.name}» восстановлена`);
+			.then(() => {
+				Toast.push(isArchived ? `Группа «${ group.name }» заархивирована` : `Группа «${ group.name }» восстановлена`);
 
-			group = {...group, ...newSettings};
+				group = { ...group, ...newSettings };
 
-			if (isArchived) {
-				this.moveGroup(group, 'groups', 'archiveGroups');
-			} else {
-				this.moveGroup(group, 'archiveGroups', 'groups');
-			}
-		})
-		.catch((error) => {
-			error.showToast();
-		});
+				if(isArchived) {
+					this.moveGroup(group, 'groups', 'archiveGroups');
+				} else {
+					this.moveGroup(group, 'archiveGroups', 'groups');
+				}
+			})
+			.catch((error) => {
+				error.showToast();
+			});
 	};
 
 	moveGroup = (group, moveFrom, moveTo) => {
@@ -222,7 +222,7 @@ class GroupListPage extends Component {
 	};
 
 	get loading() {
-		if (this.state.filter === "archived") {
+		if(this.state.filter === "archived") {
 			return this.state.loadingArchived;
 		} else {
 			return this.state.loadingActive;
@@ -237,10 +237,7 @@ class GroupListPage extends Component {
 
 	static mapDispatchToProps(dispatch) {
 		return {
-			enterToCourse: (courseId) => dispatch({
-				type: COURSES__COURSE_ENTERED,
-				courseId: courseId
-			}),
+			enterToCourse: (courseId) => dispatch(changeCurrentCourseAction((courseId))),
 		}
 	}
 }

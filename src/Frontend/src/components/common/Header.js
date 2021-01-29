@@ -16,7 +16,7 @@ import { isMobile } from "src/utils/getDeviceType";
 import styles from './Header.less';
 
 import { getQueryStringParameter } from "src/utils";
-import { toggleNavigation } from "src/actions/navigation";
+import { toggleNavigationAction } from "src/actions/navigation";
 
 import api from "src/api";
 import { CourseRoleType } from "src/consts/accessType";
@@ -224,7 +224,7 @@ const mapStateToHeaderProps = ({ account, courses }) => {
 
 const mapDispatchToHeaderProps = (dispatch) => {
 	return {
-		toggleNavigation: () => dispatch(toggleNavigation()),
+		toggleNavigation: () => dispatch(toggleNavigationAction()),
 	}
 };
 
@@ -272,7 +272,7 @@ const mapStateToNavMenuProps = (state) => {
 
 const mapDispatchToNavMenuProps = (dispatch) => {
 	return {
-		toggleNavigation: () => dispatch(toggleNavigation()),
+		toggleNavigation: () => dispatch(toggleNavigationAction()),
 	};
 };
 

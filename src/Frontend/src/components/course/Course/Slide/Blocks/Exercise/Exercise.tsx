@@ -9,6 +9,7 @@ import { ExerciseFormHeader } from "./ExerciseFormHeader/ExerciseFormHeader";
 import Controls from "./Controls/Controls";
 import LoginForContinue from "src/components/notificationModal/LoginForContinue";
 import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent.js";
+import { HelpLite, Info } from 'icons';
 
 import { darkFlat } from "src/uiTheme";
 
@@ -25,9 +26,11 @@ import {
 	SubmissionColor,
 	SubmissionIsLast,
 } from "./ExerciseUtils";
+import { isMobile, isTablet } from "src/utils/getDeviceType";
 
 import { Language, } from "src/consts/languages";
 import { constructPathToAcceptedSolutions, } from "src/consts/routes";
+import { AccountState } from "src/redux/account";
 import {
 	AutomaticExerciseCheckingResult as CheckingResult,
 	AutomaticExerciseCheckingResult,
@@ -35,7 +38,7 @@ import {
 	RunSolutionResponse,
 	SolutionRunStatus,
 } from "src/models/exercise";
-import { AccountState, ReviewInfoRedux, SubmissionInfoRedux } from "src/models/reduxState";
+import { ReviewInfoRedux, SubmissionInfoRedux } from "src/models/reduxState";
 import { SlideUserProgress } from "src/models/userProgress";
 import { ExerciseBlockProps } from "src/models/slide";
 
@@ -75,7 +78,7 @@ interface FromMapStateToProps {
 	lastCheckingResponse: RunSolutionResponse | null,
 	author: AccountState,
 	slideProgress: SlideUserProgress,
-	submissionError: string,
+	submissionError: string | null,
 }
 
 interface Props extends ExerciseBlockProps, DispatchFunctionsProps, FromSlideProps, FromMapStateToProps {
@@ -555,7 +558,7 @@ class Exercise extends React.Component<Props, State> {
 			<ThemeContext.Provider value={ darkFlat }>
 				<Tooltip trigger={ "hover" } render={ this.renderLanguageLaunchInfoTooltipContent }>
 					<span className={ styles.launchInfoHelpIcon }>
-						Как компилируется код?
+						{ !isMobile() && !isTablet() ? texts.compilationText : <Info/> }
 					</span>
 				</Tooltip>
 			</ThemeContext.Provider>

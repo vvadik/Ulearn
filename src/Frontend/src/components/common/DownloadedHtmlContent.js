@@ -5,11 +5,11 @@ import * as PropTypes from "prop-types";
 import { saveAs } from "file-saver";
 import { connect } from "react-redux";
 import api from "src/api";
-import { COURSES__COURSE_ENTERED } from "src/consts/actions";
 import { getQueryStringParameter } from "src/utils";
 import { withRouter } from "react-router-dom";
 import { UrlError } from "./Error/NotFoundErrorBoundary";
 import Error404 from "./Error/Error404";
+import { changeCurrentCourseAction } from "src/actions/course";
 
 
 function getUrlParts(url) {
@@ -360,10 +360,7 @@ class DownloadedHtmlContent extends Component {
 
 	static mapDispatchToProps(dispatch) {
 		return {
-			enterToCourse: (courseId) => dispatch({
-				type: COURSES__COURSE_ENTERED,
-				courseId: courseId
-			}),
+			enterToCourse: (courseId) => dispatch(changeCurrentCourseAction(courseId)),
 			updateUserInformation: () => dispatch(api.account.getCurrentUser()),
 			updateCourses: () => dispatch(api.courses.getCourses()),
 		}
