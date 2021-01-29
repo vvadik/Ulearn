@@ -38,5 +38,10 @@
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToOutputDirectory>Newer</CopyToOutputDirectory>
     </Content>
+    <Content Include="deploy\**">
+      <Link>deploy\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>None</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 </Project>
