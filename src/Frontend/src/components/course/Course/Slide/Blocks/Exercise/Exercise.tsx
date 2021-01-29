@@ -207,7 +207,7 @@ class Exercise extends React.Component<Props, State> {
 		if(submissions.length > 0) {
 			this.loadSubmissionToState(submissions[this.lastSubmissionIndex]);
 		} else {
-			this.loadCodeFromCache(slideId);
+			this.loadLatestCode(slideId);
 		}
 	};
 
@@ -939,7 +939,7 @@ class Exercise extends React.Component<Props, State> {
 	loadNewTry = (): void => {
 		const { slideId } = this.props;
 		this.resetCode();
-		this.loadCodeFromCache(slideId);
+		this.loadLatestCode(slideId);
 	};
 
 	toggleOutput = (): void => {
@@ -1106,28 +1106,47 @@ class Exercise extends React.Component<Props, State> {
 		saveExerciseCodeToCache(slideId, value, moment().format(), language);
 	};
 
-	loadCodeFromCache = (slideId: string): void => {
-		const { submissions } = this.props;
-		const { value, language } = this.state;
+	loadLatestCode = (slideId: string): void => {
+		const { submissions, } = this.props;
+		const { language, } = this.state;
 
 		const code = loadExerciseCodeFromCache(slideId);
 
-		if(code) {
+		if(submissions.length > 0 && code) {
 			let newValue = code.value;
 
-			if(submissions.length > 0) {
-				const lastSubmission = submissions[this.lastSubmissionIndex];
-				const lastSubmissionTime = convertDefaultTimezoneToLocal(lastSubmission.timestamp);
-				const codeFromCacheTime = moment(code.time);
+			const lastSubmission = submissions[this.lastSubmissionIndex];
+			const lastSubmissionTime = convertDefaultTimezoneToLocal(lastSubmission.timestamp);
+			const codeFromCacheTime = moment(code.time);
 
-				if(lastSubmissionTime.diff(codeFromCacheTime, 'seconds') >= 0) { //if last submission is newer then last saved
-					this.saveCodeToCache(slideId, value);
-					newValue = value;
-				}
+			if(lastSubmissionTime.diff(codeFromCacheTime, 'seconds') >= 0) { //if last submission is newer then last saved
+				this.saveCodeToCache(slideId, lastSubmission.code);
+				newValue = lastSubmission.code;
 			}
+
 			this.resetCode();
 			this.setState({
 				value: newValue,
+				language: code.language ? code.language : language,
+			});
+			return;
+		}
+
+		if(submissions.length > 0) {
+			const lastSubmission = submissions[this.lastSubmissionIndex];
+			this.saveCodeToCache(slideId, lastSubmission.code);
+			this.resetCode();
+			this.setState({
+				value: lastSubmission.code,
+				language: lastSubmission.language,
+			});
+			return;
+		}
+
+		if(code) {
+			this.resetCode();
+			this.setState({
+				value: code.value,
 				language: code.language ? code.language : language,
 			});
 		}
