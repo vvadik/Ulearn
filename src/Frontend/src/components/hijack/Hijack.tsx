@@ -1,21 +1,26 @@
 import React from "react";
+import { Dispatch } from "redux";
+import { connect } from "react-redux";
+import { withCookies, ReactCookieProps } from 'react-cookie';
 
 import { Gapped, Tooltip } from "@skbkontur/react-ui";
 import { Logout, } from "@skbkontur/react-icons";
 
-import { setHijack, } from "src/actions/account";
-
-import { withCookies } from 'react-cookie';
-
-import PropTypes from 'prop-types';
+import { userProgressHijackAction, } from "src/actions/account";
+import { RootState } from "src/models/reduxState";
 
 import styles from './Hijack.less';
-import { connect } from "react-redux";
 
 const hijackCookieName = 'ulearn.auth.hijack';
 const hijackReturnControllerPath = '/Account/ReturnHijack';
 
-function Hijack({ allCookies, name, setHijack, isHijacked, }) {
+interface Props extends ReactCookieProps {
+	name: string,
+	setHijack: (isHijack: boolean) => void;
+	isHijacked: boolean,
+}
+
+function Hijack({ allCookies, name, setHijack, isHijacked, }: Props) {
 	let isCookieContainsHijack = false;
 	for (const cookie in allCookies) {
 		if(cookie.endsWith(hijackCookieName)) {
@@ -57,18 +62,14 @@ function Hijack({ allCookies, name, setHijack, isHijacked, }) {
 	}
 }
 
-Hijack.propTypes = {
-	name: PropTypes.string,
-}
-
-const mapStateToProps = (state) => {
+const mapStateToProps = (state: RootState) => {
 	return {
 		isHijacked: state.account.isHijacked,
-	}
-}
+	};
+};
 
-const mapDispatchToProps = (dispatch) => ({
-	setHijack: (isHijacked) => dispatch(setHijack(isHijacked)),
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+	setHijack: (isHijacked: boolean) => dispatch(userProgressHijackAction(isHijacked)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withCookies(Hijack));

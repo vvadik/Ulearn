@@ -14,10 +14,10 @@ import OpenedFlashcard from "../Flashcards/OpenedFlashcard/OpenedFlashcard.js";
 import { RootState } from "src/models/reduxState";
 import { ShortSlideInfo } from "src/models/slide";
 import { Flashcard } from "src/models/flashcards";
-import { MatchParams } from "src/consts/router";
+import { MatchParams } from "src/models/router";
 import { constructPathToSlide } from "src/consts/routes";
 
-import { loadFlashcards, } from "src/actions/course.js";
+import { loadFlashcards, } from "src/actions/flashcards";
 
 import getFlashcardsWithTheorySlides from "src/pages/course/getFlashcardsWithTheorySlides";
 
@@ -165,7 +165,7 @@ const mapStateToProps = (state: RootState, { match }: RouteComponentProps<MatchP
 	const unitId = getQueryStringParameter('unitId');
 	const courseIdInLowerCase = courseId.toLowerCase();
 	const data = state.courses;
-	const courseInfo = data.fullCoursesInfo[courseIdInLowerCase];
+	const courseInfo = state.courses.fullCoursesInfo[courseIdInLowerCase];
 	const infoByUnits = Object.values(data.flashcardsByUnits);
 	const slugsByUnits: { [unitId: string]: string } = {};
 	for (const unitId in data.flashcardsByUnits) {
@@ -199,7 +199,7 @@ const mapStateToProps = (state: RootState, { match }: RouteComponentProps<MatchP
 };
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-	loadFlashcards: (courseId: string) => dispatch(loadFlashcards(courseId)),
+	loadFlashcards: (courseId: string) => loadFlashcards(courseId)(dispatch),
 });
 
 const connected = connect(mapStateToProps, mapDispatchToProps)(PreviewUnitPageFromAllCourse);

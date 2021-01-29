@@ -9,7 +9,7 @@ interface CourseInfo {
 	scoring: ScoringGroup;
 	containsFlashcards: boolean;
 	isTempCourse: boolean;
-	tempCourseError: string;
+	tempCourseError: string | null;
 }
 
 interface ScoringGroup {
@@ -50,6 +50,21 @@ interface AbstractScoringGroupInfo {
 interface UnitScoringGroupInfo extends AbstractScoringGroupInfo {
 	canInstructorSetAdditionalScore: boolean;
 	maxAdditionalScore: number;
+}
+
+export interface TempCourseErrorsResponse extends Response {
+	tempCourseError: string | null,
+}
+
+export interface CoursesListResponse extends Response {
+	courses: ShortCourseInfo[],
+}
+
+export interface ShortCourseInfo {
+	id: string,
+	title: string,
+	apiUrl: string,
+	isTempCourse: boolean,
 }
 
 export { CourseInfo, ScoringGroup, UnitInfo, UnitScoringGroupInfo, InfoByUnit };

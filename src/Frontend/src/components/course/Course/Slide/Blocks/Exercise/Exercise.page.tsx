@@ -7,9 +7,9 @@ import { AutomaticExerciseCheckingResult as CheckingResult } from "src/models/ex
 import { RootState } from "src/models/reduxState";
 
 import { userProgressUpdateAction } from "src/actions/userProgress";
-import { sendCode, addReviewComment, deleteReviewComment, } from "src/actions/course.js";
+import { sendCode, addReviewComment, deleteReviewComment, } from "src/actions/exercise";
 import { Language } from "src/consts/languages";
-import { MatchParams } from "src/consts/router";
+import { MatchParams } from "src/models/router";
 
 const mapStateToProps = (state: RootState, { courseId, slideId, }: MatchParams) => {
 	const { slides, account, userProgress } = state;
@@ -36,15 +36,15 @@ const mapStateToProps = (state: RootState, { courseId, slideId, }: MatchParams) 
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
 	sendCode: (courseId: string, slideId: string, code: string, language: Language
-	) => dispatch(sendCode(courseId, slideId, code, language)),
+	) => sendCode(courseId, slideId, code, language)(dispatch),
 
 	addReviewComment: (courseId: string, slideId: string, submissionId: number, reviewId: number,
 		comment: string
-	) => dispatch(addReviewComment(courseId, slideId, submissionId, reviewId, comment)),
+	) => addReviewComment(courseId, slideId, submissionId, reviewId, comment)(dispatch),
 
 	deleteReviewComment: (courseId: string, slideId: string, submissionId: number, reviewId: number,
 		commentId: number
-	) => dispatch(deleteReviewComment(courseId, slideId, submissionId, reviewId, commentId)),
+	) => deleteReviewComment(courseId, slideId, submissionId, reviewId, commentId)(dispatch),
 
 	visitAcceptedSolutions: (courseId: string, slideId: string,
 	) => dispatch(userProgressUpdateAction(courseId, slideId, { isSkipped: true })),

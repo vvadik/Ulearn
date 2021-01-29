@@ -1,9 +1,9 @@
 import { connect } from "react-redux";
 
-import UnitFlashcards from "../../components/flashcards/UnitPage/UnitPage";
-import Course from "../../components/course/Course";
+import UnitFlashcards from "src/components/flashcards/UnitPage/UnitPage";
+import Course from "src/components/course/Course";
 
-import { sendFlashcardResult, loadFlashcards } from '../../actions/course';
+import { sendFlashcardResult, loadFlashcards } from 'src/actions/flashcards';
 import getFlashcardsWithTheorySlides from "./getFlashcardsWithTheorySlides";
 
 const mapStateToProps = (state, { match }) => {
@@ -17,7 +17,7 @@ const mapStateToProps = (state, { match }) => {
 	const unitId = Course.findUnitIdBySlideId(slideId, courseInfo);
 	const unitInfo = data.flashcardsByUnits[unitId];
 
-	if (!courseInfo) {
+	if(!courseInfo) {
 		return {
 			courseId,
 			unitId,

@@ -14,7 +14,7 @@ import { courseMenuItemType, menuItemType, groupAsStudentType, progressType } fr
 import { flashcards } from "src/consts/routes";
 
 import { isMobile, isTablet } from "src/utils/getDeviceType";
-import { toggleNavigation } from "src/actions/navigation";
+import { toggleNavigationAction } from "src/actions/navigation";
 
 import styles from './Navigation.less';
 
@@ -313,7 +313,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = (dispatch) => ({
-	toggleNavigation: () => dispatch(toggleNavigation()),
+	toggleNavigation: () => dispatch(toggleNavigationAction()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Navigation);

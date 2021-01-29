@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import api from "src/api/index";
+import api from "src/api";
 import { Select, Modal, Button, Toast } from "ui";
 import getPluralForm from "src/utils/getPluralForm";
 

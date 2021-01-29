@@ -1,16 +1,17 @@
 import { Dispatch } from "redux";
 
 import { getUserProgressInCourse, updateUserProgressInCourse } from 'src/api/userProgress';
+
 import { SlideUserProgress, UsersProgressResponse } from "src/models/userProgress";
 import {
-	LoadUserProgressFailAction,
-	LoadUserProgressStartAction,
-	LoadUserProgressSuccessAction,
-	UserProgressUpdateAction,
 	USER__PROGRESS_LOAD_FAIL,
 	USER__PROGRESS_LOAD_START,
 	USER__PROGRESS_LOAD_SUCCESS,
 	USER__PROGRESS_UPDATE,
+	LoadUserProgressFailAction,
+	LoadUserProgressStartAction,
+	LoadUserProgressSuccessAction,
+	UserProgressUpdateAction,
 	UserProgressActionTypes,
 } from "./userProgress.types";
 

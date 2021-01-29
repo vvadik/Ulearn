@@ -1,13 +1,13 @@
 import {
 	INSTRUCTOR__STUDENT_MODE_TOGGLE,
-} from 'src/consts/actions';
-import { StudentModeAction } from "src/actions/instructor";
+	StudentModeAction,
+} from 'src/actions/instructor.types';
 
 export interface InstructorState {
 	isStudentMode: boolean,
 }
 
-const initialInstructorState = {
+const initialInstructorState: InstructorState = {
 	isStudentMode: false,
 };
 

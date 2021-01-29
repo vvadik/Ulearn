@@ -32,7 +32,7 @@ interface ReviewState {
 interface ReviewProps {
 	reviews: ReviewInfo[];
 	selectedReviewId: number;
-	userId: string | null;
+	userId?: string | null;
 	onSelectComment: (e: React.MouseEvent | React.FocusEvent, id: number,) => void;
 	addReviewComment: (reviewId: number, comment: string) => void;
 	deleteReviewComment: (reviewId: number, commentId: number) => void;

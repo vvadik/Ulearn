@@ -1,14 +1,20 @@
 import {
 	NOTIFICATIONS__COUNT_RESETED,
 	NOTIFICATIONS__COUNT_UPDATED,
-} from "src/consts/actions";
+	NotificationsAction,
+} from "src/actions/notifications.types";
 
-const initialNotificationsState = {
+interface NotificationsState {
+	count: number,
+	lastTimestamp: string,
+}
+
+const initialNotificationsState: NotificationsState = {
 	count: 0,
 	lastTimestamp: "",
 };
 
-function notifications(state = initialNotificationsState, action) {
+function notifications(state = initialNotificationsState, action: NotificationsAction): NotificationsState {
 	switch (action.type) {
 		case NOTIFICATIONS__COUNT_UPDATED:
 			return {

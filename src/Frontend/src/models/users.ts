@@ -1,5 +1,4 @@
-export enum Gender
-{
+export enum Gender {
 	Male = 'male',
 	Female = 'female'
 }
@@ -13,4 +12,21 @@ export interface ShortUserInfo {
 	visibleName: string
 	avatarUrl: string
 	gender: Gender | null
+}
+
+export interface UsersSearchResponse {
+	users: FoundUserResponse[],
+}
+
+export interface FoundUserResponse {
+	user: ShortUserInfo,
+	fields: SearchField[],
+}
+
+export enum SearchField {
+	UserId,
+	Login,
+	Name,
+	Email,
+	SocialLogin,
 }
