@@ -1,21 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <ProjectGuid>{73474493-49F2-48E2-8550-B1FF0B32C67E}</ProjectGuid>
-    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <AssemblyTitle>XQueueWatcher</AssemblyTitle>
-    <Product>XQueueWatcher</Product>
-    <Description>XQueueWatcher service for ulearn mooc platform</Description>
-    <Copyright>Copyright 2014–2018 SKB Kontur</Copyright>
-    <Version>1.0.0.0</Version>
-    <Authors>SKB Kontur</Authors>
-    <PackageId>Kontur.Ulearn.XQueueWatcher</PackageId>
-    <PackageLicenseUrl>https://ulearn.me/Home/Terms</PackageLicenseUrl>
-    <PackageProjectUrl>https://ulearn.me</PackageProjectUrl>
-    <PackageTags>ulearn education mooc xqueue</PackageTags>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-    <LangVersion>default</LangVersion>
+    <RootNamespace>XQueueWatcher</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.2" />
