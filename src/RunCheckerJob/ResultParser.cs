@@ -9,11 +9,11 @@ namespace RunCheckerJob
 	{
 		private static ILog log => LogProvider.Get().ForContext(typeof(ResultParser));
 
-		public static RunningResults Parse(RunningResults response)
+		public static RunningResults Parse(string stdout, string stderr)
 		{
 			try
 			{
-				var result = JsonConvert.DeserializeObject<RunningResults>(response.Output);
+				var result = JsonConvert.DeserializeObject<RunningResults>(stdout);
 				if (result == null)
 					throw new Exception();
 				return result;
@@ -21,7 +21,16 @@ namespace RunCheckerJob
 			catch (Exception)
 			{
 				log.Warn("Не удалось распарсить результат");
-				return response;
+				return new RunningResults(Verdict.SandboxError)
+				{
+					Logs = new[]
+					{
+						"Не удалось распарсить результат",
+						"Exit code: 0",
+						$"stdout: {stdout}",
+						$"stderr: {stderr}"
+					}
+				};
 			}
 		}
 	}

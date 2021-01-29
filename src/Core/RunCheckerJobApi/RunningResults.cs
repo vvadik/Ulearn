@@ -67,20 +67,18 @@ namespace Ulearn.Core.RunCheckerJobApi
 		{
 		}
 
-		public RunningResults(string id, Verdict verdict, int? timeLimit = null, string compilationOutput = "", string output = "", string error = "", float? points = null, List<StyleError> styleErrors = null)
+		public RunningResults(string id, Verdict verdict, int? timeLimit = null, string compilationOutput = "", string output = "", string error = "")
 		{
 			Id = id;
 			Verdict = verdict;
 			CompilationOutput = compilationOutput;
 			Output = output;
 			Error = error;
-			Points = points;
 			this.timeLimit = timeLimit;
-			StyleErrors = styleErrors;
 		}
 
-		public RunningResults(Verdict verdict, int? timeLimit = null, string compilationOutput = "", string output = "", string error = "", float? points = null, List<StyleError> styleErrors = null)
-			: this(null, verdict, timeLimit, compilationOutput, output, error, points, styleErrors)
+		public RunningResults(Verdict verdict, int? timeLimit = null, string compilationOutput = "", string output = "", string error = "")
+			: this(null, verdict, timeLimit, compilationOutput, output, error)
 		{
 		}
 
