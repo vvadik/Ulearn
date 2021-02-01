@@ -7,7 +7,7 @@ process.on('unhandledRejection', err => {
 
 require('../config/env');
 
-const fs = require('fs');
+const fs = require('fs-extra');
 const chalk = require('chalk');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
@@ -24,7 +24,7 @@ const paths = require('../config/paths');
 const config = require('../config/webpack.config.dev');
 const createDevServerConfig = require('../config/webpackDevServer.config');
 
-const useYarn = fs.existsSync(paths.yarnLockFile);
+const useYarn = fs.pathExistsSync(paths.yarnLockFile);
 const isInteractive = process.stdout.isTTY;
 
 if(!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
@@ -65,7 +65,14 @@ choosePort(HOST, DEFAULT_PORT)
 			protocol,
 			HOST,
 		);
-		const compiler = createCompiler({ webpack, config, appName, urls, useYarn });
+		const compiler = createCompiler({
+			webpack,
+			config,
+			appName,
+			urls,
+			useYarn,
+			useTypeScript: true,
+		});
 		const devServer = new WebpackDevServer(compiler, serverConfig);
 		devServer.listen(port, HOST, err => {
 			if(err) {

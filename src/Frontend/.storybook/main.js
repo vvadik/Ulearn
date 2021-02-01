@@ -1,7 +1,7 @@
 ﻿const path = require("path");
 const autoprefixer = require('autoprefixer');
 const base = require('../config/webpack.config.base');
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 
 module.exports = {
 	stories: ['../src/**/**.story.@(js|jsx|tsx)'],
@@ -9,7 +9,7 @@ module.exports = {
 		'@storybook/addon-essentials',
 	],
 	webpackFinal: async (config, { configType }) => {
-		config = merge(base, config);
+		config = merge([base, config]);
 
 		config.module.rules.find(
 			rule => rule.test.toString() === '/\\.css$/'
@@ -26,7 +26,7 @@ module.exports = {
 						options: {
 							modules: {
 								mode: 'local',
-								localIdentName: '[name]__[local]--[hash:base64:5]',
+								localIdentName: '[name]__[local]--[fullhash:base64:5]',
 							}
 						},
 					},
@@ -50,7 +50,7 @@ module.exports = {
 						loader: 'postcss-loader',
 						options: {
 							ident: 'postcss',
-							plugins: () => [
+							plugins: [
 								require('postcss-flexbugs-fixes'),
 								autoprefixer({ flexbox: 'no-2009' }),
 							],
