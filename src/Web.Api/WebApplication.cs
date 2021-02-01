@@ -70,7 +70,7 @@ namespace Ulearn.Web.Api
 					.WithOrigins(configuration.Web.Cors.AllowOrigins)
 					.AllowAnyMethod()
 					.WithHeaders("Authorization", "Content-Type", "Json-Naming-Strategy",
-						"X-Requested-With" // signalR
+						"X-Requested-With", "x-signalr-user-agent" // signalR
 					)
 					.WithExposedHeaders("Location")
 					.AllowCredentials();
