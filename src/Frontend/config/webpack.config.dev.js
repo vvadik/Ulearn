@@ -14,9 +14,9 @@ const publicUrl = '';
 const env = getClientEnvironment(publicUrl);
 
 const base = require('./webpack.config.base');
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 
-module.exports = merge(base, {
+module.exports = merge([base, {
 	mode: 'development',
 	devtool: 'eval-cheap-source-map',
 	entry: {
@@ -84,7 +84,7 @@ module.exports = merge(base, {
 								options: {
 									modules: {
 										mode: 'local',
-										localIdentName: '[name]__[local]--[hash:base64:5]',
+										localIdentName: '[name]__[local]--[hash:5]',
 									},
 									importLoaders: 1,
 								},
@@ -107,11 +107,13 @@ module.exports = merge(base, {
 							{
 								loader: 'postcss-loader',
 								options: {
-									ident: 'postcss',
-									plugins: () => [
-										require('postcss-flexbugs-fixes'),
-										autoprefixer({ flexbox: 'no-2009' }),
-									],
+									postcssOptions: {
+										ident: 'postcss',
+										plugins: [
+											require('postcss-flexbugs-fixes'),
+											autoprefixer({ flexbox: 'no-2009' }),
+										],
+									}
 								},
 							},
 						],
@@ -141,6 +143,9 @@ module.exports = merge(base, {
 		}),
 		new InterpolateHtmlPlugin(HtmlWebpackPlugin, env.raw),
 		new webpack.DefinePlugin(env.stringified),
+		new webpack.ProvidePlugin({
+			process: 'process/browser',
+		}),
 		new webpack.HotModuleReplacementPlugin(),
 		new CaseSensitivePathsPlugin(),
 		new WatchMissingNodeModulesPlugin(paths.appNodeModules),
@@ -149,4 +154,4 @@ module.exports = merge(base, {
 	performance: {
 		hints: false,
 	},
-});
+}]);

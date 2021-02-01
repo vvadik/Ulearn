@@ -1,5 +1,4 @@
 import outdatedBrowserRework from 'outdated-browser-rework'
-import '../node_modules/outdated-browser-rework/dist/style.css'
 
 outdatedBrowserRework({
 	browserSupport: {
