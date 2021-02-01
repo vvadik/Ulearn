@@ -27,7 +27,7 @@ const createDevServerConfig = require('../config/webpackDevServer.config');
 const useYarn = fs.pathExistsSync(paths.yarnLockFile);
 const isInteractive = process.stdout.isTTY;
 
-if(!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
+if(!checkRequiredFiles([paths.appHtml, paths.appIndexTsx])) {
 	process.exit(1);
 }
 

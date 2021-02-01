@@ -1,7 +1,5 @@
 import React, { ReactElement } from "react";
 
-import { isMobile, isTablet, } from "src/utils/getDeviceType";
-
 import { ThemeContext } from "ui";
 import SubmitButton from "./SubmitButton";
 import ShowHintButton from "./ShowHintButton";
@@ -10,21 +8,24 @@ import ResetButton from "./ResetButton";
 import StatisticsHint from "./StatisticsHint";
 import AcceptedSolutionsButton from "./AcceptedSolutionsButton";
 import { darkFlat } from "src/uiTheme";
+import { DeviceType } from "src/consts/deviceType";
 
 import ShowControlsTextContext from "./ShowControlsTextContext";
 
 import styles from './Controls.less';
+import { RootState } from "src/models/reduxState";
+import { connect } from "react-redux";
 
 interface Props {
 	children: React.ReactNode[] | React.ReactNode,
+	deviceType: DeviceType,
 }
 
 interface State {
-	resizeTimeout?: NodeJS.Timeout,
 	showControlsText: boolean,
 }
 
-const isControlsTextSuits = (): boolean => !isMobile() && !isTablet();
+const isControlsTextSuits = (deviceType: DeviceType): boolean => deviceType !== DeviceType.mobile && deviceType !== DeviceType.tablet;
 
 class Controls extends React.Component<Props, State> {
 	public static SubmitButton = SubmitButton;
@@ -34,36 +35,24 @@ class Controls extends React.Component<Props, State> {
 	public static StatisticsHint = StatisticsHint;
 	public static AcceptedSolutionsButton = AcceptedSolutionsButton;
 
-	state = {
-		resizeTimeout: undefined,
-		showControlsText: isControlsTextSuits(),
-	};
+	constructor(props: Props) {
+		super(props);
 
-	componentDidMount = (): void => {
-		window.addEventListener("resize", this.onWindowResize);
-	};
+		this.state = {
+			showControlsText: isControlsTextSuits(props.deviceType),
+		};
+	}
 
-	componentWillUnmount = (): void => {
-		window.removeEventListener("resize", this.onWindowResize);
-	};
+	componentDidUpdate(prevProps: Readonly<Props>) {
+		const { deviceType, } = this.props;
 
-	onWindowResize = (): void => {
-		const { resizeTimeout, } = this.state;
-
-		const throttleTimeout = 66;
-
-		//resize event can be called rapidly, to prevent performance issue, we throttling event handler
-		if(!resizeTimeout) {
+		if(prevProps.deviceType !== deviceType) {
+			console.log(deviceType);
 			this.setState({
-				resizeTimeout: setTimeout(() => {
-					this.setState({
-						resizeTimeout: undefined,
-						showControlsText: isControlsTextSuits(),
-					});
-				}, throttleTimeout),
+				showControlsText: isControlsTextSuits(deviceType),
 			});
 		}
-	};
+	}
 
 	render = (): React.ReactNode => {
 		const { showControlsText, } = this.state;
@@ -130,4 +119,11 @@ class Controls extends React.Component<Props, State> {
 	};
 }
 
-export default Controls;
+const mapStateToProps = (state: RootState) => {
+	return ({
+			deviceType: state.device.deviceType,
+		}
+	);
+};
+
+export default connect(mapStateToProps, ({}))(Controls);

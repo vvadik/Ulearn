@@ -12,7 +12,7 @@ import { Language } from "src/consts/languages";
 import { MatchParams } from "src/models/router";
 
 const mapStateToProps = (state: RootState, { courseId, slideId, }: MatchParams) => {
-	const { slides, account, userProgress } = state;
+	const { slides, account, userProgress, device, } = state;
 	const { submissionsByCourses, submissionError, lastCheckingResponse, } = slides;
 	const slideProgress = userProgress?.progress[courseId]?.[slideId] || {};
 
@@ -30,7 +30,8 @@ const mapStateToProps = (state: RootState, { courseId, slideId, }: MatchParams) 
 		submissionError,
 		lastCheckingResponse: !(lastCheckingResponse && lastCheckingResponse.courseId === courseId && lastCheckingResponse.slideId === slideId) ? null : lastCheckingResponse,
 		author: account,
-		slideProgress
+		slideProgress,
+		deviceType: device.deviceType,
 	};
 };
 

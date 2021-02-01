@@ -30,6 +30,7 @@ import { isMobile, isTablet } from "src/utils/getDeviceType";
 
 import { Language, } from "src/consts/languages";
 import { constructPathToAcceptedSolutions, } from "src/consts/routes";
+import { DeviceType } from "src/consts/deviceType";
 import { AccountState } from "src/redux/account";
 import {
 	AutomaticExerciseCheckingResult as CheckingResult,
@@ -79,6 +80,7 @@ interface FromMapStateToProps {
 	author: AccountState,
 	slideProgress: SlideUserProgress,
 	submissionError: string | null,
+	deviceType: DeviceType,
 }
 
 interface Props extends ExerciseBlockProps, DispatchFunctionsProps, FromSlideProps, FromMapStateToProps {
@@ -554,11 +556,14 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	renderLanguageLaunchInfoTooltip = (): React.ReactElement => {
+		const { deviceType, } = this.props;
 		return (
 			<ThemeContext.Provider value={ darkFlat }>
 				<Tooltip trigger={ "hover" } render={ this.renderLanguageLaunchInfoTooltipContent }>
 					<span className={ styles.launchInfoHelpIcon }>
-						{ !isMobile() && !isTablet() ? texts.compilationText : <Info/> }
+						{ (deviceType !== DeviceType.mobile && deviceType !== DeviceType.tablet)
+							? texts.compilationText
+							: <Info/> }
 					</span>
 				</Tooltip>
 			</ThemeContext.Provider>

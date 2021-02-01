@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import UlearnApp from './App';
-import "./externalComponentRenderer";
+import UlearnApp from 'src/App';
+import "src/externalComponentRenderer";
 
 import 'moment/locale/ru';
 import "moment-timezone";
@@ -27,7 +27,7 @@ function unregisterServiceWorker() {
 	if (window.navigator && navigator.serviceWorker) {
 		navigator.serviceWorker.getRegistrations()
 		.then(function (registrations) {
-			for (let registration of registrations) {
+			for (const registration of registrations) {
 				registration.unregister();
 			}
 		});

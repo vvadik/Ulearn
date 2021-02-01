@@ -56,7 +56,7 @@ module.exports = merge([base, {
 		main: [
 			'./config/polyfills',
 			'./config/sentry',
-			paths.appIndexJs
+			paths.appIndexTsx
 		],
 		oldBrowser: [
 			paths.oldBrowserJs,

@@ -24,7 +24,7 @@ module.exports = merge([base, {
 			'./config/polyfills',
 			//'./config/sentry', we're rejecting all error coming from localhost, so uncommenting this line will just pollute console on errors
 			'react-dev-utils/webpackHotDevClient',
-			paths.appIndexJs,
+			paths.appIndexTsx,
 		],
 		oldBrowser: [
 			paths.oldBrowserJs
