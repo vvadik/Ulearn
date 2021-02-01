@@ -1,8 +1,7 @@
 import React, { createRef, RefObject } from "react";
 
-import { Button, Modal, Tooltip, TooltipTrigger } from "ui";
+import { Button, Tooltip, TooltipTrigger } from "ui";
 import { EyeOpened } from "icons";
-import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent.js";
 import IControlWithText from "./IControlWithText";
 
 import ShowControlsTextContext from "./ShowControlsTextContext";
