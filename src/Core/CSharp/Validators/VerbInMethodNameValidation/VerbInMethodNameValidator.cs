@@ -33,6 +33,9 @@ namespace Ulearn.Core.CSharp.Validators.VerbInMethodNameValidation
 
 			var wordsInName = syntaxToken.ValueText.SplitByCamelCase().ToList();
 
+			if (wordsInName.Count == 0)
+				yield break;
+
 			if (exceptionsPreposition.Contains(wordsInName.First()))
 				yield break;
 
