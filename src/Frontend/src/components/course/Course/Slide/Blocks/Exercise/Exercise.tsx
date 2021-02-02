@@ -242,8 +242,10 @@ class Exercise extends React.Component<Props, State> {
 		}
 
 		if(courseId !== prevProps.courseId || slideId !== prevProps.slideId) {
+			this.setState({
+				submissionLoading: false,
+			});
 			this.loadSlideSubmission();
-			//this.setState({ showedHintsCount: 0 });
 			return;
 		}
 
@@ -1123,6 +1125,7 @@ class Exercise extends React.Component<Props, State> {
 		const { language, } = this.state;
 
 		const code = loadExerciseCodeFromCache(slideId);
+		this.resetCode();
 
 		if(submissions.length > 0 && code) {
 			let newValue = code.value;
@@ -1136,7 +1139,6 @@ class Exercise extends React.Component<Props, State> {
 				newValue = lastSubmission.code;
 			}
 
-			this.resetCode();
 			this.setState({
 				value: newValue,
 				language: code.language ? code.language : language,
@@ -1147,7 +1149,6 @@ class Exercise extends React.Component<Props, State> {
 		if(submissions.length > 0) {
 			const lastSubmission = submissions[this.lastSubmissionIndex];
 			this.saveCodeToCache(slideId, lastSubmission.code);
-			this.resetCode();
 			this.setState({
 				value: lastSubmission.code,
 				language: lastSubmission.language,
@@ -1156,7 +1157,6 @@ class Exercise extends React.Component<Props, State> {
 		}
 
 		if(code) {
-			this.resetCode();
 			this.setState({
 				value: code.value,
 				language: code.language ? code.language : language,
