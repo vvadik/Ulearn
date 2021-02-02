@@ -282,7 +282,7 @@ class Course extends Component {
 	}
 
 	renderSlide() {
-		const { pageInfo: { isNavigationVisible, isReview, }, user, courseId, isStudentMode, } = this.props;
+		const { pageInfo: { isNavigationVisible, isReview, isLti, }, user, courseId, isStudentMode, } = this.props;
 		const { currentSlideInfo, currentSlideId, currentCourseId, Page, title, openUnit, } = this.state;
 
 		const wrapperClassName = classnames(
@@ -323,6 +323,7 @@ class Course extends Component {
 								courseId={ currentCourseId }
 								showHiddenBlocks={ !isStudentMode }
 								slideInfo={ slideInfo }
+								isLti={ isLti }
 							/>
 							: <BlocksWrapper>
 								<Page match={ this.props.match }/>

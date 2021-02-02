@@ -62,6 +62,7 @@ interface Props {
 	loadSlide: (courseId: string, slideId: string,) => void,
 	showHiddenBlocks: boolean,
 	slideInfo: ShortSlideInfo,
+	isLti: boolean,
 }
 
 class Slide extends React.Component<Props> {
@@ -88,11 +89,16 @@ class Slide extends React.Component<Props> {
 	};
 
 	render = () => {
-		const { slideBlocks, showHiddenBlocks, slideInfo, } = this.props;
+		const { slideBlocks, showHiddenBlocks, slideInfo, isLti, } = this.props;
 		const isHiddenSlide = slideInfo.hide;
 
 		if(!slideBlocks) {
 			return (<CourseLoader/>);
+		}
+
+		const exerciseSlideBlock = slideBlocks.find(sb => sb.$type === BlockTypes.exercise);
+		if(isLti && exerciseSlideBlock) {
+			return this.renderSlideBlocks([JSON.parse(JSON.stringify(exerciseSlideBlock))]);
 		}
 
 		if(showHiddenBlocks) {
