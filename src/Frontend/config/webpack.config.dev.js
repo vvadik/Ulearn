@@ -146,7 +146,6 @@ module.exports = merge([base, {
 		new webpack.ProvidePlugin({
 			process: 'process/browser',
 		}),
-		new webpack.HotModuleReplacementPlugin(),
 		new CaseSensitivePathsPlugin(),
 		new WatchMissingNodeModulesPlugin(paths.appNodeModules),
 		new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/, /\.less\.d\.ts$/, /\.css\.d\.ts$/),
