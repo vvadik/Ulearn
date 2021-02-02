@@ -8,9 +8,12 @@ export enum Language {
 	typeScript = 'typescript',
 	css = 'css',
 	haskell = 'haskell',
-	text = 'text',
-	jsx = 'jsx',
-	c = 'c',
 	cpp = 'cpp',
+	c = 'c',
 	pgsql = 'pgsql',
+	mikrokosmos = 'mikrokosmos',
+
+	text = 'text',
+
+	jsx = 'jsx', // нет на бэке
 }

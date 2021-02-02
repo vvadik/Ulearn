@@ -67,6 +67,10 @@ namespace Ulearn.Common
 		[Lexer("postgresql")]
 		PgSql = 12,
 
+		[XmlEnum("mikrokosmos")]
+		[Lexer("py3")]
+		Mikrokosmos = 13, // https://mroman42.github.io/mikrokosmos/userguide.html
+
 		[XmlEnum("text")]
 		[Lexer("text")]
 		Text = 100,
@@ -98,7 +102,8 @@ namespace Ulearn.Common
 			{ ".c", Language.C },
 			{ ".cpp", Language.Cpp },
 			{ ".sql", Language.PgSql },
-			{ ".txt", Language.Text }
+			{ ".mkr", Language.Mikrokosmos },
+			{ ".txt", Language.Text },
 		};
 
 		public static Language GuessByExtension(string extension)
