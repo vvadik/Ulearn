@@ -7,6 +7,7 @@ const { GenerateSW } = require('workbox-webpack-plugin');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const postcssPresetEnv = require('postcss-preset-env');
 const paths = require('./paths');
 const getClientEnvironment = require('./env');
 
@@ -124,12 +125,15 @@ module.exports = merge([base, {
 								}
 							},
 							{
-								loader: "postcss-loader",
+								loader: 'postcss-loader',
 								options: {
 									postcssOptions: {
+										ident: 'postcss',
 										plugins: [
-											autoprefixer({ flexbox: 'no-2009' })
-										]
+											postcssPresetEnv({
+												autoprefixer: { flexbox : 'no-2009' }
+											}),
+										],
 									}
 								},
 							},
@@ -159,8 +163,9 @@ module.exports = merge([base, {
 									postcssOptions: {
 										ident: 'postcss',
 										plugins: [
-											require('postcss-flexbugs-fixes'),
-											autoprefixer({ flexbox: 'no-2009', }),
+											postcssPresetEnv({
+												autoprefixer: { flexbox : 'no-2009' }
+											}),
 										],
 									}
 								},

@@ -1,5 +1,5 @@
 ﻿const path = require("path");
-const autoprefixer = require('autoprefixer');
+const postcssPresetEnv = require('postcss-preset-env');
 const base = require('../config/webpack.config.base');
 const { merge } = require('webpack-merge');
 
@@ -51,8 +51,9 @@ module.exports = {
 						options: {
 							ident: 'postcss',
 							plugins: [
-								require('postcss-flexbugs-fixes'),
-								autoprefixer({ flexbox: 'no-2009' }),
+								postcssPresetEnv({
+									autoprefixer: { flexbox : 'no-2009' }
+								}),
 							],
 						},
 					},

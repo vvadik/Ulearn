@@ -5,6 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
+const postcssPresetEnv = require('postcss-preset-env');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
@@ -110,8 +111,9 @@ module.exports = merge([base, {
 									postcssOptions: {
 										ident: 'postcss',
 										plugins: [
-											require('postcss-flexbugs-fixes'),
-											autoprefixer({ flexbox: 'no-2009' }),
+											postcssPresetEnv({
+												autoprefixer: { flexbox : 'no-2009' }
+											}),
 										],
 									}
 								},
