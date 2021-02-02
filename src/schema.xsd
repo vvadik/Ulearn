@@ -151,20 +151,9 @@
 			<xs:element name="scoring" type="ExerciseScoring" minOccurs="0" maxOccurs="1" />
 			<xs:group ref="SlideInternals" />
 		</xs:sequence>
-		<xs:attribute name="id" type="NonEmptyString" use="required">
-			<xs:annotation>
-				<xs:documentation xml:lang="en">Slide's id, should be guid</xs:documentation>
-				<xs:documentation xml:lang="ru">Идентификатор слайда, должен быть гуидом</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
-		<xs:attribute name="hide" type="xs:boolean">
-			<xs:annotation>
-				<xs:documentation xml:lang="en">Side is shown to instructors only</xs:documentation>
-				<xs:documentation xml:lang="ru">Слайд показывается только преподавателям</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
+		<xs:attributeGroup ref="SlideAttributes" />
 	</xs:complexType>
-	
+
 	<xs:complexType name="PolygonSlide">
 		<xs:all>
 			<xs:element name="scoring" type="ExerciseScoring" minOccurs="0"/>
