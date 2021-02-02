@@ -153,15 +153,6 @@ class Course extends Component {
 		if(!prevProps.progress && progress && !isHijacked && currentSlideInfo && currentSlideInfo.current) {
 			updateVisitedSlide(courseId, currentSlideInfo.current.id);
 		}
-
-		if((currentSlideId !== prevState.currentSlideId || isStudentMode !== prevProps.isStudentMode)
-			&& currentSlideInfo && currentSlideInfo.current && currentSlideInfo.current.type === SlideType.Exercise && (pageInfo.isNavigationVisible && !pageInfo.isAcceptedSolutions)) {
-			if(isStudentMode) {
-				history.push('?version=-1'); //prevent showing task solution
-			} else if(history.location.search === '?version=-1') {
-				history.replace();
-			}
-		}
 	}
 
 	static getDerivedStateFromProps(props, state) {
