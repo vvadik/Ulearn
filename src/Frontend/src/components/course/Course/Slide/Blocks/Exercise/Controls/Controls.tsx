@@ -47,7 +47,6 @@ class Controls extends React.Component<Props, State> {
 		const { deviceType, } = this.props;
 
 		if(prevProps.deviceType !== deviceType) {
-			console.log(deviceType);
 			this.setState({
 				showControlsText: isControlsTextSuits(deviceType),
 			});
