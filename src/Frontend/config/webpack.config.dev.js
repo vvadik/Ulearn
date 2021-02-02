@@ -90,6 +90,19 @@ module.exports = merge([base, {
 									importLoaders: 1,
 								},
 							},
+							{
+								loader: 'postcss-loader',
+								options: {
+									postcssOptions: {
+										ident: 'postcss',
+										plugins: [
+											postcssPresetEnv({
+												autoprefixer: { flexbox : 'no-2009' }
+											}),
+										],
+									}
+								},
+							},
 							'less-loader',
 						]
 					},
