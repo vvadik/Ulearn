@@ -88,7 +88,7 @@ namespace Ulearn.Web.Api.Controllers
 					"emailNotConfirmed"
 				));
 
-			var isInstructor = await courseRolesRepo.HasUserAccessToAnyCourseAsync(user.Id, CourseRoleType.Instructor).ConfigureAwait(false);
+			var isInstructor = await courseRolesRepo.HasUserAccessTo_Any_CourseAsync(user.Id, CourseRoleType.Instructor).ConfigureAwait(false);
 			if (isInstructor && (string.IsNullOrEmpty(user.FirstName) || string.IsNullOrEmpty(user.LastName)))
 				problems.Add(new AccountProblem(
 					"Не указаны имя или фамилия",
@@ -118,7 +118,7 @@ namespace Ulearn.Web.Api.Controllers
 		[Authorize]
 		public async Task<ActionResult<TokenResponse>> ApiToken([FromQuery] int days)
 		{
-			var isInstructor = await courseRolesRepo.HasUserAccessToAnyCourseAsync(User.GetUserId(), CourseRoleType.Instructor).ConfigureAwait(false);
+			var isInstructor = await courseRolesRepo.HasUserAccessTo_Any_CourseAsync(User.GetUserId(), CourseRoleType.Instructor).ConfigureAwait(false);
 			if (!isInstructor)
 				return StatusCode((int)HttpStatusCode.Forbidden, "You should be at least instructor");
 

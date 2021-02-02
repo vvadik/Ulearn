@@ -24,19 +24,6 @@ namespace Database.Extensions
 			return courseRole?.Item2 <= minAccessLevel;
 		}
 
-		[Obsolete("Use CourseRolesRepo.HasUserAccessToAnyCourseAsync() instead")]
-		public static bool HasAccess(this IPrincipal principal, CourseRoleType minAccessLevel)
-		{
-			if (principal.IsSystemAdministrator())
-				return true;
-
-			var roles = principal.GetAllRoles().Select(t => t.Item2).ToList();
-
-			if (!roles.Any())
-				return false;
-			return roles.Min() <= minAccessLevel;
-		}
-
 		private static IEnumerable<Tuple<string, CourseRoleType>> GetAllRoles(this IPrincipal principal)
 		{
 			var roleTuples = principal

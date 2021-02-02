@@ -88,7 +88,7 @@ namespace Database.Repos
 			return (await Internal_GetActualUserRoles(userId)).Any(r => string.Equals(r.CourseId, courseId, StringComparison.OrdinalIgnoreCase) && r.Role <= minCourseRoleType);
 		}
 
-		public async Task<bool> HasUserAccessToAnyCourseAsync(string userId, CourseRoleType minCourseRoleType)
+		public async Task<bool> HasUserAccessTo_Any_CourseAsync(string userId, CourseRoleType minCourseRoleType)
 		{
 			var user = await usersRepo.FindUserByIdAsync(userId).ConfigureAwait(false);
 			if (usersRepo.IsSystemAdministrator(user))
