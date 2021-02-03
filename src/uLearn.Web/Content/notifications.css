@@ -40,6 +40,7 @@
 
 .notifications__feed-switcher {
 	white-space: nowrap;
+	display: flex;
 }
 
 .notifications__feed-switcher a {
@@ -47,7 +48,7 @@
 	box-sizing: border-box;
 	font-size: 16px;
 	padding: 10px;
-	width: 50%;
+	flex-grow: 1;
 	text-align: center;
 	white-space: normal;
 	border-bottom: 1px solid #ddd;
