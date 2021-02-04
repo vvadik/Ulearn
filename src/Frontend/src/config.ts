@@ -1,9 +1,3 @@
-declare global {
-	interface Window {
-		config: { api: { endpoint: string } };
-	}
-}
-
 let config = window.config;
 
 /* By default configuration is provided by backend via inserting JSON in index.html. If backend didn't provide
