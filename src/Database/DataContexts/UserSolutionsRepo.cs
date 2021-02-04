@@ -383,6 +383,8 @@ namespace Database.DataContexts
 
 			var isRightAnswer = IsRightAnswer(result, output, exerciseSlide?.Exercise);
 
+			var elapsed = DateTime.Now - checking.Timestamp;
+			elapsed = elapsed < TimeSpan.FromDays(1) ? elapsed : new TimeSpan(0, 23, 59, 59); 
 			var newChecking = new AutomaticExerciseChecking
 			{
 				Id = checking.Id,
@@ -396,7 +398,7 @@ namespace Database.DataContexts
 				ExecutionServiceName = checking.ExecutionServiceName,
 				Status = AutomaticExerciseCheckingStatus.Done,
 				DisplayName = checking.DisplayName,
-				Elapsed = DateTime.Now - checking.Timestamp,
+				Elapsed = elapsed,
 				IsRightAnswer = isRightAnswer,
 				CheckingAgentName = checking.CheckingAgentName,
 				Points = result.Points

@@ -355,14 +355,9 @@ namespace Database.Repos
 					.Include(s => s.AutomaticChecking)
 					.Include(s => s.SolutionCode)
 					.FirstOrDefaultAsync(s => s.Id == workItemId
-						&& (s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting 
-							|| s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Running
-							|| (s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.RequestTimeLimit
-								&& s.AutomaticChecking.DisplayName == "XQueue watcher Stepik.org")));
+						&& (s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting || s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Running));
 				var minutes = TimeSpan.FromMinutes(15);
-				var notSoLongAgo = submission?.AutomaticChecking?.DisplayName == "XQueue watcher Stepik.org"
-					? new DateTime(2021, 1, 30) // Временно для переконверта отставшего XQueue watcher
-					: DateTime.Now - TimeSpan.FromMinutes(15);
+				var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
 				if (submission == null)
 				{
 					await workQueueRepo.Remove(work.Id);
