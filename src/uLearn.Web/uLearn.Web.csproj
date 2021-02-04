@@ -1680,7 +1680,7 @@
     </PostBuildEvent>
   </PropertyGroup>
   <Target Name="CompileFrontend" BeforeTargets="BeforeBuild;OctoPack">
-    <Exec Command="npm run build" WorkingDirectory="..\Frontend" />
+    <Exec Command="yarn build" WorkingDirectory="..\Frontend" />
     <Exec Command="if not exist static mkdir static" WorkingDirectory="$(MSBuildProjectDirectory)" />
     <!-- Robocopy always exits with code 1: https://social.msdn.microsoft.com/Forums/en-US/d599833c-dcea-46f5-85e9-b1f028a0fefe/robocopy-exits-with-error-code-1?forum=tfsbuild -->
     <Exec Command="robocopy /s ..\Frontend\build\static\ static\ || exit 0" WorkingDirectory="$(MSBuildProjectDirectory)" />
