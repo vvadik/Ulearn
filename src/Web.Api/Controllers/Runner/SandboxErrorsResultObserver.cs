@@ -23,11 +23,14 @@ namespace Ulearn.Web.Api.Controllers.Runner
 				return;
 
 			var output = result.GetOutput();
-			await bot.PostToChannelAsync(
-				$"<b>Решение #{submission.Id} не запустилось в песочнице (SandboxError).</b>\n" +
-				(string.IsNullOrEmpty(output) ? "" : $"Вывод:\n<pre>{output.EscapeHtml()}</pre>"),
-				ParseMode.Html
-			).ConfigureAwait(false);
+			var logs = result.Logs == null ? null : string.Join("\n", result.Logs);
+			var message = $"<b>Решение #{submission.Id} не запустилось в песочнице {submission.Sandbox} (SandboxError).</b>\n";
+			if (!string.IsNullOrEmpty(output))
+				message += $"Вывод:\n<pre>{output.EscapeHtml()}</pre>\n";
+			if (!string.IsNullOrEmpty(logs))
+				message += $"Логи:\n<pre>{logs.EscapeHtml()}</pre>\n";
+
+			await bot.PostToChannelAsync(message, ParseMode.Html).ConfigureAwait(false);
 		}
 	}
 }
