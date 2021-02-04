@@ -1,10 +1,13 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AntiPlagiarism.Web.Database;
 using AntiPlagiarism.Web.Database.Models;
 using Database;
+using Database.Models;
+using Database.Repos;
 using ManualUtils.AntiPlagiarism;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -41,8 +44,34 @@ namespace ManualUtils
 			//CampusRegistration();
 			//GetIps(db);
 			//FillAntiplagFields.FillClientSubmissionId(adb);
+			//await XQueueRunAutomaticChecking(db);
 		}
-		
+
+		private static async Task XQueueRunAutomaticChecking(UlearnDb db)
+		{
+			var userSolutionsRepo = new UserSolutionsRepo(db, new TextsRepo(db), new WorkQueueRepo(db), null);
+			var time = new DateTime(2021, 1, 30);
+			var submissions = await db.UserExerciseSubmissions.Where(s =>
+				s.AutomaticChecking.DisplayName == "XQueue watcher Stepik.org"
+				&& (s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting || s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.RequestTimeLimit)
+				&& s.AutomaticChecking.Timestamp > time)
+				.OrderBy(c => c.Timestamp)
+				.ToListAsync();
+			var i = 0;
+			foreach (var submission in submissions)
+			{
+				Console.WriteLine($"{i} from {submissions.Count} {submission.Id}");
+				await userSolutionsRepo.RunAutomaticChecking(submission, TimeSpan.FromSeconds(25), false, -10);
+				Thread.Sleep(1000);
+				var result = await db.UserExerciseSubmissions
+					.Include(s => s.AutomaticChecking)
+					.Where(s => s.Id == submission.Id).FirstOrDefaultAsync();
+				Console.WriteLine($"IsRightAnswer: {result.AutomaticCheckingIsRightAnswer}");
+				Console.WriteLine($"Status: {result.AutomaticChecking.Status}");
+				i++;
+			}
+		}
+
 		private static void GetMostSimilarSubmission(AntiPlagiarismDb adb)
 		{
 			//var lines = File.ReadLines("pairweights.txt");

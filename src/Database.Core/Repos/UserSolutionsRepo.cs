@@ -355,9 +355,14 @@ namespace Database.Repos
 					.Include(s => s.AutomaticChecking)
 					.Include(s => s.SolutionCode)
 					.FirstOrDefaultAsync(s => s.Id == workItemId
-						&& (s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting || s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Running));
+						&& (s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting 
+							|| s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Running
+							|| (s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.RequestTimeLimit
+								&& s.AutomaticChecking.DisplayName == "XQueue watcher Stepik.org")));
 				var minutes = TimeSpan.FromMinutes(15);
-				var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
+				var notSoLongAgo = submission?.AutomaticChecking?.DisplayName == "XQueue watcher Stepik.org"
+					? new DateTime(2021, 1, 30) // Временно для переконверта отставшего XQueue watcher
+					: DateTime.Now - TimeSpan.FromMinutes(15);
 				if (submission == null)
 				{
 					await workQueueRepo.Remove(work.Id);
@@ -483,6 +488,8 @@ namespace Database.Repos
 
 			var isRightAnswer = IsRightAnswer(result, output, exerciseSlide?.Exercise);
 
+			var elapsed = DateTime.Now - checking.Timestamp;
+			elapsed = elapsed < TimeSpan.FromDays(1) ? elapsed : new TimeSpan(0, 23, 59, 59); 
 			var newChecking = new AutomaticExerciseChecking
 			{
 				Id = checking.Id,
@@ -496,7 +503,7 @@ namespace Database.Repos
 				ExecutionServiceName = checking.ExecutionServiceName,
 				Status = result.Verdict == Verdict.SandboxError ? AutomaticExerciseCheckingStatus.Error : AutomaticExerciseCheckingStatus.Done,
 				DisplayName = checking.DisplayName,
-				Elapsed = DateTime.Now - checking.Timestamp,
+				Elapsed = elapsed,
 				IsRightAnswer = isRightAnswer,
 				CheckingAgentName = checking.CheckingAgentName,
 				Points = result.Points,
