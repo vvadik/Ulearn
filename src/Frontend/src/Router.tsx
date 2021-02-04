@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 
-import AnyPage from "src/pages/AnyPage.js";
+import AnyPage from "src/pages/AnyPage";
 import GroupListPage from "src/pages/course/groups/GroupListPage.js";
 import GroupPage from "src/pages/course/groups/GroupPage.js";
 import Course from 'src/pages/course/CoursePage.js';
