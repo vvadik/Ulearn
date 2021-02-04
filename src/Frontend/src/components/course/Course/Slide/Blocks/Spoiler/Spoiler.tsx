@@ -1,9 +1,10 @@
 import React from "react";
 
-import { BlocksWrapper } from "src/components/course/Course/Slide/Blocks";
-import { Button } from "@skbkontur/react-ui";
+import { BlocksWrapper, Text } from "src/components/course/Course/Slide/Blocks";
+import { ArrowChevronDown, ArrowChevronUp } from "icons";
 
-const closeButtonText = "Свернуть спойлер";
+import styles from './Spoiler.less';
+
 
 interface Props {
 	text: string,
@@ -11,7 +12,6 @@ interface Props {
 	blocksId: string,
 	isPreviousBlockHidden: boolean,
 	hide: boolean,
-	closable?: boolean,
 }
 
 interface State {
@@ -40,6 +40,15 @@ class Spoiler extends React.Component<Props, State> {
 		}
 	}
 
+	toggleContent = (): void => {
+		const { contentVisible } = this.state;
+		if(contentVisible) {
+			this.hideContent();
+		} else {
+			this.showContent();
+		}
+	};
+
 	showContent = (): void => {
 		this.setState({
 			contentVisible: true,
@@ -53,46 +62,45 @@ class Spoiler extends React.Component<Props, State> {
 	};
 
 	render = (): React.ReactNode => {
-		const { text, renderedBlocks, hide, isPreviousBlockHidden, closable, } = this.props;
+		const { text, renderedBlocks, hide, isPreviousBlockHidden, } = this.props;
 		const { contentVisible, } = this.state;
-
-		if(contentVisible) {
-			return (
-				<React.Fragment>
-					{ this.getBlocksWithStyles(renderedBlocks) }
-					{ closable &&
-					<BlocksWrapper
-						withoutEyeHint={ hide && !isPreviousBlockHidden }
-						withoutTopPaddings
-						isBlock={ isPreviousBlockHidden !== undefined }
-						hide={ hide }
-					>
-						<Button use="success" onClick={ this.hideContent }>{ closeButtonText }</Button>
-					</BlocksWrapper>
-					}
-				</React.Fragment>
-			);
-		}
+		const titleClassName = contentVisible ? styles.opened : undefined;
 
 		return (
-			<BlocksWrapper
-				withoutEyeHint={ hide && isPreviousBlockHidden }
-				withoutTopPaddings={ hide === isPreviousBlockHidden }
-				isBlock={ isPreviousBlockHidden !== undefined }
-				hide={ hide }
-			>
-				<Button use="success" onClick={ this.showContent }>{ text }</Button>
-			</BlocksWrapper>
+			<>
+				<BlocksWrapper
+					withoutEyeHint={ hide && isPreviousBlockHidden }
+					withoutTopPaddings={ hide === isPreviousBlockHidden }
+					isBlock={ isPreviousBlockHidden !== undefined }
+					hide={ hide }
+					className={ titleClassName }
+				>
+					<Text>
+						<span onClick={ this.toggleContent } className={ styles.title }>
+							{ text }
+							<span className={ styles.arrow }>
+								{ contentVisible
+									? <ArrowChevronUp/>
+									: <ArrowChevronDown/> }
+							</span>
+						</span>
+					</Text>
+				</BlocksWrapper>
+				{ contentVisible && this.getBlocksWithStyles(renderedBlocks) }
+			</>
 		);
 	};
 
 	getBlocksWithStyles = (blocks: React.ReactNode[]): React.ReactNode => {
 		const { isPreviousBlockHidden, hide, } = this.props;
+		let prevBlockHidden = isPreviousBlockHidden;
+
 		return blocks.map((block) => {
 			const element = block as React.ReactElement;
 
 			if(typeof element.type === typeof BlocksWrapper) {
-				const withoutTopPaddings = hide === isPreviousBlockHidden;
+				const withoutTopPaddings = element.props.hide === prevBlockHidden;
+				prevBlockHidden = element.props.hide;
 
 				return <BlocksWrapper
 					{ ...element.props }
