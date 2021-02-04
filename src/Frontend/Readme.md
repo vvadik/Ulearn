@@ -54,7 +54,7 @@ window.config={
 }
 ```
 
-на локале это прописано в src/config.js (он берет адресс из settings.json).
+на локале это прописано в src/config.ts (он берет адресс из settings.json).
 
 ### Структура фронта
 
