@@ -61,6 +61,7 @@ namespace Database.DataContexts
 				"uLearn", $"XQueue watcher {watcher.Name}",
 				Language.CSharp, null
 			).ConfigureAwait(false);
+			await userSolutionsRepo.RunAutomaticChecking(submission, TimeSpan.FromSeconds(25), false);
 			db.XQueueExerciseSubmissions.Add(new XQueueExerciseSubmission
 			{
 				SubmissionId = submission.Id,
