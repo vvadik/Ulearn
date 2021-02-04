@@ -1,5 +1,4 @@
 ﻿const path = require("path");
-const postcssPresetEnv = require('postcss-preset-env');
 const base = require('../config/webpack.config.base');
 const { merge } = require('webpack-merge');
 
@@ -8,7 +7,7 @@ module.exports = {
 	addons: [
 		'@storybook/addon-essentials',
 	],
-	webpackFinal: async (config, { configType }) => {
+	webpackFinal: async (config) => {
 		config = merge([base, config]);
 
 		config.module.rules.find(
@@ -27,6 +26,20 @@ module.exports = {
 							modules: {
 								mode: 'local',
 								localIdentName: '[name]__[local]--[fullhash:base64:5]',
+							}
+						},
+					},
+					{
+						loader: 'postcss-loader',
+						options: {
+							postcssOptions: {
+								ident: 'postcss',
+								plugins: [
+									"postcss-preset-env",
+									{
+										autoprefixer: { flexbox: 'no-2009' }
+									},
+								]
 							}
 						},
 					},
@@ -49,12 +62,15 @@ module.exports = {
 					{
 						loader: 'postcss-loader',
 						options: {
-							ident: 'postcss',
-							plugins: [
-								postcssPresetEnv({
-									autoprefixer: { flexbox : 'no-2009' }
-								}),
-							],
+							postcssOptions: {
+								ident: 'postcss',
+								plugins: [
+									"postcss-preset-env",
+									{
+										autoprefixer: { flexbox: 'no-2009' }
+									},
+								]
+							}
 						},
 					},
 				],

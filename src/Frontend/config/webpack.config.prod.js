@@ -5,9 +5,7 @@ const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin')
 const { GenerateSW } = require('workbox-webpack-plugin');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
-const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const postcssPresetEnv = require('postcss-preset-env');
 const paths = require('./paths');
 const getClientEnvironment = require('./env');
 
@@ -130,10 +128,11 @@ module.exports = merge([base, {
 									postcssOptions: {
 										ident: 'postcss',
 										plugins: [
-											postcssPresetEnv({
-												autoprefixer: { flexbox : 'no-2009' }
-											}),
-										],
+											"postcss-preset-env",
+											{
+												autoprefixer: { flexbox: 'no-2009' }
+											},
+										]
 									}
 								},
 							},
@@ -163,10 +162,11 @@ module.exports = merge([base, {
 									postcssOptions: {
 										ident: 'postcss',
 										plugins: [
-											postcssPresetEnv({
-												autoprefixer: { flexbox : 'no-2009' }
-											}),
-										],
+											"postcss-preset-env",
+											{
+												autoprefixer: { flexbox: 'no-2009' }
+											},
+										]
 									}
 								},
 							},
@@ -257,6 +257,5 @@ module.exports = merge([base, {
 	],
 	optimization: {
 		minimize: true,
-		minimizer: [new TerserPlugin()],
 	},
 }]);
