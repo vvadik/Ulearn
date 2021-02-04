@@ -407,7 +407,13 @@
 		</xs:sequence>
 		<xs:attribute name="text" type="NonEmptyString" use="required" />
 		<xs:attribute name="hideQuizButton" type="xs:boolean" use="optional" />
-		<xs:attribute name="closable" type="xs:boolean" use="optional" />
+		<xs:attribute name="closable" type="xs:boolean" use="optional" >
+			<xs:annotation>
+				<xs:documentation>
+					Атрибут устарел. Все спойлеры можно закрыть.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		<xs:attribute name="hide" type="xs:boolean" use="optional" />
 	</xs:complexType>
 
