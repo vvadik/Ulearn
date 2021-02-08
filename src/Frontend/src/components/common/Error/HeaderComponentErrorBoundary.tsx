@@ -3,14 +3,13 @@ import React, { Component, ErrorInfo } from "react";
 import { Warning } from "icons";
 import { Toast } from "ui";
 
-import Raven from 'raven-js';
+import * as Sentry from "@sentry/react";
 import cn from "classnames";
 
 import styles from './style.less';
 
 interface Props {
 	className?: string;
-	componentName?: string;
 }
 
 interface State {
@@ -23,9 +22,8 @@ class HeaderComponentErrorBoundary extends Component<Props, State> {
 	};
 
 	componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-		const { componentName } = this.props;
 		this.setState({ error });
-		Raven.captureException(error, { extra: { ...errorInfo, componentName }, });
+		Sentry.captureException(error, { extra: { ...errorInfo, }, });
 		Toast.push('Произошла ошибка. Попробуйте перезагрузить страницу.');
 	}
 
@@ -36,7 +34,7 @@ class HeaderComponentErrorBoundary extends Component<Props, State> {
 		if(error) {
 			return (
 				<div className={ cn(styles.headerError, className || '') }
-					 onClick={ this.showRavenReportDialog }>
+					 onClick={ this.showSentryReportDialog }>
 					<Warning color="#f77" size={ 20 }/>
 				</div>
 			);
@@ -44,9 +42,8 @@ class HeaderComponentErrorBoundary extends Component<Props, State> {
 		return this.props.children;
 	}
 
-	showRavenReportDialog = (): void => {
-		Raven.lastEventId();
-		Raven.showReportDialog();
+	showSentryReportDialog = (): void => {
+		Sentry.showReportDialog();
 	};
 }
 

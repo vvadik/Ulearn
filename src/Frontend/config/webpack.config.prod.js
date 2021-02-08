@@ -53,8 +53,6 @@ module.exports = merge([base, {
 	bail: true,
 	entry: {
 		main: [
-			'./config/polyfills',
-			'./config/sentry',
 			paths.appIndexTsx
 		],
 		oldBrowser: [

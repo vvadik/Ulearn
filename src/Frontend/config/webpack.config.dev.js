@@ -21,8 +21,6 @@ module.exports = merge([base, {
 	devtool: 'eval-cheap-source-map',
 	entry: {
 		main: [
-			'./config/polyfills',
-			//'./config/sentry', we're rejecting all error coming from localhost, so uncommenting this line will just pollute console on errors
 			'react-dev-utils/webpackHotDevClient',
 			paths.appIndexTsx,
 		],

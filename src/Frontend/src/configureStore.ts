@@ -1,5 +1,6 @@
 import { applyMiddleware, compose, createStore, Store } from "redux";
 import thunkMiddleware from "redux-thunk";
+import * as Sentry from "@sentry/react";
 import rootReducer from "src/redux/reducers";
 
 export default function configureStore(): Store {
@@ -14,7 +15,9 @@ export default function configureStore(): Store {
 		middlewares = composeEnhancers(applyMiddleware(thunkMiddleware));
 
 	} else {
-		middlewares = applyMiddleware(thunkMiddleware);
+		const sentryReduxEnhancer = Sentry.createReduxEnhancer();
+
+		middlewares = compose(applyMiddleware(thunkMiddleware), sentryReduxEnhancer);
 	}
 
 	return createStore(

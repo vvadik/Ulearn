@@ -1,7 +1,7 @@
 import React, { Component, ErrorInfo } from "react";
 
 import { Toast } from "ui";
-import Raven from 'raven-js';
+import * as Sentry from "@sentry/react";
 
 interface State {
 	error: Error | null;
@@ -15,7 +15,7 @@ class ErrorBoundary extends Component<unknown, State> {
 
 	componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
 		this.setState({ error });
-		Raven.captureException(error, { extra: errorInfo });
+		Sentry.captureException(error, { extra: { ...errorInfo } });
 	}
 
 	render(): React.ReactNode {
@@ -37,9 +37,7 @@ class ErrorBoundary extends Component<unknown, State> {
 	}
 
 	onClick = (): void => {
-		if(Raven.lastEventId()) {
-			Raven.showReportDialog();
-		}
+		Sentry.showReportDialog();
 	};
 }
 
