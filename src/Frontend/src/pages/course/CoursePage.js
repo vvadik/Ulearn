@@ -30,7 +30,7 @@ const mapStateToProps = (state, { match, location, }) => {
 		courseInfo,
 		loadedCourseIds,
 		pageInfo: { isNavigationVisible, isReview, isLti, isAcceptedSolutions, isAcceptedAlert, },
-		isSlideReady: state.courses.isSlideReady,
+		isSlideReady: state.slides.isSlideReady,
 		units: mapCourseInfoToUnits(courseInfo),
 		user: state.account,
 		progress: state.userProgress.progress[courseId],
