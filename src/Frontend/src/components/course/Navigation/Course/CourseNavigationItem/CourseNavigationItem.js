@@ -12,7 +12,7 @@ import classnames from "classnames";
 import styles from "./CourseNavigationItem.less";
 import { isMobile, isTablet } from "src/utils/getDeviceType";
 
-function CourseNavigationItem({ title, isActive, isNotPublished, publicationDate, progress, onClick, }) {
+function CourseNavigationItem({ title, isActive, isNotPublished, publicationDate, progress, onClick, id, }) {
 	const classes = classnames(
 		styles.itemLink,
 		{ [styles.active]: isActive },
@@ -60,7 +60,7 @@ function CourseNavigationItem({ title, isActive, isNotPublished, publicationDate
 	}
 
 	function clickHandle() {
-		onClick(this.props.id);
+		onClick(id);
 	}
 
 	function hintClickHandle(e) {
