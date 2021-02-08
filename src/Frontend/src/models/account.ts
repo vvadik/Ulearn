@@ -23,6 +23,6 @@ export interface AccountInfo {
 export interface RolesInfo {
 	isSystemAdministrator: boolean,
 	courseRoles: { courseId: string, role: CourseRoleType }[];
-	courseAccesses: { courseId: string, accesses: CourseAccessType }[];
+	courseAccesses: { courseId: string, accesses: CourseAccessType[] }[];
 	groupsAsStudent: GroupAsStudentInfo[];
 }

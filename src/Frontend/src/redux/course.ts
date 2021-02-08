@@ -23,7 +23,7 @@ import { RateTypes } from "src/consts/rateTypes";
 import { Flashcard, UnitFlashcardsInfo } from "src/models/flashcards";
 import { SlideType } from "src/models/slide";
 
-interface CourseState {
+export interface CourseState {
 	currentCourseId?: string,
 	courseLoading: boolean,
 	courseLoadingErrorStatus: null | string,

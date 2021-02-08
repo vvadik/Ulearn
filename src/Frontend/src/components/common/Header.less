@@ -1,243 +1,34 @@
 @import "../../variables.less";
 
+@defaultColor: #f2f2f2;
+
 .header {
+  display: inline-flex;
+  justify-content: space-between;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
+  height: @headerHeight;
   z-index: @headerZIndex;
+
+  align-items: center;
+
   background-color: white;
-  font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+  font-family: @defaultFonts;
   font-size: 14px;
   color: #333;
-  height: @headerHeight;
+}
 
-  > * {
-    display: inline-flex;
-    vertical-align: top;
-    height: @headerHeight;
-  }
-
-  .header__logo {
-    color: @linkColor;
-    font-size: 18px;
-
-    a {
-      display: inline-block;
-      padding: 11px 20px 15px 23px;
-      text-decoration: none;
-      color: inherit;
-
-      &:hover, &:active, &:focus {
-        text-decoration: none;
-        color: @linkHoverColor;
-      }
-
-      @media (max-width: @maxPhoneWidth) {
-        padding-left: 15px;
-        padding-right: 15px;
-      }
-
-      @media (max-width: @maxLaptopWidth) {
-        padding-left: 14px;
-        padding-right: 14px;
-      }
-    }
-
-    .visible-only-phone {
-      color: #666;
-      font-size: 20px;
-    }
-  }
-
-  .header__course-menu,
-  .header__sysadmin-menu,
-  .header__my-courses-menu {
-    display: inline-block;
-    cursor: pointer;
-
-    > * {
-      display: inline-block;
-      vertical-align: top;
-      height: @headerHeight;
-    }
-
-    .caption {
-      display: inline-block;
-      color: #666;
-      border-color: #666;
-      height: @headerHeight;
-      padding: 14px 10px;
-
-      &:hover, &:focus, &:active {
-        text-decoration: none;
-      }
-
-      &:hover {
-        background-color: #f2f2f2;
-        cursor: pointer;
-      }
-
-      .courseName {
-        display: inline-block;
-        vertical-align: top;
-        max-width: 200px;
-        overflow-x: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-      }
-    }
-
-    .icon {
-      display: inline-block;
-      color: #666;
-      font-size: 20px;
-      height: 50px;
-      padding: 11px 15px 11px 0;
-    }
-  }
-
-  .header__menu {
-    position: fixed;
-    right: 0;
-    color: #666;
-    user-select: none;
-
-    > * {
-      display: inline-block;
-      vertical-align: top;
-      height: @headerHeight;
-    }
-
-    a {
-      color: #666;
-      border-color: #666;
-      height: @headerHeight;
-
-      &:hover, &:focus, &:active {
-        text-decoration: none;
-      }
-
-      &:hover {
-        background-color: #f2f2f2;
-      }
-    }
-
-    .header__notifications-icon {
-      padding: 11px 0 11px 18px;
-      height: @headerHeight;
-
-      .icon {
-        font-size: 20px;
-      }
-
-      .counter {
-        background-color: #F69C00;
-        color: white;
-        width: 18px;
-        height: 18px;
-        display: inline-block;
-        text-align: center;
-        border-radius: 9px;
-        font-size: 11px;
-        position: relative;
-        top: -10px;
-        left: -11px;
-        padding-top: 1px;
-      }
-
-      &.without-counter {
-        padding-right: 18px;
-
-        @media (max-width: @maxPhoneWidth) {
-          padding-left: 10px;
-          padding-right: 10px;
-        }
-      }
-
-      &:hover {
-        background-color: #f2f2f2;
-        cursor: pointer;
-      }
-    }
-
-    .opened > .header__notifications-icon {
-      background-color: #f2f2f2;
-      cursor: pointer;
-    }
-
-    .header__profile-link {
-      .icon {
-        margin-right: 6px;
-        font-size: 20px;
-      }
-
-      > a {
-        display: inline-block;
-        padding: 11px 15px;
-        text-decoration: none;
-
-        > * {
-          vertical-align: middle;
-        }
-
-        @media (max-width: @maxTabletWidth) {
-          .username {
-            display: inline-block;
-            max-width: 100px;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-          }
-        }
-
-        @media (max-width: @maxPhoneWidth) {
-          .username {
-            display: none;
-          }
-
-          padding-left: 7px;
-          padding-right: 7px;
-        }
-      }
-    }
-
-    .header__logout-link,
-    .header__login-link,
-    .header__registration-link {
-      > button,
-      > a {
-        display: inline-block;
-        padding: 15px 30px 13px 15px;
-        text-decoration: none;
-        border: none;
-        outline: none;
-        background: transparent;
-
-        @media (max-width: @maxLaptopWidth) {
-          & {
-            padding-right: 15px;
-          }
-        }
-      }
-    }
-
-    .header__registration-link > a {
-      padding-right: 15px;
-    }
-  }
-
-  .header__separator {
-    @margin: 10px;
-    width: 0;
-    height: (@headerHeight - 2 * @margin);
-    border-left: 2px solid #eee;
-    margin-top: @margin;
-    margin-bottom: @margin;
-  }
+.header a:hover, .header a:active, .header a:focus {
+  color: #666;
+  text-decoration: none;
 }
 
 .header:after {
+  position: fixed;
+  top: 50px;
+  left: 0;
   width: 100vw;
   content: '';
   display: block;
@@ -245,7 +36,81 @@
   background-color: @backgroundGray;
 }
 
-.dropdown-container {
+.controlsWrapper {
+  display: inline-flex;
+  padding-left: 8px;
+}
+
+.accountWrapper {
+  display: inline-flex;
+  padding-right: 8px;
+}
+
+.headerElement {
+  height: @headerHeight;
+  line-height: 50px;
+  padding: 0 8px;
+}
+
+.headerElement:hover, .headerElement:active, .headerElement:focus {
+  background-color: rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+}
+
+.separator {
+  @margin: 10px;
+  width: 0;
+  height: (@headerHeight - 2 * @margin);
+  border-left: 2px solid #eee;
+  margin-top: @margin;
+  margin-bottom: @margin;
+}
+
+.logo {
+  font-size: 14px;
+}
+
+.logo:hover, .logo:active, .logo:focus {
+  text-decoration: none;
+  background-color: unset;
+}
+
+.button {
+  border: none;
+  background: initial;
+  color: #666;
+}
+
+.button:focus, .button:active, .button.focus {
+  outline: none;
+}
+
+
+.profileLink {
+  display: flex;
+}
+
+.username {
+  max-width: 100px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.icon:not(:last-child) {
+  margin-right: 5px;
+}
+
+.opened {
+  background-color: @whiteSmoke;
+}
+
+.notificationsWithNew {
+  padding: 0 10px;
+  position: relative;
+}
+
+.notificationsContainer {
   background-color: white;
   border: 1px solid #d5d5d5;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
@@ -256,15 +121,28 @@
   @media (max-width: @maxPhoneWidth) {
     min-width: 300px;
     width: 100%;
-
-    .notifications__dropdown {
-      width: 100%;
-    }
   }
 }
 
-.notifications__dropdown {
+.notificationsDropdown {
+  width: 100%;
   list-style: none;
+}
+
+.notificationsCounter {
+  background-color: #F69C00;
+  color: white;
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  text-align: center;
+  border-radius: 9px;
+  font-size: 11px;
+  position: absolute;
+  top: 9px;
+  left: 17px;
+  padding-top: 1px;
+  line-height: 1.42;
 }
 
 .caret {
@@ -278,64 +156,26 @@
   border-left: 4px solid transparent;
 }
 
-.visible-only-phone {
-  display: initial;
-
-  @media (min-width: @minLaptopWidth) {
-    & {
-      display: none;
-    }
+@media (min-width: @minTabletWidth) {
+  .controlsWrapper > :first-child {
+    padding-left: 16px;
   }
-}
 
-.visible-at-least-tablet {
-  display: none;
-}
-
-.navMenuButton {
-  border: none;
-  background: initial;
-}
-
-.navMenuButton:focus, .navMenuButton:active {
-  outline: none;
-}
-
-.phoneHeaderElementsContainer {
-  display: inline-flex;
-
-  height: 100%;
-
-  margin-left: 10px;
-  margin-right: 10px;
-}
-
-.phoneHeaderElement {
-  width: 40px;
-
-  display: flex;
-  align-items: center;
-
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-.studentModeToggleContainer {
-  align-items: center;
-  padding-left: 5px;
-  padding-right: 5px;
+  .accountWrapper > :last-child {
+    padding-right: 16px;
+  }
 }
 
 @media (min-width: @minLaptopWidth) {
-  .phoneHeaderElementsContainer {
-    display: none;
+  .username {
+    max-width: unset;
   }
 
-  .visible-at-least-tablet {
-    display: inline-flex;
+  .headerElement {
+    padding: 0 15px;
   }
 
-  .studentModeToggleContainer {
-    padding: 14px 10px;
+  .logo {
+    font-size: 18px;
   }
 }

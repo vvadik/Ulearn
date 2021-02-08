@@ -1,44 +1,51 @@
-import React from "react";
+import React, { RefObject } from "react";
+import { Dispatch } from "redux";
+import { connect } from "react-redux";
+import { RouteComponentProps, } from "react-router-dom";
+import cn from "classnames";
 
 import { Toggle } from "ui";
 
 import { studentModeToggleAction, } from "src/actions/instructor";
 import getSlideInfo from "src/utils/getSlideInfo";
 
-import { Dispatch } from "redux";
-
-import { connect } from "react-redux";
-import { RouteComponentProps, withRouter } from "react-router-dom";
-
 import { RootState } from "src/models/reduxState";
+import { DeviceType } from "src/consts/deviceType";
 
-import styles from "./StudentMode.less";
+import styles from './StudentMode.less';
 
 interface Props extends RouteComponentProps {
-	containerClass?: string,
-	isStudentMode: boolean,
-	setStudentMode: (value: boolean) => void,
+	isStudentMode: boolean;
+	deviceType: DeviceType;
+	containerClass?: string;
+	setStudentMode: (value: boolean) => void;
 }
 
-function StudentMode({ isStudentMode, setStudentMode, containerClass, location, }: Props) {
+function StudentMode({ isStudentMode, setStudentMode, location, deviceType, containerClass, }: Props) {
 	const slideInfo = getSlideInfo(location);
+	const ref: RefObject<HTMLSpanElement> = React.createRef();
 
 	if(!slideInfo || slideInfo.isReview || slideInfo.isLti) {
 		return null;
 	}
 
 	return (
-		<div className={ containerClass }>
+		<span className={ cn(styles.toggleWrapper, containerClass,) } onClick={ onClick } ref={ ref }>
 			<Toggle
 				checked={ isStudentMode }
-				onValueChange={ showForStudentToggleChanged }
-			/>
-			<span className={ styles.toggleText }> Режим студента </span>
-		</div>
+				onValueChange={ showForStudentToggleChanged }/>
+			{ deviceType !== DeviceType.mobile && <span> Режим студента </span> }
+		</span>
 	);
 
 	function showForStudentToggleChanged(value: boolean) {
 		setStudentMode(value);
+	}
+
+	function onClick(e: React.MouseEvent) {
+		if(e.target === ref.current) {
+			setStudentMode(!isStudentMode);
+		}
 	}
 }
 
@@ -51,4 +58,4 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
 	setStudentMode: (isStudentMode: boolean) => dispatch(studentModeToggleAction(isStudentMode)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(StudentMode));
+export default connect(mapStateToProps, mapDispatchToProps)(StudentMode);

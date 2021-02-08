@@ -11,7 +11,7 @@ import { ThemeContext, Toast } from "ui";
 import ErrorBoundary from "src/components/common/ErrorBoundary";
 import NotFoundErrorBoundary from "src/components/common/Error/NotFoundErrorBoundary";
 import YandexMetrika from "src/components/common/YandexMetrika";
-import Header from "src/components/common/Header.js";
+import Header from "src/components/common/Header";
 import EmailNotConfirmedModal from "src/components/notificationModal/EmailNotConfirmedModal";
 import Router from "src/Router";
 

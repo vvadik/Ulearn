@@ -9,7 +9,7 @@ import { ExerciseFormHeader } from "./ExerciseFormHeader/ExerciseFormHeader";
 import Controls from "./Controls/Controls";
 import LoginForContinue from "src/components/notificationModal/LoginForContinue";
 import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent.js";
-import { HelpLite, Info } from 'icons';
+import { Info } from 'icons';
 
 import { darkFlat } from "src/uiTheme";
 
@@ -26,7 +26,6 @@ import {
 	SubmissionColor,
 	SubmissionIsLast,
 } from "./ExerciseUtils";
-import { isMobile, isTablet } from "src/utils/getDeviceType";
 
 import { Language, } from "src/consts/languages";
 import { constructPathToAcceptedSolutions, } from "src/consts/routes";

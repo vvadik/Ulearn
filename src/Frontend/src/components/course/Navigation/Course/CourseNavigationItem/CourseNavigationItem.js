@@ -12,21 +12,18 @@ import classnames from "classnames";
 import styles from "./CourseNavigationItem.less";
 import { isMobile, isTablet } from "src/utils/getDeviceType";
 
-class CourseNavigationItem extends Component {
-	render() {
-		const { title, isActive, isNotPublished, publicationDate } = this.props;
+function CourseNavigationItem({ title, isActive, isNotPublished, publicationDate, progress, onClick, }) {
+	const classes = classnames(
+		styles.itemLink,
+		{ [styles.active]: isActive },
+	);
 
-		const classes = classnames(
-			styles.itemLink,
-			{ [styles.active]: isActive },
-		);
-
-		return (
-			<li className={ styles.root } onClick={ this.clickHandle }>
-				<div className={ classes }>
+	return (
+		<li className={ styles.root } onClick={ clickHandle }>
+			<div className={ classes }>
 					<span className={ styles.text }>
 						{ isNotPublished &&
-						<span className={ styles.isNotPublishedIcon } onClick={ this.hintClickHandle }>
+						<span className={ styles.isNotPublishedIcon } onClick={ hintClickHandle }>
 								{ publicationDate
 									?
 									<Hint text={ `Этот модуль будет опубликован ${ getDateDDMMYY(publicationDate) }` }>
@@ -41,14 +38,12 @@ class CourseNavigationItem extends Component {
 						}
 						{ title }
 					</span>
-					{ this.renderProgress() }
-				</div>
-			</li>
-		);
-	}
+				{ renderProgress() }
+			</div>
+		</li>
+	);
 
-	renderProgress() {
-		const { progress, isActive } = this.props;
+	function renderProgress() {
 		const percentage = progress.current / progress.max;
 
 		if(percentage > 0) {
@@ -64,15 +59,15 @@ class CourseNavigationItem extends Component {
 		}
 	}
 
-	clickHandle = () => {
-		this.props.onClick(this.props.id);
-	};
+	function clickHandle() {
+		onClick(this.props.id);
+	}
 
-	hintClickHandle = (e) => {
+	function hintClickHandle(e) {
 		if(isMobile() || isTablet()) {
 			e.stopPropagation();
 		}
-	};
+	}
 }
 
 CourseNavigationItem.propTypes = courseMenuItemType;

@@ -12,11 +12,11 @@ export function isMobile(): boolean {
 }
 
 export function isTablet(): boolean {
-	return !isMobile() && window.matchMedia("(max-width: 1280px)").matches;
+	return window.matchMedia("(min-width: 800px)").matches && window.matchMedia("(max-width: 1280px)").matches;
 }
 
 export function isLaptop(): boolean {
-	return !isTablet() && window.matchMedia("(max-width: 1600px)").matches;
+	return window.matchMedia("(min-width: 1280px)").matches && window.matchMedia("(max-width: 1600px)").matches;
 }
 
 export function isDesktop(): boolean {
@@ -24,17 +24,17 @@ export function isDesktop(): boolean {
 }
 
 export function getDeviceType(): DeviceType {
-	if(isMobile()) {
-		return DeviceType.mobile;
-	}
-
-	if(isTablet()) {
-		return DeviceType.tablet;
+	if(isDesktop()) {
+		return DeviceType.desktop;
 	}
 
 	if(isLaptop()) {
 		return DeviceType.laptop;
 	}
 
-	return DeviceType.desktop;
+	if(isTablet()) {
+		return DeviceType.tablet;
+	}
+
+	return DeviceType.mobile;
 }

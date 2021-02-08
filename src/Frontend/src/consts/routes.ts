@@ -1,6 +1,7 @@
 import { buildQuery } from "src/utils";
 
 export const coursePath = "course";
+export const adminCoursePath = "/admin/courses";
 export const flashcards = "flashcards";
 export const flashcardsPreview = "preview";
 export const commentsPath = "comments";
@@ -16,6 +17,10 @@ export const accountPath = '/account/manage';
 export const signalrWS = 'ws';
 export const login = 'login';
 export const register = 'account/register';
+export const externalLoginConfirmation = login + '/externalLoginConfirmation';
+export const externalLoginCallback = login + '/externalLoginCallback';
+export const feed = 'feed';
+export const notificationsFeed = feed + '/notificationsPartial';
 
 export function constructPathToSlide(courseId: string, slideId: string): string {
 	return `/${ coursePath }/${ courseId }/${ slideId }`;

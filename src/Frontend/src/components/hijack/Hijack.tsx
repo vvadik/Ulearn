@@ -15,7 +15,7 @@ const hijackCookieName = 'ulearn.auth.hijack';
 const hijackReturnControllerPath = '/Account/ReturnHijack';
 
 interface Props extends ReactCookieProps {
-	name: string,
+	name?: string | null,
 	setHijack: (isHijack: boolean) => void;
 	isHijacked: boolean,
 }

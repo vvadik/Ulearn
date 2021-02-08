@@ -20,7 +20,7 @@ export interface AccountUserRolesUpdateAction {
 
 	isSystemAdministrator: boolean,
 	roleByCourse: { [courseId: string]: CourseRoleType };
-	accessesByCourse: { [courseId: string]: CourseAccessType };
+	accessesByCourse: { [courseId: string]: CourseAccessType[] };
 	groupsAsStudent: GroupAsStudentInfo[];
 }
 

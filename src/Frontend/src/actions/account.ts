@@ -37,7 +37,7 @@ export const rolesUpdateAction = ({
 		courseRoles.forEach(c => courseRolesObject[c.courseId.toLowerCase()] = c.role);
 	}
 
-	const courseAccessesObject: { [courseId: string]: CourseAccessType } = {};
+	const courseAccessesObject: { [courseId: string]: CourseAccessType[] } = {};
 	courseAccesses.forEach(c => courseAccessesObject[c.courseId.toLowerCase()] = c.accesses);
 
 	return {

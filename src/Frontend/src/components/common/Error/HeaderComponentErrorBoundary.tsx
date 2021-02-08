@@ -9,11 +9,12 @@ import cn from "classnames";
 import styles from './style.less';
 
 interface Props {
-	className?: string,
+	className?: string;
+	componentName?: string;
 }
 
 interface State {
-	error: Error | null,
+	error: Error | null;
 }
 
 class HeaderComponentErrorBoundary extends Component<Props, State> {
@@ -22,8 +23,9 @@ class HeaderComponentErrorBoundary extends Component<Props, State> {
 	};
 
 	componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+		const { componentName } = this.props;
 		this.setState({ error });
-		Raven.captureException(error, { extra: errorInfo });
+		Raven.captureException(error, { extra: { ...errorInfo, componentName }, });
 		Toast.push('Произошла ошибка. Попробуйте перезагрузить страницу.');
 	}
 

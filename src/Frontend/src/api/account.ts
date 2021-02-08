@@ -32,21 +32,19 @@ export function getRoles() {
 	};
 }
 
-export function logout() {
-	return (): Promise<void> => {
-		return api.post<LogoutInfo>('account/logout')
-			.then(json => {
-				if(json.logout) {
-					localStorage.removeItem('exercise_solutions');
-					api.clearApiJwtToken();
-					redirectToMainPage();
-				}
-			});
+export function logout(): Promise<void | LogoutInfo> {
+	return api.post<LogoutInfo>('account/logout')
+		.then(json => {
+			if(json.logout) {
+				localStorage.removeItem('exercise_solutions');
+				api.clearApiJwtToken();
+				redirectToMainPage();
+			}
+		});
 
-		function redirectToMainPage() {
-			const parser = document.createElement('a');
-			parser.href = window.location.href;
-			window.location.href = parser.protocol + "//" + parser.host;
-		}
-	};
+	function redirectToMainPage() {
+		const parser = document.createElement('a');
+		parser.href = window.location.href;
+		window.location.href = parser.protocol + "//" + parser.host;
+	}
 }

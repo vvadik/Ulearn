@@ -28,7 +28,7 @@ export interface AccountState {
 	accountProblems: AccountProblem[];
 	systemAccesses: SystemAccessType[];
 	roleByCourse: { [courseId: string]: CourseRoleType };
-	accessesByCourse: { [courseId: string]: CourseAccessType };
+	accessesByCourse: { [courseId: string]: CourseAccessType[] };
 	groupsAsStudent: GroupAsStudentInfo[];
 }
 
