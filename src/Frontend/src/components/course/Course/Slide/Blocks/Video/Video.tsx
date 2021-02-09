@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 
 import YouTube, { Options } from 'react-youtube';
+import { DropdownMenu, Link, MenuItem, } from "ui";
 import { BlocksWrapper, Text, } from "src/components/course/Course/Slide/Blocks";
-import { ArrowChevronUp, ArrowChevronDown, } from "@skbkontur/react-icons";
-import { Link } from "@skbkontur/react-ui";
+import { ArrowChevronDown, ArrowChevronUp, } from "icons";
 
 import classNames from 'classnames';
 import { Cookies, withCookies } from 'react-cookie';
+
+import { DeviceType } from "src/consts/deviceType";
 
 import styles from './Video.less';
 
@@ -33,6 +35,7 @@ interface Props {
 	containerClassName: string,
 	hide: boolean,
 	cookies: Cookies,
+	deviceType: DeviceType,
 }
 
 interface State {
@@ -41,11 +44,23 @@ interface State {
 
 class Video extends React.Component<Props, State> {
 	private ytPlayer: YT.Player | null = null;
+	private readonly rateItems: ReactElement[] = [];
 
 	constructor(props: Props) {
 		super(props);
 
-		const { openAnnotation, } = this.props;
+		const { openAnnotation, deviceType, } = this.props;
+
+		const step = 0.25;
+		const maxRate = 2;
+		const length = maxRate / step;
+		this.rateItems = deviceType === DeviceType.mobile
+			? Array.from({ length }, (x, i) => maxRate - i * step).map(
+				i => <MenuItem
+					onClick={ () => this.onRateChange(i) }>
+					{ i }x
+				</MenuItem>)
+			: [];
 
 		this.state = {
 			showedAnnotation: openAnnotation,
@@ -53,19 +68,30 @@ class Video extends React.Component<Props, State> {
 	}
 
 	componentDidUpdate(prevProps: Props) {
-		if(prevProps.openAnnotation !== this.props.openAnnotation) {
-			this.setState({ showedAnnotation: this.props.openAnnotation });
+		const { cookies, openAnnotation, } = this.props;
+
+		if(prevProps.openAnnotation !== openAnnotation) {
+			this.setState({ showedAnnotation: openAnnotation });
 		}
 
 		if(this.ytPlayer) {
-			const newVideoRate = parseFloat(this.props.cookies.get(videoCookieName) || '1');
+			const newVideoRate = parseFloat(cookies.get(videoCookieName) || '1');
 
 			this.ytPlayer.setPlaybackRate(newVideoRate);
 		}
 	}
 
 	render() {
-		const { videoId, className, containerClassName, autoplay, googleDocLink, hide, } = this.props;
+		const {
+			videoId,
+			className,
+			containerClassName,
+			autoplay,
+			googleDocLink,
+			hide,
+			cookies,
+			deviceType,
+		} = this.props;
 
 		const containerClassNames = classNames(styles.videoContainer, { [containerClassName]: containerClassName });
 		const frameClassNames = classNames(styles.frame, { [className]: className });
@@ -77,6 +103,7 @@ class Video extends React.Component<Props, State> {
 				rel: 0,
 			},
 		};
+		const rate = parseFloat(cookies.get(videoCookieName) || '1');
 
 		return (
 			<React.Fragment>
@@ -88,6 +115,18 @@ class Video extends React.Component<Props, State> {
 					onReady={ this.onReady }
 					onPlaybackRateChange={ this.onPlaybackRateChange }
 				/>
+				{ deviceType === DeviceType.mobile &&
+				<BlocksWrapper withoutBottomPaddings className={ styles.playbackRateWrapper }>
+					<span className={ styles.playbackDropdown }> Скорость видео: </span>
+					<DropdownMenu caption={
+						<span className={ styles.playbackCaption }>
+							{ rate }x
+							<ArrowChevronDown className={ styles.playbackArrow }/>
+						</span>
+					}>
+						{ this.rateItems }
+					</DropdownMenu>
+				</BlocksWrapper> }
 				{ hide && <BlocksWrapper hide isBlock withoutBottomPaddings={ !!googleDocLink }>
 					<Text className={ styles.withoutBottomMargins }>
 						<p>Видео выше скрыто</p>
@@ -98,8 +137,16 @@ class Video extends React.Component<Props, State> {
 		);
 	}
 
+	onRateChange = (rate: number): void => {
+		const { cookies } = this.props;
 
-	onReady = (event: { target: YT.Player }): void => {
+		cookies.set(videoCookieName, rate);
+	};
+
+	onReady = (event: {
+			target: YT.Player
+		}
+	): void => {
 		const { cookies } = this.props;
 
 		this.ytPlayer = event.target;
@@ -115,7 +162,7 @@ class Video extends React.Component<Props, State> {
 
 	renderAnnotation = () => {
 		const { showedAnnotation } = this.state;
-		const { annotation, googleDocLink, hide, annotationWithoutBottomPaddings } = this.props;
+		const { annotation, googleDocLink, hide, annotationWithoutBottomPaddings, } = this.props;
 
 		return (
 			<BlocksWrapper
