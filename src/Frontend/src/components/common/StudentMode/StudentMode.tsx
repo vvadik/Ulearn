@@ -23,19 +23,20 @@ interface Props extends RouteComponentProps {
 
 function StudentMode({ isStudentMode, setStudentMode, location, deviceType, containerClass, }: Props) {
 	const slideInfo = getSlideInfo(location);
-	const ref: RefObject<HTMLSpanElement> = React.createRef();
+	const refButton: RefObject<HTMLButtonElement> = React.createRef();
+	const refSpan: RefObject<HTMLSpanElement> = React.createRef();
 
 	if(!slideInfo || slideInfo.isReview || slideInfo.isLti) {
 		return null;
 	}
 
 	return (
-		<span className={ cn(styles.toggleWrapper, containerClass,) } onClick={ onClick } ref={ ref }>
+		<button className={ cn(styles.toggleWrapper, containerClass,) } onClick={ onClick } ref={ refButton }>
 			<Toggle
 				checked={ isStudentMode }
 				onValueChange={ showForStudentToggleChanged }/>
-			{ deviceType !== DeviceType.mobile && <span> Режим студента </span> }
-		</span>
+			{ deviceType !== DeviceType.mobile && <span ref={ refSpan }> Режим студента </span> }
+		</button>
 	);
 
 	function showForStudentToggleChanged(value: boolean) {
@@ -43,7 +44,7 @@ function StudentMode({ isStudentMode, setStudentMode, location, deviceType, cont
 	}
 
 	function onClick(e: React.MouseEvent) {
-		if(e.target === ref.current) {
+		if(e.target === refButton.current || e.target === refSpan.current) {
 			setStudentMode(!isStudentMode);
 		}
 	}
