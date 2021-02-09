@@ -125,7 +125,7 @@ class NotificationsMenu extends Component<Props, State> {
 		const className = cn(
 			styles.headerElement,
 			styles.button,
-			{ [styles.notificationsWithNew]: counter !== 0 },
+			{ [styles.notificationsWithCounter]: counter !== 0 },
 			{ [styles.opened]: isOpened }
 		);
 
