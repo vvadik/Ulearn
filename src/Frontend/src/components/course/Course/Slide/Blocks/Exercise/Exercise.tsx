@@ -354,9 +354,14 @@ class Exercise extends React.Component<Props, State> {
 				ctrlSpace: "autocomplete",
 				".": function (cm: Editor) {
 					setTimeout(function () {
-						cm.execCommand("autocomplete");
+						const cursorPosition = cm.getCursor();
+						const char = cm.getLine(cursorPosition.line).substr(Math.max(cursorPosition.ch - 1, 0), 1);
+
+						if(char === '.') {
+							cm.execCommand("autocomplete");
+						}
 					}, 100);
-					cm.replaceSelection('.');
+					return CodeMirror.Pass;
 				}
 			},
 		};
