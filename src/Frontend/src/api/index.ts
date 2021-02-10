@@ -15,7 +15,7 @@ import * as signalR from "@microsoft/signalr";
 
 const API_JWT_TOKEN_UPDATED = "API_JWT_TOKEN_UPDATED";
 let apiJwtToken = "";
-let refreshApiJwtTokenPromise: Promise<string> | undefined = undefined;
+let refreshApiJwtTokenPromise: Promise<string | ErrorWithResponse> | undefined = undefined;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 let serverErrorHandler = (error?: string): void => {
 	return;
@@ -29,7 +29,7 @@ class ErrorWithResponse extends Error {
 	response?: Response;
 }
 
-function refreshApiJwtToken(): Promise<string> {
+function refreshApiJwtToken(): Promise<string | ErrorWithResponse> {
 	return fetch(config.api.endpoint + "account/token", { credentials: "include", method: "POST" })
 		.then(response => {
 			if(response.status !== 200) {
@@ -70,10 +70,9 @@ function request<T>(url: string, options?: RequestInit, isRetry?: boolean): Prom
 				return request(url, options, true);
 			});
 	}
-
 	options = options || {};
 	options.credentials = options.credentials || "include";
-	options.headers = new Headers(options.headers);
+	options.headers = new Headers(options.headers || {});
 	options.headers.set('Authorization', "Bearer " + apiJwtToken);
 
 	return fetch(config.api.endpoint + url, options)
