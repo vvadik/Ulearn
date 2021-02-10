@@ -64,7 +64,6 @@ interface Props {
 	showHiddenBlocks: boolean,
 	slideInfo: ShortSlideInfo,
 	isLti: boolean,
-	deviceType: DeviceType,
 }
 
 class Slide extends React.Component<Props> {
@@ -181,7 +180,7 @@ class Slide extends React.Component<Props> {
 	};
 
 	addAdditionalPropsToBlocks = (slideBlocks: Block<BlockTypes>[]) => {
-		const { slideId, courseId, showHiddenBlocks, slideInfo, deviceType, } = this.props;
+		const { slideId, courseId, showHiddenBlocks, slideInfo, } = this.props;
 		const { autoplay } = queryString.parse(window.location.search);
 		const { maxScore } = slideInfo;
 
@@ -229,7 +228,6 @@ class Slide extends React.Component<Props> {
 						(i < slideBlocks.length - 1
 							? slideBlocks[i + 1].$type !== BlockTypes.video
 							: true);
-					videoBlock.deviceType = deviceType;
 					break;
 				}
 				case BlockTypes.code: {
@@ -297,15 +295,14 @@ class Slide extends React.Component<Props> {
 }
 
 const mapStateToProps = (state: RootState, { courseId, slideId, }: MatchParams) => {
-	const { slides, device, } = state;
+	const { slides, } = state;
 	const { slidesByCourses, slideLoading } = slides;
 
-	const props: Pick<Props, 'courseId' | 'slideId' | 'slideLoading' | 'slideBlocks' | 'deviceType'> = {
+	const props: Pick<Props, 'courseId' | 'slideId' | 'slideLoading' | 'slideBlocks'> = {
 		courseId,
 		slideId,
 		slideLoading,
 		slideBlocks: undefined,
-		deviceType: device.deviceType,
 	};
 
 	const coursesSlides = slidesByCourses[courseId];

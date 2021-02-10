@@ -58,7 +58,6 @@ interface VideoBlock extends Block<BlockTypes.video> {
 	autoplay: boolean,
 	openAnnotation: boolean,
 	annotationWithoutBottomPaddings: boolean,
-	deviceType: DeviceType,
 }
 
 interface ExerciseBlock extends Block<BlockTypes.exercise> {

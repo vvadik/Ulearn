@@ -1,14 +1,12 @@
-import React, { ReactElement } from 'react';
+import React from 'react';
 
 import YouTube, { Options } from 'react-youtube';
-import { DropdownMenu, Link, MenuItem, } from "ui";
+import { Link, } from "ui";
 import { BlocksWrapper, Text, } from "src/components/course/Course/Slide/Blocks";
 import { ArrowChevronDown, ArrowChevronUp, } from "icons";
 
 import classNames from 'classnames';
 import { Cookies, withCookies } from 'react-cookie';
-
-import { DeviceType } from "src/consts/deviceType";
 
 import styles from './Video.less';
 
@@ -35,7 +33,6 @@ interface Props {
 	containerClassName: string,
 	hide: boolean,
 	cookies: Cookies,
-	deviceType: DeviceType,
 }
 
 interface State {
@@ -44,23 +41,11 @@ interface State {
 
 class Video extends React.Component<Props, State> {
 	private ytPlayer: YT.Player | null = null;
-	private readonly rateItems: ReactElement[] = [];
 
 	constructor(props: Props) {
 		super(props);
 
-		const { openAnnotation, deviceType, } = this.props;
-
-		const step = 0.25;
-		const maxRate = 2;
-		const length = maxRate / step;
-		this.rateItems = deviceType === DeviceType.mobile
-			? Array.from({ length }, (x, i) => maxRate - i * step).map(
-				i => <MenuItem
-					onClick={ () => this.onRateChange(i) }>
-					{ i }x
-				</MenuItem>)
-			: [];
+		const { openAnnotation, } = this.props;
 
 		this.state = {
 			showedAnnotation: openAnnotation,
@@ -89,8 +74,6 @@ class Video extends React.Component<Props, State> {
 			autoplay,
 			googleDocLink,
 			hide,
-			cookies,
-			deviceType,
 		} = this.props;
 
 		const containerClassNames = classNames(styles.videoContainer, { [containerClassName]: containerClassName });
@@ -103,7 +86,6 @@ class Video extends React.Component<Props, State> {
 				rel: 0,
 			},
 		};
-		const rate = parseFloat(cookies.get(videoCookieName) || '1');
 
 		return (
 			<React.Fragment>
@@ -115,18 +97,6 @@ class Video extends React.Component<Props, State> {
 					onReady={ this.onReady }
 					onPlaybackRateChange={ this.onPlaybackRateChange }
 				/>
-				{ deviceType === DeviceType.mobile &&
-				<BlocksWrapper withoutBottomPaddings className={ styles.playbackRateWrapper }>
-					<span className={ styles.playbackDropdown }> Скорость видео: </span>
-					<DropdownMenu caption={
-						<span className={ styles.playbackCaption }>
-							{ rate }x
-							<ArrowChevronDown className={ styles.playbackArrow }/>
-						</span>
-					}>
-						{ this.rateItems }
-					</DropdownMenu>
-				</BlocksWrapper> }
 				{ hide && <BlocksWrapper hide isBlock withoutBottomPaddings={ !!googleDocLink }>
 					<Text className={ styles.withoutBottomMargins }>
 						<p>Видео выше скрыто</p>
@@ -139,7 +109,6 @@ class Video extends React.Component<Props, State> {
 
 	onRateChange = (rate: number): void => {
 		const { cookies } = this.props;
-
 		cookies.set(videoCookieName, rate);
 	};
 
