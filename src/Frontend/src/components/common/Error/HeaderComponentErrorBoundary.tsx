@@ -33,7 +33,7 @@ class HeaderComponentErrorBoundary extends Component<Props, State> {
 
 		if(error) {
 			return (
-				<div className={ cn(styles.headerError, className || '') }
+				<div className={ cn(className || '') }
 					 onClick={ this.showSentryReportDialog }>
 					<Warning color="#f77" size={ 20 }/>
 				</div>

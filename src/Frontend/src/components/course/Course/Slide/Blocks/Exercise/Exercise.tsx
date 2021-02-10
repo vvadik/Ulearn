@@ -42,7 +42,7 @@ import { ReviewInfoRedux, SubmissionInfoRedux } from "src/models/reduxState";
 import { SlideUserProgress } from "src/models/userProgress";
 import { ExerciseBlockProps } from "src/models/slide";
 
-import CodeMirror, { Doc, Editor, EditorChange, EditorConfiguration, TextMarker } from "codemirror";
+import CodeMirror, { Doc, Editor, EditorChange, EditorConfiguration, MarkerRange, TextMarker } from "codemirror";
 import 'codemirror/addon/edit/matchbrackets';
 import 'codemirror/addon/hint/show-hint';
 import 'codemirror/addon/hint/show-hint.css';
@@ -853,7 +853,7 @@ class Exercise extends React.Component<Props, State> {
 		if(selectedReviewId >= 0) {
 			const selectedReview = newCurrentReviews.find(r => r.id === selectedReviewId);
 			if(selectedReview) {
-				const { from, to, } = selectedReview.marker.find();
+				const { from, to, } = selectedReview.marker.find() as MarkerRange;
 				selectedReview.marker.clear();
 				selectedReview.marker =
 					this.highlightLine(to.line, to.ch, from.line, from.ch, styles.reviewCode, exerciseCodeDoc);
@@ -864,7 +864,7 @@ class Exercise extends React.Component<Props, State> {
 		if(id >= 0) {
 			const review = newCurrentReviews.find(r => r.id === id);
 			if(review) {
-				const { from, to, } = review.marker.find();
+				const { from, to, } = review.marker.find() as MarkerRange;
 				review.marker.clear();
 				review.marker =
 					this.highlightLine(to.line, to.ch, from.line, from.ch, styles.selectedReviewCode, exerciseCodeDoc);
@@ -990,7 +990,7 @@ class Exercise extends React.Component<Props, State> {
 		}
 	};
 
-	deleteReviewComment = (reviewId: number, commentId: number,) => {
+	deleteReviewComment = (reviewId: number, commentId: number,): void => {
 		const { deleteReviewComment, courseId, slideId, } = this.props;
 		const { currentSubmission, } = this.state;
 
