@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 import api from "src/api";
-import { saveAs } from "file-saver";
 
 import Navigation from "../Navigation";
 import AnyPage from 'src/pages/AnyPage';
@@ -78,10 +77,6 @@ class Course extends Component {
 			loadUserProgress(courseId, user.id);
 		}
 
-		if(isAuthenticated) {
-			window.reloadUserProgress = () => loadUserProgress(courseId, user.id); //adding hack to let legacy page scripts to reload progress,TODO(rozentor) remove it after implementing react task slides
-		}
-
 		/* TODO: (rozentor) for now it copied from downloadedHtmlContetn, which run documentReadyFunctions scripts. In future, we will have no scripts in back, so it can be removed totally ( in other words, remove it when DownloadedHtmlContent will be removed)  */
 		(window.documentReadyFunctions || []).forEach(f => f());
 	}
@@ -122,26 +117,13 @@ class Course extends Component {
 			progress,
 			isHijacked,
 			updateVisitedSlide,
-			isStudentMode,
-			history,
-			pageInfo,
 		} = this.props;
-		const { title, currentSlideInfo, currentSlideId, } = this.state;
+		const { title, currentSlideInfo, } = this.state;
 		const { isAuthenticated } = user;
 
 		if(isAuthenticated !== prevProps.user.isAuthenticated) {
 			loadCourse(courseId);
 			loadUserProgress(courseId, user.id);
-			window.downloadFile = (url) => fetch(url, { credentials: 'include' }).then(response => {
-				const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-				let contentDisposition = response.headers.get('Content-Disposition');
-				let matches = filenameRegex.exec(contentDisposition);
-				if(matches != null && matches[1]) {
-					let filename = matches[1].replace(/['"]/g, '');
-					response.blob().then(blob => saveAs(blob, filename, false));
-				}
-			});
-			window.reloadUserProgress = () => loadUserProgress(courseId, user.id); //adding hack to let legacy page scripts to reload progress,TODO(rozentor) remove it after implementing react task slides
 		}
 
 		if(title !== prevState.title) {
