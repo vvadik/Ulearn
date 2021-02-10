@@ -25,9 +25,9 @@ function OutputButton({
 				<DocumentLite/>
 			</span>
 			<ShowControlsTextContext.Consumer>
-			{
-				(showControlsTextContext) => (showControlsTextContext || showControlsText) && (showOutput ? texts.controls.output.hide : texts.controls.output.show)
-			}
+				{
+					(showControlsTextContext) => (showControlsTextContext || showControlsText) && (showOutput ? texts.controls.output.hide : texts.controls.output.show)
+				}
 			</ShowControlsTextContext.Consumer>
 		</span>
 	);

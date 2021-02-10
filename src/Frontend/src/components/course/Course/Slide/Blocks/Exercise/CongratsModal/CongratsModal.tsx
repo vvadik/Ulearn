@@ -20,6 +20,7 @@ class CongratsModal extends React.Component<CongratsModalProps> {
 	componentDidMount(): void {
 		document.querySelector('body')
 			?.classList.add(styles.bodyOverflow);
+		this.overlay.current?.focus();
 	}
 
 	componentWillUnmount(): void {
@@ -31,7 +32,8 @@ class CongratsModal extends React.Component<CongratsModalProps> {
 		const { waitingForManualChecking, score, showAcceptedSolutions, onClose, } = this.props;
 
 		return (
-			<div ref={ this.overlay }
+			<div tabIndex={ 0 }
+				 ref={ this.overlay }
 				 className={ styles.overlay }
 				 onClick={ this.handleCongratsOverlayClick }>
 				<div className={ styles.modal }>

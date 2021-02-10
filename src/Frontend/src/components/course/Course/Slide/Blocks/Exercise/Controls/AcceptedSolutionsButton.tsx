@@ -41,9 +41,9 @@ export default class AcceptedSolutionsButton
 							<EyeOpened/>
 						</span>
 						<ShowControlsTextContext.Consumer>
-						{
-							(showControlsTextContext) => (showControlsText || showControlsTextContext) && texts.controls.acceptedSolutions.text
-						}
+							{
+								(showControlsTextContext) => (showControlsText || showControlsTextContext) && texts.controls.acceptedSolutions.text
+							}
 						</ShowControlsTextContext.Consumer>
 					</Tooltip>
 				</span>

@@ -10,7 +10,7 @@ import { AttemptsStatistics } from "src/models/exercise";
 import styles from './Controls.less';
 
 import texts from "../Exercise.texts";
-import { DocumentLite, Statistic } from "@skbkontur/react-icons";
+import { Statistic } from "@skbkontur/react-icons";
 
 
 export interface Props extends IControlWithText {
@@ -32,16 +32,19 @@ function StatisticsHint({
 
 	return (
 		<span className={ statisticsClassName }>
-			<Tooltip pos={ "bottom right" } closeButton={ false } trigger={ tooltipTrigger }
-					 render={ renderTooltipContent }>
+			<Tooltip
+				pos={ "bottom right" }
+				closeButton={ false }
+				trigger={ tooltipTrigger }
+				render={ renderTooltipContent }>
 				<ShowControlsTextContext.Consumer>
-				{
-					(showControlsTextContext) => (showControlsTextContext || showControlsText)
-						? texts.controls.statistics.buildShortText(usersWithRightAnswerCount)
-						: <span className={ styles.exerciseControlsIcon }>
+					{
+						(showControlsTextContext) => (showControlsTextContext || showControlsText)
+							? texts.controls.statistics.buildShortText(usersWithRightAnswerCount)
+							: <span className={ styles.exerciseControlsIcon }>
 							<Statistic/>
 						</span>
-				}
+					}
 				</ShowControlsTextContext.Consumer>
 			</Tooltip>
 		</span>

@@ -276,7 +276,7 @@ class Exercise extends React.Component<Props, State> {
 
 				if((!automaticChecking || automaticChecking.result === CheckingResult.RightAnswer)
 					&& !slideProgress.isSkipped
-					&& IsFirstRightAnswer(submissions, submission)) {
+					) {//&& IsFirstRightAnswer(submissions, submission)
 					this.openModal({
 						type: ModalType.congrats,
 						score: lastCheckingResponse.score,
@@ -352,6 +352,8 @@ class Exercise extends React.Component<Props, State> {
 			indentWithTabs: true,
 			extraKeys: {
 				ctrlSpace: "autocomplete",
+				"Shift-Tab": false,
+				Tab: false,
 				".": function (cm: Editor) {
 					setTimeout(function () {
 						const cursorPosition = cm.getCursor();

@@ -7,7 +7,7 @@ import OutputButton from "./OutputButton";
 import ResetButton from "./ResetButton";
 import StatisticsHint from "./StatisticsHint";
 import AcceptedSolutionsButton from "./AcceptedSolutionsButton";
-import { darkFlat } from "src/uiTheme";
+import defaultTheme, { darkFlat } from "src/uiTheme";
 import { DeviceType } from "src/consts/deviceType";
 
 import ShowControlsTextContext from "./ShowControlsTextContext";
@@ -60,14 +60,18 @@ class Controls extends React.Component<Props, State> {
 		return (
 			<div className={ styles.exerciseControlsContainer }>
 				<ShowControlsTextContext.Provider value={ showControlsText }>
-					{ hint }
 					<ThemeContext.Provider value={ darkFlat }>
 						{ submit }
+						<ThemeContext.Provider value={ defaultTheme }>
+							{ hint }
+						</ThemeContext.Provider>
 						{ reset }
 						{ output }
+						<ThemeContext.Provider value={ defaultTheme }>
+							{ acceptedSolutions }
+						</ThemeContext.Provider>
 						{ statistics }
 					</ThemeContext.Provider>
-					{ acceptedSolutions }
 				</ShowControlsTextContext.Provider>
 			</div>
 		);

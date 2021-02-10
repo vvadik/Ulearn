@@ -40,6 +40,10 @@ function StaticCode({
 		theme: 'default',
 		readOnly: true,
 		matchBrackets: true,
+		extraKeys: {
+			"Shift-Tab": false,
+			Tab: false
+		},
 	};
 
 	opts.mode = CodeMirror.loadLanguageStyles(language);
@@ -55,9 +59,9 @@ function StaticCode({
 				value={ value }
 			/>
 			{ collapseEditor &&
-			<div className={ styles.showAllCodeButton } onClick={ showAllCodeButtonClicked }>
+			<button className={ styles.showAllCodeButton } onClick={ showAllCodeButtonClicked }>
 				{ texts.controls.showAllCode.text }
-			</div>
+			</button>
 			}
 			{ hide && <div className={ styles.copyCodeButton } onClick={ copyCodeButtonClicked }>
 				<Hint text={ texts.controls.copyCode.text }>

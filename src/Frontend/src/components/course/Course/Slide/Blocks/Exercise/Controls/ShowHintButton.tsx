@@ -47,9 +47,9 @@ function ShowHintButton({
 				</Tooltip>
 			</span>
 			<ShowControlsTextContext.Consumer>
-			{
-				(showControlsTextContext) => (showControlsTextContext || showControlsText) && texts.controls.hints.text
-			}
+				{
+					(showControlsTextContext) => (showControlsTextContext || showControlsText) && texts.controls.hints.text
+				}
 			</ShowControlsTextContext.Consumer>
 		</span>
 	);
