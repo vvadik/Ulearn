@@ -31,7 +31,10 @@ function StudentMode({ isStudentMode, setStudentMode, location, deviceType, cont
 	}
 
 	return (
-		<button className={ cn(styles.toggleWrapper, containerClass,) } onClick={ onClick } ref={ refButton }>
+		<button tabIndex={ -1 }
+				className={ cn(styles.toggleWrapper, containerClass,) }
+				onClick={ onClick }
+				ref={ refButton }>
 			<Toggle
 				checked={ isStudentMode }
 				onValueChange={ showForStudentToggleChanged }/>
