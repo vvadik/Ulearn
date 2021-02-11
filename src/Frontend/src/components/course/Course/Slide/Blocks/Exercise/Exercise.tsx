@@ -352,8 +352,6 @@ class Exercise extends React.Component<Props, State> {
 			indentWithTabs: true,
 			extraKeys: {
 				ctrlSpace: "autocomplete",
-				"Shift-Tab": false,
-				Tab: false,
 				".": function (cm: Editor) {
 					setTimeout(function () {
 						const cursorPosition = cm.getCursor();
