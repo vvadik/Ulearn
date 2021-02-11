@@ -55,6 +55,7 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 			};
 			result.ProcessStatus = GetProcessStatus(checking);
 			result.Output = checking.Output?.Text;
+			result.CheckerLogs = showCheckerLogs ? checking.DebugLogs?.Text : null;
 			if (result.ProcessStatus != AutomaticExerciseCheckingProcessStatus.Done)
 			{
 				if (result.Output == null)
@@ -76,7 +77,6 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 			}
 			result.Result = checking.IsRightAnswer ? AutomaticExerciseCheckingResult.RightAnswer : AutomaticExerciseCheckingResult.WrongAnswer;
 			result.Reviews = botReviews;
-			result.CheckerLogs = showCheckerLogs ? checking.DebugLogs?.Text : null;
 			return result;
 		}
 
