@@ -8,5 +8,5 @@ export function getFlashcards(courseId: string): Promise<FlashcardsByUnits> {
 
 export function putFlashcardStatus(courseId: string, flashcardId: string, rate: RateTypes): Promise<Response> {
 	return api.put(`courses/${ courseId }/flashcards/${ flashcardId }/status`,
-		api.createRequestParams({ rate: rate }));
+		api.createRequestParams(rate));
 }

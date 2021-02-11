@@ -152,7 +152,7 @@ function deleteRequest<T>(url: string, options?: RequestInit): Promise<T> { /* d
 	return request(url, options);
 }
 
-function createRequestParams(body: Record<string, unknown>): RequestInit {
+function createRequestParams(body: Record<string, unknown> | string): RequestInit {
 	return {
 		headers: {
 			"Content-Type": "application/json",
