@@ -9,4 +9,12 @@ export function loadFromCache<T>(groupName: string, id: string): T | undefined {
 	return data[id];
 }
 
+export function removeFromCache(groupName: string): void {
+	localStorage.removeItem(groupName);
+}
+
+export function clearCache():void{
+	localStorage.clear();
+}
+
 export const exerciseSolutions = 'exercise_solutions';

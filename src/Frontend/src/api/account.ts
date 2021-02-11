@@ -2,10 +2,12 @@ import { Dispatch } from "redux";
 import api from "src/api";
 import { AccountInfo, LogoutInfo, RolesInfo } from "src/models/account";
 import { accountInfoUpdateAction, rolesUpdateAction } from "src/actions/account";
+import { account, logoutPath, rolesPath } from "src/consts/routes";
+import { clearCache, } from "src/utils/localStorageManager";
 
 export function getCurrentUser() {
 	return (dispatch: Dispatch): Promise<void> => {
-		return api.get<AccountInfo>('account')
+		return api.get<AccountInfo>(account)
 			.then(json => {
 				const isAuthenticated = json.isAuthenticated;
 				if(isAuthenticated) {
@@ -25,7 +27,7 @@ export function getCurrentUser() {
 
 export function getRoles() {
 	return (dispatch: Dispatch): Promise<void> => {
-		return api.get<RolesInfo>('account/roles')
+		return api.get<RolesInfo>(rolesPath)
 			.then(json => {
 				dispatch(rolesUpdateAction(json));
 			});
@@ -33,10 +35,10 @@ export function getRoles() {
 }
 
 export function logout(): Promise<void | LogoutInfo> {
-	return api.post<LogoutInfo>('account/logout')
+	return api.post<LogoutInfo>(logoutPath)
 		.then(json => {
 			if(json.logout) {
-				localStorage.removeItem('exercise_solutions');
+				clearCache();
 				api.clearApiJwtToken();
 				redirectToMainPage();
 			}

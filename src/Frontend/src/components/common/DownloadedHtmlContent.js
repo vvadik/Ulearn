@@ -10,6 +10,7 @@ import { withRouter } from "react-router-dom";
 import { UrlError } from "./Error/NotFoundErrorBoundary";
 import Error404 from "./Error/Error404";
 import { changeCurrentCourseAction } from "src/actions/course";
+import { clearCache, } from "src/utils/localStorageManager";
 
 
 function getUrlParts(url) {
@@ -128,7 +129,7 @@ class DownloadedHtmlContent extends Component {
 
 					let newUrl = getUrlParts(response.url);
 					if(oldUrlPathname.startsWith('/Account/ReturnHijack') || oldUrlPathname.startsWith('/Account/Hijack')) {
-						localStorage.removeItem('exercise_solutions');
+						clearCache();
 						window.location.href = newUrl.pathname + newUrl.search;
 					} else {
 						this.props.history.replace(newUrl.pathname + newUrl.search);
@@ -334,7 +335,7 @@ class DownloadedHtmlContent extends Component {
 							newUrlParts.search += (newUrlParts.search === '' ? '?' : '&') + 'rnd=' + Math.random();
 
 						if(formUrlParts.startsWith('/Account/ReturnHijack') || formUrlParts.startsWith('/Account/Hijack')) {
-							localStorage.removeItem('exercise_solutions');
+							clearCache();
 							window.location.href = newUrlParts.pathname + newUrlParts.search;
 						} else {
 							this.props.history.replace(newUrlParts.pathname + newUrlParts.search);

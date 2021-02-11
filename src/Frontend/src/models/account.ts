@@ -1,10 +1,10 @@
 import { AccountProblemType } from "src/consts/accountProblemType";
 import { CourseAccessType, CourseRoleType, SystemAccessType } from "src/consts/accessType";
-import { Gender, ShortUserInfo } from "src/models/users";
+import { ShortUserInfo } from "src/models/users";
 import { GroupAsStudentInfo } from "src/models/groups";
 
 export interface LogoutInfo {
-	logout: unknown,
+	logout: boolean,
 }
 
 export interface AccountProblem {
