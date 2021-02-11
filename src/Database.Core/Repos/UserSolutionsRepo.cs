@@ -54,11 +54,9 @@ namespace Database.Repos
 			var hash = (await textsRepo.AddText(code)).Hash;
 			var compilationErrorHash = (await textsRepo.AddText(compilationError)).Hash;
 			var outputHash = (await textsRepo.AddText(output)).Hash;
-			var exerciseBlock = ((await courseManager.FindCourseAsync(courseId))?.FindSlideById(slideId, true) as ExerciseSlide)?.Exercise;
 
 			AutomaticExerciseChecking automaticChecking;
-			if (language.HasAutomaticChecking() && (language == Language.CSharp || exerciseBlock is UniversalExerciseBlock) 
-				|| exerciseBlock is PolygonExerciseBlock && PolygonExerciseBlock.LanguagesInfo.ContainsKey(language))
+			if (hasAutomaticChecking)
 			{
 				automaticChecking = new AutomaticExerciseChecking
 				{

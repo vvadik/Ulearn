@@ -154,11 +154,6 @@ namespace Ulearn.Common
 
 	public static class LanguageExtensions
 	{
-		public static bool HasAutomaticChecking(this Language language)
-		{
-			return language == Language.CSharp || language == Language.JavaScript || language == Language.Python3 || language == Language.Haskell;
-		}
-
 		public static string GetName(this Language language)
 		{
 			return language.GetXmlEnumName();

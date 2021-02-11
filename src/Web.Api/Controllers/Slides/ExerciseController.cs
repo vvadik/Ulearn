@@ -152,8 +152,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 
 			var compilationErrorMessage = buildResult.HasErrors ? buildResult.ErrorMessage : null;
 			var submissionSandbox = (exerciseBlock as UniversalExerciseBlock)?.DockerImageName;
-			var hasAutomaticChecking = language.HasAutomaticChecking() && (language == Language.CSharp || exerciseBlock is UniversalExerciseBlock) 
-				|| exerciseBlock is PolygonExerciseBlock && PolygonExerciseBlock.LanguagesInfo.ContainsKey(language);
+			var hasAutomaticChecking = exerciseBlock.HasAutomaticChecking(language);
 			var automaticCheckingStatus = hasAutomaticChecking
 				? buildResult.HasErrors
 					? AutomaticExerciseCheckingStatus.Done

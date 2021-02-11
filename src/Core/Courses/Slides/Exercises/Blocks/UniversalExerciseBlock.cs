@@ -136,6 +136,8 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			return code;
 		}
 
+		public override bool HasAutomaticChecking(Language? _) => true;
+
 		public override IEnumerable<SlideBlock> BuildUp(SlideBuildingContext context, IImmutableSet<string> filesInProgress)
 		{
 			if (!Language.HasValue)
