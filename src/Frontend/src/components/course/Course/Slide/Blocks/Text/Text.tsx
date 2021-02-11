@@ -22,7 +22,7 @@ class Text extends React.Component<Props> {
 		}
 
 		const anchors = Array.from(this.textContainer.current.getElementsByTagName('a'));
-		const hashAnchorsLinks = anchors.filter(a => a.hash);
+		const hashAnchorsLinks = anchors.filter(a => a.origin === window.location.origin && a.hash);
 
 		const hashInUrl = window.location.hash;
 		if(hashInUrl) {
