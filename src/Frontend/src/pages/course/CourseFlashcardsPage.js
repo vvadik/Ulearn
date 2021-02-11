@@ -11,7 +11,7 @@ const mapStateToProps = (state, { match }) => {
 
 	const data = state.courses;
 	const courseInfo = data.fullCoursesInfo[courseId];
-	const infoByUnits = Object.values(data.flashcardsByUnits);
+	const infoByUnits = data.flashcardsInfoByCourseByUnits[courseId] ? Object.values(data.flashcardsInfoByCourseByUnits[courseId]) : [];
 
 	if(!courseInfo) {
 		return {

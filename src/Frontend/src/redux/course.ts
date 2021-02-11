@@ -24,16 +24,16 @@ import { Flashcard, UnitFlashcardsInfo } from "src/models/flashcards";
 import { SlideType } from "src/models/slide";
 
 export interface CourseState {
-	currentCourseId?: string,
-	courseLoading: boolean,
-	courseLoadingErrorStatus: null | string,
-	courseById: { [courseId: string]: CourseInfo },
-	fullCoursesInfo: { [courseId: string]: CourseInfo }
+	currentCourseId?: string;
+	courseLoading: boolean;
+	courseLoadingErrorStatus: null | string;
+	courseById: { [courseId: string]: CourseInfo };
+	fullCoursesInfo: { [courseId: string]: CourseInfo };
 
 	//FLASHCARDS
-	flashcardsByCourses: { [courseId: string]: { [flashcardId: string]: Flashcard } }
-	flashcardsByUnits: { [unitId: string]: UnitFlashcardsInfo };
-	flashcardsLoading: boolean,
+	flashcardsByCourses: { [courseId: string]: { [flashcardId: string]: Flashcard } };
+	flashcardsInfoByCourseByUnits: { [courseId: string]: { [unitId: string]: UnitFlashcardsInfo } };
+	flashcardsLoading: boolean;
 }
 
 const initialCoursesState: CourseState = {
@@ -45,7 +45,7 @@ const initialCoursesState: CourseState = {
 
 	flashcardsLoading: false,
 	flashcardsByCourses: {},
-	flashcardsByUnits: {},
+	flashcardsInfoByCourseByUnits: {},
 };
 
 export default function courseReducer(state: CourseState = initialCoursesState, action: CourseAction): CourseState {
@@ -157,9 +157,9 @@ export default function courseReducer(state: CourseState = initialCoursesState, 
 					...state.flashcardsByCourses,
 					[courseId]: courseFlashcards,
 				},
-				flashcardsByUnits: {
-					...state.flashcardsByUnits,
-					...flashcardsByUnits,
+				flashcardsInfoByCourseByUnits: {
+					...state.flashcardsInfoByCourseByUnits,
+					[courseId]: { ...flashcardsByUnits },
 				},
 			};
 		}
@@ -187,7 +187,7 @@ export default function courseReducer(state: CourseState = initialCoursesState, 
 				},
 			};
 
-			const unitInfo = newState.flashcardsByUnits[unitId];
+			const unitInfo = newState.flashcardsInfoByCourseByUnits[courseId][unitId];
 
 			if(unitInfo.unratedFlashcardsCount > 0) {
 				unitInfo.unratedFlashcardsCount--;

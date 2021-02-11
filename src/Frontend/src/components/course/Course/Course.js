@@ -132,7 +132,7 @@ class Course extends Component {
 				loadCourseErrors(courseId);
 		}
 
-		if(!prevProps.progress && progress && !isHijacked && currentSlideInfo && currentSlideInfo.current) {
+		if(!prevProps.progress && progress && !isHijacked && currentSlideInfo && currentSlideInfo.current && currentSlideInfo.current.id) {
 			updateVisitedSlide(courseId, currentSlideInfo.current.id);
 		}
 	}
@@ -154,7 +154,7 @@ class Course extends Component {
 			const slideInfo = Course.getSlideInfoById(props.slideId, props.courseInfo);
 			const Page = Course.getOpenedPage(props.slideId, props.courseInfo, slideInfo, props.pageInfo);
 			const title = Course.getTitle(slideInfo, Page);
-			if(slideInfo && progress && !isHijacked) {
+			if(slideInfo && slideInfo.current && slideInfo.current.id && progress && !isHijacked) {
 				updateVisitedSlide(courseId, slideInfo.current.id);
 			}
 
@@ -304,7 +304,7 @@ class Course extends Component {
 					}
 				</div>
 				{ currentSlideInfo && isNavigationVisible && this.renderNavigationButtons(currentSlideInfo) }
-				{ currentSlideInfo && isNavigationVisible && this.renderComments(currentSlideInfo.current, userRoles) }
+				{ currentSlideInfo && slideInfo && slideInfo.id && isNavigationVisible && this.renderComments(currentSlideInfo.current, userRoles) }
 				{ isNavigationVisible && this.renderFooter() }
 			</main>
 		);

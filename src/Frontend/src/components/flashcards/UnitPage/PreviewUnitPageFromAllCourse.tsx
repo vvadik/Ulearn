@@ -166,10 +166,12 @@ const mapStateToProps = (state: RootState, { match }: RouteComponentProps<MatchP
 	const courseIdInLowerCase = courseId.toLowerCase();
 	const data = state.courses;
 	const courseInfo = state.courses.fullCoursesInfo[courseIdInLowerCase];
-	const infoByUnits = Object.values(data.flashcardsByUnits);
+	const infoByUnits = data.flashcardsInfoByCourseByUnits[courseId]
+		? Object.values(data.flashcardsInfoByCourseByUnits[courseId])
+		: [];
 	const slugsByUnits: { [unitId: string]: string } = {};
-	for (const unitId in data.flashcardsByUnits) {
-		slugsByUnits[unitId] = data.flashcardsByUnits[unitId].flashcardsSlideSlug;
+	for (const unitId in data.flashcardsInfoByCourseByUnits[courseId]) {
+		slugsByUnits[unitId] = data.flashcardsInfoByCourseByUnits[courseId][unitId].flashcardsSlideSlug;
 	}
 
 	if(!courseInfo) {
