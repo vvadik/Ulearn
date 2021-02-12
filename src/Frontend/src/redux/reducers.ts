@@ -1,4 +1,4 @@
-import { AnyAction, combineReducers } from "redux";
+import { AnyAction, combineReducers, Reducer, } from "redux";
 import courseReducer from "./course";
 import userProgressReducer from "./userProgress";
 import navigationReducer from "./navigation";
@@ -22,7 +22,7 @@ const rootReducer = combineReducers({
 
 type RootState = ReturnType<typeof rootReducer>
 
-const resetReducer = (state: RootState, action: AnyAction): RootState => {
+function resetReducer(state: RootState, action: AnyAction): RootState {
 	const newState = { ...state };
 	if(action.type === ACCOUNT__USER_INFO_UPDATED) {
 		if(action.isAuthenticated && !newState.account.isAuthenticated) {
@@ -31,7 +31,7 @@ const resetReducer = (state: RootState, action: AnyAction): RootState => {
 	}
 
 	return rootReducer(newState, action);
-};
+}
 
-export default resetReducer;
+export default resetReducer as Reducer;
 export { RootState };
