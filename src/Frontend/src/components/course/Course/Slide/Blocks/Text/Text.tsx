@@ -22,7 +22,9 @@ class Text extends React.Component<Props> {
 		}
 
 		const anchors = Array.from(this.textContainer.current.getElementsByTagName('a'));
-		const hashAnchorsLinks = anchors.filter(a => a.origin === window.location.origin && a.hash);
+		//if href equal to origin + pathname + hash => <a href="#hash"> that means its navigation on slide via headers, we need to handle this via our modificated scrolling
+		const hashAnchorsLinks = anchors.filter(
+			a => window.location.origin + window.location.pathname + a.hash === a.href);
 
 		const hashInUrl = window.location.hash;
 		if(hashInUrl) {
