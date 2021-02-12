@@ -3,7 +3,7 @@ import api from "src/api";
 import { AccountInfo, LogoutInfo, RolesInfo } from "src/models/account";
 import { accountInfoUpdateAction, rolesUpdateAction } from "src/actions/account";
 import { account, logoutPath, rolesPath } from "src/consts/routes";
-import { clearCache, } from "src/utils/localStorageManager";
+import { clearCache, exerciseSolutions, removeFromCache, setBlockCache, } from "src/utils/localStorageManager";
 
 export function getCurrentUser() {
 	return (dispatch: Dispatch): Promise<void> => {
@@ -38,7 +38,8 @@ export function logout(): Promise<void | LogoutInfo> {
 	return api.post<LogoutInfo>(logoutPath)
 		.then(json => {
 			if(json.logout) {
-				clearCache();
+				removeFromCache(exerciseSolutions);
+				setBlockCache(true);
 				api.clearApiJwtToken();
 				redirectToMainPage();
 			}

@@ -4,7 +4,7 @@ import {
 	ReviewInfo,
 	SubmissionInfo
 } from "./exercise";
-import rootReducer from "src/redux/reducers";
+import { RootState } from "src/redux/reducers";
 
 interface ReviewCommentResponseRedux extends ReviewCommentResponse {
 	isDeleted?: boolean,
@@ -24,6 +24,4 @@ interface SubmissionInfoRedux extends SubmissionInfo {
 	manualCheckingReviews: ReviewInfoRedux[];
 }
 
-export type RootState = ReturnType<typeof rootReducer>
-
-export { SubmissionInfoRedux, ReviewInfoRedux, };
+export { SubmissionInfoRedux, ReviewInfoRedux, RootState, };

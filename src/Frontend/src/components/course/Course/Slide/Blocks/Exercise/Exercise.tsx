@@ -224,6 +224,7 @@ class Exercise extends React.Component<Props, State> {
 			forceInitialCode,
 			submissionError,
 			slideProgress,
+			isAuthenticated,
 		} = this.props;
 		const { currentSubmission, submissionLoading, showOutput, selectedReviewId, } = this.state;
 
@@ -240,7 +241,7 @@ class Exercise extends React.Component<Props, State> {
 			return;
 		}
 
-		if(courseId !== prevProps.courseId || slideId !== prevProps.slideId) {
+		if(courseId !== prevProps.courseId || slideId !== prevProps.slideId || isAuthenticated && isAuthenticated !== prevProps.isAuthenticated) {
 			this.setState({
 				submissionLoading: false,
 			});
@@ -276,7 +277,8 @@ class Exercise extends React.Component<Props, State> {
 
 				if((!automaticChecking || automaticChecking.result === CheckingResult.RightAnswer)
 					&& !slideProgress.isSkipped
-					) {//&& IsFirstRightAnswer(submissions, submission)
+					&& IsFirstRightAnswer(submissions, submission)
+				) {
 					this.openModal({
 						type: ModalType.congrats,
 						score: lastCheckingResponse.score,
@@ -310,10 +312,10 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	saveCodeDraftToCache = (): void => {
-		const { slideId, forceInitialCode, } = this.props;
+		const { slideId, forceInitialCode, isAuthenticated } = this.props;
 		const { value, } = this.state;
 
-		if(!forceInitialCode) {
+		if(!forceInitialCode && isAuthenticated) {
 			this.saveCodeToCache(slideId, value);
 		}
 	};

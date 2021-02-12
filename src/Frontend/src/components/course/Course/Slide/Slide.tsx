@@ -19,7 +19,6 @@ import {
 } from "src/models/slide";
 import { RootState } from "src/models/reduxState";
 import { MatchParams } from "src/models/router";
-import { DeviceType } from "src/consts/deviceType";
 import { Dispatch } from "redux";
 
 import styles from './Slide.less';
@@ -79,7 +78,9 @@ class Slide extends React.Component<Props> {
 	}
 
 	componentDidUpdate(prevProps: Props) {
-		if(prevProps.slideId !== this.props.slideId) {
+		const { slideBlocks, slideLoading } = this.props;
+
+		if(prevProps.slideId !== this.props.slideId || !slideBlocks && !slideLoading) {
 			this.loadSlide();
 		}
 	}

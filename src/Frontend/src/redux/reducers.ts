@@ -1,4 +1,4 @@
-import { combineReducers } from "redux";
+import { AnyAction, combineReducers } from "redux";
 import courseReducer from "./course";
 import userProgressReducer from "./userProgress";
 import navigationReducer from "./navigation";
@@ -7,6 +7,7 @@ import accountReducer from "./account";
 import notificationsReducer from "./notifications";
 import instructorReducer from "./instructor";
 import deviceReducer from "./device";
+import { ACCOUNT__USER_INFO_UPDATED } from "src/actions/account.types";
 
 const rootReducer = combineReducers({
 	account: accountReducer,
@@ -19,4 +20,18 @@ const rootReducer = combineReducers({
 	device: deviceReducer,
 });
 
-export default rootReducer;
+type RootState = ReturnType<typeof rootReducer>
+
+const resetReducer = (state: RootState, action: AnyAction): RootState => {
+	const newState = { ...state };
+	if(action.type === ACCOUNT__USER_INFO_UPDATED) {
+		if(action.isAuthenticated && !newState.account.isAuthenticated) {
+			newState.slides.slidesByCourses = {}; //deleting all loaded slides
+		}
+	}
+
+	return rootReducer(newState, action);
+};
+
+export default resetReducer;
+export { RootState };
