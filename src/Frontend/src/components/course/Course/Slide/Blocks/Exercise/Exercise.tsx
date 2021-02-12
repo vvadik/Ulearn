@@ -456,7 +456,7 @@ class Exercise extends React.Component<Props, State> {
 						showOutput={ showOutput }
 						onShowOutputButtonClicked={ this.toggleOutput }
 					/> }
-					<Controls.StatisticsHint attemptsStatistics={ attemptsStatistics }/>
+					{ attemptsStatistics && <Controls.StatisticsHint attemptsStatistics={ attemptsStatistics }/> }
 					{ (!hideSolutions && (isAllHintsShowed || isAcceptedSolutionsWillNotDiscardScore))
 					&& <Controls.AcceptedSolutionsButton
 						acceptedSolutionsUrl={ constructPathToAcceptedSolutions(courseId, slideId) }

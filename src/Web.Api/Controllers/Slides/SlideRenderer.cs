@@ -175,12 +175,14 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				CodeReviewComments = codeReviewComments,
 				SlideFile = context.Slide.Info.SlideFile,
 				CanSeeCheckerLogs = isCourseAdmin,
-				AttemptsStatistics = new ExerciseAttemptsStatistics
-				{
-					AttemptedUsersCount = exerciseUsersCount,
-					UsersWithRightAnswerCount = exerciseUsersWithRightAnswerCount,
-					LastSuccessAttemptDate = lastSuccessAttemptDate
-				}
+				AttemptsStatistics = b.HasAutomaticChecking(b.Language) 
+					? new ExerciseAttemptsStatistics
+					{
+						AttemptedUsersCount = exerciseUsersCount,
+						UsersWithRightAnswerCount = exerciseUsersWithRightAnswerCount,
+						LastSuccessAttemptDate = lastSuccessAttemptDate
+					}
+					: null
 			};
 			return new[] { new ExerciseBlockResponse(b, exerciseSlideRendererContext) };
 		}
