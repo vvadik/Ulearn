@@ -175,7 +175,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				CodeReviewComments = codeReviewComments,
 				SlideFile = context.Slide.Info.SlideFile,
 				CanSeeCheckerLogs = isCourseAdmin,
-				AttemptsStatistics = b.HasAutomaticChecking(b.Language) 
+				AttemptsStatistics = b.HasAutomaticChecking() 
 					? new ExerciseAttemptsStatistics
 					{
 						AttemptedUsersCount = exerciseUsersCount,

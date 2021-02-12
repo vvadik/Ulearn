@@ -70,10 +70,5 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		{
 			return $"python3.8 main.py {language} {TimeLimitPerTest} {UserCodeFilePath.Split('/', '\\')[1]}";
 		}
-
-		public override bool HasAutomaticChecking(Language? language)
-		{
-			return language != null && LanguagesInfo.ContainsKey(language.Value);
-		}
 	}
 }

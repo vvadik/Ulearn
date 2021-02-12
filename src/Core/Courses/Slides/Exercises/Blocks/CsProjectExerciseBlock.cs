@@ -115,7 +115,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		[XmlIgnore]
 		public string CourseId { get; private set; }
 
-		public override bool HasAutomaticChecking(Language? _) => Language == Common.Language.CSharp;
+		public override bool HasAutomaticChecking() => Language == Common.Language.CSharp;
 
 		public override IEnumerable<SlideBlock> BuildUp(SlideBuildingContext context, IImmutableSet<string> filesInProgress)
 		{

@@ -103,7 +103,7 @@ namespace uLearn.Web.Controllers
 			if (buildResult.HasErrors)
 				return new RunSolutionResult { IsCompileError = true, ErrorMessage = buildResult.ErrorMessage, SubmissionId = submission.Id, ExecutionServiceName = "uLearn" };
 
-			var hasAutomaticChecking = exerciseBlock.HasAutomaticChecking(null);
+			var hasAutomaticChecking = exerciseBlock.HasAutomaticChecking();
 			var executionTimeout = TimeSpan.FromSeconds(exerciseBlock.TimeLimit * 2 + 5);
 			try
 			{

@@ -58,7 +58,7 @@ namespace Database.DataContexts
 			var exerciseBlock = (courseManager.FindCourse(courseId)?.FindSlideById(slideId, true) as ExerciseSlide)?.Exercise;
 
 			AutomaticExerciseChecking automaticChecking;
-			if (exerciseBlock != null && exerciseBlock.HasAutomaticChecking(language))
+			if (exerciseBlock != null && exerciseBlock.HasAutomaticChecking())
 			{
 				automaticChecking = new AutomaticExerciseChecking
 				{
