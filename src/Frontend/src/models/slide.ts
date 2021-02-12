@@ -77,7 +77,7 @@ interface ExerciseBlockProps {
 	hideSolutions: boolean,
 	expectedOutput: string,
 	submissions: SubmissionInfoRedux[],
-	attemptsStatistics: AttemptsStatistics
+	attemptsStatistics: AttemptsStatistics | null,
 }
 
 interface LanguageLaunchInfo {
