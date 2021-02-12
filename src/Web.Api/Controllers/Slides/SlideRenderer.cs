@@ -164,10 +164,21 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				.Include(s => s.ManualCheckings).ThenInclude(c => c.Reviews).ThenInclude(r => r.Author)
 				.ToListAsync();
 			var codeReviewComments = await slideCheckingsRepo.GetExerciseCodeReviewComments(context.CourseId, context.Slide.Id, context.UserId);
-			var exerciseUsersCount = await slideCheckingsRepo.GetExerciseUsersCount(context.CourseId, context.Slide.Id);
-			var exerciseUsersWithRightAnswerCount = await slideCheckingsRepo.GetExerciseUsersWithRightAnswerCount(context.CourseId, context.Slide.Id);
-			var lastSuccessAttemptDate = await slideCheckingsRepo.GetExerciseLastRightAnswerDate(context.CourseId, context.Slide.Id);
 			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourseAsync(context.UserId, context.CourseId, CourseRoleType.CourseAdmin);
+			
+			ExerciseAttemptsStatistics exerciseAttemptsStatistics = null;
+			if (b.HasAutomaticChecking())
+			{
+				var exerciseUsersCount = await slideCheckingsRepo.GetExerciseUsersCount(context.CourseId, context.Slide.Id);
+				var exerciseUsersWithRightAnswerCount = await slideCheckingsRepo.GetExerciseUsersWithRightAnswerCount(context.CourseId, context.Slide.Id);
+				var lastSuccessAttemptDate = await slideCheckingsRepo.GetExerciseLastRightAnswerDate(context.CourseId, context.Slide.Id);
+				exerciseAttemptsStatistics = new ExerciseAttemptsStatistics
+				{
+					AttemptedUsersCount = exerciseUsersCount,
+					UsersWithRightAnswerCount = exerciseUsersWithRightAnswerCount,
+					LastSuccessAttemptDate = lastSuccessAttemptDate
+				};
+			}
 
 			var exerciseSlideRendererContext = new ExerciseSlideRendererContext
 			{
@@ -175,14 +186,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				CodeReviewComments = codeReviewComments,
 				SlideFile = context.Slide.Info.SlideFile,
 				CanSeeCheckerLogs = isCourseAdmin,
-				AttemptsStatistics = b.HasAutomaticChecking() 
-					? new ExerciseAttemptsStatistics
-					{
-						AttemptedUsersCount = exerciseUsersCount,
-						UsersWithRightAnswerCount = exerciseUsersWithRightAnswerCount,
-						LastSuccessAttemptDate = lastSuccessAttemptDate
-					}
-					: null
+				AttemptsStatistics = exerciseAttemptsStatistics,
 			};
 			return new[] { new ExerciseBlockResponse(b, exerciseSlideRendererContext) };
 		}
