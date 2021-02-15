@@ -43,6 +43,7 @@ import { SlideUserProgress } from "src/models/userProgress";
 import { ExerciseBlockProps } from "src/models/slide";
 
 import CodeMirror, { Doc, Editor, EditorChange, EditorConfiguration, MarkerRange, TextMarker } from "codemirror";
+import 'codemirror/lib/codemirror.css';
 import 'codemirror/addon/edit/matchbrackets';
 import 'codemirror/addon/hint/show-hint';
 import 'codemirror/addon/hint/show-hint.css';
