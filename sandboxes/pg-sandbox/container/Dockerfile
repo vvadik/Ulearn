@@ -84,5 +84,8 @@ FROM postgres:alpine
             && rm dotnet.tar.gz \
         && echo '5) Install nuget packages:'\
             && dotnet build packages.csproj \
-            && rm -rf $DOTNET_PACKAGES_DIR \
-            && mkdir /app
+            && rm -rf $DOTNET_PACKAGES_DIR
+
+WORKDIR /
+RUN mkdir /app
+WORKDIR app
