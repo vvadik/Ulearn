@@ -15,7 +15,7 @@ FROM postgres:alpine
         && apk add --no-cache --upgrade grep \
         && echo '1) Run postgres DB internally for init cluster:' \
             && bash -c "$DOCKER_ENTRYPOINT postgres --autovacuum=off &" \
-            && sleep 5 \
+            && sleep 10 \
         && echo '2) Configure postgres: use conf.d directory:' \
             && sed -i "s@#include_dir = '...'@include_dir = '/etc/postgres/conf.d/'@" "$PGDATA/postgresql.conf" \
         && echo '3) Populate DB data: Restore DB backup:' \
@@ -27,7 +27,7 @@ FROM postgres:alpine
             && time vacuumdb -U postgres --full --all --analyze --freeze \
         && echo '5) Stop postgres:' \
             && su-exec postgres pg_ctl -D "$PGDATA" -m fast -w stop \
-            && sleep 5 \
+            && sleep 10 \
         && echo '6) Cleanup pg_xlog required to do not include it in image:' \
             && su-exec postgres pg_resetwal -o \
                 $( LANG=C pg_controldata $PGDATA | grep -oP '(?<=NextOID:\s{10})\d+' ) -x \
