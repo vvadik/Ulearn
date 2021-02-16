@@ -11,7 +11,9 @@ using Database.Repos;
 using ManualUtils.AntiPlagiarism;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Ulearn.Core;
 using Ulearn.Core.Configuration;
+using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Logging;
 
 namespace ManualUtils
@@ -34,6 +36,7 @@ namespace ManualUtils
 			//await FindExternalSolutionsPlagiarism.UploadSolutions();
 			//await FindExternalSolutionsPlagiarism.GetRawResults();
 			//await FindExternalSolutionsPlagiarism.PrepareResults();
+			//await UpdateExerciseVisits(db, "fpIntroduction");
 
 			//Users.PrintCourseAdmins(db);
 			//await ScoresUpdater.UpdateTests(db, "java-rtf");
@@ -45,6 +48,23 @@ namespace ManualUtils
 			//GetIps(db);
 			//FillAntiplagFields.FillClientSubmissionId(adb);
 			//await XQueueRunAutomaticChecking(db);
+		}
+
+		private static async Task UpdateExerciseVisits(UlearnDb db, string courseId)
+		{
+			var courseManager = new CourseManager(CourseManager.GetCoursesDirectory());
+			var course = courseManager.GetCourse(courseId);
+			var slideCheckingsRepo = new SlideCheckingsRepo(db, null);
+			var visitsRepo = new VisitsRepo(db, slideCheckingsRepo);
+			var slides = course.GetSlides(true).OfType<ExerciseSlide>().ToList();
+			foreach (var slide in slides)
+			{
+				var slideVisits = db.Visits.Where(v => v.CourseId == courseId && v.SlideId == slide.Id && v.IsPassed).ToList();
+				foreach (var visit in slideVisits)
+				{
+					await visitsRepo.UpdateScoreForVisit(courseId, slide, visit.UserId);
+				}
+			}
 		}
 
 		private static async Task XQueueRunAutomaticChecking(UlearnDb db)
