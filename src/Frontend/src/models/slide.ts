@@ -2,7 +2,6 @@ import { ReactNode } from "react";
 import { Language } from "src/consts/languages";
 import { SubmissionInfoRedux } from "src/models/reduxState";
 import { AttemptsStatistics, SubmissionInfo } from "src/models/exercise";
-import { DeviceType } from "src/consts/deviceType";
 
 interface ShortSlideInfo {
 	id: string;

@@ -30,7 +30,6 @@ import {
 import { Language, } from "src/consts/languages";
 import { constructPathToAcceptedSolutions, } from "src/consts/routes";
 import { DeviceType } from "src/consts/deviceType";
-import { AccountState } from "src/redux/account";
 import {
 	AutomaticExerciseCheckingResult as CheckingResult,
 	AutomaticExerciseCheckingResult,
@@ -58,7 +57,7 @@ import texts from './Exercise.texts';
 
 
 interface DispatchFunctionsProps {
-	sendCode: (courseId: string, slideId: string, value: string, language: Language) => unknown;
+	sendCode: (courseId: string, slideId: string, value: string, language: Language,) => unknown;
 	addReviewComment: (courseId: string, slideId: string, submissionId: number, reviewId: number,
 		text: string
 	) => unknown;
@@ -77,14 +76,14 @@ interface FromSlideProps {
 interface FromMapStateToProps {
 	isAuthenticated: boolean,
 	lastCheckingResponse: RunSolutionResponse | null,
-	author: AccountState,
+	userId?: string | null,
 	slideProgress: SlideUserProgress,
 	submissionError: string | null,
 	deviceType: DeviceType,
 }
 
 interface Props extends ExerciseBlockProps, DispatchFunctionsProps, FromSlideProps, FromMapStateToProps {
-	className: string,
+	className?: string,
 }
 
 enum ModalType {
@@ -372,7 +371,7 @@ class Exercise extends React.Component<Props, State> {
 
 	renderControlledCodeMirror = (opts: EditorConfiguration): React.ReactElement => {
 		const {
-			expectedOutput, submissions, author,
+			expectedOutput, submissions, userId,
 			slideProgress, maxScore, languages,
 			courseId, slideId, hideSolutions, renderedHints,
 			attemptsStatistics, isAuthenticated
@@ -430,7 +429,7 @@ class Exercise extends React.Component<Props, State> {
 					/>
 					{ exerciseCodeDoc && isReview &&
 					<Review
-						userId={ author.id }
+						userId={ userId }
 						addReviewComment={ this.addReviewComment }
 						deleteReviewComment={ this.deleteReviewComment }
 						selectedReviewId={ selectedReviewId }

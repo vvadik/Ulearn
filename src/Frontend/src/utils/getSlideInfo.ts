@@ -2,7 +2,7 @@ import { acceptedAlert, acceptedSolutions, coursePath, ltiSlide } from "src/cons
 
 import queryString from "query-string";
 
-interface SlideInfo {
+export interface SlideInfo {
 	slideId: string,
 	isReview: boolean,
 	isLti: boolean,

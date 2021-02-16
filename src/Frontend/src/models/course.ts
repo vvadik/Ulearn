@@ -1,4 +1,5 @@
 import { ShortSlideInfo } from "./slide";
+import { ScoringGroupsIds } from "src/consts/scoringGroup";
 
 interface CourseInfo {
 	id: string;
@@ -6,18 +7,24 @@ interface CourseInfo {
 	description: string;
 	units: UnitInfo[];
 	nextUnitPublishTime: string | null;
-	scoring: ScoringGroup;
+	scoring: ScoringInfo;
 	containsFlashcards: boolean;
 	isTempCourse: boolean;
 	tempCourseError: string | null;
 }
 
-interface ScoringGroup {
+interface ScoringInfo {
 	id: string;
 	name: string;
 	abbr: string | null;
 	description: string | null;
 	weight: number; // decimal
+	groups: ScoringGroup[];
+}
+
+interface ScoringGroup {
+	id: ScoringGroupsIds;
+	weight: number;
 }
 
 interface UnitInfo {
@@ -67,4 +74,4 @@ export interface ShortCourseInfo {
 	isTempCourse: boolean,
 }
 
-export { CourseInfo, ScoringGroup, UnitInfo, UnitScoringGroupInfo, InfoByUnit };
+export { CourseInfo, ScoringInfo, UnitInfo, UnitScoringGroupInfo, InfoByUnit, ScoringGroup, };

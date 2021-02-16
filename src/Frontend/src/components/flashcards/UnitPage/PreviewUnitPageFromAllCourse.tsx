@@ -3,7 +3,7 @@ import React from 'react';
 import classnames from 'classnames';
 import { connect, } from "react-redux";
 import { Dispatch } from "redux";
-import { Link, RouteComponentProps } from 'react-router-dom';
+import { Link, RouteComponentProps, withRouter } from 'react-router-dom';
 
 import { getQueryStringParameter } from "src/utils";
 
@@ -205,4 +205,4 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
 });
 
 const connected = connect(mapStateToProps, mapDispatchToProps)(PreviewUnitPageFromAllCourse);
-export default connected;
+export default withRouter(connected);

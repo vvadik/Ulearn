@@ -1,4 +1,5 @@
 import { connect } from "react-redux";
+import { withRouter } from "react-router-dom";
 
 import UnitFlashcards from "src/components/flashcards/UnitPage/UnitPage";
 import Course from "src/components/course/Course";
@@ -48,5 +49,5 @@ const mapDispatchToProps = (dispatch) => ({
 
 
 const connected = connect(mapStateToProps, mapDispatchToProps)(UnitFlashcards);
-export default connected;
+export default withRouter(connected);
 

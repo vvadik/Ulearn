@@ -29,14 +29,14 @@ const mapStateToProps = (state: RootState, { courseId, slideId, }: MatchParams) 
 		submissions,
 		submissionError,
 		lastCheckingResponse: !(lastCheckingResponse && lastCheckingResponse.courseId === courseId && lastCheckingResponse.slideId === slideId) ? null : lastCheckingResponse,
-		author: account,
+		userId: account.id,
 		slideProgress,
 		deviceType: device.deviceType,
 	};
 };
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-	sendCode: (courseId: string, slideId: string, code: string, language: Language
+	sendCode: (courseId: string, slideId: string, code: string, language: Language,
 	) => sendCode(courseId, slideId, code, language)(dispatch),
 
 	addReviewComment: (courseId: string, slideId: string, submissionId: number, reviewId: number,

@@ -7,7 +7,7 @@ import { ShortSlideInfo, SlideType } from "src/models/slide";
 
 import { RootState } from "src/models/reduxState";
 
-import Course from '../../Course.js';
+import Course from '../../Course';
 import DownloadedHtmlContent from 'src/components/common/DownloadedHtmlContent.js';
 import { Modal } from "@skbkontur/react-ui";
 
@@ -99,7 +99,7 @@ const mapState = (state: RootState, ownProps: ScoreHeaderProps) => {
 
 	const slideProgress = userProgress.progress[courseId]?.[slideId];
 	const courseInfo = courses.fullCoursesInfo[courseId];
-	const slideInfo: ShortSlideInfo = Course.getSlideInfoById(slideId, courseInfo).current;
+	const slideInfo = Course.getSlideInfoById(slideId, courseInfo)?.current;
 	const submissions = submissionsByCourses[courseId]?.[slideId];
 	const hasReviewedSubmissions = submissions
 		? Object.values(submissionsByCourses[courseId][slideId]).some(s => s.manualCheckingPassed)
@@ -114,9 +114,9 @@ const mapState = (state: RootState, ownProps: ScoreHeaderProps) => {
 		isSkipped: slideProgress?.isSkipped ?? false,
 		waitingForManualChecking: slideProgress?.waitingForManualChecking ?? false,
 		prohibitFurtherManualChecking: slideProgress?.prohibitFurtherManualChecking ?? false,
-		maxScore: slideInfo.maxScore,
+		maxScore: slideInfo?.maxScore || 0,
 		hasReviewedSubmissions: hasReviewedSubmissions,
-		showStudentSubmissions: slideInfo.type === SlideType.Exercise && instructor,
+		showStudentSubmissions: slideInfo?.type === SlideType.Exercise && instructor,
 	};
 };
 const connector = connect(mapState);
