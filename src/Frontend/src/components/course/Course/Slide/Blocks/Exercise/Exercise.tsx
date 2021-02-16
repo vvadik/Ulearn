@@ -57,7 +57,7 @@ import texts from './Exercise.texts';
 
 
 interface DispatchFunctionsProps {
-	sendCode: (courseId: string, slideId: string, value: string, language: Language) => unknown;
+	sendCode: (courseId: string, slideId: string, value: string, language: Language, isLti: boolean,) => unknown;
 	addReviewComment: (courseId: string, slideId: string, submissionId: number, reviewId: number,
 		text: string
 	) => unknown;
@@ -71,6 +71,7 @@ interface FromSlideProps {
 	slideId: string,
 	maxScore: number,
 	forceInitialCode: boolean,
+	isLti: boolean,
 }
 
 interface FromMapStateToProps {
@@ -974,13 +975,13 @@ class Exercise extends React.Component<Props, State> {
 
 	sendExercise = (): void => {
 		const { value, language } = this.state;
-		const { courseId, slideId, sendCode, } = this.props;
+		const { courseId, slideId, sendCode, isLti, } = this.props;
 
 		this.setState({
 			submissionLoading: true,
 		});
 
-		sendCode(courseId, slideId, value, language);
+		sendCode(courseId, slideId, value, language, isLti);
 	};
 
 	addReviewComment = (reviewId: number, text: string): void => {

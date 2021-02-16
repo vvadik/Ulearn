@@ -120,10 +120,11 @@ export const sendCode = (
 	courseId: string,
 	slideId: string,
 	code: string,
-	language: Language
+	language: Language,
+	isLti: boolean,
 ): (dispatch: Dispatch) => void => {
 	return (dispatch: Dispatch) => {
-		submitCode(courseId, slideId, code, language)
+		submitCode(courseId, slideId, code, language, isLti)
 			.then(r => {
 				dispatch(addSubmissionAction(courseId, slideId, r));
 				updateUserProgress(r, dispatch);

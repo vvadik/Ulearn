@@ -36,8 +36,8 @@ const mapStateToProps = (state: RootState, { courseId, slideId, }: MatchParams) 
 };
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-	sendCode: (courseId: string, slideId: string, code: string, language: Language
-	) => sendCode(courseId, slideId, code, language)(dispatch),
+	sendCode: (courseId: string, slideId: string, code: string, language: Language, isLti: boolean,
+	) => sendCode(courseId, slideId, code, language, isLti)(dispatch),
 
 	addReviewComment: (courseId: string, slideId: string, submissionId: number, reviewId: number,
 		comment: string
