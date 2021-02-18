@@ -15,6 +15,7 @@ using Ulearn.Core;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Logging;
+using Ulearn.Web.Api.Utils.LTI;
 
 namespace ManualUtils
 {
@@ -33,6 +34,7 @@ namespace ManualUtils
 				.UseSqlServer(configuration.Database);
 			var adb = new AntiPlagiarismDb(aOptionsBuilder.Options);
 
+			//await ResendLti(db);
 			//await FindExternalSolutionsPlagiarism.UploadSolutions();
 			//await FindExternalSolutionsPlagiarism.GetRawResults();
 			//await FindExternalSolutionsPlagiarism.PrepareResults();
@@ -48,6 +50,27 @@ namespace ManualUtils
 			//GetIps(db);
 			//FillAntiplagFields.FillClientSubmissionId(adb);
 			//await XQueueRunAutomaticChecking(db);
+		}
+		
+		private static async Task ResendLti(UlearnDb db)
+		{
+			var ltiRequestsRepo = new LtiRequestsRepo(db);
+			var ltiConsumersRepo = new LtiConsumersRepo(db);
+			var slideCheckingsRepo = new SlideCheckingsRepo(db, null);
+			var visitsRepo = new VisitsRepo(db, slideCheckingsRepo);
+			var ltiRequests = await db.LtiRequests.Where(r => r.RequestId > 284927).OrderByDescending(r => r.RequestId).ToListAsync();
+			var courseManager = new CourseManager(CourseManager.GetCoursesDirectory());
+
+			var i = 0;
+			foreach (var ltiRequest in ltiRequests)
+			{
+				var course = courseManager.GetCourse(ltiRequest.CourseId);
+				var slide = course.GetSlideById(ltiRequest.SlideId, true);
+				var score = await visitsRepo.GetScore(ltiRequest.CourseId, ltiRequest.SlideId, ltiRequest.UserId);
+				await LtiUtils.SubmitScore(ltiRequest.CourseId, slide, ltiRequest.UserId, score, ltiRequestsRepo, ltiConsumersRepo);
+				i++;
+				Console.WriteLine($"{i} requestId {ltiRequest.RequestId} score {score}");
+			}
 		}
 
 		private static async Task UpdateExerciseVisits(UlearnDb db, string courseId)
