@@ -1,18 +1,27 @@
-import React, { Component } from "react";
+import React from "react";
+import classnames from "classnames";
+
+import { isMobile, isTablet } from "src/utils/getDeviceType";
 
 import ProgressBar from "../../ProgressBar";
-
-import { courseMenuItemType } from "../../types"
 import { Calendar, EyeClosed, } from "icons";
 import { Hint, } from "ui";
 
 import { getDateDDMMYY } from "src/utils/momentUtils";
-import classnames from "classnames";
+
+import { CourseMenuItem, Progress } from "../../types";
 
 import styles from "./CourseNavigationItem.less";
-import { isMobile, isTablet } from "src/utils/getDeviceType";
 
-function CourseNavigationItem({ title, isActive, isNotPublished, publicationDate, progress, onClick, id, }) {
+function CourseNavigationItem({
+	title,
+	isActive,
+	isNotPublished,
+	publicationDate,
+	progress,
+	onClick,
+	id,
+}: CourseMenuItem): React.ReactElement {
 	const classes = classnames(
 		styles.itemLink,
 		{ [styles.active]: isActive },
@@ -38,21 +47,22 @@ function CourseNavigationItem({ title, isActive, isNotPublished, publicationDate
 						}
 						{ title }
 					</span>
-				{ renderProgress() }
+				{ progress && renderProgress(progress) }
 			</div>
 		</li>
 	);
 
-	function renderProgress() {
+	function renderProgress(progress: Progress) {
 		const percentage = progress.current / progress.max;
 
 		if(percentage > 0) {
 			return (
 				<span className={ styles.progressWrapper } title={ `${ progress.current } из ${ progress.max }` }>
-					<ProgressBar value={ percentage }
-								 small
-								 color={ percentage >= 1 ? 'green' : 'blue' }
-								 active={ isActive }
+					<ProgressBar
+						value={ percentage }
+						small
+						color={ percentage >= 1 ? 'green' : 'blue' }
+						active={ isActive }
 					/>
 				</span>
 			);
@@ -60,17 +70,17 @@ function CourseNavigationItem({ title, isActive, isNotPublished, publicationDate
 	}
 
 	function clickHandle() {
-		onClick(id);
+		if(onClick) {
+			onClick(id);
+		}
 	}
 
-	function hintClickHandle(e) {
+	function hintClickHandle(e: React.MouseEvent) {
 		if(isMobile() || isTablet()) {
 			e.stopPropagation();
 		}
 	}
 }
 
-CourseNavigationItem.propTypes = courseMenuItemType;
-
-export default CourseNavigationItem
+export default CourseNavigationItem;
 

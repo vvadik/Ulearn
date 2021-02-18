@@ -1,16 +1,16 @@
 import React from "react";
-import NavigationHeader from "./NavigationHeader.js";
+import NavigationHeader from "./NavigationHeader";
 
 
 const Header = (): React.ReactNode => (
 	<div>
 		<NavigationHeader
-			createRef={ () => ({}) }
+			onClick={ () => ({}) }
+			createRef={ React.createRef() }
 			groupsAsStudent={ [] }
 			progress={ { current: 5, max: 10 } }
 			title="Первое знакомство с C#"
 			courseName="Основы программирования"
-			courseUrl="/BasicProgramming"
 		/>
 	</div>
 );

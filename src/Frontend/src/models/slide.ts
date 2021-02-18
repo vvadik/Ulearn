@@ -13,7 +13,7 @@ interface ShortSlideInfo {
 	type: SlideType;
 	apiUrl: string;
 	questionsCount: number; // Количество вопросов в quiz
-	gitEditLink: string | undefined;
+	gitEditLink?: string;
 }
 
 enum SlideType {
@@ -63,7 +63,7 @@ interface ExerciseBlock extends Block<BlockTypes.exercise> {
 	slideId: string,
 	courseId: string,
 	forceInitialCode: boolean,
-	maxScore: number,
+	maxScore?: number,
 	submissions?: SubmissionInfo[],//we're moving this field to other state in redux reducer
 }
 

@@ -1,6 +1,6 @@
-import React, { Component } from "react";
-import PropTypes from 'prop-types';
+import React, { Component, CSSProperties } from "react";
 import { connect } from "react-redux";
+import { Dispatch } from "redux";
 
 import NavigationHeader from './Unit/NavigationHeader';
 import NavigationContent from './Unit/NavigationContent';
@@ -10,29 +10,78 @@ import CourseNavigationHeader from "./Course/CourseNavigationHeader";
 import CourseNavigationContent from "./Course/CourseNavigationContent";
 import Flashcards from "./Course/Flashcards/Flashcards";
 
-import { courseMenuItemType, menuItemType, groupAsStudentType, progressType } from './types';
 import { flashcards } from "src/consts/routes";
 
 import { isMobile, isTablet } from "src/utils/getDeviceType";
 import { toggleNavigationAction } from "src/actions/navigation";
 
+import { CourseMenuItem, MenuItem, Progress } from "./types";
+
+import { GroupAsStudentInfo } from "src/models/groups";
+import { RootState } from "src/redux/reducers";
+import { UnitInfo } from "src/models/course";
+import { SlideType } from "src/models/slide";
+
 import styles from './Navigation.less';
 
 const mobileNavigationMenuWidth = 250;//250 is @mobileNavigationMenuWidth, its mobile nav menu width
 
-class Navigation extends Component {
-	touchDistanceTolerance = 10;
+export type Props = PropsFromRedux & DefaultNavigationProps & (CourseNavigationProps | UnitNavigationProps);
 
-	constructor(props) {
+interface DefaultNavigationProps {
+	courseTitle: string;
+	navigationOpened: boolean;
+}
+
+interface PropsFromRedux {
+	groupsAsStudent: GroupAsStudentInfo[];
+	toggleNavigation: () => void;
+}
+
+export interface CourseNavigationProps {
+	courseId: string;
+	slideId?: string;
+	description: string;
+
+	containsFlashcards: boolean;
+
+	courseProgress: Progress;
+	courseItems: CourseMenuItem[];
+}
+
+export interface UnitNavigationProps {
+	unitTitle: string;
+
+	unitProgress: Progress;
+
+	unitItems: MenuItem<SlideType>[];
+	nextUnit: UnitInfo | null;
+
+	onCourseClick: () => void;
+}
+
+interface State {
+	overlayStyle?: CSSProperties;
+	sideMenuStyle?: CSSProperties;
+	xDown: null | number;
+	yDown: null | number;
+	touchListenerAdded: boolean,
+}
+
+class Navigation extends Component<Props, State> {
+	touchDistanceTolerance = 10;
+	touchStartMaxX = 24;//is simmilar to left padding on slide
+	unitHeaderRef: React.RefObject<HTMLElement> = React.createRef();
+	animationDuration = 300;
+
+	constructor(props: Props) {
 		super(props);
 
 		this.state = {
-			overlayStyle: null,
-			sideMenuStyle: null,
 			xDown: null,
 			yDown: null,
 			touchListenerAdded: false,
-		}
+		};
 	}
 
 	componentDidMount() {
@@ -42,37 +91,37 @@ class Navigation extends Component {
 
 	isMobileNavigationMenu = () => {
 		return isMobile() || isTablet();
-	}
+	};
 
 	tryAddTouchListener = () => {
 		if(this.isMobileNavigationMenu() && !this.state.touchListenerAdded) {
 			document.addEventListener('touchstart', this.handleTouchStart);
 			this.setState({
 				touchListenerAdded: true,
-			})
+			});
 		}
-	}
+	};
 
-	getTouches = (evt) => {
+	getTouches = (evt: TouchEvent) => {
 		return evt.touches || evt.changedTouches;
-	}
+	};
 
-	handleTouchStart = (evt) => {
+	handleTouchStart = (evt: TouchEvent) => {
 		document.addEventListener('touchmove', this.handleTouchMove);
 		document.addEventListener('touchend', this.handleTouchEnd);
 
 		const { clientX, clientY, } = this.getTouches(evt)[0];
 		const { navigationOpened } = this.props;
 
-		if(!navigationOpened || navigationOpened) {
+		if(!navigationOpened && clientX <= this.touchStartMaxX || navigationOpened) {
 			this.setState({
 				xDown: clientX,
 				yDown: clientY,
-			})
+			});
 		}
 	};
 
-	handleTouchEnd = (evt) => {
+	handleTouchEnd = (evt: TouchEvent) => {
 		const { clientX, } = evt.changedTouches[0];
 		const { toggleNavigation, navigationOpened, } = this.props;
 		const { xDown, yDown, overlayStyle, } = this.state;
@@ -98,14 +147,14 @@ class Navigation extends Component {
 		this.setState({
 			xDown: null,
 			yDown: null,
-			sideMenuStyle: null,
-		})
+			sideMenuStyle: undefined,
+		});
 
 		document.removeEventListener('touchmove', this.handleTouchMove);
 		document.removeEventListener('touchend', this.handleTouchEnd);
 	};
 
-	handleTouchMove = (evt) => {
+	handleTouchMove = (evt: TouchEvent) => {
 		const { xDown, yDown, } = this.state;
 		const { navigationOpened } = this.props;
 
@@ -138,14 +187,14 @@ class Navigation extends Component {
 					transform: `translateX(${ Math.min(0, diff) }px)`,
 					transition: 'unset',
 				}
-			})
+			});
 		} else {
 			this.setState({
 				xDown: null,
 				yDown: null,
-				overlayStyle: null,
-				sideMenuStyle: null,
-			})
+				overlayStyle: undefined,
+				sideMenuStyle: undefined,
+			});
 		}
 	};
 
@@ -162,12 +211,11 @@ class Navigation extends Component {
 		}
 	}
 
-	componentDidUpdate(prevProps, prevState, snapshot) {
+	componentDidUpdate(prevProps: Props) {
 		const { navigationOpened } = this.props;
 
 		if((isMobile() || isTablet()) && prevProps.navigationOpened !== navigationOpened) {
-			document.querySelector('body')
-				.classList.toggle(styles.overflow, navigationOpened);
+			document.querySelector('body')?.classList.toggle(styles.overflow, navigationOpened);
 			if(!navigationOpened) {
 				this.playHidingOverlayAnimation();
 			}
@@ -182,10 +230,10 @@ class Navigation extends Component {
 		});
 		setTimeout(() => {
 			this.setState({
-				overlayStyle: null,
-			})
-		}, 300);
-	}
+				overlayStyle: undefined,
+			});
+		}, this.animationDuration);
+	};
 
 	hideNavigationMenu = () => {
 		const { navigationOpened, toggleNavigation, } = this.props;
@@ -193,68 +241,71 @@ class Navigation extends Component {
 		if(navigationOpened) {
 			toggleNavigation();
 		}
-	}
+	};
 
 	render() {
-		const { unitTitle, } = this.props;
 		const { overlayStyle } = this.state;
+
+		const courseProps = this.props as CourseNavigationProps;
 
 		return (
 			<aside>
 				<div className={ styles.overlay } style={ overlayStyle } onClick={ this.hideNavigationMenu }/>
-				{ unitTitle
-					? this.renderUnitNavigation()
-					: this.renderCourseNavigation()
+				{ courseProps.courseItems
+					? this.renderCourseNavigation(this.props as CourseNavigationProps)
+					: this.renderUnitNavigation(this.props as UnitNavigationProps)
 				}
 			</aside>
 		);
 	}
 
-	renderUnitNavigation() {
+	renderUnitNavigation({
+		unitTitle,
+		onCourseClick,
+		unitItems,
+		nextUnit,
+		unitProgress
+	}: UnitNavigationProps) {
 		const {
-			unitTitle,
 			courseTitle,
-			onCourseClick,
-			unitItems,
-			nextUnit,
 			groupsAsStudent,
-			unitProgress
+			toggleNavigation,
 		} = this.props;
 		const { sideMenuStyle } = this.state;
 
 		return (
 			<div className={ styles.contentWrapper } style={ sideMenuStyle }>
-				< NavigationHeader
-					createRef={ (ref) => this.unitHeaderRef = ref }
+				<NavigationHeader
 					title={ unitTitle }
-					progress={ unitProgress }
 					courseName={ courseTitle }
-					onCourseClick={ onCourseClick }
+					progress={ unitProgress }
 					groupsAsStudent={ groupsAsStudent }
+					createRef={ this.unitHeaderRef }
+					onClick={ onCourseClick }
 				/>
-				< NavigationContent items={ unitItems } toggleNavigation={ this.hideNavigationMenu }/>
-				{ nextUnit && <NextUnit unit={ nextUnit } toggleNavigation={ this.handleToggleNavigation }
-				/> }
+				<NavigationContent items={ unitItems } onClick={ toggleNavigation }/>
+				{ nextUnit && <NextUnit unit={ nextUnit } onClick={ this.handleToggleNavigation }/> }
 			</div>
-		)
+		);
 	}
 
 	handleToggleNavigation = () => {
-		this.unitHeaderRef.scrollIntoView();
+		this.unitHeaderRef.current?.scrollIntoView();
 		this.hideNavigationMenu();
 	};
 
-	renderCourseNavigation() {
+	renderCourseNavigation({
+		description,
+		courseItems,
+		containsFlashcards,
+		courseId,
+		slideId,
+		courseProgress
+	}: CourseNavigationProps) {
 		const {
 			courseTitle,
-			description,
-			courseItems,
-			containsFlashcards,
-			courseId,
-			slideId,
 			toggleNavigation,
 			groupsAsStudent,
-			courseProgress
 		} = this.props;
 		const { sideMenuStyle } = this.state;
 
@@ -271,35 +322,11 @@ class Navigation extends Component {
 				<Flashcards toggleNavigation={ toggleNavigation } courseId={ courseId }
 							isActive={ slideId === flashcards }/> }
 			</div>
-		)
+		);
 	}
 }
 
-Navigation.propTypes = {
-	navigationOpened: PropTypes.bool,
-	courseTitle: PropTypes.string,
-	groupsAsStudent: PropTypes.arrayOf(PropTypes.shape(groupAsStudentType)),
-
-	courseId: PropTypes.string,
-	description: PropTypes.string,
-	courseProgress: PropTypes.shape(progressType),
-	courseItems: PropTypes.arrayOf(PropTypes.shape(courseMenuItemType)),
-	slideId: PropTypes.string,
-	containsFlashcards: PropTypes.bool,
-
-	unitTitle: PropTypes.string,
-	unitProgress: PropTypes.shape(progressType),
-	unitItems: PropTypes.arrayOf(PropTypes.shape(menuItemType)),
-	nextUnit: PropTypes.shape({
-		title: PropTypes.string,
-		slug: PropTypes.string,
-	}),
-
-	onCourseClick: PropTypes.func,
-	toggleNavigation: PropTypes.func,
-};
-
-const mapStateToProps = (state) => {
+const mapStateToProps = (state: RootState) => {
 	const { currentCourseId } = state.courses;
 	const courseId = currentCourseId
 		? currentCourseId.toLowerCase()
@@ -312,8 +339,9 @@ const mapStateToProps = (state) => {
 	return { groupsAsStudent: courseGroupsAsStudent, };
 };
 
-const mapDispatchToProps = (dispatch) => ({
+const mapDispatchToProps = (dispatch: Dispatch) => ({
 	toggleNavigation: () => dispatch(toggleNavigationAction()),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Navigation);
+const connected = connect(mapStateToProps, mapDispatchToProps)(Navigation);
+export default connected;

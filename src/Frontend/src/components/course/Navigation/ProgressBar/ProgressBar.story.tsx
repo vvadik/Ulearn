@@ -1,5 +1,5 @@
 import React from "react";
-import ProgressBar from "./ProgressBar.js";
+import ProgressBar from "./ProgressBar";
 import { Gapped } from "ui";
 
 const ProgressBars = () => (

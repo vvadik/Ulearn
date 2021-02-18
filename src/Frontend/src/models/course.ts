@@ -30,8 +30,8 @@ interface ScoringGroup {
 interface UnitInfo {
 	id: string;
 	title: string;
-	isNotPublished: boolean | undefined;
-	publicationDate: string | undefined;
+	isNotPublished?: boolean;
+	publicationDate?: string;
 	slides: ShortSlideInfo[];
 	additionalScores: UnitScoringGroupInfo[];
 }
@@ -74,4 +74,25 @@ export interface ShortCourseInfo {
 	isTempCourse: boolean,
 }
 
-export { CourseInfo, ScoringInfo, UnitInfo, UnitScoringGroupInfo, InfoByUnit, ScoringGroup, };
+interface UnitsInfo {
+	[p: string]: UnitInfo;
+}
+
+interface PageInfo {
+	isLti: boolean;
+	isReview: boolean;
+	isAcceptedSolutions: boolean;
+	isNavigationVisible: boolean;
+	isAcceptedAlert: boolean;
+}
+
+export {
+	CourseInfo,
+	ScoringInfo,
+	UnitInfo,
+	UnitScoringGroupInfo,
+	InfoByUnit,
+	ScoringGroup,
+	UnitsInfo,
+	PageInfo,
+};
