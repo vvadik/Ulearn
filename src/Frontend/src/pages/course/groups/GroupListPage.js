@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet";
 import connect from "react-redux/es/connect/connect";
 import PropTypes from 'prop-types';
 import api from "src/api";
-import { Page } from "../../index";
+import Page from "../../index";
 import GroupList from "src/components/groups/GroupMainPage/GroupList/GroupList";
 import GroupHeader from "src/components/groups/GroupMainPage/GroupHeader/GroupHeader";
 import Error404 from "src/components/common/Error/Error404";
