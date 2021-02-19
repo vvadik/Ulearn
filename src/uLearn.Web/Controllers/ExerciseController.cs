@@ -213,11 +213,11 @@ namespace uLearn.Web.Controllers
 
 				/* Invalid form: percent isn't integer */
 				if (!int.TryParse(exercisePercent, out var percent))
-					return Json(new ScoreExerciseOperationResult { Status = "error", Redirect = errorUrl + "Неверное количество баллов"});
+					return Json(new ScoreExerciseOperationResult { Status = "error", Redirect = errorUrl + "Неверное количество процентов"});
 
 				/* Invalid form: score isn't from range 0..100 */
 				if (percent < 0 || percent > 100)
-					return Json(new ScoreExerciseOperationResult { Status = "error", Redirect = errorUrl + $"Неверное количество баллов: {percent}"});
+					return Json(new ScoreExerciseOperationResult { Status = "error", Redirect = errorUrl + $"Неверное количество процентов: {percent}"});
 
 				checking.ProhibitFurtherManualCheckings = prohibitFurtherReview;
 				await slideCheckingsRepo.MarkManualExerciseCheckingAsChecked(checking, percent).ConfigureAwait(false);
