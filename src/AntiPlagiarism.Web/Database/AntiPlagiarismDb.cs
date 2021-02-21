@@ -65,6 +65,9 @@ namespace AntiPlagiarism.Web.Database
 
 			modelBuilder.Entity<TaskStatisticsParameters>()
 				.HasKey(p => new { p.TaskId, p.Language });
+			
+			modelBuilder.Entity<ManualSuspicionLevels>()
+				.HasKey(p => new { p.TaskId, p.Language });
 		}
 
 		public void MigrateToLatestVersion()

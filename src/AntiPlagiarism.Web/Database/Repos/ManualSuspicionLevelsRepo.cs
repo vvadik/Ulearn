@@ -26,7 +26,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 		{
 			using (var ts = new TransactionScope(TransactionScopeOption.Required, TimeSpan.FromSeconds(30), TransactionScopeAsyncFlowOption.Enabled))
 			{
-				db.AddOrUpdate(manualSuspicionLevels, p => p.TaskId == manualSuspicionLevels.TaskId);
+				db.AddOrUpdate(manualSuspicionLevels, p => p.TaskId == manualSuspicionLevels.TaskId && p.Language == manualSuspicionLevels.Language);
 				await db.SaveChangesAsync().ConfigureAwait(false);
 				ts.Complete();
 			}

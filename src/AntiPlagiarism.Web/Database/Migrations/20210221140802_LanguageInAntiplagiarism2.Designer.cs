@@ -4,14 +4,16 @@ using AntiPlagiarism.Web.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AntiPlagiarism.Web.Migrations
 {
     [DbContext(typeof(AntiPlagiarismDb))]
-    partial class AntiPlagiarismDbModelSnapshot : ModelSnapshot
+    [Migration("20210221140802_LanguageInAntiplagiarism2")]
+    partial class LanguageInAntiplagiarism2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

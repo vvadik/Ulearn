@@ -323,6 +323,7 @@ namespace AntiPlagiarism.Web.Controllers
 			await manualSuspicionLevelsRepo.SetManualSuspicionLevelsAsync(new ManualSuspicionLevels
 			{
 				TaskId = parameters.TaskId,
+				Language = parameters.Language,
 				FaintSuspicion = parameters.FaintSuspicion,
 				StrongSuspicion = parameters.StrongSuspicion,
 				Timestamp = DateTime.Now
