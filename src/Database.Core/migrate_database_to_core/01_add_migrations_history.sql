@@ -79,4 +79,5 @@ VALUES
 ('20200917114641_AddStyleErrorSettings', '3.1.2'),
 ('20200929114914_AddWorkQueue', '3.1.2'),
 ('20201006095220_ChangeScoreFields', '3.1.2'),
-('20210128041937_AddDebugLogsRunningResult', '3.1.2')
+('20210128041937_AddDebugLogsRunningResult', '3.1.2'),
+('20210221133234_LanguageInAntiplagiarism', '3.1.2')

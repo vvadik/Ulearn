@@ -8,9 +8,7 @@ namespace AntiPlagiarism.Web.Database.Models
 	/* TODO (andgein): Add clientId to TaskStatisticsParameters? */
 	public class TaskStatisticsParameters
 	{
-		[Key]
 		public Guid TaskId { get; set; }
-		[Key]
 		public Language Language { get; set; }
 
 		public double Mean { get; set; }
@@ -20,5 +18,6 @@ namespace AntiPlagiarism.Web.Database.Models
 		public int SubmissionsCount { get; set; }
 
 		public DateTime? Timestamp { get; set; }
+		
 	}
 }
