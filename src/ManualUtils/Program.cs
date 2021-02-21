@@ -34,6 +34,8 @@ namespace ManualUtils
 				.UseSqlServer(configuration.Database);
 			var adb = new AntiPlagiarismDb(aOptionsBuilder.Options);
 
+			FillLanguageToAntiplagiarism.FillLanguage(adb);
+
 			//await ResendLti(db);
 			//await FindExternalSolutionsPlagiarism.UploadSolutions();
 			//await FindExternalSolutionsPlagiarism.GetRawResults();
