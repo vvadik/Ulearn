@@ -1,8 +1,8 @@
-import BlockTypes from "../components/course/Course/Slide/blockTypes";
 import { ReactNode } from "react";
-import { Language } from "../consts/languages";
-import { SubmissionInfoRedux } from "./reduxState";
-import { AttemptsStatistics } from "./exercise";
+import { Language } from "src/consts/languages";
+import { SubmissionInfoRedux } from "src/models/reduxState";
+import { AttemptsStatistics, SubmissionInfo } from "src/models/exercise";
+import { DeviceType } from "src/consts/deviceType";
 
 interface ShortSlideInfo {
 	id: string;
@@ -24,6 +24,16 @@ enum SlideType {
 	Flashcards = "flashcards",
 	CourseFlashcards = "courseFlashcards",
 	PreviewFlashcards = "previewFlashcards",
+}
+
+export enum BlockTypes {
+	video = "youtube",
+	code = "code",
+	text = "html",
+	image = "imageGallery",
+	spoiler = "spoiler",
+	tex = 'tex',
+	exercise = 'exercise',
 }
 
 interface Block<T extends BlockTypes> {
@@ -55,17 +65,36 @@ interface ExerciseBlock extends Block<BlockTypes.exercise> {
 	courseId: string,
 	forceInitialCode: boolean,
 	maxScore: number,
+	submissions?: SubmissionInfo[],//we're moving this field to other state in redux reducer
+	isLti: boolean,
 }
 
 interface ExerciseBlockProps {
 	languages: Language[],
-	languageNames: EnumDictionary<Language, string> | null,
+	languageInfo: EnumDictionary<Language, LanguageLaunchInfo> | null,
+	defaultLanguage: Language | null,
 	renderedHints: string[],
 	exerciseInitialCode: string,
 	hideSolutions: boolean,
 	expectedOutput: string,
 	submissions: SubmissionInfoRedux[],
-	attemptsStatistics: AttemptsStatistics
+	attemptsStatistics: AttemptsStatistics | null,
 }
 
-export { ShortSlideInfo, SlideType, Block, SpoilerBlock, TexBlock, VideoBlock, ExerciseBlock, ExerciseBlockProps, };
+interface LanguageLaunchInfo {
+	compiler: string;
+	compileCommand: string;
+	runCommand: string;
+}
+
+export {
+	ShortSlideInfo,
+	SlideType,
+	Block,
+	SpoilerBlock,
+	TexBlock,
+	VideoBlock,
+	ExerciseBlock,
+	ExerciseBlockProps,
+	LanguageLaunchInfo,
+};

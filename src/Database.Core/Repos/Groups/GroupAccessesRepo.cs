@@ -201,7 +201,7 @@ namespace Database.Repos.Groups
 		/* Instructor can view student if he is a course admin or if student is member of one of accessible for instructor group */
 		public async Task<bool> CanInstructorViewStudentAsync(string instructorId, string studentId)
 		{
-			if (await courseRolesRepo.HasUserAccessToAnyCourseAsync(instructorId, CourseRoleType.CourseAdmin).ConfigureAwait(false))
+			if (await courseRolesRepo.HasUserAccessTo_Any_CourseAsync(instructorId, CourseRoleType.CourseAdmin).ConfigureAwait(false))
 				return true;
 
 			var coursesIds = (await courseManager.GetCoursesAsync()).Select(c => c.Id).ToList();

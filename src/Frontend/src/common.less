@@ -5,10 +5,6 @@
 }
 
 :global {
-  .react-ui *:not(button) { //preventing styles bugs for kontur ui components
-    box-sizing: initial;
-  }
-
   .inline-pre { //styles for inline code, used in comments and review, class is added in backend render
     font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
     font-size: 13px;
@@ -22,6 +18,18 @@
     border: 0 solid #ccc;
     padding: 0 5px;
     overflow: visible;
+  }
+
+  a {
+    color: #337ab7;
+    text-decoration: none;
+  }
+
+  code {
+    padding: 2px 4px;
+    color: #c7254e;
+    background-color: #f9f2f4;
+    border-radius: 4px;
   }
 }
 
@@ -40,22 +48,3 @@ body {
   border-right: 4px solid transparent;
   border-left: 4px solid transparent;
 }
-
-@media (min-width: @maxTabletWidth) {
-  .visible-only-desktop {
-    display: initial;
-  }
-}
-
-@media (max-width: @maxPhoneWidth) {
-  .visible-only-phone {
-    display: initial;
-  }
-}
-
-@media (max-width: @maxPhoneWidth) {
-  .visible-at-least-tablet {
-    display: none !important;
-  }
-}
-

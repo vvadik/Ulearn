@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AngleSharp.Html.Parser;
+using Database.Models;
 using Database.Repos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,14 +26,16 @@ namespace Ulearn.Web.Api.Controllers.Slides
 	{
 		private readonly IUlearnVideoAnnotationsClient videoAnnotationsClient;
 		private readonly IUserSolutionsRepo solutionsRepo;
+		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
 
 		public SlideRenderer(IUlearnVideoAnnotationsClient videoAnnotationsClient,
-			IUserSolutionsRepo solutionsRepo, ISlideCheckingsRepo slideCheckingsRepo)
+			IUserSolutionsRepo solutionsRepo, ISlideCheckingsRepo slideCheckingsRepo, ICourseRolesRepo courseRolesRepo)
 		{
 			this.videoAnnotationsClient = videoAnnotationsClient;
 			this.solutionsRepo = solutionsRepo;
 			this.slideCheckingsRepo = slideCheckingsRepo;
+			this.courseRolesRepo = courseRolesRepo;
 		}
 
 		public ShortSlideInfo BuildShortSlideInfo(string courseId, Slide slide, Func<Slide, int> getSlideMaxScoreFunc, Func<Slide, string> getGitEditLink, IUrlHelper urlHelper)
@@ -133,7 +136,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 
 		private static async Task<IEnumerable<IApiSlideBlock>> RenderBlock(MarkdownBlock mb, SlideRenderContext context)
 		{
-			var renderedMarkdown = mb.RenderMarkdown(context.CourseId, context.Slide.Id, context.BaseUrl);
+			var renderedMarkdown = mb.RenderMarkdown(context.CourseId, context.Slide, context.BaseUrl);
 			var parsedBlocks = ParseBlocksFromMarkdown(renderedMarkdown);
 			if (mb.Hide)
 				parsedBlocks.ForEach(b => b.Hide = true);
@@ -155,26 +158,35 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				.GetAllSubmissionsByUser(context.CourseId, context.Slide.Id, context.UserId)
 				.Include(s => s.AutomaticChecking).ThenInclude(c => c.Output)
 				.Include(s => s.AutomaticChecking).ThenInclude(c => c.CompilationError)
+				.Include(s => s.AutomaticChecking).ThenInclude(c => c.DebugLogs)
 				.Include(s => s.SolutionCode)
 				.Include(s => s.Reviews).ThenInclude(c => c.Author)
 				.Include(s => s.ManualCheckings).ThenInclude(c => c.Reviews).ThenInclude(r => r.Author)
 				.ToListAsync();
 			var codeReviewComments = await slideCheckingsRepo.GetExerciseCodeReviewComments(context.CourseId, context.Slide.Id, context.UserId);
-			var exerciseUsersCount = await slideCheckingsRepo.GetExerciseUsersCount(context.CourseId, context.Slide.Id);
-			var exerciseUsersWithRightAnswerCount = await slideCheckingsRepo.GetExerciseUsersWithRightAnswerCount(context.CourseId, context.Slide.Id);
-			var lastSuccessAttemptDate = await slideCheckingsRepo.GetExerciseLastRightAnswerDate(context.CourseId, context.Slide.Id);
+			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourseAsync(context.UserId, context.CourseId, CourseRoleType.CourseAdmin);
+			
+			ExerciseAttemptsStatistics exerciseAttemptsStatistics = null;
+			if (b.HasAutomaticChecking())
+			{
+				var exerciseUsersCount = await slideCheckingsRepo.GetExerciseUsersCount(context.CourseId, context.Slide.Id);
+				var exerciseUsersWithRightAnswerCount = await slideCheckingsRepo.GetExerciseUsersWithRightAnswerCount(context.CourseId, context.Slide.Id);
+				var lastSuccessAttemptDate = await slideCheckingsRepo.GetExerciseLastRightAnswerDate(context.CourseId, context.Slide.Id);
+				exerciseAttemptsStatistics = new ExerciseAttemptsStatistics
+				{
+					AttemptedUsersCount = exerciseUsersCount,
+					UsersWithRightAnswerCount = exerciseUsersWithRightAnswerCount,
+					LastSuccessAttemptDate = lastSuccessAttemptDate
+				};
+			}
 
 			var exerciseSlideRendererContext = new ExerciseSlideRendererContext
 			{
 				Submissions = submissions,
 				CodeReviewComments = codeReviewComments,
 				SlideFile = context.Slide.Info.SlideFile,
-				AttemptsStatistics = new ExerciseAttemptsStatistics
-				{
-					AttemptedUsersCount = exerciseUsersCount,
-					UsersWithRightAnswerCount = exerciseUsersWithRightAnswerCount,
-					LastSuccessAttemptDate = lastSuccessAttemptDate
-				}
+				CanSeeCheckerLogs = isCourseAdmin,
+				AttemptsStatistics = exerciseAttemptsStatistics,
 			};
 			return new[] { new ExerciseBlockResponse(b, exerciseSlideRendererContext) };
 		}

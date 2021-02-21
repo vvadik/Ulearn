@@ -66,7 +66,7 @@ namespace Database.Repos.Users.Search
 			if (usersRepo.IsSystemAdministrator(currentUser))
 				return Task.FromResult(true);
 
-			return courseRolesRepo.HasUserAccessToAnyCourseAsync(currentUser.Id, CourseRoleType.Instructor);
+			return courseRolesRepo.HasUserAccessTo_Any_CourseAsync(currentUser.Id, CourseRoleType.Instructor);
 		}
 
 #pragma warning disable 1998

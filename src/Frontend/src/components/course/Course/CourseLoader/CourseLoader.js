@@ -3,7 +3,7 @@ import React from "react";
 import { Loader } from "@skbkontur/react-ui";
 
 import { connect } from "react-redux";
-import { setSlideReady } from "src/actions/course";
+import { setSlideReady } from "src/actions/slides";
 import PropTypes from "prop-types";
 
 import styles from "./CourseLoader.less";

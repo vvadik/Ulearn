@@ -14,7 +14,7 @@ export const textareaHidden = ThemeFactory.create({
 }, FLAT_THEME);
 
 //currently it only applies a dark background and white text in popup(tooltip), styles copied from dark theme
-export var darkFlat = ThemeFactory.create({
+export const darkFlat = ThemeFactory.create({
 	popupTextColor: '#fff',
 	bgDefault: '#333333cc',
 	btnBorderRadiusLarge: '8px',

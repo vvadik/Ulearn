@@ -19,10 +19,10 @@ const ListTemplate: Story<{ items: { props: OutputTypeProps, header: string }[] 
 				<ExerciseOutput { ...item.props } />
 			</>
 		) }
-	</>
+	</>;
 };
 
-const outputTypeProps = {
+const outputTypeProps: OutputTypeProps = {
 	solutionRunStatus: SolutionRunStatus.Success,
 	message: "message text",
 	expectedOutput: "1\n2\n      3\nНазвание теста: MoveManipulatorTo_ActuallyBringsManipulatorToDesiredLocation(-207.950052059698d,109.42692431548d,62.2635171658309d)",
@@ -31,7 +31,8 @@ const outputTypeProps = {
 		output: "3\n2\n3",
 		processStatus: ProcessStatus.Done,
 		result: CheckingResult.WrongAnswer,
-		reviews: null
+		reviews: null,
+		checkerLogs: null,
 	},
 };
 
@@ -51,7 +52,7 @@ AllSolutionRunStatuses.args = { items: allSolutionRunStatusesItems };
 
 const allProcessStatusesItems = Object.values(ProcessStatus)
 	.map(s => ({
-		header: s, props: {
+		header: s as string, props: {
 			...outputTypeProps,
 			message: null,
 			submissionColor: SubmissionColor.NeedImprovements,
@@ -59,14 +60,14 @@ const allProcessStatusesItems = Object.values(ProcessStatus)
 				...outputTypeProps.automaticChecking,
 				processStatus: s,
 			},
-		}
+		} as OutputTypeProps
 	}));
 export const AllProcessStatuses = ListTemplate.bind({});
 AllProcessStatuses.args = { items: allProcessStatusesItems };
 
 const allCheckingResultsItems = Object.values(CheckingResult)
 	.map(s => ({
-		header: s, props: {
+		header: s as string, props: {
 			...outputTypeProps,
 			message: null,
 			submissionColor: s === CheckingResult.CompilationError || s === CheckingResult.WrongAnswer || s === CheckingResult.RuntimeError
@@ -76,7 +77,7 @@ const allCheckingResultsItems = Object.values(CheckingResult)
 				...outputTypeProps.automaticChecking,
 				result: s,
 			}
-		}
+		} as OutputTypeProps
 	}));
 export const allCheckingResults = ListTemplate.bind({});
 allCheckingResults.args = { items: allCheckingResultsItems };

@@ -1,20 +1,20 @@
-import { ShortUserInfo } from "./users";
-import { Language } from "../consts/languages";
+import { ShortUserInfo } from "src/models/users";
+import { Language } from "src/consts/languages";
 
 export interface RunSolutionResponse extends ProgressUpdate {
-	courseId: string,
-	slideId: string,
+	courseId?: string,
+	slideId?: string,
 	solutionRunStatus: SolutionRunStatus;
 	message: string | null; // Сообщение от проверяющей системы в случае ошибок на сервере и в случае некоторых ошибок компиляции.
 	submission: SubmissionInfo | null; // Если submission создан, он лежит в Submission, иначе null. Не создан в случае некоторых ошибок на сервере и иногда в случае ошибок компиляции.
-	automaticChecking: ExerciseAutomaticCheckingResponse,
+	automaticChecking?: ExerciseAutomaticCheckingResponse,
 	// Ответ сервера содержит поля из ProgressUpdate
 }
 
 export interface ProgressUpdate {
-	score: number | null; // В случае rightAnswer не null. В остальных как попало; если null, то не изменился.
-	waitingForManualChecking: boolean | null; // В случае rightAnswer не null. В остальных как попало; если null, то не изменился.
-	prohibitFurtherManualChecking: boolean | null; // В случае rightAnswer не null.
+	score?: number | null; // В случае rightAnswer не null. В остальных как попало; если null, то не изменился.
+	waitingForManualChecking?: boolean | null; // В случае rightAnswer не null. В остальных как попало; если null, то не изменился.
+	prohibitFurtherManualChecking?: boolean | null; // В случае rightAnswer не null.
 }
 
 export enum SolutionRunStatus {
@@ -41,6 +41,7 @@ export interface ExerciseAutomaticCheckingResponse {
 	processStatus: AutomaticExerciseCheckingProcessStatus;
 	result: AutomaticExerciseCheckingResult;
 	output: string | null;
+	checkerLogs: string | null;
 	reviews: ReviewInfo[] | null;
 }
 
@@ -74,11 +75,11 @@ export interface ReviewInfo {
 }
 
 export interface ReviewCommentResponse {
-	id: number;
-	text: string;
-	renderedText: string;
-	publishTime: string;
-	author: ShortUserInfo;
+	id?: number;
+	text?: string;
+	renderedText?: string;
+	publishTime?: string;
+	author?: ShortUserInfo;
 }
 
 export interface AttemptsStatistics {

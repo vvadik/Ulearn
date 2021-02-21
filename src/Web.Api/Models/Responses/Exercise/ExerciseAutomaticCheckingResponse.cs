@@ -39,9 +39,14 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 
 		[CanBeNull]
 		[DataMember]
+		public string CheckerLogs;
+
+		[CanBeNull]
+		[DataMember]
 		public List<ReviewInfo> Reviews;
 
-		public static ExerciseAutomaticCheckingResponse Build([NotNull] AutomaticExerciseChecking checking, [NotNull]List<ReviewInfo> botReviews)
+		public static ExerciseAutomaticCheckingResponse Build([NotNull] AutomaticExerciseChecking checking,
+			[CanBeNull] List<ReviewInfo> botReviews, bool showCheckerLogs)
 		{
 			var result = new ExerciseAutomaticCheckingResponse
 			{
@@ -50,6 +55,7 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 			};
 			result.ProcessStatus = GetProcessStatus(checking);
 			result.Output = checking.Output?.Text;
+			result.CheckerLogs = showCheckerLogs ? checking.DebugLogs?.Text : null;
 			if (result.ProcessStatus != AutomaticExerciseCheckingProcessStatus.Done)
 			{
 				if (result.Output == null)

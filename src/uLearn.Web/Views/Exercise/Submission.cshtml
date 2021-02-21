@@ -164,7 +164,7 @@
 		}
 		<textarea id="secretCodeExercise" class="hide">@Model.Block.ExerciseInitialCode.EnsureEnoughLines(4)</textarea>
 
-		<textarea class="code @classString hidden" data-lang="@Model.Language.ToString().ToLower()">@(Model.Solution ?? Model.Block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
+		<textarea class="code @classString hidden" data-lang="@Model.Language.GetName()">@(Model.Solution ?? Model.Block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
 		<div class="loading-spinner">
 			<img src="/Content/loading.gif"/>
 		</div>

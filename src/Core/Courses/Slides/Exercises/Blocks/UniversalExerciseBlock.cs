@@ -26,7 +26,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public string ExerciseDirPath { get; set; }
 
 		[XmlElement("userCodeFile")]
-		public virtual string UserCodeFilePath { get; set; }
+		public string UserCodeFilePath { get; set; }
 
 		[XmlElement("solutionFilePath")]
 		public string SolutionFilePath { get; set; } // По умолчанию используется UserCodeFilePath
@@ -57,10 +57,10 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public static readonly Regex DockerImageNameRegex = new Regex("^[-_a-z.]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
 		[XmlElement("run")]
-		public virtual string RunCommand { get; set; } // см. RunCommandRegex
+		public string RunCommand { get; set; } // см. RunCommandRegex
 
 		[XmlIgnore]
-		public static readonly Regex RunCommandRegex = new Regex("^[-_a-z.0-9 ;|>]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+		public static readonly Regex RunCommandRegex = new Regex("^[-_a-zA-Z.0-9 ;,|>]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
 		[XmlIgnore]
 		public DirectoryInfo UnitDirectory { get; set; }
@@ -136,6 +136,8 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			return code;
 		}
 
+		public override bool HasAutomaticChecking() => true;
+
 		public override IEnumerable<SlideBlock> BuildUp(SlideBuildingContext context, IImmutableSet<string> filesInProgress)
 		{
 			if (!Language.HasValue)
@@ -156,7 +158,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			if (correctSolution != null)
 			{
 				yield return new MarkdownBlock("### Решение") { Hide = true };
-				yield return new CodeBlock(GetCorrectSolution(), Language) { Hide = true };
+				yield return new CodeBlock(correctSolution, Language) { Hide = true };
 			}
 		}
 

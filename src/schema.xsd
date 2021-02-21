@@ -151,20 +151,9 @@
 			<xs:element name="scoring" type="ExerciseScoring" minOccurs="0" maxOccurs="1" />
 			<xs:group ref="SlideInternals" />
 		</xs:sequence>
-		<xs:attribute name="id" type="NonEmptyString" use="required">
-			<xs:annotation>
-				<xs:documentation xml:lang="en">Slide's id, should be guid</xs:documentation>
-				<xs:documentation xml:lang="ru">Идентификатор слайда, должен быть гуидом</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
-		<xs:attribute name="hide" type="xs:boolean">
-			<xs:annotation>
-				<xs:documentation xml:lang="en">Side is shown to instructors only</xs:documentation>
-				<xs:documentation xml:lang="ru">Слайд показывается только преподавателям</xs:documentation>
-			</xs:annotation>
-		</xs:attribute>
+		<xs:attributeGroup ref="SlideAttributes" />
 	</xs:complexType>
-	
+
 	<xs:complexType name="PolygonSlide">
 		<xs:all>
 			<xs:element name="scoring" type="ExerciseScoring" minOccurs="0"/>
@@ -418,7 +407,13 @@
 		</xs:sequence>
 		<xs:attribute name="text" type="NonEmptyString" use="required" />
 		<xs:attribute name="hideQuizButton" type="xs:boolean" use="optional" />
-		<xs:attribute name="closable" type="xs:boolean" use="optional" />
+		<xs:attribute name="closable" type="xs:boolean" use="optional" >
+			<xs:annotation>
+				<xs:documentation>
+					Атрибут устарел. Все спойлеры можно закрыть.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
 		<xs:attribute name="hide" type="xs:boolean" use="optional" />
 	</xs:complexType>
 

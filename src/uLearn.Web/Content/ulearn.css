@@ -585,12 +585,12 @@
 	width: 100%;
 }
 
-.legacy-page .quiz-submit-btn {
-	margin-bottom: 5px;
+.legacy-page .quiz-submit-wrapper {
+	margin-top: 15px;
 }
 
-.legacy-page .quiz-button {
-	margin-top: 15px;
+.legacy-page .quiz-submit-btn {
+	margin-bottom: 5px;
 }
 
 .legacy-page .quiz-status,

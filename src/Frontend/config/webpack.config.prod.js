@@ -1,11 +1,10 @@
 const autoprefixer = require('autoprefixer');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ManifestPlugin = require('webpack-manifest-plugin');
-const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
-const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
+const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
+const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin')
+const { GenerateSW } = require('workbox-webpack-plugin');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
-const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const paths = require('./paths');
 const getClientEnvironment = require('./env');
@@ -27,7 +26,7 @@ const env = getClientEnvironment(publicUrl);
 
 // Assert this just to be safe.
 // Development builds of React are slow and not intended for production.
-if (env.stringified['process.env'].NODE_ENV !== '"production"') {
+if(env.stringified['process.env'].NODE_ENV !== '"production"') {
 	throw new Error('Production builds must have NODE_ENV=production.');
 }
 
@@ -45,18 +44,16 @@ const miniCssExtractPluginOptions = shouldUseRelativeAssetPaths
 	: {};
 
 let base = require('./webpack.config.base');
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 // This is the production configuration.
 // It compiles slowly and is focused on producing a fast and minimal bundle.
 // The development configuration is different and lives in a separate file.
-module.exports = merge(base,{
+module.exports = merge([base, {
 	mode: 'production',
 	bail: true,
 	entry: {
 		main: [
-			'./config/polyfills',
-			'./config/sentry',
-			paths.appIndexJs
+			paths.appIndexTsx
 		],
 		oldBrowser: [
 			paths.oldBrowserJs,
@@ -124,11 +121,17 @@ module.exports = merge(base,{
 								}
 							},
 							{
-								loader: "postcss-loader",
+								loader: 'postcss-loader',
 								options: {
-									plugins: () => [
-										autoprefixer({ flexbox: 'no-2009' })
-									]
+									postcssOptions: {
+										ident: 'postcss',
+										plugins: [
+											"postcss-preset-env",
+											{
+												autoprefixer: { flexbox: 'no-2009' }
+											},
+										]
+									}
 								},
 							},
 							{
@@ -154,11 +157,15 @@ module.exports = merge(base,{
 							{
 								loader: 'postcss-loader',
 								options: {
-									ident: 'postcss',
-									plugins: () => [
-										require('postcss-flexbugs-fixes'),
-										autoprefixer({ flexbox: 'no-2009', }),
-									],
+									postcssOptions: {
+										ident: 'postcss',
+										plugins: [
+											"postcss-preset-env",
+											{
+												autoprefixer: { flexbox: 'no-2009' }
+											},
+										]
+									}
 								},
 							},
 						],
@@ -202,8 +209,8 @@ module.exports = merge(base,{
 			chunksSortMode: (chunk1, chunk2) => {
 				/* oldBrowser.js should be the first bundle. For more complex cases see solution
 				   at https://github.com/jantimon/html-webpack-plugin/issues/481#issuecomment-287370259*/
-				if (chunk1 === 'oldBrowser') return -1;
-				if (chunk2 === 'oldBrowser') return 1;
+				if(chunk1 === 'oldBrowser') return -1;
+				if(chunk2 === 'oldBrowser') return 1;
 				return 0;
 			},
 		}),
@@ -212,6 +219,9 @@ module.exports = merge(base,{
 		// It is absolutely essential that NODE_ENV was set to production here.
 		// Otherwise React will be compiled in the very slow development mode.
 		new webpack.DefinePlugin(env.stringified),
+		new webpack.ProvidePlugin({
+			process: 'process/browser',
+		}),
 		// See https://github.com/webpack-contrib/mini-css-extract-plugin for details
 		new MiniCssExtractPlugin({
 			// Options similar to the same options in webpackOptions.output
@@ -222,38 +232,19 @@ module.exports = merge(base,{
 		// Generate a manifest file which contains a mapping of all asset filenames
 		// to their corresponding output file so that tools can pick it up without
 		// having to parse `index.html`.
-		new ManifestPlugin({
+		new WebpackManifestPlugin({
 			fileName: 'asset-manifest.json',
 		}),
 		// Generate a service worker script that will precache, and keep up to date,
 		// the HTML & assets that are part of the Webpack build.
-		new SWPrecacheWebpackPlugin({
-			// By default, a cache-busting query parameter is appended to requests
-			// used to populate the caches, to ensure the responses are fresh.
-			// If a URL is already hashed by Webpack, then there is no concern
-			// about it being stale, and the cache-busting can be skipped.
-			dontCacheBustUrlsMatching: /\.\w{8}\./,
-			filename: 'service-worker.js',
-			logger(message) {
-				if (message.indexOf('Total precache size is') === 0) {
-					// This message occurs for every build and is a bit too noisy.
-					return;
-				}
-				if (message.indexOf('Skipping static resource') === 0) {
-					// This message obscures real errors so we ignore it.
-					// https://github.com/facebookincubator/create-react-app/issues/2612
-					return;
-				}
-				console.log(message);
-			},
-			minify: true,
+		new GenerateSW({
 			// For unknown URLs, fallback to the index page
 			navigateFallback: publicUrl + '/index.html',
 			// Ignores URLs starting from /__ (useful for Firebase):
 			// https://github.com/facebookincubator/create-react-app/issues/2237#issuecomment-302693219
-			navigateFallbackWhitelist: [/^(?!\/__).*/],
+			navigateFallbackAllowlist: [/^(?!\/__).*/],
 			// Don't precache sourcemaps (they're large) and build asset manifest:
-			staticFileGlobsIgnorePatterns: [/\.map$/, /asset-manifest\.json$/],
+			exclude: [/\.map$/, /asset-manifest\.json$/],
 		}),
 		// Moment.js is an extremely popular library that bundles large locale files
 		// by default due to how Webpack interprets its code. This is a practical
@@ -264,6 +255,5 @@ module.exports = merge(base,{
 	],
 	optimization: {
 		minimize: true,
-		minimizer: [new TerserPlugin()],
 	},
-});
+}]);

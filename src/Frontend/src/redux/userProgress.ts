@@ -1,12 +1,16 @@
-import { UserProgressState } from "../models/reduxState";
-
 import {
-	UserProgressActionTypes,
 	USER__PROGRESS_LOAD_FAIL,
 	USER__PROGRESS_LOAD_START,
 	USER__PROGRESS_LOAD_SUCCESS,
 	USER__PROGRESS_UPDATE,
+	UserProgressActionTypes,
 } from "src/actions/userProgress.types";
+import { SlideUserProgress } from "src/models/userProgress";
+
+interface UserProgressState {
+	loading: boolean;
+	progress: { [courseId: string]: { [slideId: string]: SlideUserProgress } };
+}
 
 const initialState: UserProgressState = {
 	progress: {},

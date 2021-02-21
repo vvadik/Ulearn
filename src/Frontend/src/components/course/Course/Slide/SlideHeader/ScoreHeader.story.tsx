@@ -5,8 +5,8 @@ import configureStore from "redux-mock-store";
 
 import { ScoreHeader, ScoreHeaderPropsFromRedux } from "./ScoreHeader";
 import { RootState } from "src/models/reduxState";
-import { SlideType } from "../../../../../models/slide";
-import {CourseRoleType} from "../../../../../consts/accessType";
+import { SlideType } from "src/models/slide";
+import {CourseRoleType} from "src/consts/accessType";
 
 const courseId = "courseId";
 const slideId = "slideId";

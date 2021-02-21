@@ -1,0 +1,224 @@
+.problem li:before { 
+    content: '' !important; 
+}
+
+.problem .problem-statement {
+    margin: 0.5em auto 2em auto;
+    font-family: verdana,serif;
+    line-height: 1.5em;
+    font-size: 14px;
+    max-width: 1024px;
+}
+
+.problem .problem-statement .epigraph {
+    margin-left: 67%;
+    width: 33%;
+}
+
+.problem .problem-statement .epigraph-text {
+}
+
+.problem .problem-statement .epigraph-source {
+    border-top: 1px solid #888;
+    text-align: right;
+}
+
+.problem .problem-statement p {
+    margin: 0 0 1em 0;
+}
+
+.problem .problem-statement .header {
+    margin-bottom: 1em;
+    text-align: center;
+}
+
+.problem .problem-statement .header .title {
+    font-size: 150%;
+    margin-bottom: 0.25em;
+}
+
+.problem .problem-statement .header .title {
+    font-size: 150%;
+    font-family: arial;
+}
+
+.problem .problem-statement ul {
+    list-style: disc;
+    list-style-type: disc;
+    list-style-position: outside;
+}
+
+.problem .problem-statement ol {
+    list-style: decimal;
+    list-style-type: decimal;
+    list-style-position: outside;
+}
+
+.problem .problem-statement li {
+    line-height: 1.5em;
+    margin-left: 3em;
+}
+
+.problem .problem-statement .property-title {
+    display: inline;
+}
+
+.problem .problem-statement .property-title:after {
+    content: ": ";
+}
+
+.problem .problem-statement .time-limit, .problem-statement .memory-limit, .problem-statement .input-file, .problem-statement .output-file {
+    margin: 0 auto;
+}
+
+.problem .problem-statement .legend {
+    margin-bottom: 1em;
+}
+
+.problem .problem-statement .section-title {
+    font-family: arial;
+    font-size: 115%;
+    font-weight: bold;
+}
+
+.problem .problem-statement .input-specification,
+    .problem-statement .output-specification,
+    .problem-statement .sample-tests,
+    .problem-statement .author,
+    .problem-statement .resource,
+    .problem-statement .date {
+    /*margin-bottom: 1em;*/
+}
+
+.problem .problem-statement .output-specification {
+    margin-bottom: 1em;
+}
+
+.problem .problem-statement .sample-tests .sample-test {
+}
+
+.problem .problem-statement .sample-tests .input, .problem-statement .sample-tests .output {
+    border: 1px solid #888;
+}
+
+.problem .problem-statement .sample-tests .output {
+    margin-bottom: 1em;
+    position: relative;
+    top: -1px;
+}
+
+.problem .problem-statement .sample-tests pre {
+    line-height: 1.25em;
+    padding: 0.25em;
+    margin: 0;
+    background-color: #efefef;
+}
+
+.problem .problem-statement .sample-tests .title {
+    font-family: arial;
+    padding: 0.25em;
+    border-bottom: 1px solid #888;
+    text-transform: lowercase;
+    font-weight: bold;
+}
+
+.problem .problem-statement .tex-formula {
+    vertical-align: middle;
+    margin: 0;
+    border:medium none;
+    position: relative;
+    bottom: 2px;
+}
+
+.problem .problem-statement .tex-span {
+    font-size: 125%;
+    font-family: times new roman;
+    white-space: nowrap;
+}
+
+.problem .problem-statement .tex-font-size-tiny {
+    font-size: 70%;
+}
+
+.problem .problem-statement .tex-font-size-script {
+    font-size: 75%;
+}
+
+.problem .problem-statement .tex-font-size-footnotes {
+    font-size: 85%;
+}
+
+.problem .problem-statement .tex-font-size-small {
+    font-size: 85%;
+}
+
+.problem .problem-statement .tex-font-size-normal {
+    font-size: 100%;
+}
+
+.problem .problem-statement .tex-font-size-large-1 {
+    font-size: 115%;
+}
+
+.problem .problem-statement .tex-font-size-large-2 {
+    font-size: 130%;
+}
+
+.problem .problem-statement .tex-font-size-large-3 {
+    font-size: 145%;
+}
+
+.problem .problem-statement .tex-font-size-huge-1 {
+    font-size: 175%;
+}
+
+.problem .problem-statement .tex-font-size-huge-2 {
+    font-size: 200%;
+}
+
+.problem .problem-statement .tex-font-style-rm {
+}
+
+.problem .problem-statement .tex-font-style-sf {
+    font-family: arial;
+}
+
+.problem .problem-statement .tex-font-style-striked {
+    text-decoration: line-through;
+}
+
+.problem .problem-statement .tex-font-style-tt {
+    font-size: 110%;
+    font-family: courier new;
+}
+
+.problem .problem-statement .tex-font-style-md {
+}
+
+.problem .problem-statement .tex-font-style-bf {
+    font-weight: bold;
+}
+
+.problem .problem-statement .tex-font-style-underline {
+    text-decoration: underline;
+}
+
+.problem .problem-statement .tex-font-style-up {
+}
+
+.problem .problem-statement .tex-font-style-it {
+    font-style: italic;
+}
+
+.problem .problem-statement .tex-font-style-sl {
+    font-style: italic;
+}
+
+.problem .problem-statement .tex-font-style-sc {
+    text-transform: uppercase;
+}
+
+.problem .problem-statement .tex-graphics {
+    max-width: 75%;
+    display: block;
+}

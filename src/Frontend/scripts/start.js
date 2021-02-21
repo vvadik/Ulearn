@@ -7,10 +7,10 @@ process.on('unhandledRejection', err => {
 
 require('../config/env');
 
-const fs = require('fs');
+const fs = require('fs-extra');
 const chalk = require('chalk');
 const webpack = require('webpack');
-const WebpackDevServer = require('webpack-dev-server');
+const webpackDevServer = require('webpack-dev-server');
 const clearConsole = require('react-dev-utils/clearConsole');
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
 const {
@@ -20,14 +20,17 @@ const {
 	prepareUrls,
 } = require('react-dev-utils/WebpackDevServerUtils');
 const openBrowser = require('react-dev-utils/openBrowser');
+const ignoredFiles = require('react-dev-utils/ignoredFiles');
+const errorOverlayMiddleware = require('react-dev-utils/errorOverlayMiddleware');
+const noopServiceWorkerMiddleware = require('react-dev-utils/noopServiceWorkerMiddleware');
 const paths = require('../config/paths');
 const config = require('../config/webpack.config.dev');
-const createDevServerConfig = require('../config/webpackDevServer.config');
 
-const useYarn = fs.existsSync(paths.yarnLockFile);
+
+const useYarn = fs.pathExistsSync(paths.yarnLockFile);
 const isInteractive = process.stdout.isTTY;
 
-if(!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
+if(!checkRequiredFiles([paths.appHtml, paths.appIndexTsx])) {
 	process.exit(1);
 }
 
@@ -59,14 +62,42 @@ choosePort(HOST, DEFAULT_PORT)
 		const urls = prepareUrls(protocol, HOST, port);
 		const proxySetting = require(paths.appPackageJson).proxy;
 		const proxyConfig = prepareProxy(proxySetting, paths.appPublic);
-		const serverConfig = createDevServerConfig(
-			proxyConfig,
-			urls.lanUrlForConfig,
-			protocol,
-			HOST,
-		);
-		const compiler = createCompiler({ webpack, config, appName, urls, useYarn });
-		const devServer = new WebpackDevServer(compiler, serverConfig);
+		const options = {
+			disableHostCheck: !proxyConfig || process.env.DANGEROUSLY_DISABLE_HOST_CHECK === 'true',
+			compress: true,
+			clientLogLevel: 'info',
+			contentBase: paths.appPublic,
+			watchContentBase: true,
+			hot: true,
+			transportMode: 'ws',
+			injectClient: false,
+			quiet: true,
+			watchOptions: {
+				ignored: ignoredFiles(paths.appSrc),
+			},
+			https: protocol === 'https',
+			host: HOST,
+			overlay: false,
+			proxy: proxyConfig,
+			historyApiFallback: {
+				disableDotRule: true,
+			},
+			public: urls.lanUrlForConfig,
+			publicPath: config.output.publicPath,
+			before(app) {
+				app.use(errorOverlayMiddleware());
+				app.use(noopServiceWorkerMiddleware(paths.serviceWorker));
+			},
+		};
+		webpackDevServer.addDevServerEntrypoints(config, options);
+		const compiler = createCompiler({
+			webpack,
+			config,
+			appName,
+			urls,
+			useYarn,
+		});
+		const devServer = new webpackDevServer(compiler, options);
 		devServer.listen(port, HOST, err => {
 			if(err) {
 				return console.log(err);

@@ -193,14 +193,27 @@ window.documentReadyFunctions.push(function() {
 	/* Auto-height by maximum height in matching block */
 	$('.quiz-block-matching').each(function(idx, block) {
 		var $block = $(block);
-		var $allItems = $block.find('.quiz-block-matching__fixed-item').
+		
+		const calculateHeights = function (){
+			if(!$block){
+				window.removeEventListener('resize', calculateHeights);
+				return;
+			}
+			
+			var $allItems = $block.find('.quiz-block-matching__fixed-item').
+			
 			add($block.find('.quiz-block-matching__movable-item')).
 			add($block.find('.quiz-block-matching__droppable')).
 			add($block.find('.quiz-block-matching__source__droppable'));
-		var heights = $allItems.map(function (_, el) { return $(el).outerHeight(); }).get();
-		var maxHeight = Math.max.apply(null, heights);
+			$allItems.css('min-height', 'unset');
+			
+			var heights = $allItems.map(function (_, el) { return $(el).outerHeight(); }).get();
+			var maxHeight = Math.max.apply(null, heights);
 
-		$allItems.outerHeight(maxHeight);
+			$allItems.css('min-height', maxHeight);
+		}
+		window.addEventListener('resize', calculateHeights);
+		calculateHeights();
 	});
 	
 	/* Remove ?send=1 from query-string */

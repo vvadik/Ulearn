@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -54,11 +54,9 @@ namespace Database.Repos
 			var hash = (await textsRepo.AddText(code)).Hash;
 			var compilationErrorHash = (await textsRepo.AddText(compilationError)).Hash;
 			var outputHash = (await textsRepo.AddText(output)).Hash;
-			var exerciseBlock = ((await courseManager.FindCourseAsync(courseId))?.FindSlideById(slideId, true) as ExerciseSlide)?.Exercise;
 
 			AutomaticExerciseChecking automaticChecking;
-			if (language.HasAutomaticChecking() && (language == Language.CSharp || exerciseBlock is UniversalExerciseBlock) 
-				|| exerciseBlock is PolygonExerciseBlock && PolygonExerciseBlock.LanguagesInfo.ContainsKey(language))
+			if (hasAutomaticChecking)
 			{
 				automaticChecking = new AutomaticExerciseChecking
 				{
@@ -397,6 +395,7 @@ namespace Database.Repos
 			return await db.UserExerciseSubmissions
 				.AsNoTracking()	
 				.Include(s => s.AutomaticChecking).ThenInclude(c => c.Output)
+				.Include(s => s.AutomaticChecking).ThenInclude(c => c.DebugLogs)
 				.Include(s => s.AutomaticChecking).ThenInclude(c => c.CompilationError)
 				.Include(s => s.SolutionCode)
 				.Include(s => s.Reviews).ThenInclude(c => c.Author)
@@ -470,6 +469,9 @@ namespace Database.Repos
 			var compilationErrorHash = (await textsRepo.AddText(result.CompilationOutput)).Hash;
 			var output = result.GetOutput().NormalizeEoln();
 			var outputHash = (await textsRepo.AddText(output)).Hash;
+			
+			var logs = result.GetLogs().NormalizeEoln();
+			var logsHash = (await textsRepo.AddText(logs)).Hash;
 
 			var isWebRunner = checking.CourseId == "web" && checking.SlideId == Guid.Empty;
 			var exerciseSlide = isWebRunner
@@ -479,6 +481,8 @@ namespace Database.Repos
 
 			var isRightAnswer = IsRightAnswer(result, output, exerciseSlide?.Exercise);
 
+			var elapsed = DateTime.Now - checking.Timestamp;
+			elapsed = elapsed < TimeSpan.FromDays(1) ? elapsed : new TimeSpan(0, 23, 59, 59); 
 			var newChecking = new AutomaticExerciseChecking
 			{
 				Id = checking.Id,
@@ -492,10 +496,11 @@ namespace Database.Repos
 				ExecutionServiceName = checking.ExecutionServiceName,
 				Status = result.Verdict == Verdict.SandboxError ? AutomaticExerciseCheckingStatus.Error : AutomaticExerciseCheckingStatus.Done,
 				DisplayName = checking.DisplayName,
-				Elapsed = DateTime.Now - checking.Timestamp,
+				Elapsed = elapsed,
 				IsRightAnswer = isRightAnswer,
 				CheckingAgentName = checking.CheckingAgentName,
-				Points = result.Points
+				Points = result.Points,
+				DebugLogsHash = logsHash
 			};
 
 			return newChecking;

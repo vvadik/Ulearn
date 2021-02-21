@@ -1,57 +1,35 @@
 #include "testlib.h"
-#include <sstream>
+
+#include <string>
 
 using namespace std;
 
+pattern pnum("0|-?[1-9][0-9]*");
+
+bool isNumeric(const string& p)
+{
+    return pnum.matches(p);
+}
+
 int main(int argc, char * argv[])
 {
-    setName("compare ordered sequences of signed int%d numbers", 8 * int(sizeof(long long)));
-
+    setName("compare two signed huge integers");
     registerTestlibCmd(argc, argv);
-
-    int n = 0;
-    string firstElems;
-
-    while (!ans.seekEof() && !ouf.seekEof())
-    {
-        n++;
-        long long j = ans.readLong();
-        long long p = ouf.readLong();
-        if (j != p)
-            quitf(_wa, "%d%s numbers differ - expected: '%s', found: '%s'", n, englishEnding(n).c_str(), vtos(j).c_str(), vtos(p).c_str());
-        else
-            if (n <= 5)
-            {
-                if (firstElems.length() > 0)
-                    firstElems += " ";
-                firstElems += vtos(j);
-            }
-    }
-
-    int extraInAnsCount = 0;
-
-    while (!ans.seekEof())
-    {
-        ans.readLong();
-        extraInAnsCount++;
-    }
     
-    int extraInOufCount = 0;
+    string ja = ans.readWord();
+    string pa = ouf.readWord();
 
-    while (!ouf.seekEof())
-    {
-        ouf.readLong();
-        extraInOufCount++;
-    }
+    if (!isNumeric(ja))
+        quitf(_fail, "%s is not a valid integer", compress(ja).c_str());
 
-    if (extraInAnsCount > 0)
-        quitf(_wa, "Answer contains longer sequence [length = %d], but output contains %d elements", n + extraInAnsCount, n);
+    if (!ans.seekEof())
+        quitf(_fail, "expected exactly one token in the answer file");
     
-    if (extraInOufCount > 0)
-        quitf(_wa, "Output contains longer sequence [length = %d], but answer contains %d elements", n + extraInOufCount, n);
+    if (!isNumeric(pa))
+        quitf(_pe, "%s is not a valid integer", compress(pa).c_str());
+
+    if (ja != pa)
+        quitf(_wa, "expected '%s', found '%s'", compress(ja).c_str(), compress(pa).c_str());
     
-    if (n <= 5)
-        quitf(_ok, "%d number(s): \"%s\"", n, compress(firstElems).c_str());
-    else
-        quitf(_ok, "%d numbers", n);
+    quitf(_ok, "answer is '%s'", compress(ja).c_str());
 }

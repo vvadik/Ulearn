@@ -25,6 +25,8 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		[XmlAttribute("file")]
 		public string CodeFile { get; set; }
 
+		public override bool HasAutomaticChecking() => Language == Common.Language.CSharp;
+
 		public override IEnumerable<SlideBlock> BuildUp(SlideBuildingContext context, IImmutableSet<string> filesInProgress)
 		{
 			CodeFile = CodeFile ?? context.Slide.DefaultIncludeCodeFile ?? context.Unit.Settings?.DefaultIncludeCodeFile;

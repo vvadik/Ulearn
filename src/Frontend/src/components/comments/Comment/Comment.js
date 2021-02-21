@@ -10,7 +10,7 @@ import KebabActions from "./Kebab/KebabActions";
 import Header from "./Header/Header";
 import Marks from "./Marks/Marks";
 import CommentActions from "./CommentActions/CommentActions";
-import scrollToView from "../../../utils/scrollToView";
+import scrollToView from "src/utils/scrollToView";
 import { convertDefaultTimezoneToLocal } from "src/utils/momentUtils";
 
 import styles from "./Comment.less";

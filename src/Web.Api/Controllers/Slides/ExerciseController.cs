@@ -152,8 +152,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 
 			var compilationErrorMessage = buildResult.HasErrors ? buildResult.ErrorMessage : null;
 			var submissionSandbox = (exerciseBlock as UniversalExerciseBlock)?.DockerImageName;
-			var hasAutomaticChecking = language.HasAutomaticChecking() && (language == Language.CSharp || exerciseBlock is UniversalExerciseBlock) 
-				|| exerciseBlock is PolygonExerciseBlock && PolygonExerciseBlock.LanguagesInfo.ContainsKey(language);
+			var hasAutomaticChecking = exerciseBlock.HasAutomaticChecking();
 			var automaticCheckingStatus = hasAutomaticChecking
 				? buildResult.HasErrors
 					? AutomaticExerciseCheckingStatus.Done
@@ -174,8 +173,10 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				automaticCheckingStatus
 			);
 
+			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin);
+
 			if (buildResult.HasErrors)
-				return new RunSolutionResponse(SolutionRunStatus.Success) { Submission = SubmissionInfo.Build(initialSubmission, null) };
+				return new RunSolutionResponse(SolutionRunStatus.Success) { Submission = SubmissionInfo.Build(initialSubmission, null, isCourseAdmin) };
 
 			var executionTimeout = TimeSpan.FromSeconds(exerciseBlock.TimeLimit * 2 + 5);
 			UserExerciseSubmission updatedSubmissionNoTracking;
@@ -198,7 +199,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				return new RunSolutionResponse(SolutionRunStatus.SubmissionCheckingTimeout)
 				{
 					Message = $"К сожалению, мы не смогли оперативно проверить ваше решение. {message}. Просто подождите и обновите страницу.",
-					Submission = SubmissionInfo.Build(updatedSubmissionNoTracking, null)
+					Submission = SubmissionInfo.Build(updatedSubmissionNoTracking, null, isCourseAdmin)
 				};
 			}
 
@@ -206,7 +207,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			{
 				metricSender.SendCount($"exercise.{exerciseMetricId}.dont_wait_result");
 				// По вовзращаемому значению нельзя отличить от случая, когда никто не взял на проверку
-				return new RunSolutionResponse(SolutionRunStatus.Success) { Submission = SubmissionInfo.Build(initialSubmission, null) };
+				return new RunSolutionResponse(SolutionRunStatus.Success) { Submission = SubmissionInfo.Build(initialSubmission, null, isCourseAdmin) };
 			}
 
 			updatedSubmissionNoTracking = await userSolutionsRepo.FindSubmissionByIdNoTracking(initialSubmission.Id);
@@ -214,7 +215,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			if (!hasAutomaticChecking)
 				await SendToReviewAndUpdateScore(updatedSubmissionNoTracking, courseManager, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender);
 
-			var score = (await slideCheckingsRepo.GetExerciseSlideScoreAndPercent(courseId, exerciseSlide, userId)).Score;
+			var score = await visitsRepo.GetScore(courseId, exerciseSlide.Id, userId);
 			var waitingForManualChecking = updatedSubmissionNoTracking.ManualCheckings.Any(c => !c.IsChecked) ? true : (bool?)null;
 			var prohibitFurtherManualChecking = updatedSubmissionNoTracking.ManualCheckings.Any(c => c.ProhibitFurtherManualCheckings);
 			var result = new RunSolutionResponse(SolutionRunStatus.Success)
@@ -222,9 +223,8 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				Score = score,
 				WaitingForManualChecking = waitingForManualChecking,
 				ProhibitFurtherManualChecking = prohibitFurtherManualChecking,
-				Submission = SubmissionInfo.Build(updatedSubmissionNoTracking, null)
+				Submission = SubmissionInfo.Build(updatedSubmissionNoTracking, null, isCourseAdmin)
 			};
-
 			return result;
 		}
 

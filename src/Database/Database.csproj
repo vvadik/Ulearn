@@ -891,5 +891,22 @@
     <EmbeddedResource Update="Migrations\202010060950465_ChangeScoreFields.resx">
       <DependentUpon>202010060950465_ChangeScoreFields.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Update="Migrations\202101271856143_AddLogsRunningResult.resx">
+      <DependentUpon>202101271856143_AddLogsRunningResult.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Migrations\202101271914468_AddDebugLogsRunningResult.resx">
+      <DependentUpon>202101271914468_AddDebugLogsRunningResult.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="appsettings.local.json" />
+    <Content Include="appsettings.local.json">
+      <DependentUpon>appsettings.json</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Remove="appsettings.json" />
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>

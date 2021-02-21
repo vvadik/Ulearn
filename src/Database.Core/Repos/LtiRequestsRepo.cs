@@ -1,10 +1,7 @@
 ﻿using System;
-using System.IO;
 using System.Threading.Tasks;
 using Database.Models;
-using LtiLibrary.NetCore.Lti.v1;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 
@@ -13,12 +10,10 @@ namespace Database.Repos
 	public class LtiRequestsRepo : ILtiRequestsRepo
 	{
 		private readonly UlearnDb db;
-		private readonly JsonSerializer serializer;
 
 		public LtiRequestsRepo(UlearnDb db)
 		{
 			this.db = db;
-			serializer = new JsonSerializer();
 		}
 
 		public async Task Update(string courseId, string userId, Guid slideId, string ltiRequestJson)
@@ -47,13 +42,10 @@ namespace Database.Repos
 			await db.SaveChangesAsync();
 		}
 
-		public async Task<LtiRequest> Find(string courseId, string userId, Guid slideId)
+		public async Task<string> Find(string courseId, string userId, Guid slideId)
 		{
 			var ltiRequestModel = await FindElement(courseId, slideId, userId);
-			if (ltiRequestModel == null)
-				return null;
-
-			return serializer.Deserialize<LtiRequest>(new JsonTextReader(new StringReader(ltiRequestModel.Request)));
+			return ltiRequestModel?.Request;
 		}
 
 		private async Task<LtiSlideRequest> FindElement(string courseId, Guid slideId, string userId)

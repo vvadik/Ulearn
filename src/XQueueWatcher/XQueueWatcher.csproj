@@ -1,27 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <ProjectGuid>{73474493-49F2-48E2-8550-B1FF0B32C67E}</ProjectGuid>
-    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <AssemblyTitle>XQueueWatcher</AssemblyTitle>
-    <Product>XQueueWatcher</Product>
-    <Description>XQueueWatcher service for ulearn mooc platform</Description>
-    <Copyright>Copyright 2014–2018 SKB Kontur</Copyright>
-    <Version>1.0.0.0</Version>
-    <Authors>SKB Kontur</Authors>
-    <PackageId>Kontur.Ulearn.XQueueWatcher</PackageId>
-    <PackageLicenseUrl>https://ulearn.me/Home/Terms</PackageLicenseUrl>
-    <PackageProjectUrl>https://ulearn.me</PackageProjectUrl>
-    <PackageTags>ulearn education mooc xqueue</PackageTags>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-    <LangVersion>default</LangVersion>
+    <RootNamespace>XQueueWatcher</RootNamespace>
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.2" />
-    <PackageReference Include="OctoPack" Version="3.6.4">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Graphite, Version=1.3.0.0, Culture=neutral, PublicKeyToken=db1870846884bbb9">
@@ -53,6 +38,11 @@
     <Content Include="appsettings.local.json">
       <DependentUpon>appsettings.json</DependentUpon>
       <CopyToOutputDirectory>Newer</CopyToOutputDirectory>
+    </Content>
+    <Content Include="deploy\**">
+      <Link>deploy\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>None</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
 </Project>

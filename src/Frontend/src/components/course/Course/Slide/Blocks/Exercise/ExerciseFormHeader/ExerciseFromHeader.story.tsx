@@ -4,13 +4,15 @@ import { ExerciseFormHeader, ExerciseFormHeaderProps } from "./ExerciseFormHeade
 import {
 	AutomaticExerciseCheckingProcessStatus,
 	AutomaticExerciseCheckingResult,
-	SolutionRunStatus,
+	SolutionRunStatus, SubmissionInfo,
 } from "src/models/exercise";
+import { Language } from "src/consts/languages";
+
 import { SubmissionColor } from "../ExerciseUtils";
 
 const Template: Story<ExerciseFormHeaderProps> = (args) => <ExerciseFormHeader { ...args } />;
 
-const submissionInfo = {
+const submissionInfo: SubmissionInfo = {
 	id: 1,
 	code: "",
 	timestamp: "",
@@ -18,18 +20,20 @@ const submissionInfo = {
 		processStatus: AutomaticExerciseCheckingProcessStatus.Done,
 		result: AutomaticExerciseCheckingResult.RightAnswer,
 		output: null,
-		reviews: null
+		reviews: null,
+		checkerLogs:null,
 	},
 	manualCheckingPassed: false,
-	manualCheckingReviews: []
-}
+	manualCheckingReviews: [],
+	language: Language.cSharp
+};
 
 export const Editable = Template.bind({});
 Editable.args = {
 	solutionRunStatus: null,
 	selectedSubmission: submissionInfo,
 	score: 10
-}
+};
 
 export default {
 	title: 'Exercise/ExerciseFromHeader',

@@ -1,23 +1,26 @@
 import React from "react";
 
+import CupIcon from "./CupIcon";
+
 import styles from "./CongratsModal.less";
 
 import texts from "./CongratsModal.texts";
-import CupIcon from "./CupIcon.js";
 
 interface CongratsModalProps {
-	onClose: () => void,
 	waitingForManualChecking: boolean,
 	score: number,
-	showAcceptedSolutions: boolean,
+
+	onClose: () => void,
+	showAcceptedSolutions?: () => void,
 }
 
 class CongratsModal extends React.Component<CongratsModalProps> {
-	overlay: HTMLDivElement | null | undefined;
+	overlay: React.RefObject<HTMLDivElement> = React.createRef();
 
 	componentDidMount(): void {
 		document.querySelector('body')
 			?.classList.add(styles.bodyOverflow);
+		this.overlay.current?.focus();
 	}
 
 	componentWillUnmount(): void {
@@ -29,7 +32,8 @@ class CongratsModal extends React.Component<CongratsModalProps> {
 		const { waitingForManualChecking, score, showAcceptedSolutions, onClose, } = this.props;
 
 		return (
-			<div ref={ (ref) => this.overlay = ref }
+			<div tabIndex={ 0 }
+				 ref={ this.overlay }
 				 className={ styles.overlay }
 				 onClick={ this.handleCongratsOverlayClick }>
 				<div className={ styles.modal }>
@@ -44,14 +48,14 @@ class CongratsModal extends React.Component<CongratsModalProps> {
 						{ texts.title }
 					</h2>
 					<section className={ styles.text }>
-						{ texts.getBodyText(waitingForManualChecking, showAcceptedSolutions, score) }
+						{ texts.getBodyText(waitingForManualChecking, !!showAcceptedSolutions, score) }
 					</section>
 
 					{/* this.renderSelfCheckContent() */ }
 
 					<div className={ styles.closeButtonWrapper }>
 						<button className={ styles.closeButton }
-								onClick={ showAcceptedSolutions ? this.onCloseClick : onClose }>
+								onClick={ showAcceptedSolutions ? showAcceptedSolutions : onClose }>
 							{ showAcceptedSolutions ? texts.closeButtonForAcceptedSolutions : texts.closeButton }
 						</button>
 					</div>
@@ -64,11 +68,6 @@ class CongratsModal extends React.Component<CongratsModalProps> {
 		return (
 			<div className={ styles.scoreTextWrapper }>+{ score }</div>
 		);
-	};
-
-	private onCloseClick = () => {
-		const { onClose, } = this.props;
-		onClose();
 	};
 
 	private renderSelfCheckContent = () => {
@@ -86,7 +85,7 @@ class CongratsModal extends React.Component<CongratsModalProps> {
 	};
 
 	private handleCongratsOverlayClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-		if(e.target === this.overlay) {
+		if(e.target === this.overlay.current) {
 			this.props.onClose();
 		}
 	};

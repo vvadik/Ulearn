@@ -30,6 +30,7 @@ Content\buttons.css
 Content\libs\likely.css
 Content\notifications.css
 Content\stepik.css
+Content\problem-statement.css
 Content\modals.css
 Content\antiplagiarism.css
 Content\exercise\student-submissions.css

@@ -14,17 +14,15 @@ const publicUrl = '';
 const env = getClientEnvironment(publicUrl);
 
 const base = require('./webpack.config.base');
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 
-module.exports = merge(base, {
+module.exports = merge([base, {
 	mode: 'development',
 	devtool: 'eval-cheap-source-map',
 	entry: {
 		main: [
-			'./config/polyfills',
-			'./config/sentry',
 			'react-dev-utils/webpackHotDevClient',
-			paths.appIndexJs,
+			paths.appIndexTsx,
 		],
 		oldBrowser: [
 			paths.oldBrowserJs
@@ -84,9 +82,25 @@ module.exports = merge(base, {
 								options: {
 									modules: {
 										mode: 'local',
-										localIdentName: '[name]__[local]--[hash:base64:5]',
+										localIdentName: '[name]__[local]--[hash:5]',
 									},
 									importLoaders: 1,
+								},
+							},
+							{
+								loader: 'postcss-loader',
+								options: {
+									postcssOptions: {
+										ident: 'postcss',
+										plugins: [
+											[
+												"postcss-preset-env",
+												{
+													autoprefixer: { flexbox: 'no-2009' }
+												},
+											]
+										],
+									}
 								},
 							},
 							'less-loader',
@@ -107,11 +121,15 @@ module.exports = merge(base, {
 							{
 								loader: 'postcss-loader',
 								options: {
-									ident: 'postcss',
-									plugins: () => [
-										require('postcss-flexbugs-fixes'),
-										autoprefixer({ flexbox: 'no-2009' }),
-									],
+									postcssOptions: {
+										ident: 'postcss',
+										plugins: [
+											"postcss-preset-env",
+											{
+												autoprefixer: { flexbox: 'no-2009' }
+											},
+										]
+									}
 								},
 							},
 						],
@@ -141,7 +159,9 @@ module.exports = merge(base, {
 		}),
 		new InterpolateHtmlPlugin(HtmlWebpackPlugin, env.raw),
 		new webpack.DefinePlugin(env.stringified),
-		new webpack.HotModuleReplacementPlugin(),
+		new webpack.ProvidePlugin({
+			process: 'process/browser',
+		}),
 		new CaseSensitivePathsPlugin(),
 		new WatchMissingNodeModulesPlugin(paths.appNodeModules),
 		new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/, /\.less\.d\.ts$/, /\.css\.d\.ts$/),
@@ -149,4 +169,4 @@ module.exports = merge(base, {
 	performance: {
 		hints: false,
 	},
-});
+}]);

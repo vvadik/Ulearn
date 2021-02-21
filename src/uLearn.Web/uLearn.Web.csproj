@@ -1180,6 +1180,7 @@
     <Content Include="Content\awesome-bootstrap-checkbox.css" />
     <Content Include="Content\banner-campus-2019.png" />
     <Content Include="Content\banner-campus.png" />
+    <Content Include="Content\banner-intern-backend-2021.jpg" />
     <Content Include="Content\banner-internship-2020.jpg" />
     <Content Include="Content\banner-summer-practice.jpg" />
     <Content Include="Content\bootstrap.refresh-animate.css" />
@@ -1211,6 +1212,7 @@
     <Content Include="Content\notifications.css" />
     <Content Include="Content\notification_settings.css" />
     <Content Include="Content\stepik.css" />
+	<Content Include="Content\problem-statement.css" />
     <Content Include="Content\tablesorter.css" />
     <Content Include="Content\ulearn.css" />
     <Content Include="favicon.ico" />
@@ -1679,7 +1681,7 @@
     </PostBuildEvent>
   </PropertyGroup>
   <Target Name="CompileFrontend" BeforeTargets="BeforeBuild;OctoPack">
-    <Exec Command="npm run build" WorkingDirectory="..\Frontend" />
+    <Exec Command="yarn build" WorkingDirectory="..\Frontend" />
     <Exec Command="if not exist static mkdir static" WorkingDirectory="$(MSBuildProjectDirectory)" />
     <!-- Robocopy always exits with code 1: https://social.msdn.microsoft.com/Forums/en-US/d599833c-dcea-46f5-85e9-b1f028a0fefe/robocopy-exits-with-error-code-1?forum=tfsbuild -->
     <Exec Command="robocopy /s ..\Frontend\build\static\ static\ || exit 0" WorkingDirectory="$(MSBuildProjectDirectory)" />

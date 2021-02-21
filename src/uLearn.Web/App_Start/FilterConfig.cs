@@ -37,8 +37,10 @@ namespace uLearn.Web
 				"/elmah/",
 				"/Certificate/",
 				"/Analytics/ExportCourseStatisticsAs",
-				"/Exercise/StudentZip",
 				"/Content/"
+			}, excludedRegexps: new List<Regex>
+			{
+				new Regex("^/Exercise/.*/.*/StudentZip/.*", RegexOptions.Compiled | RegexOptions.IgnoreCase)
 			}));
 
 			var requireHttps = Convert.ToBoolean(WebConfigurationManager.AppSettings["ulearn.requireHttps"] ?? "true");
@@ -128,11 +130,13 @@ namespace uLearn.Web
 	public class ServeStaticFileForEveryNonAjaxRequest : ActionFilterAttribute
 	{
 		private readonly List<string> excludedPrefixes;
+		private readonly List<Regex> excludedRegexps;
 		private readonly byte[] content;
 
-		public ServeStaticFileForEveryNonAjaxRequest(FileInfo file, List<string> excludedPrefixes)
+		public ServeStaticFileForEveryNonAjaxRequest(FileInfo file, List<string> excludedPrefixes, List<Regex> excludedRegexps)
 		{
 			this.excludedPrefixes = excludedPrefixes;
+			this.excludedRegexps = excludedRegexps;
 			content = File.ReadAllBytes(file.FullName);
 			content = InsertFrontendConfiguration(content);
 		}
@@ -154,6 +158,10 @@ namespace uLearn.Web
 
 			foreach (var prefix in excludedPrefixes)
 				if (httpContext.Request.Url != null && httpContext.Request.Url.LocalPath.StartsWith(prefix))
+					return;
+
+			foreach (var regex in excludedRegexps)
+				if (httpContext.Request.Url != null && regex.IsMatch(httpContext.Request.Url.LocalPath))
 					return;
 
 			var acceptHeader = httpContext.Request.Headers["Accept"] ?? "";

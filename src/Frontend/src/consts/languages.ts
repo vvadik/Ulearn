@@ -1,18 +1,19 @@
 export enum Language {
-	cSharp = 'cSharp',
+	cSharp = 'csharp',
 	python2 = 'python2',
 	python3 = 'python3',
 	java = 'java',
-	javaScript = 'javaScript',
+	javaScript = 'javascript',
 	html = 'html',
-	typeScript = 'typeScript',
+	typeScript = 'typescript',
 	css = 'css',
 	haskell = 'haskell',
-	text = 'text',
-}
+	cpp = 'cpp',
+	c = 'c',
+	pgsql = 'pgsql',
+	mikrokosmos = 'mikrokosmos',
 
-export interface LanguageLaunchInfo {
-	compiler: string;
-	compileCommand: string;
-	runCommand: string;
+	text = 'text',
+
+	jsx = 'jsx', // нет на бэке
 }

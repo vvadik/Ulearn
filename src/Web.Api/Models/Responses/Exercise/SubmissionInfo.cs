@@ -36,7 +36,7 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 		public List<ReviewInfo> ManualCheckingReviews;
 
 		public static SubmissionInfo Build(UserExerciseSubmission submission,
-			[CanBeNull] Dictionary<int, IEnumerable<ExerciseCodeReviewComment>> reviewId2Comments)
+			[CanBeNull] Dictionary<int, IEnumerable<ExerciseCodeReviewComment>> reviewId2Comments, bool showCheckerLogs)
 		{
 			var botReviews = submission.NotDeletedReviews
 				.Select(r => ToReviewInfo(r, true, reviewId2Comments))
@@ -46,7 +46,7 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 				.Select(r => ToReviewInfo(r, false, reviewId2Comments))
 				.ToList();
 			var automaticChecking = submission.AutomaticChecking == null
-				? null : ExerciseAutomaticCheckingResponse.Build(submission.AutomaticChecking, botReviews);
+				? null : ExerciseAutomaticCheckingResponse.Build(submission.AutomaticChecking, botReviews, showCheckerLogs);
 			return new SubmissionInfo
 			{
 				Id = submission.Id,

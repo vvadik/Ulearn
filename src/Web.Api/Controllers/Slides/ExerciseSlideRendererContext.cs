@@ -12,5 +12,6 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		public List<ExerciseCodeReviewComment> CodeReviewComments;
 		public ExerciseAttemptsStatistics AttemptsStatistics;
 		public FileInfo SlideFile;
+		public bool CanSeeCheckerLogs;
 	}
 }

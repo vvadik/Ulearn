@@ -27,6 +27,10 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 		[CanBeNull]
 		[DataMember]
 		public Dictionary<Language, LanguageLaunchInfo> LanguageInfo { get; set; } // Для языка содержит его текстовое название, если оно не такое же, как поле enum
+		
+		[DataMember]
+		public Language? DefaultLanguage { get; set; }
+		
 
 		[NotNull]
 		[DataMember]
@@ -57,17 +61,18 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 			var reviewId2Comments = context.CodeReviewComments
 				?.GroupBy(c => c.ReviewId)
 				.ToDictionary(g => g.Key, g => g.AsEnumerable());
-			
-			
-			if (exerciseBlock is PolygonExerciseBlock)
+
+			if (exerciseBlock is PolygonExerciseBlock polygonExerciseBlock)
 			{
 				Languages = PolygonExerciseBlock.LanguagesInfo.Keys.ToArray();
 				LanguageInfo = PolygonExerciseBlock.LanguagesInfo;
+				DefaultLanguage = polygonExerciseBlock.DefaultLanguage;
 			}
 			else
 			{
 				Languages = exerciseBlock.Language != null ? new[] { exerciseBlock.Language.Value } : new Language[0];
 				LanguageInfo = null;
+				DefaultLanguage = null;
 			}
 
 			RenderedHints = exerciseBlock.Hints.Select(h => RenderHtmlWithHint(h, context.SlideFile)).ToArray();
@@ -77,7 +82,7 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 			AttemptsStatistics = context.AttemptsStatistics;
 			Submissions = context.Submissions
 				.EmptyIfNull()
-				.Select(s => SubmissionInfo.Build(s, reviewId2Comments))
+				.Select(s => SubmissionInfo.Build(s, reviewId2Comments, context.CanSeeCheckerLogs))
 				.ToList();
 		}
 

@@ -62,10 +62,14 @@ namespace Ulearn.Common
 		[XmlEnum("c")]
 		[Lexer("c")]
 		C = 11,
-		
-		[XmlEnum("any")]
-		[Lexer("any")]
-		Any = 12,
+
+		[XmlEnum("pgsql")]
+		[Lexer("postgresql")]
+		PgSql = 12,
+
+		[XmlEnum("mikrokosmos")]
+		[Lexer("py3")]
+		Mikrokosmos = 13, // https://mroman42.github.io/mikrokosmos/userguide.html
 
 		[XmlEnum("text")]
 		[Lexer("text")]
@@ -97,8 +101,9 @@ namespace Ulearn.Common
 			{ ".hs", Language.Haskell },
 			{ ".c", Language.C },
 			{ ".cpp", Language.Cpp },
+			{ ".sql", Language.PgSql },
+			{ ".mkr", Language.Mikrokosmos },
 			{ ".txt", Language.Text },
-			{ ".any", Language.Any }
 		};
 
 		public static Language GuessByExtension(string extension)
@@ -149,11 +154,6 @@ namespace Ulearn.Common
 
 	public static class LanguageExtensions
 	{
-		public static bool HasAutomaticChecking(this Language language)
-		{
-			return language == Language.CSharp || language == Language.JavaScript || language == Language.Python3 || language == Language.Haskell;
-		}
-
 		public static string GetName(this Language language)
 		{
 			return language.GetXmlEnumName();

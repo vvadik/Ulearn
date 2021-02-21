@@ -129,10 +129,14 @@ namespace Database.Repos
 
 		public async Task<(int Score, int? Percent)> GetExerciseSlideScoreAndPercent(string courseId, ExerciseSlide slide, string userId)
 		{
-			var isRightAnswer = await GetSlideCheckingsByUser<AutomaticExerciseChecking>(courseId, slide.Id, userId)
-				.AnyAsync(c => c.IsRightAnswer);
-			if (!isRightAnswer)
-				return (0, null);
+			var hasAutomaticChecking = slide.Exercise.HasAutomaticChecking();
+			if (hasAutomaticChecking)
+			{
+				var isRightAnswer = await GetSlideCheckingsByUser<AutomaticExerciseChecking>(courseId, slide.Id, userId)
+					.AnyAsync(c => c.IsRightAnswer);
+				if (!isRightAnswer)
+					return (0, null);
+			}
 			var checkedScoresAndPercents = await GetCheckedScoresAndPercents(courseId, slide, userId, null);
 			var automaticScore = slide.Scoring.PassedTestsScore;
 			if (checkedScoresAndPercents.Count == 0)

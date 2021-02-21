@@ -155,7 +155,7 @@
 
 	if (!Model.IsGuest)
 	{
-		<div id="SubmitQuiz" data-url='@Url.Action("SubmitQuiz", "Quiz")'>
+		<div id="SubmitQuiz" class="quiz-submit-wrapper" data-url='@Url.Action("SubmitQuiz", "Quiz")'>
 			@if (Model.Checking != null)
 			{
 				/* This attempt should not be calculated as left checking */

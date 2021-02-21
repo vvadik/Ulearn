@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Runtime.Serialization;
 using JetBrains.Annotations;
-using Newtonsoft.Json;
+using Ulearn.Common.Extensions;
 
 namespace Ulearn.Core.RunCheckerJobApi
 {
@@ -52,9 +52,13 @@ namespace Ulearn.Core.RunCheckerJobApi
 		[DataMember]
 		[CanBeNull]
 		public List<StyleError> StyleErrors { get; set; }
+		
+		[DataMember]
+		[CanBeNull]
+		public string[] Logs { get; set; }
 
 		[DataMember]
-		public int TestNumber;
+		public int? TestNumber { get; set; }
 
 		[IgnoreDataMember]
 		private readonly int? timeLimit;
@@ -63,20 +67,18 @@ namespace Ulearn.Core.RunCheckerJobApi
 		{
 		}
 
-		public RunningResults(string id, Verdict verdict, int? timeLimit = null, string compilationOutput = "", string output = "", string error = "", float? points = null, List<StyleError> styleErrors = null)
+		public RunningResults(string id, Verdict verdict, int? timeLimit = null, string compilationOutput = "", string output = "", string error = "")
 		{
 			Id = id;
 			Verdict = verdict;
 			CompilationOutput = compilationOutput;
 			Output = output;
 			Error = error;
-			Points = points;
 			this.timeLimit = timeLimit;
-			StyleErrors = styleErrors;
 		}
 
-		public RunningResults(Verdict verdict, int? timeLimit = null, string compilationOutput = "", string output = "", string error = "", float? points = null, List<StyleError> styleErrors = null)
-			: this(null, verdict, timeLimit, compilationOutput, output, error, points, styleErrors)
+		public RunningResults(Verdict verdict, int? timeLimit = null, string compilationOutput = "", string output = "", string error = "")
+			: this(null, verdict, timeLimit, compilationOutput, output, error)
 		{
 		}
 
@@ -109,14 +111,26 @@ namespace Ulearn.Core.RunCheckerJobApi
 				case Verdict.Ok:
 					return output;
 				case Verdict.TimeLimit:
-					return output + "\n Ваше решение не успело пройти все тесты" + (timeLimit == null ? null : $" за {timeLimit} секунд"); // TODO: Окончание слова секунд сейчас рассчитано на числа, кратные 10.
+					return output + TestNumberOutput 
+								  + "\nВаше решение не успело пройти" 
+								  + (TestNumber == null ? " все тесты" : " тест") 
+								  + (timeLimit == null ? null : $" за {timeLimit} " + timeLimit.Value.SelectPluralWordInRussian(RussianPluralizationOptions.Seconds));
 				case Verdict.WrongAnswer:
-					return output + "\n Неправильный ответ";
+					return output + TestNumberOutput +  "\nНеправильный ответ";
 				case Verdict.RuntimeError:
-					return output + "\n Ошибка времени выполнения";
+					return output + TestNumberOutput + "\nПрограмма завершилась с ошибкой";
 				default:
-					return output + "\n" + Verdict;
+					return output + TestNumberOutput + "\n" + Verdict;
 			}
 		}
+
+		public string GetLogs()
+		{
+			return Logs != null 
+				? string.Join("\n", Logs) 
+				: "";
+		}
+
+		private string TestNumberOutput => TestNumber == null ? null : $" \nТест №{TestNumber}";
 	}
 }

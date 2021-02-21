@@ -232,6 +232,10 @@ namespace Database.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
+                    b.Property<string>("DebugLogsHash")
+                        .HasColumnType("nvarchar(40)")
+                        .HasMaxLength(40);
+
                     b.Property<string>("DisplayName")
                         .HasColumnType("nvarchar(max)");
 
@@ -275,6 +279,8 @@ namespace Database.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CompilationErrorHash");
+
+                    b.HasIndex("DebugLogsHash");
 
                     b.HasIndex("IsRightAnswer");
 
@@ -2731,6 +2737,10 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.TextBlob", "CompilationError")
                         .WithMany()
                         .HasForeignKey("CompilationErrorHash");
+
+                    b.HasOne("Database.Models.TextBlob", "DebugLogs")
+                        .WithMany()
+                        .HasForeignKey("DebugLogsHash");
 
                     b.HasOne("Database.Models.TextBlob", "Output")
                         .WithMany()

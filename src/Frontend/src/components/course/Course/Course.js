@@ -8,6 +8,7 @@ import AnyPage from 'src/pages/AnyPage';
 import UnitFlashcardsPage from 'src/pages/course/UnitFlashcardsPage';
 import CourseFlashcardsPage from 'src/pages/course/CourseFlashcardsPage';
 import PreviewUnitPageFromAllCourse from "src/components/flashcards/UnitPage/PreviewUnitPageFromAllCourse";
+import SlideHeader from "./Slide/SlideHeader/SlideHeader.tsx";
 import { BlocksWrapper } from "src/components/course/Course/Slide/Blocks";
 import CommentsView from "src/components/comments/CommentsView/CommentsView";
 import Slide from './Slide/Slide';
@@ -26,7 +27,6 @@ import { ScoringGroupsIds } from 'src/consts/scoringGroup';
 import classnames from 'classnames';
 
 import styles from "./Course.less"
-import SlideHeader from "./Slide/SlideHeader/SlideHeader.tsx";
 
 const slideNavigationButtonTitles = {
 	next: "Далее",
@@ -77,10 +77,6 @@ class Course extends Component {
 			loadUserProgress(courseId, user.id);
 		}
 
-		if(isAuthenticated) {
-			window.reloadUserProgress = () => loadUserProgress(courseId, user.id); //adding hack to let legacy page scripts to reload progress,TODO(rozentor) remove it after implementing react task slides
-		}
-
 		/* TODO: (rozentor) for now it copied from downloadedHtmlContetn, which run documentReadyFunctions scripts. In future, we will have no scripts in back, so it can be removed totally ( in other words, remove it when DownloadedHtmlContent will be removed)  */
 		(window.documentReadyFunctions || []).forEach(f => f());
 	}
@@ -121,17 +117,13 @@ class Course extends Component {
 			progress,
 			isHijacked,
 			updateVisitedSlide,
-			isStudentMode,
-			history,
-			pageInfo,
 		} = this.props;
-		const { title, currentSlideInfo, currentSlideId, } = this.state;
+		const { title, currentSlideInfo, } = this.state;
 		const { isAuthenticated } = user;
 
 		if(isAuthenticated !== prevProps.user.isAuthenticated) {
 			loadCourse(courseId);
 			loadUserProgress(courseId, user.id);
-			window.reloadUserProgress = () => loadUserProgress(courseId, user.id); //adding hack to let legacy page scripts to reload progress,TODO(rozentor) remove it after implementing react task slides
 		}
 
 		if(title !== prevState.title) {
@@ -140,17 +132,8 @@ class Course extends Component {
 				loadCourseErrors(courseId);
 		}
 
-		if(!prevProps.progress && progress && !isHijacked && currentSlideInfo && currentSlideInfo.current) {
+		if(!prevProps.progress && progress && !isHijacked && currentSlideInfo && currentSlideInfo.current && currentSlideInfo.current.id) {
 			updateVisitedSlide(courseId, currentSlideInfo.current.id);
-		}
-
-		if((currentSlideId !== prevState.currentSlideId || isStudentMode !== prevProps.isStudentMode)
-			&& currentSlideInfo && currentSlideInfo.current && currentSlideInfo.current.type === SlideType.Exercise && (pageInfo.isNavigationVisible && !pageInfo.isAcceptedSolutions)) {
-			if(isStudentMode) {
-				history.push('?version=-1'); //prevent showing task solution
-			} else if(history.location.search === '?version=-1') {
-				history.replace();
-			}
 		}
 	}
 
@@ -171,7 +154,7 @@ class Course extends Component {
 			const slideInfo = Course.getSlideInfoById(props.slideId, props.courseInfo);
 			const Page = Course.getOpenedPage(props.slideId, props.courseInfo, slideInfo, props.pageInfo);
 			const title = Course.getTitle(slideInfo, Page);
-			if(slideInfo && progress && !isHijacked) {
+			if(slideInfo && slideInfo.current && slideInfo.current.id && progress && !isHijacked) {
 				updateVisitedSlide(courseId, slideInfo.current.id);
 			}
 
@@ -272,8 +255,8 @@ class Course extends Component {
 	}
 
 	renderSlide() {
-		const { pageInfo: { isNavigationVisible, isReview, }, user, courseId, isStudentMode, } = this.props;
-		const { currentSlideInfo, currentSlideId, currentCourseId, Page, title, } = this.state;
+		const { pageInfo: { isNavigationVisible, isReview, isLti, }, user, courseId, isStudentMode, } = this.props;
+		const { currentSlideInfo, currentSlideId, currentCourseId, Page, title, openUnit, } = this.state;
 
 		const wrapperClassName = classnames(
 			styles.rootWrapper,
@@ -303,6 +286,7 @@ class Course extends Component {
 						isHiddenSlide={ slideInfo && slideInfo.hide }
 						slideType={ slideInfo && slideInfo.type }
 						userRoles={ userRoles }
+						openUnitId={ openUnit?.id }
 					/> }
 					{
 						Page === Slide
@@ -312,6 +296,7 @@ class Course extends Component {
 								courseId={ currentCourseId }
 								showHiddenBlocks={ !isStudentMode }
 								slideInfo={ slideInfo }
+								isLti={ isLti }
 							/>
 							: <BlocksWrapper>
 								<Page match={ this.props.match }/>
@@ -319,7 +304,7 @@ class Course extends Component {
 					}
 				</div>
 				{ currentSlideInfo && isNavigationVisible && this.renderNavigationButtons(currentSlideInfo) }
-				{ currentSlideInfo && isNavigationVisible && this.renderComments(currentSlideInfo.current, userRoles) }
+				{ currentSlideInfo && slideInfo && slideInfo.id && isNavigationVisible && this.renderComments(currentSlideInfo.current, userRoles) }
 				{ isNavigationVisible && this.renderFooter() }
 			</main>
 		);

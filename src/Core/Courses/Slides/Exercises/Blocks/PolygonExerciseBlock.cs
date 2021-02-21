@@ -13,7 +13,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		{
 			[Common.Language.Java] = new LanguageLaunchInfo
 			{
-				Compiler = "Java 1.8",
+				Compiler = "Java 14",
 				CompileCommand = "javac {source}",
 				RunCommand = "java {compilation-result-file}"
 			},
@@ -35,7 +35,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			} ,
 			[Common.Language.CSharp] = new LanguageLaunchInfo
 			{
-				Compiler = ".Net SDK 5.0",
+				Compiler = "C# .Net 5.0",
 				CompileCommand = "dotnet build",
 				RunCommand = "./bin/Debug/net5.0/app"
 			},
@@ -49,25 +49,11 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		
 		public override string DockerImageName => "algorithms-sandbox";
 		public override bool NoStudentZip => true;
-		public override string UserCodeFilePath => "Program.any";
-		public override Language? Language => Common.Language.Any;
-		public override string RunCommand => "python3.8 main.py";
 		public override string Region => "Task";
 		public override bool CheckInitialSolution => false;
-		public int MsPerTest { get; set; }
-		public override string[] PathsToExcludeForChecker => new[]
-		{
-			"files",
-			"scripts",
-			"solutions",
-			"statements",
-			"statements-sections",
-			"check.exe",
-			"doall.bat",
-			"problem.xml",
-			"tags",
-			"wipe.bat"
-		};
+		public double TimeLimitPerTest { get; set; }
+		public override string[] PathsToExcludeForChecker => new[] { "statements", "statements-sections" };
+		public Language? DefaultLanguage { get; set; }
 		
 		public RunnerSubmission CreateSubmission(string submissionId, string code, Language language)
 		{
@@ -76,14 +62,13 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 				return submission;
 			
 			commandRunnerSubmission.RunCommand = RunCommandWithArguments(language);
-			commandRunnerSubmission.TimeLimit = (int)Math.Ceiling(TimeLimit / 1000d);
 			
 			return commandRunnerSubmission;
 		}
-
+		
 		private string RunCommandWithArguments(Language language)
 		{
-			return $"{RunCommand} {language} {MsPerTest}";
+			return $"python3.8 main.py {language} {TimeLimitPerTest} {UserCodeFilePath.Split('/', '\\')[1]}";
 		}
 	}
 }

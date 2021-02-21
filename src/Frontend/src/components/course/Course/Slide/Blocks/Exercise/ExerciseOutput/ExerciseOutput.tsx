@@ -37,7 +37,8 @@ const outputTypeToHeader: EnumDictionary<OutputType, string> = {
 
 type OutputTypeAndBody = { outputType: OutputType, body?: string | null };
 
-function HasOutput(message: string | null | undefined, automaticChecking: ExerciseAutomaticCheckingResponse | null | undefined,
+function HasOutput(message: string | null | undefined,
+	automaticChecking: ExerciseAutomaticCheckingResponse | null | undefined,
 	expectedOutput: string
 ): boolean {
 	if(message) {
@@ -110,7 +111,8 @@ class ExerciseOutput extends React.Component<OutputTypeProps> {
 
 	static getOutputTypeAndBodyFromAutomaticChecking(automaticChecking: ExerciseAutomaticCheckingResponse): OutputTypeAndBody {
 		let outputType: OutputType;
-		const output = automaticChecking.output;
+		const checkerLogs = automaticChecking.checkerLogs ? `\n\nЛоги (для админов курса): \n${ automaticChecking.checkerLogs }` : "";
+		const output = automaticChecking.output + checkerLogs;
 		switch (automaticChecking.processStatus) {
 			case ProcessStatus.Done:
 				outputType = ExerciseOutput.getOutputTypeByCheckingResults(automaticChecking);
@@ -154,9 +156,11 @@ class ExerciseOutput extends React.Component<OutputTypeProps> {
 		const lines = output.split('\n');
 		return <div className={ styles.outputTextWrapper }>
 			{ lines.map((text, i) =>
-				<span key={ i } className={ styles.outputParagraph }>
-					{ text }
-				</span>)
+				text.length === 0 ?
+					<br/> :
+					<span key={ i } className={ styles.outputParagraph }>
+						{ text }
+					</span>)
 			}
 		</div>;
 	}

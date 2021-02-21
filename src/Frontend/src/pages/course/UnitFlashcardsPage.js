@@ -1,23 +1,22 @@
 import { connect } from "react-redux";
 
-import UnitFlashcards from "../../components/flashcards/UnitPage/UnitPage";
-import Course from "../../components/course/Course";
+import UnitFlashcards from "src/components/flashcards/UnitPage/UnitPage";
+import Course from "src/components/course/Course";
 
-import { sendFlashcardResult, loadFlashcards } from '../../actions/course';
+import { sendFlashcardResult, loadFlashcards } from 'src/actions/flashcards';
 import getFlashcardsWithTheorySlides from "./getFlashcardsWithTheorySlides";
 
 const mapStateToProps = (state, { match }) => {
 	let { courseId, slideSlugOrAction } = match.params;
 	courseId = courseId.toLowerCase();
 	const slideId = slideSlugOrAction.split('_').pop();
-
 	const data = state.courses;
 	const courseInfo = data.fullCoursesInfo[courseId];
-	const infoByUnits = Object.values(data.flashcardsByUnits);
+	const infoByUnits = data.flashcardsInfoByCourseByUnits[courseId] ? Object.values(data.flashcardsInfoByCourseByUnits[courseId]) : [];
 	const unitId = Course.findUnitIdBySlideId(slideId, courseInfo);
-	const unitInfo = data.flashcardsByUnits[unitId];
+	const unitInfo = data.flashcardsInfoByCourseByUnits[courseId] ? data.flashcardsInfoByCourseByUnits[courseId][unitId] : {};
 
-	if (!courseInfo) {
+	if(!courseInfo) {
 		return {
 			courseId,
 			unitId,
@@ -30,9 +29,8 @@ const mapStateToProps = (state, { match }) => {
 
 	const courseSlides = courseInfo.units
 		.reduce((slides, unit) => ([...slides, ...unit.slides]), []);
-
 	const courseFlashcards = data.flashcardsByCourses[courseId];
-	const flashcards = getFlashcardsWithTheorySlides(infoByUnits, courseFlashcards, courseSlides);
+	const flashcards = courseFlashcards ? getFlashcardsWithTheorySlides(infoByUnits, courseFlashcards, courseSlides) : [];
 
 	return {
 		courseId,

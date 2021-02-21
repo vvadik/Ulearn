@@ -3,15 +3,22 @@ import React from "react";
 import { BlocksWrapper, Exercise, Image, Spoiler, StaticCode, Text, Video, } from "./Blocks";
 import CourseLoader from "src/components/course/Course/CourseLoader/CourseLoader.js";
 
-import { loadSlide } from "src/actions/course.js";
+import { loadSlide } from "src/actions/slides";
 import { connect } from "react-redux";
 import classNames from 'classnames';
 import queryString from "query-string";
 
-import { Block, ExerciseBlock, ShortSlideInfo, SpoilerBlock, TexBlock, VideoBlock, } from "src/models/slide";
+import {
+	Block,
+	BlockTypes,
+	ExerciseBlock,
+	ShortSlideInfo,
+	SpoilerBlock,
+	TexBlock,
+	VideoBlock,
+} from "src/models/slide";
 import { RootState } from "src/models/reduxState";
-import MatchType from "src/consts/router";
-import BlockTypes from "src/components/course/Course/Slide/blockTypes";
+import { MatchParams } from "src/models/router";
 import { Dispatch } from "redux";
 
 import styles from './Slide.less';
@@ -55,6 +62,7 @@ interface Props {
 	loadSlide: (courseId: string, slideId: string,) => void,
 	showHiddenBlocks: boolean,
 	slideInfo: ShortSlideInfo,
+	isLti: boolean,
 }
 
 class Slide extends React.Component<Props> {
@@ -70,7 +78,9 @@ class Slide extends React.Component<Props> {
 	}
 
 	componentDidUpdate(prevProps: Props) {
-		if(prevProps.slideId !== this.props.slideId) {
+		const { slideBlocks, slideLoading } = this.props;
+
+		if(prevProps.slideId !== this.props.slideId || !slideBlocks && !slideLoading) {
 			this.loadSlide();
 		}
 	}
@@ -81,11 +91,16 @@ class Slide extends React.Component<Props> {
 	};
 
 	render = () => {
-		const { slideBlocks, showHiddenBlocks, slideInfo, } = this.props;
+		const { slideBlocks, showHiddenBlocks, slideInfo, isLti, } = this.props;
 		const isHiddenSlide = slideInfo.hide;
 
 		if(!slideBlocks) {
 			return (<CourseLoader/>);
+		}
+
+		const exerciseSlideBlock = slideBlocks.find(sb => sb.$type === BlockTypes.exercise);
+		if(isLti && exerciseSlideBlock) {
+			return this.renderSlideBlocks([JSON.parse(JSON.stringify(exerciseSlideBlock))]);
 		}
 
 		if(showHiddenBlocks) {
@@ -166,10 +181,9 @@ class Slide extends React.Component<Props> {
 	};
 
 	addAdditionalPropsToBlocks = (slideBlocks: Block<BlockTypes>[]) => {
-		const { slideId, courseId, showHiddenBlocks, slideInfo } = this.props;
+		const { slideId, courseId, showHiddenBlocks, slideInfo, isLti, } = this.props;
 		const { autoplay } = queryString.parse(window.location.search);
 		const { maxScore } = slideInfo;
-		let firstVideoBlock = true;
 
 		for (const [i, block] of slideBlocks.entries()) {
 			const type = block.$type;
@@ -201,7 +215,7 @@ class Slide extends React.Component<Props> {
 				case BlockTypes.video: {
 					const videoBlock = block as VideoBlock;
 
-					if(firstVideoBlock) {
+					if(i === 0) {
 						if(autoplay) {
 							videoBlock.autoplay = !!autoplay; //autoplay for first video on slide
 						}
@@ -209,8 +223,6 @@ class Slide extends React.Component<Props> {
 						if(slideBlocks.length === 1) {
 							videoBlock.openAnnotation = true; // only video on slide => open annotation
 						}
-
-						firstVideoBlock = false;
 					}
 
 					videoBlock.annotationWithoutBottomPaddings = !block.hide &&
@@ -228,6 +240,7 @@ class Slide extends React.Component<Props> {
 					exerciseBlock.courseId = courseId;
 					exerciseBlock.forceInitialCode = !showHiddenBlocks;
 					exerciseBlock.maxScore = maxScore;
+					exerciseBlock.isLti = isLti;
 					break;
 				}
 			}
@@ -283,7 +296,7 @@ class Slide extends React.Component<Props> {
 	};
 }
 
-const mapStateToProps = (state: RootState, { courseId, slideId, }: MatchType) => {
+const mapStateToProps = (state: RootState, { courseId, slideId, }: MatchParams) => {
 	const { slides, } = state;
 	const { slidesByCourses, slideLoading } = slides;
 
@@ -304,7 +317,7 @@ const mapStateToProps = (state: RootState, { courseId, slideId, }: MatchType) =>
 };
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({
-	loadSlide: (courseId: string, slideId: string) => dispatch(loadSlide(courseId, slideId)),
+	loadSlide: (courseId: string, slideId: string) => loadSlide(courseId, slideId)(dispatch),
 });
 
 

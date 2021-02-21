@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 
-import { Button } from "ui";
+import { Link, } from "ui";
 import { ArrowChevron2Left } from 'icons';
 
 import { groupAsStudentType, progressType } from "../../types";
@@ -30,14 +30,13 @@ class NavigationHeader extends Component {
 
 		return (
 			<nav className={ styles.breadcrumbs }>
-				<Button
-					use="link"
+				<Link
 					icon={ <ArrowChevron2Left/> }
 					onClick={ onCourseClick }>
 						<span className={ styles.breadcrumbsText }>
 							{ courseName }
 						</span>
-				</Button>
+				</Link>
 			</nav>
 		);
 	}

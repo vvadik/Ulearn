@@ -1,7 +1,7 @@
 'use strict';
 
 const path = require('path');
-const fs = require('fs');
+const fs = require('fs-extra');
 const url = require('url');
 
 // Make sure any symlinks in the project folder are resolved:
@@ -44,7 +44,7 @@ module.exports = {
 	appBuild: resolveApp('build'),
 	appPublic: resolveApp('public'),
 	appHtml: resolveApp('public/index.html'),
-	appIndexJs: resolveApp('src/index.js'),
+	appIndexTsx: resolveApp('src/index.tsx'),
 	appPackageJson: resolveApp('package.json'),
 	appSrc: resolveApp('src'),
 	yarnLockFile: resolveApp('yarn.lock'),

@@ -34,8 +34,9 @@ namespace RunCheckerJob
 			}
 			catch (Exception ex)
 			{
-				log.Error(ex, "Не могу распаковать решение");
-				return new RunningResults(submission.Id, Verdict.SandboxError, error: ex.ToString());
+				var message = "Не могу распаковать решение";
+				log.Error(ex, message);
+				return new RunningResults(submission.Id, Verdict.SandboxError) { Logs = new[] { message } };
 			}
 
 			log.Info($"Запускаю Docker для решения {submission.Id} в папке {dir.FullName}");
@@ -60,7 +61,7 @@ namespace RunCheckerJob
 				var ms = sw.ElapsedMilliseconds;
 
 				RunningResults unsuccessfulResult = null;
-				
+
 				if (!dockerShellProcess.HasExited)
 					GracefullyShutdownDocker(dockerShellProcess, name, settings);
 
@@ -79,17 +80,28 @@ namespace RunCheckerJob
 				}
 				else
 					log.Info($"Docker закончил работу за {ms} ms");
-				
+
 				if (unsuccessfulResult != null)
 					return unsuccessfulResult;
 
 				if (dockerShellProcess.ExitCode != 0)
 				{
-					log.Info($"Упал в папке {dir.FullName}");
-					return new RunningResults(Verdict.SandboxError, output: readOutTask.Result, error: readErrTask.Result);
+					log.Warn($"Упал в папке {dir.FullName}");
+					return new RunningResults(Verdict.SandboxError)
+					{
+						Logs = new[]
+						{
+							$"Exit code: {dockerShellProcess.ExitCode}",
+							$"stdout: {readOutTask.Result}",
+							$"stderr: {readErrTask.Result}"
+						}
+					};
 				}
 
-				return new RunningResults(Verdict.Ok, output: readOutTask.Result, error: readErrTask.Result);
+				if (readOutTask.Result == "" && readErrTask.Result == "") // Поддержка старого соглашения
+					return new RunningResults(Verdict.Ok) { Logs = new[] { "Чеккер ничего не вывел" } };
+
+				return ResultParser.Parse(readOutTask.Result, readErrTask.Result);
 			}
 		}
 

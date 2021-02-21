@@ -14,9 +14,9 @@ namespace RunCheckerJob
 		{
 			SandBoxName = sandBoxName;
 			RunCommand = runCommand;
-			MemoryLimit = 256 * 1024 * 1024;
+			MemoryLimit = (256 + 100) * 1024 * 1024; // из расчета 100 на ОС.
 			MemorySwapLimit = MemoryLimit; // If MemoryLimit and MemorySwapLimit are set to the same value, this prevents containers from using any swap.
-			TestingTimeLimit = TimeSpan.FromSeconds(Math.Max(100, timeLimit));
+			TestingTimeLimit = TimeSpan.FromSeconds(Math.Min(100, timeLimit));
 			MaintenanceTimeLimit = TimeSpan.FromSeconds(10);
 		}
 	}

@@ -19,9 +19,6 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 		[DataMember(Name = "hideQuizButton", EmitDefaultValue = false)]
 		public bool HideQuizButton { get; set; }
 
-		[DataMember(Name = "closable")]
-		public bool Closable { get; set; }
-
 		[DataMember(Name = "blocks")]
 		public List<IApiSlideBlock> InnerBlocks { get; set; }
 
@@ -30,7 +27,6 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 			Hide = spoilerBlock.Hide;
 			Text = spoilerBlock.Text;
 			HideQuizButton = spoilerBlock.HideQuizButton;
-			Closable = spoilerBlock.Closable;
 			InnerBlocks = innerBlocks;
 		}
 	}

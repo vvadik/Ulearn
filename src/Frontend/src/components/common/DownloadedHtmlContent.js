@@ -5,11 +5,12 @@ import * as PropTypes from "prop-types";
 import { saveAs } from "file-saver";
 import { connect } from "react-redux";
 import api from "src/api";
-import { COURSES__COURSE_ENTERED } from "src/consts/actions";
 import { getQueryStringParameter } from "src/utils";
 import { withRouter } from "react-router-dom";
 import { UrlError } from "./Error/NotFoundErrorBoundary";
 import Error404 from "./Error/Error404";
+import { changeCurrentCourseAction } from "src/actions/course";
+import { exerciseSolutions, removeFromCache, setBlockCache, } from "src/utils/localStorageManager";
 
 
 function getUrlParts(url) {
@@ -42,7 +43,7 @@ let decodeHtmlEntities = (function () {
 	let element = document.createElement('div');
 
 	function decodeEntities(str) {
-		if (str && typeof str === 'string') {
+		if(str && typeof str === 'string') {
 			// strip script/html tags
 			str = str.replace(/<script[^>]*>([\S\s]*?)<\/script>/gmi, '');
 			str = str.replace(/<\/?\w(?:[^"'>]|"[^"]*"|'[^']*')*>/gmi, '');
@@ -78,8 +79,8 @@ class DownloadedHtmlContent extends Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		if (this.props.url !== prevProps.url || this.props.account.isAuthenticated !== prevProps.account.isAuthenticated){
-			this.setState({loading:true, body: '',});
+		if(this.props.url !== prevProps.url || this.props.account.isAuthenticated !== prevProps.account.isAuthenticated) {
+			this.setState({ loading: true, body: '', });
 			this.fetchContentFromServer(this.props.url);
 		}
 	}
@@ -88,7 +89,7 @@ class DownloadedHtmlContent extends Component {
 		let body = document.getElementsByTagName('body')[0];
 		body.classList.remove('modal-open');
 		let backdrop = body.getElementsByClassName('modal-backdrop')[0];
-		if (backdrop)
+		if(backdrop)
 			backdrop.remove();
 	}
 
@@ -109,26 +110,27 @@ class DownloadedHtmlContent extends Component {
 
 		fetch(this.BASE_URL + url, { credentials: 'include' })
 			.then(response => {
-				if (url !== this.props.url) {
+				if(url !== this.props.url) {
 					return;
 				}
-				if (response.headers.has('ReactRender')) {
+				if(response.headers.has('ReactRender')) {
 					this.setState({
 						error: new UrlError(),
 					});
 					return;
 				}
-				if (response.redirected) {
+				if(response.redirected) {
 					/* If it was a redirect from external login callback, then update user information */
 					const oldUrlPathname = getUrlParts(url).pathname;
-					if (oldUrlPathname.startsWith("/Login/ExternalLoginCallback") || oldUrlPathname.startsWith("/Login/ExternalLoginConfirmation")) {
+					if(oldUrlPathname.startsWith("/Login/ExternalLoginCallback") || oldUrlPathname.startsWith("/Login/ExternalLoginConfirmation")) {
 						this.props.updateUserInformation();
 						this.props.updateCourses();
 					}
 
 					let newUrl = getUrlParts(response.url);
-					if (oldUrlPathname.startsWith('/Account/ReturnHijack') || oldUrlPathname.startsWith('/Account/Hijack')) {
-						localStorage.removeItem('exercise_solutions');
+					if(oldUrlPathname.startsWith('/Account/ReturnHijack') || oldUrlPathname.startsWith('/Account/Hijack')) {
+						removeFromCache(exerciseSolutions);
+						setBlockCache(true);
 						window.location.href = newUrl.pathname + newUrl.search;
 					} else {
 						this.props.history.replace(newUrl.pathname + newUrl.search);
@@ -136,12 +138,12 @@ class DownloadedHtmlContent extends Component {
 					}
 				}
 				/* Process attaches: download them and return url back */
-				if (response.headers.has('Content-Disposition')) {
+				if(response.headers.has('Content-Disposition')) {
 					let contentDisposition = response.headers.get('Content-Disposition');
-					if (contentDisposition.indexOf('attachment') !== -1) {
+					if(contentDisposition.indexOf('attachment') !== -1) {
 						const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
 						let matches = filenameRegex.exec(contentDisposition);
-						if (matches != null && matches[1]) {
+						if(matches != null && matches[1]) {
 							let filename = matches[1].replace(/['"]/g, '');
 							response.blob().then(blob => this.downloadFile(blob, filename));
 							return Promise.resolve(undefined);
@@ -149,7 +151,7 @@ class DownloadedHtmlContent extends Component {
 					}
 				}
 				/* Process content files: also download them and return url back */
-				if (url.startsWith('/Content/') || url.startsWith('/Certificates/')) {
+				if(url.startsWith('/Content/') || url.startsWith('/Certificates/')) {
 					response.blob().then(blob => this.downloadFile(blob, url));
 					return Promise.resolve(undefined);
 				}
@@ -160,7 +162,7 @@ class DownloadedHtmlContent extends Component {
 				return response.text();
 			})
 			.then(data => {
-				if (data === undefined) {
+				if(data === undefined) {
 					return;
 				}
 
@@ -227,7 +229,7 @@ class DownloadedHtmlContent extends Component {
 	_getCourseIdFromUrl() {
 		/* 1. Extract courseId from urls like /Course/<courseId/... */
 		const pathname = window.location.pathname.toLowerCase();
-		if (pathname.startsWith('/course/')) {
+		if(pathname.startsWith('/course/')) {
 			const regex = new RegExp('/course/([^/]+)(/|$)');
 			const results = regex.exec(pathname);
 			return results[1].toLowerCase();
@@ -235,7 +237,7 @@ class DownloadedHtmlContent extends Component {
 
 		/* 2. Extract courseId from query string: ?courseId=BasicProgramming */
 		const courseIdFromQueryString = getQueryStringParameter("courseId");
-		if (courseIdFromQueryString)
+		if(courseIdFromQueryString)
 			return courseIdFromQueryString.toLowerCase();
 
 		/* 3. Return undefined if courseId is not found */
@@ -250,7 +252,11 @@ class DownloadedHtmlContent extends Component {
 	render() {
 		if(this.state.error)
 			return <Error404/>;
-		if (this.state.loading) {
+		if(this.props.injectInWrapperAfterContentReady) {
+			if(!this.state.body)
+				return null;
+			return this.props.injectInWrapperAfterContentReady(this.getContent());
+		} else if(this.state.loading) {
 			return (
 				<CourseLoader/>
 			)
@@ -291,12 +297,12 @@ class DownloadedHtmlContent extends Component {
 		let postForms = forms.filter(f => f.method.toLowerCase() === 'post' && !f.onsubmit && f.action);
 		postForms.forEach(f => {
 			let formUrl = f.action;
-			if (exceptions.some(e => getUrlParts(formUrl).pathname.toUpperCase() === e.toUpperCase()))
+			if(exceptions.some(e => getUrlParts(formUrl).pathname.toUpperCase() === e.toUpperCase()))
 				return;
 
 			f.addEventListener('submit', e => {
 				let formTarget = f.target;
-				if (formTarget === '_blank')
+				if(formTarget === '_blank')
 					return true;
 
 				e.preventDefault();
@@ -305,7 +311,7 @@ class DownloadedHtmlContent extends Component {
 
 				let formData = new FormData(f);
 				let button = document.activeElement;
-				if (button && button.name && button.value)
+				if(button && button.name && button.value)
 					formData.append(button.name, button.value);
 
 				fetch(formUrl, {
@@ -313,10 +319,10 @@ class DownloadedHtmlContent extends Component {
 					credentials: 'include',
 					body: formData
 				}).then(response => {
-					if (response.redirected) {
+					if(response.redirected) {
 						/* If it was the login form, then update user information in header */
 						let formUrlParts = getUrlParts(formUrl).pathname;
-						if (formUrlParts.startsWith('/Login') || formUrlParts.startsWith('/Account/') || formUrlParts.startsWith('/RestorePassword/')) {
+						if(formUrlParts.startsWith('/Login') || formUrlParts.startsWith('/Account/') || formUrlParts.startsWith('/RestorePassword/')) {
 							this.props.updateUserInformation();
 							this.props.updateCourses();
 						}
@@ -326,11 +332,12 @@ class DownloadedHtmlContent extends Component {
 						/* Is URL has not been changed then add random query parameter to enforce page reloading */
 						let oldUrlParts = getUrlParts(window.location.href);
 						const isUrlChanged = oldUrlParts.pathname + oldUrlParts.search !== newUrlParts.pathname + newUrlParts.search;
-						if (!isUrlChanged)
+						if(!isUrlChanged)
 							newUrlParts.search += (newUrlParts.search === '' ? '?' : '&') + 'rnd=' + Math.random();
 
-						if (formUrlParts.startsWith('/Account/ReturnHijack') || formUrlParts.startsWith('/Account/Hijack')) {
-							localStorage.removeItem('exercise_solutions');
+						if(formUrlParts.startsWith('/Account/ReturnHijack') || formUrlParts.startsWith('/Account/Hijack')) {
+							removeFromCache(exerciseSolutions);
+							setBlockCache(true);
 							window.location.href = newUrlParts.pathname + newUrlParts.search;
 						} else {
 							this.props.history.replace(newUrlParts.pathname + newUrlParts.search);
@@ -339,7 +346,7 @@ class DownloadedHtmlContent extends Component {
 					}
 					return response.text()
 				}).then(data => {
-					if (typeof data === 'undefined')
+					if(typeof data === 'undefined')
 						return;
 					this.processNewHtmlContent(formUrl, data)
 				})
@@ -356,21 +363,19 @@ class DownloadedHtmlContent extends Component {
 
 	static mapDispatchToProps(dispatch) {
 		return {
-			enterToCourse: (courseId) => dispatch({
-				type: COURSES__COURSE_ENTERED,
-				courseId: courseId
-			}),
+			enterToCourse: (courseId) => dispatch(changeCurrentCourseAction(courseId)),
 			updateUserInformation: () => dispatch(api.account.getCurrentUser()),
 			updateCourses: () => dispatch(api.courses.getCourses()),
 		}
 	}
 
 	static propTypes = {
-		history:  PropTypes.shape({
+		history: PropTypes.shape({
 			push: PropTypes.func.isRequired,
 			replace: PropTypes.func.isRequired,
 			createHref: PropTypes.func.isRequired
 		}).isRequired,
+		injectInWrapperAfterContentReady: PropTypes.func,
 	}
 }
 

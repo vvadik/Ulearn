@@ -148,5 +148,15 @@
 			hideNumberOne = false,
 			smallNumbersAreWords = false,
 		};
+		
+		public static readonly RussianPluralizationOptions Seconds = new RussianPluralizationOptions
+		{
+			One = "секунда",
+			Two = "секунды",
+			Five = "секунд",
+			Gender = Gender.Female,
+			hideNumberOne = false,
+			smallNumbersAreWords = false,
+		};
 	}
 }

@@ -3,9 +3,9 @@ import getPluralForm from "src/utils/getPluralForm";
 
 export default {
 	getSlideScore: (score: number, maxScore: number, showZeroScore = false): React.ReactNode =>
-		showZeroScore && score === 0
-			? `Максимум ${ maxScore } ${ getPluralForm(maxScore, 'балл', 'балла', 'баллов') }`
-			: `${ score } ${ getPluralForm(score, 'балл', 'балла', 'баллов') } из ${ maxScore }`,
+		score !== 0 || showZeroScore
+			? `${ score } ${ getPluralForm(score, 'балл', 'балла', 'баллов') } из ${ maxScore }`
+			: `Максимум ${ maxScore } ${ getPluralForm(maxScore, 'балл', 'балла', 'баллов') }`,
 	skippedHeaderText: "Вы посмотрели чужие решения, поэтому не получите баллы за эту задачу",
 	pendingReview: "Решение ожидает код-ревью",
 	prohibitFurtherReview: 'По этой задаче код-ревью больше не проводится',

@@ -3,7 +3,8 @@ import PropTypes from "prop-types";
 
 import { Toggle } from "ui";
 
-import translateCode from "../../../../codeTranslator/translateCode";
+import translateCode from "src/codeTranslator/translateCode";
+import { settingsForFlashcards } from "src/codeTranslator/codemirror";
 
 import styles from './shortQuestions.less';
 
@@ -19,20 +20,20 @@ class ShortQuestions extends Component {
 	}
 
 	componentDidMount() {
-		translateCode(this.list);
+		translateCode(this.list, { 'codeMirror': settingsForFlashcards });
 	}
 
 	componentDidUpdate(prevProps, prevState, snapshot) {
 		const { questionsWithAnswers } = this.props;
 
-		translateCode(this.list);
+		translateCode(this.list, { 'codeMirror': settingsForFlashcards });
 
-		if (prevProps.questionsWithAnswers.length !== questionsWithAnswers.length) {
+		if(prevProps.questionsWithAnswers.length !== questionsWithAnswers.length) {
 			this.setState({ showAllAnswers: false, });
 		}
 
 
-		if (this.state.questionsWithAnswers.length !== questionsWithAnswers.length) {
+		if(this.state.questionsWithAnswers.length !== questionsWithAnswers.length) {
 			this.setState({ questionsWithAnswers, showAllAnswers: false, });
 		}
 	}
