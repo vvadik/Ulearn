@@ -8,15 +8,19 @@ namespace ManualUtils.AntiPlagiarism
 	{
 		private static void FillLanguageTasksStatisticsParameters(AntiPlagiarismDb adb)
 		{
+			Console.WriteLine("FillLanguageTasksStatisticsParameters");
+
 			var parameterses = adb
 				.TasksStatisticsParameters
 				.Where(p => p.Language == 0)
 				.ToList();
 
+			Console.WriteLine($"Count {parameterses.Count}");
+
 			adb.DisableAutoDetectChanges();
 			foreach (var parameterse in parameterses)
 			{
-				var submission = adb.Submissions.First(s => s.TaskId == parameterse.TaskId);
+				var submission = adb.Submissions.OrderByDescending(s => s.AddingTime).First(s => s.TaskId == parameterse.TaskId);
 				try
 				{
 					parameterse.Language = submission.Language;
@@ -33,15 +37,19 @@ namespace ManualUtils.AntiPlagiarism
 
 		private static void FillLanguageSnippetsStatistics(AntiPlagiarismDb adb)
 		{
+			Console.WriteLine("FillLanguageSnippetsStatistics");
+
 			var snippets = adb
 				.SnippetsStatistics
 				.Where(p => p.Language == 0)
 				.ToList();
 
+			Console.WriteLine($"Count snippets {snippets.Count}");
+
 			adb.DisableAutoDetectChanges();
 			foreach (var snippet in snippets)
 			{
-				var submission = adb.Submissions.First(s => s.TaskId == snippet.TaskId);
+				var submission = adb.Submissions.OrderByDescending(s => s.AddingTime).First(s => s.TaskId == snippet.TaskId);
 				try
 				{
 					snippet.Language = submission.Language;
@@ -58,15 +66,19 @@ namespace ManualUtils.AntiPlagiarism
 
 		private static void FillLanguageManualSuspicionLevels(AntiPlagiarismDb adb)
 		{
+			Console.WriteLine("FillLanguageManualSuspicionLevels");
+
 			var suspicionLevels = adb
 				.ManualSuspicionLevels
 				.Where(p => p.Language == 0)
 				.ToList();
 
+			Console.WriteLine($"Count {suspicionLevels.Count}");
+
 			adb.DisableAutoDetectChanges();
 			foreach (var level in suspicionLevels)
 			{
-				var submission = adb.Submissions.First(s => s.TaskId == level.TaskId);
+				var submission = adb.Submissions.OrderByDescending(s => s.AddingTime).First(s => s.TaskId == level.TaskId);
 				try
 				{
 					level.Language = submission.Language;
