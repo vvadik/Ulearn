@@ -65,8 +65,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			[FromRoute] Course course, 
 			[FromRoute] Guid slideId,
 			[FromBody] RunSolutionParameters parameters,
-			[FromQuery] Language language,
-			[FromQuery] bool isLti = false)
+			[FromQuery] Language language)
 		{
 			var courseId = course.Id;
 
@@ -96,26 +95,9 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				return NotFound(new ErrorResponse("Slide not found"));
 
 			var result = await CheckSolution(
-				courseId, exerciseSlide, code, language, User.Identity.GetUserId(), User.Identity.Name,
+				courseId, exerciseSlide, code, language, UserId, User.Identity.Name,
 				waitUntilChecked: true, saveSubmissionOnCompileErrors: false
 			).ConfigureAwait(false);
-
-			if (isLti)
-			{
-				try
-				{
-					var score = await visitsRepo.GetScore(courseId, slideId, UserId);
-					await LtiUtils.SubmitScore(courseId, exerciseSlide, User.Identity.GetUserId(), score, ltiRequestsRepo, ltiConsumersRepo);
-				}
-				catch (Exception e)
-				{
-					log.Error(e, "Мы не смогли отправить баллы на вашу образовательную платформу");
-					return Json(new RunSolutionResponse(SolutionRunStatus.InternalServerError)
-					{
-						Message = "Мы не смогли отправить баллы на вашу образовательную платформу. Пожалуйста, обновите страницу — мы попробуем сделать это ещё раз."
-					});
-				}
-			}
 
 			return result;
 		}

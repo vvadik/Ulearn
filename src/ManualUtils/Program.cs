@@ -54,7 +54,6 @@ namespace ManualUtils
 		
 		private static async Task ResendLti(UlearnDb db)
 		{
-			var ltiRequestsRepo = new LtiRequestsRepo(db);
 			var ltiConsumersRepo = new LtiConsumersRepo(db);
 			var slideCheckingsRepo = new SlideCheckingsRepo(db, null);
 			var visitsRepo = new VisitsRepo(db, slideCheckingsRepo);
@@ -67,7 +66,7 @@ namespace ManualUtils
 				var course = courseManager.GetCourse(ltiRequest.CourseId);
 				var slide = course.GetSlideById(ltiRequest.SlideId, true);
 				var score = await visitsRepo.GetScore(ltiRequest.CourseId, ltiRequest.SlideId, ltiRequest.UserId);
-				await LtiUtils.SubmitScore(ltiRequest.CourseId, slide, ltiRequest.UserId, score, ltiRequestsRepo, ltiConsumersRepo);
+				await LtiUtils.SubmitScore(slide, ltiRequest.UserId, score, ltiRequest.Request, ltiConsumersRepo);
 				i++;
 				Console.WriteLine($"{i} requestId {ltiRequest.RequestId} score {score}");
 			}

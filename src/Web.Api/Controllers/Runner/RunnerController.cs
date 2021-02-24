@@ -38,13 +38,14 @@ namespace Ulearn.Web.Api.Controllers.Runner
 			IUsersRepo usersRepo, IUserSolutionsRepo userSolutionsRepo, ISlideCheckingsRepo slideCheckingsRepo,
 			IGroupsRepo groupsRepo, IVisitsRepo visitsRepo, MetricSender metricSender,
 			XQueueResultObserver xQueueResultObserver, SandboxErrorsResultObserver sandboxErrorsResultObserver,
-			AntiPlagiarismResultObserver antiPlagiarismResultObserver, StyleErrorsResultObserver styleErrorsResultObserver)
+			AntiPlagiarismResultObserver antiPlagiarismResultObserver, StyleErrorsResultObserver styleErrorsResultObserver, LtiResultObserver ltiResultObserver)
 			: base(courseManager, db, usersRepo)
 		{
 			configuration = options.Value;
 			resultObservers = new List<IResultObserver>
 			{
 				xQueueResultObserver,
+				ltiResultObserver,
 				sandboxErrorsResultObserver,
 				antiPlagiarismResultObserver,
 				styleErrorsResultObserver,

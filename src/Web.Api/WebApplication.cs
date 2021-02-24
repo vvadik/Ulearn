@@ -206,6 +206,7 @@ namespace Ulearn.Web.Api
 			services.AddScoped<SandboxErrorsResultObserver>();
 			services.AddScoped<AntiPlagiarismResultObserver>();
 			services.AddScoped<StyleErrorsResultObserver>();
+			services.AddScoped<LtiResultObserver>();
 
 			services.AddDatabaseServices();
 		}
