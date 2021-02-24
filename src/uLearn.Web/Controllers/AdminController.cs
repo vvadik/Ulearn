@@ -86,37 +86,6 @@ namespace uLearn.Web.Controllers
 			antiPlagiarismClient = new AntiPlagiarismClient(antiplagiarismClientConfiguration.Endpoint, antiplagiarismClientConfiguration.Token);
 		}
 
-		public ActionResult Courses(string courseId = null, string courseTitle = null)
-		{
-			var controllableCourses = new HashSet<string>(User.GetControllableCoursesId());
-			var incorrectChars = new string(CourseManager.GetInvalidCharacters().OrderBy(c => c).Where(c => 32 <= c).ToArray());
-			var courses = courseManager.GetCourses()
-				.Where(course => controllableCourses.Contains(course.Id));
-
-			if (User.IsSystemAdministrator())
-				courses = courses.OrderBy(course => course.Id, StringComparer.InvariantCultureIgnoreCase);
-			else
-				courses = courses.OrderBy(course => course.Title, StringComparer.InvariantCultureIgnoreCase);
-
-			var tempCourses = tempCoursesRepo.GetTempCourses().Select(c => c.CourseId).ToHashSet();
-			var model = new CourseListViewModel
-			{
-				Courses = courses
-					.Select(course => new CourseViewModel
-					{
-						Id = course.Id,
-						Title = course.Title,
-						LastWriteTime = courseManager.GetLastWriteTime(course.Id),
-						IsTemp = tempCourses.Contains(course.Id)
-					})
-					.ToList(),
-				LastTryCourseId = courseId,
-				LastTryCourseTitle = courseTitle,
-				InvalidCharacters = incorrectChars
-			};
-			return View(model);
-		}
-
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public ActionResult SpellingErrors(Guid versionId)
 		{
@@ -450,7 +419,7 @@ namespace uLearn.Web.Controllers
 			var versionId = Guid.NewGuid();
 
 			if (!courseManager.TryCreateCourse(courseId, courseTitle, versionId))
-				return RedirectToAction("Courses", new { courseId = courseId, courseTitle = courseTitle });
+				return RedirectToAction("Courses", "Course",  new { courseId = courseId, courseTitle = courseTitle });
 
 			var userId = User.Identity.GetUserId();
 			await coursesRepo.AddCourseVersion(courseId, versionId, userId, null, null, null, null).ConfigureAwait(false);
@@ -806,7 +775,7 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 
 			if (string.IsNullOrEmpty(queryModel.CourseId))
-				return RedirectToAction("Courses");
+				return RedirectToAction("Courses", "Course");
 			return View(queryModel);
 		}
 

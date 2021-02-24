@@ -1444,6 +1444,7 @@
     <Content Include="Views\Analytics\RatingByPoints.cshtml" />
     <Content Include="Views\AntiPlagiarism\Details.cshtml" />
     <Content Include="Views\Certificates\ListPartial.cshtml" />
+    <Content Include="Views\Course\Courses.cshtml" />
     <Content Include="Views\Errors\404.cshtml" />
     <Content Include="Views\Errors\Error.cshtml" />
     <Content Include="Views\Exercise\StudentSubmissions.cshtml" />
@@ -1482,7 +1483,6 @@
     <Content Include="Views\Hint\UseHint.cshtml" />
     <Content Include="Views\Account\List.cshtml" />
     <Content Include="Views\Admin\Units.cshtml" />
-    <Content Include="Views\Admin\Courses.cshtml" />
     <Content Include="Views\Analytics\UnitStatistics.cshtml" />
     <Content Include="Views\Course\InstructorNote.cshtml" />
     <Content Include="Views\Questions\Items.cshtml" />

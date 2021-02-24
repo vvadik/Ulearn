@@ -9,6 +9,11 @@ namespace uLearn.Web
 		{
 			routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 			routes.MapRoute(
+				name: "Course.Courses",
+				url: "Course/Courses",
+				defaults: new { controller = "Course", action = "Courses" }
+			);
+			routes.MapRoute(
 				name: "Course.Flashcards",
 				url: "Course/{courseId}/flashcards",
 				defaults: new { controller = "Spa", action = "IndexHtml" }

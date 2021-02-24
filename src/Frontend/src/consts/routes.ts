@@ -1,7 +1,7 @@
 import { buildQuery } from "src/utils";
 
 export const coursePath = "course";
-export const adminCoursePath = "/admin/courses";
+export const coursesPath = "/course/courses";
 export const flashcards = "flashcards";
 export const flashcardsPreview = "preview";
 export const commentsPath = "comments";

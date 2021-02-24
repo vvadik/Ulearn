@@ -538,6 +538,11 @@ namespace Database.DataContexts
 			var userGroupsIds = GetUserGroupsIds(courseId, userId);
 			return GetGroups(courseId).Where(g => userGroupsIds.Contains(g.Id)).ToList();
 		}
+		
+		public List<Group> GetUserGroups(string userId)
+		{
+			return db.GroupMembers.Where(m => m.UserId == userId && !m.Group.IsDeleted).Select(m => m.Group).ToList();
+		}
 
 		public bool IsManualCheckingEnabledForUser(Course course, string userId)
 		{
