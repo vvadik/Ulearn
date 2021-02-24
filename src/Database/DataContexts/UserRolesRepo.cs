@@ -156,5 +156,11 @@ namespace Database.DataContexts
 			courseId = courseId.ToLower();
 			return await db.UserRoles.Where(x => x.UserId == userId && x.CourseId == courseId).ToListAsync();
 		}
+
+		public List<string> GetCoursesWhereUserIsInRole(string userId, CourseRole minCourseRoleType)
+		{
+			var roles = GetActualUserRoles(userId).Where(r => r.Role <= minCourseRoleType).ToList();
+			return roles.Select(r => r.CourseId).ToList();
+		}
 	}
 }

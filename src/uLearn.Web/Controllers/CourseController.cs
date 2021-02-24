@@ -530,7 +530,7 @@ namespace uLearn.Web.Controllers
 			if (!isSystemAdministrator)
 			{
 				var visibleCourses = unitsRepo.GetVisibleCourses();
-				var coursesInWhichUserHasAnyRole = await userRolesRepo.GetCoursesWhereUserIsInRole(userId, CourseRole.Tester).ConfigureAwait(false);
+				var coursesInWhichUserHasAnyRole = userRolesRepo.GetCoursesWhereUserIsInRole(userId, CourseRole.Tester);
 				var coursesWhereIAmStudent = groupsRepo.GetUserGroups(userId)
 					.Select(g => g.CourseId)
 					.Distinct(StringComparer.OrdinalIgnoreCase)
