@@ -4,10 +4,10 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
+using AntiPlagiarism.Web.Database.Extensions;
 using AntiPlagiarism.Web.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Ulearn.Common;
-using Ulearn.Common.Extensions;
 using Z.EntityFramework.Plus;
 
 namespace AntiPlagiarism.Web.Database.Repos
