@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
 using AntiPlagiarism.Api.Models.Results;
+using AntiPlagiarism.Web.Database.Extensions;
 using AntiPlagiarism.Web.Database.Models;
 using Microsoft.EntityFrameworkCore;
-using Ulearn.Common.Extensions;
 using Ulearn.Core.Extensions;
 
 namespace AntiPlagiarism.Web.Database.Repos

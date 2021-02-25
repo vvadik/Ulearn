@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
+using Database.Extensions;
 using Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Vostok.Logging.Abstractions;
