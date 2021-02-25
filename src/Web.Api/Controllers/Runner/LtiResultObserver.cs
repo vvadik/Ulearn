@@ -15,10 +15,11 @@ namespace Ulearn.Web.Api.Controllers.Runner
 		private readonly IWebCourseManager courseManager;
 		private readonly ILtiConsumersRepo ltiConsumersRepo;
 		private readonly ILtiRequestsRepo ltiRequestsRepo;
-		private readonly VisitsRepo visitsRepo;
+		private readonly IVisitsRepo visitsRepo;
 		private static ILog log => LogProvider.Get().ForContext(typeof(LtiResultObserver));
 
-		public LtiResultObserver(IWebCourseManager courseManager, ILtiConsumersRepo ltiConsumersRepo, ILtiRequestsRepo ltiRequestsRepo, VisitsRepo visitsRepo)
+		public LtiResultObserver(IWebCourseManager courseManager, ILtiConsumersRepo ltiConsumersRepo,
+			ILtiRequestsRepo ltiRequestsRepo, IVisitsRepo visitsRepo)
 		{
 			this.courseManager = courseManager;
 			this.ltiConsumersRepo = ltiConsumersRepo;
