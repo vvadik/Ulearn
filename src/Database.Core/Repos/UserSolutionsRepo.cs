@@ -41,7 +41,7 @@ namespace Database.Repos
 			this.courseManager = courseManager;
 		}
 
-		public async Task<UserExerciseSubmission> AddUserExerciseSubmission(
+		public async Task<int> AddUserExerciseSubmission(
 			string courseId, Guid slideId,
 			string code, string compilationError, string output,
 			string userId, string executionServiceName, string displayName,
@@ -100,7 +100,7 @@ namespace Database.Repos
 
 			await db.SaveChangesAsync();
 
-			return submission;
+			return submission.Id;
 		}
 
 		///<returns>(likesCount, isLikedByThisUsed)</returns>
@@ -536,40 +536,40 @@ namespace Database.Repos
 			throw new InvalidOperationException($"Unknown exercise type for checking: {exerciseBlock.ExerciseType}");
 		}
 
-		public async Task RunAutomaticChecking(UserExerciseSubmission submission, TimeSpan timeout, bool waitUntilChecked, int priority)
+		public async Task RunAutomaticChecking(int submissionId, string sandbox, TimeSpan timeout, bool waitUntilChecked, int priority)
 		{
-			log.Info($"Запускаю автоматическую проверку решения. ID посылки: {submission.Id}");
-			unhandledSubmissions.TryAdd(submission.Id, DateTime.Now);
-			await workQueueRepo.Add(queueId, submission.Id.ToString(), submission.Sandbox ?? "csharp", priority);
+			log.Info($"Запускаю автоматическую проверку решения. ID посылки: {submissionId}");
+			unhandledSubmissions.TryAdd(submissionId, DateTime.Now);
+			await workQueueRepo.Add(queueId, submissionId.ToString(), sandbox ?? "csharp", priority);
 
 			if (!waitUntilChecked)
 			{
-				log.Info($"Не буду ожидать результатов проверки посылки {submission.Id}");
+				log.Info($"Не буду ожидать результатов проверки посылки {submissionId}");
 				return;
 			}
 
 			var sw = Stopwatch.StartNew();
 			while (sw.Elapsed < timeout)
 			{
-				await WaitUntilSubmissionHandled(TimeSpan.FromSeconds(5), submission.Id);
-				var submissionAutomaticCheckingStatus = await GetSubmissionAutomaticCheckingStatus(submission.Id);
+				await WaitUntilSubmissionHandled(TimeSpan.FromSeconds(5), submissionId);
+				var submissionAutomaticCheckingStatus = await GetSubmissionAutomaticCheckingStatus(submissionId);
 				if (submissionAutomaticCheckingStatus == null)
 					break;
 
 				if (submissionAutomaticCheckingStatus == AutomaticExerciseCheckingStatus.Done)
 				{
-					log.Info($"Посылка {submission.Id} проверена");
+					log.Info($"Посылка {submissionId} проверена");
 					return;
 				}
 				if (submissionAutomaticCheckingStatus == AutomaticExerciseCheckingStatus.Error)
 				{
-					log.Warn($"Во время проверки посылки {submission.Id} произошла ошибка");
+					log.Warn($"Во время проверки посылки {submissionId} произошла ошибка");
 					return;
 				}
 			}
 
 			/* If something is wrong */
-			unhandledSubmissions.TryRemove(submission.Id, out _);
+			unhandledSubmissions.TryRemove(submissionId, out _);
 			throw new SubmissionCheckingTimeout();
 		}
 

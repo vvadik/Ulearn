@@ -11,8 +11,10 @@ using Database.Repos.Users;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Ulearn.Common;
 using Ulearn.Common.Api.Models.Responses;
+using Ulearn.Core;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
@@ -22,7 +24,6 @@ using Ulearn.Core.Metrics;
 using Ulearn.Core.Telegram;
 using Ulearn.Web.Api.Models.Parameters.Exercise;
 using Ulearn.Web.Api.Models.Responses.Exercise;
-using Ulearn.Web.Api.Utils.LTI;
 using Vostok.Logging.Abstractions;
 using AutomaticExerciseCheckingStatus = Database.Models.AutomaticExerciseCheckingStatus;
 
@@ -35,28 +36,26 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		private readonly IVisitsRepo visitsRepo;
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
 		private readonly IGroupsRepo groupsRepo;
-		private readonly ILtiConsumersRepo ltiConsumersRepo;
-		private readonly ILtiRequestsRepo ltiRequestsRepo;
 		private readonly IStyleErrorsRepo styleErrorsRepo;
 		private readonly MetricSender metricSender;
+		private readonly IServiceScopeFactory serviceScopeFactory;
 		private readonly ErrorsBot errorsBot = new ErrorsBot();
 		private static ILog log => LogProvider.Get().ForContext(typeof(ExerciseController));
 
 		public ExerciseController(IWebCourseManager courseManager, UlearnDb db, MetricSender metricSender,
 			IUsersRepo usersRepo, IUserSolutionsRepo userSolutionsRepo, ICourseRolesRepo courseRolesRepo, IVisitsRepo visitsRepo,
-			ILtiConsumersRepo ltiConsumersRepo, ILtiRequestsRepo ltiRequestsRepo, ISlideCheckingsRepo slideCheckingsRepo, IGroupsRepo groupsRepo,
-			IStyleErrorsRepo styleErrorsRepo)
+			ISlideCheckingsRepo slideCheckingsRepo, IGroupsRepo groupsRepo,
+			IStyleErrorsRepo styleErrorsRepo, IServiceScopeFactory serviceScopeFactory)
 			: base(courseManager, db, usersRepo)
 		{
 			this.metricSender = metricSender;
 			this.userSolutionsRepo = userSolutionsRepo;
 			this.courseRolesRepo = courseRolesRepo;
 			this.visitsRepo = visitsRepo;
-			this.ltiConsumersRepo = ltiConsumersRepo;
-			this.ltiRequestsRepo = ltiRequestsRepo;
 			this.slideCheckingsRepo = slideCheckingsRepo;
 			this.groupsRepo = groupsRepo;
 			this.styleErrorsRepo = styleErrorsRepo;
+			this.serviceScopeFactory = serviceScopeFactory;
 		}
 
 		[HttpPost("/slides/{courseId}/{slideId}/exercise/submit")]
@@ -132,85 +131,101 @@ namespace Ulearn.Web.Api.Controllers.Slides
 					return new RunSolutionResponse(SolutionRunStatus.CompilationError) { Message = buildResult.ErrorMessage };
 			}
 
-			var compilationErrorMessage = buildResult.HasErrors ? buildResult.ErrorMessage : null;
-			var submissionSandbox = (exerciseBlock as UniversalExerciseBlock)?.DockerImageName;
 			var hasAutomaticChecking = exerciseBlock.HasAutomaticChecking();
-			var automaticCheckingStatus = hasAutomaticChecking
-				? buildResult.HasErrors
-					? AutomaticExerciseCheckingStatus.Done
-					: AutomaticExerciseCheckingStatus.Waiting
-				: (AutomaticExerciseCheckingStatus?) null;
-			var initialSubmission = await userSolutionsRepo.AddUserExerciseSubmission(
-				courseId,
-				exerciseSlide.Id,
-				userCode,
-				compilationErrorMessage,
-				null,
-				userId,
-				"uLearn",
-				GenerateSubmissionName(exerciseSlide, userName),
-				language,
-				submissionSandbox,
-				hasAutomaticChecking,
-				automaticCheckingStatus
-			);
+			var sandbox = (exerciseSlide.Exercise as UniversalExerciseBlock)?.DockerImageName;
+			var submissionId = await CreateInitialSubmission(courseId, exerciseSlide, userCode, language, userId, userName,
+				hasAutomaticChecking, buildResult, serviceScopeFactory);
+			UserExerciseSubmission submissionNoTracking; // Получается позже, чтобы быть максимально обновленным из базы, и чтобы не занимать память надолго и не попасть в 2 поколение
 
 			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin);
 
 			if (buildResult.HasErrors)
-				return new RunSolutionResponse(SolutionRunStatus.Success) { Submission = SubmissionInfo.Build(initialSubmission, null, isCourseAdmin) };
+			{
+				submissionNoTracking = await userSolutionsRepo.FindSubmissionByIdNoTracking(submissionId);
+				return new RunSolutionResponse(SolutionRunStatus.Success) { Submission = SubmissionInfo.Build(submissionNoTracking, null, isCourseAdmin) };
+			}
 
 			var executionTimeout = TimeSpan.FromSeconds(exerciseBlock.TimeLimit * 2 + 5);
-			UserExerciseSubmission updatedSubmissionNoTracking;
 			try
 			{
 				if (hasAutomaticChecking)
 				{
 					var priority = exerciseBlock is SingleFileExerciseBlock ? 10 : 0;
-					await userSolutionsRepo.RunAutomaticChecking(initialSubmission, executionTimeout, waitUntilChecked, priority);
+					await userSolutionsRepo.RunAutomaticChecking(submissionId, sandbox, executionTimeout, waitUntilChecked, priority);
 				}
 			}
 			catch (SubmissionCheckingTimeout)
 			{
 				log.Error($"Не смог запустить проверку решения, никто не взял его на проверку за {executionTimeout.TotalSeconds} секунд.\nКурс «{course.Title}», слайд «{exerciseSlide.Title}» ({exerciseSlide.Id})");
 				await errorsBot.PostToChannelAsync($"Не смог запустить проверку решения, никто не взял его на проверку за {executionTimeout.TotalSeconds} секунд.\nКурс «{course.Title}», слайд «{exerciseSlide.Title}» ({exerciseSlide.Id})\n\nhttps://ulearn.me/Sandbox");
-				updatedSubmissionNoTracking = await userSolutionsRepo.FindSubmissionByIdNoTracking(initialSubmission.Id);
-				var message = updatedSubmissionNoTracking.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Running
+				submissionNoTracking = await userSolutionsRepo.FindSubmissionByIdNoTracking(submissionId);
+				var message = submissionNoTracking.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Running
 					? "Решение уже проверяется."
 					: "Решение ждет своей очереди на проверку, мы будем пытаться проверить его еще 10 минут.";
 				return new RunSolutionResponse(SolutionRunStatus.SubmissionCheckingTimeout)
 				{
 					Message = $"К сожалению, мы не смогли оперативно проверить ваше решение. {message}. Просто подождите и обновите страницу.",
-					Submission = SubmissionInfo.Build(updatedSubmissionNoTracking, null, isCourseAdmin)
+					Submission = SubmissionInfo.Build(submissionNoTracking, null, isCourseAdmin)
 				};
 			}
+
+			submissionNoTracking = await userSolutionsRepo.FindSubmissionByIdNoTracking(submissionId);
 
 			if (!waitUntilChecked)
 			{
 				metricSender.SendCount($"exercise.{exerciseMetricId}.dont_wait_result");
 				// По вовзращаемому значению нельзя отличить от случая, когда никто не взял на проверку
-				return new RunSolutionResponse(SolutionRunStatus.Success) { Submission = SubmissionInfo.Build(initialSubmission, null, isCourseAdmin) };
+				return new RunSolutionResponse(SolutionRunStatus.Success) { Submission = SubmissionInfo.Build(submissionNoTracking, null, isCourseAdmin) };
 			}
 
-			updatedSubmissionNoTracking = await userSolutionsRepo.FindSubmissionByIdNoTracking(initialSubmission.Id);
-			updatedSubmissionNoTracking.Reviews = await CreateStyleErrorsReviewsForSubmission(updatedSubmissionNoTracking.Id, buildResult.StyleErrors, exerciseMetricId);
+			submissionNoTracking.Reviews = await CreateStyleErrorsReviewsForSubmission(submissionId, buildResult.StyleErrors, exerciseMetricId);
 			if (!hasAutomaticChecking)
-				await SendToReviewAndUpdateScore(updatedSubmissionNoTracking, courseManager, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender);
+				await SendToReviewAndUpdateScore(submissionNoTracking, courseManager, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender);
 
 			var score = await visitsRepo.GetScore(courseId, exerciseSlide.Id, userId);
-			var waitingForManualChecking = updatedSubmissionNoTracking.ManualCheckings.Any(c => !c.IsChecked) ? true : (bool?)null;
-			var prohibitFurtherManualChecking = updatedSubmissionNoTracking.ManualCheckings.Any(c => c.ProhibitFurtherManualCheckings);
+			var waitingForManualChecking = submissionNoTracking.ManualCheckings.Any(c => !c.IsChecked) ? true : (bool?)null;
+			var prohibitFurtherManualChecking = submissionNoTracking.ManualCheckings.Any(c => c.ProhibitFurtherManualCheckings);
 			var result = new RunSolutionResponse(SolutionRunStatus.Success)
 			{
 				Score = score,
 				WaitingForManualChecking = waitingForManualChecking,
 				ProhibitFurtherManualChecking = prohibitFurtherManualChecking,
-				Submission = SubmissionInfo.Build(updatedSubmissionNoTracking, null, isCourseAdmin)
+				Submission = SubmissionInfo.Build(submissionNoTracking, null, isCourseAdmin)
 			};
 			return result;
 		}
 
-		private string GenerateSubmissionName(Slide exerciseSlide, string userName)
+		private static async Task<int> CreateInitialSubmission(string courseId, ExerciseSlide exerciseSlide, string userCode, Language language,
+			string userId, string userName, bool hasAutomaticChecking, SolutionBuildResult buildResult, IServiceScopeFactory serviceScopeFactory)
+		{
+			using (var scope = serviceScopeFactory.CreateScope())
+			{
+				var userSolutionsRepo = (IUserSolutionsRepo)scope.ServiceProvider.GetService(typeof(IUserSolutionsRepo));
+				var compilationErrorMessage = buildResult.HasErrors ? buildResult.ErrorMessage : null;
+				var submissionSandbox = (exerciseSlide.Exercise as UniversalExerciseBlock)?.DockerImageName;
+				var automaticCheckingStatus = hasAutomaticChecking
+					? buildResult.HasErrors
+						? AutomaticExerciseCheckingStatus.Done
+						: AutomaticExerciseCheckingStatus.Waiting
+					: (AutomaticExerciseCheckingStatus?)null;
+				return await userSolutionsRepo.AddUserExerciseSubmission(
+					courseId,
+					exerciseSlide.Id,
+					userCode,
+					compilationErrorMessage,
+					null,
+					userId,
+					"uLearn",
+					GenerateSubmissionName(exerciseSlide, userName),
+					language,
+					submissionSandbox,
+					hasAutomaticChecking,
+					automaticCheckingStatus
+				);
+			}
+		}
+
+		private static string GenerateSubmissionName(Slide exerciseSlide, string userName)
 		{
 			return $"{userName}: {exerciseSlide.Info.Unit.Title} - {exerciseSlide.Title}";
 		}

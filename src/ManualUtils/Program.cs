@@ -103,7 +103,7 @@ namespace ManualUtils
 			foreach (var submission in submissions)
 			{
 				Console.WriteLine($"{i} from {submissions.Count} {submission.Id}");
-				await userSolutionsRepo.RunAutomaticChecking(submission, TimeSpan.FromSeconds(25), false, -10);
+				await userSolutionsRepo.RunAutomaticChecking(submission.Id, submission.Sandbox, TimeSpan.FromSeconds(25), false, -10);
 				Thread.Sleep(1000);
 				var result = await db.UserExerciseSubmissions
 					.Include(s => s.AutomaticChecking)
