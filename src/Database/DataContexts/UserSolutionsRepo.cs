@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Core.Objects;
 using System.Data.Entity.Migrations;
@@ -27,7 +26,6 @@ namespace Database.DataContexts
 		private static ILog log => LogProvider.Get().ForContext(typeof(UserSolutionsRepo));
 		private readonly ULearnDb db;
 		private readonly TextsRepo textsRepo;
-		private readonly VisitsRepo visitsRepo;
 		private readonly CourseManager courseManager;
 
 		private static volatile ConcurrentDictionary<int, DateTime> unhandledSubmissions = new ConcurrentDictionary<int, DateTime>();
@@ -39,7 +37,6 @@ namespace Database.DataContexts
 			this.db = db;
 			this.courseManager = courseManager;
 			textsRepo = new TextsRepo(db);
-			visitsRepo = new VisitsRepo(db);
 		}
 
 		public async Task<UserExerciseSubmission> AddUserExerciseSubmission(
