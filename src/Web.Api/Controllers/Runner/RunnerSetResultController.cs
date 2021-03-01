@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -11,9 +12,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Ulearn.Common;
 using Ulearn.Common.Api.Models.Responses;
+using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Metrics;
 using Ulearn.Core.RunCheckerJobApi;
-using Ulearn.Web.Api.Controllers.Slides;
 using Vostok.Logging.Abstractions;
 using Web.Api.Configuration;
 
@@ -73,7 +74,7 @@ namespace Ulearn.Web.Api.Controllers.Runner
 
 			foreach (var result in results)
 				await FuncUtils.TrySeveralTimesAsync(() => userSolutionsRepo.SaveResult(result,
-					submission => ExerciseController.SendToReviewAndUpdateScore(submission, courseManager, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender)
+					submission => SendToReviewAndUpdateScore(submission, courseManager, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender)
 				), 3).ConfigureAwait(false);
 
 			var submissionsByIds = (await userSolutionsRepo
@@ -92,6 +93,50 @@ namespace Ulearn.Web.Api.Controllers.Runner
 			}
 
 			return StatusCode((int)HttpStatusCode.Accepted);
+		}
+
+		public static async Task<bool> SendToReviewAndUpdateScore(UserExerciseSubmission submissionNoTracking,
+			IWebCourseManager courseManager, ISlideCheckingsRepo slideCheckingsRepo, IGroupsRepo groupsRepo, IVisitsRepo visitsRepo, MetricSender metricSender)
+		{
+			var userId = submissionNoTracking.UserId;
+			var courseId = submissionNoTracking.CourseId;
+			var course = await courseManager.GetCourseAsync(courseId);
+			var exerciseSlide = course.FindSlideById(submissionNoTracking.SlideId, true) as ExerciseSlide; // SlideId проверен в вызывающем методе 
+			if (exerciseSlide == null)
+				return false;
+			var exerciseMetricId = GetExerciseMetricId(courseId, exerciseSlide);
+			var automaticCheckingNoTracking = submissionNoTracking.AutomaticChecking;
+			var isProhibitedUserToSendForReview = await slideCheckingsRepo.IsProhibitedToSendExerciseToManualChecking(courseId, exerciseSlide.Id, userId);
+			var sendToReview = exerciseSlide.Scoring.RequireReview
+								&& submissionNoTracking.AutomaticCheckingIsRightAnswer
+								&& !isProhibitedUserToSendForReview
+								&& await groupsRepo.IsManualCheckingEnabledForUserAsync(course, userId);
+			if (sendToReview)
+			{
+				await slideCheckingsRepo.RemoveWaitingManualCheckings<ManualExerciseChecking>(courseId, exerciseSlide.Id, userId, false);
+				await slideCheckingsRepo.AddManualExerciseChecking(courseId, exerciseSlide.Id, userId, submissionNoTracking.Id);
+				await visitsRepo.MarkVisitsAsWithManualChecking(courseId, exerciseSlide.Id, userId);
+				metricSender.SendCount($"exercise.{exerciseMetricId}.sent_to_review");
+				metricSender.SendCount("exercise.sent_to_review");
+			}
+
+			await visitsRepo.UpdateScoreForVisit(courseId, exerciseSlide, userId);
+
+			if (automaticCheckingNoTracking != null)
+			{
+				var verdictForMetric = automaticCheckingNoTracking.GetVerdict().Replace(" ", "");
+				metricSender.SendCount($"exercise.{exerciseMetricId}.{verdictForMetric}");
+			}
+
+			return sendToReview;
+		}
+
+		public static string GetExerciseMetricId(string courseId, ExerciseSlide exerciseSlide)
+		{
+			var slideTitleForMetric = exerciseSlide.LatinTitle.Replace(".", "_").ToLower(CultureInfo.InvariantCulture);
+			if (slideTitleForMetric.Length > 25)
+				slideTitleForMetric = slideTitleForMetric.Substring(0, 25);
+			return $"{courseId.ToLower(CultureInfo.InvariantCulture)}.{exerciseSlide.Id.ToString("N").Substring(32 - 25)}.{slideTitleForMetric}";
 		}
 
 		private async Task SendResultToObservers(UserExerciseSubmission submission, RunningResults result)

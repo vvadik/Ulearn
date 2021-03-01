@@ -21,7 +21,9 @@ using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.CSharp;
 using Ulearn.Core.Metrics;
+using Ulearn.Core.RunCheckerJobApi;
 using Ulearn.Core.Telegram;
+using Ulearn.Web.Api.Controllers.Runner;
 using Ulearn.Web.Api.Models.Parameters.Exercise;
 using Ulearn.Web.Api.Models.Responses.Exercise;
 using Vostok.Logging.Abstractions;
@@ -39,12 +41,13 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		private readonly IStyleErrorsRepo styleErrorsRepo;
 		private readonly MetricSender metricSender;
 		private readonly IServiceScopeFactory serviceScopeFactory;
+		private readonly StyleErrorsResultObserver styleErrorsResultObserver;
 		private readonly ErrorsBot errorsBot = new ErrorsBot();
 		private static ILog log => LogProvider.Get().ForContext(typeof(ExerciseController));
 
 		public ExerciseController(IWebCourseManager courseManager, UlearnDb db, MetricSender metricSender,
 			IUsersRepo usersRepo, IUserSolutionsRepo userSolutionsRepo, ICourseRolesRepo courseRolesRepo, IVisitsRepo visitsRepo,
-			ISlideCheckingsRepo slideCheckingsRepo, IGroupsRepo groupsRepo,
+			ISlideCheckingsRepo slideCheckingsRepo, IGroupsRepo groupsRepo, StyleErrorsResultObserver styleErrorsResultObserver,
 			IStyleErrorsRepo styleErrorsRepo, IServiceScopeFactory serviceScopeFactory)
 			: base(courseManager, db, usersRepo)
 		{
@@ -55,6 +58,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			this.slideCheckingsRepo = slideCheckingsRepo;
 			this.groupsRepo = groupsRepo;
 			this.styleErrorsRepo = styleErrorsRepo;
+			this.styleErrorsResultObserver = styleErrorsResultObserver;
 			this.serviceScopeFactory = serviceScopeFactory;
 		}
 
@@ -111,7 +115,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			bool saveSubmissionOnCompileErrors
 			)
 		{
-			var exerciseMetricId = GetExerciseMetricId(courseId, exerciseSlide);
+			var exerciseMetricId = RunnerSetResultController.GetExerciseMetricId(courseId, exerciseSlide);
 			metricSender.SendCount("exercise.try");
 			metricSender.SendCount($"exercise.{courseId.ToLower(CultureInfo.InvariantCulture)}.try");
 			metricSender.SendCount($"exercise.{exerciseMetricId}.try");
@@ -122,8 +126,6 @@ namespace Ulearn.Web.Api.Controllers.Slides
 
 			if (buildResult.HasErrors)
 				metricSender.SendCount($"exercise.{exerciseMetricId}.CompilationError");
-			if (buildResult.HasStyleErrors)
-				metricSender.SendCount($"exercise.{exerciseMetricId}.StyleViolation");
 
 			if (!saveSubmissionOnCompileErrors)
 			{
@@ -178,9 +180,15 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				return new RunSolutionResponse(SolutionRunStatus.Success) { Submission = SubmissionInfo.Build(submissionNoTracking, null, isCourseAdmin) };
 			}
 
-			submissionNoTracking.Reviews = await CreateStyleErrorsReviewsForSubmission(submissionId, buildResult.StyleErrors, exerciseMetricId);
 			if (!hasAutomaticChecking)
-				await SendToReviewAndUpdateScore(submissionNoTracking, courseManager, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender);
+				await RunnerSetResultController.SendToReviewAndUpdateScore(submissionNoTracking, courseManager, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender);
+
+			// StyleErrors для C# proj и file устанавливаются только здесь, берутся из buildResult. В StyleErrorsResultObserver.ProcessResult попадают только ошибки из docker
+			if (buildResult.HasStyleErrors)
+			{
+				var styleErrors = await ConvertStyleErrors(buildResult);
+				submissionNoTracking.Reviews = await styleErrorsResultObserver.CreateStyleErrorsReviewsForSubmission(submissionId, styleErrors, exerciseMetricId);
+			}
 
 			var score = await visitsRepo.GetScore(courseId, exerciseSlide.Id, userId);
 			var waitingForManualChecking = submissionNoTracking.ManualCheckings.Any(c => !c.IsChecked) ? true : (bool?)null;
@@ -230,77 +238,25 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			return $"{userName}: {exerciseSlide.Info.Unit.Title} - {exerciseSlide.Title}";
 		}
 
-		public static async Task<bool> SendToReviewAndUpdateScore(UserExerciseSubmission submissionNoTracking,
-			IWebCourseManager courseManager, ISlideCheckingsRepo slideCheckingsRepo, IGroupsRepo groupsRepo, IVisitsRepo visitsRepo, MetricSender metricSender)
+		private async Task<List<StyleError>> ConvertStyleErrors(SolutionBuildResult buildResult)
 		{
-			var userId = submissionNoTracking.UserId;
-			var courseId = submissionNoTracking.CourseId;
-			var course = await courseManager.GetCourseAsync(courseId);
-			var exerciseSlide = course.FindSlideById(submissionNoTracking.SlideId, true) as ExerciseSlide; // SlideId проверен в вызывающем методе 
-			if (exerciseSlide == null)
-				return false;
-			var exerciseMetricId = GetExerciseMetricId(courseId, exerciseSlide);
-			var automaticCheckingNoTracking = submissionNoTracking.AutomaticChecking;
-			var isProhibitedUserToSendForReview = await slideCheckingsRepo.IsProhibitedToSendExerciseToManualChecking(courseId, exerciseSlide.Id, userId);
-			var sendToReview = exerciseSlide.Scoring.RequireReview
-								&& submissionNoTracking.AutomaticCheckingIsRightAnswer
-								&& !isProhibitedUserToSendForReview
-								&& await groupsRepo.IsManualCheckingEnabledForUserAsync(course, userId);
-			if (sendToReview)
-			{
-				await slideCheckingsRepo.RemoveWaitingManualCheckings<ManualExerciseChecking>(courseId, exerciseSlide.Id, userId, false);
-				await slideCheckingsRepo.AddManualExerciseChecking(courseId, exerciseSlide.Id, userId, submissionNoTracking.Id);
-				await visitsRepo.MarkVisitsAsWithManualChecking(courseId, exerciseSlide.Id, userId);
-				metricSender.SendCount($"exercise.{exerciseMetricId}.sent_to_review");
-				metricSender.SendCount("exercise.sent_to_review");
-			}
-
-			await visitsRepo.UpdateScoreForVisit(courseId, exerciseSlide, userId);
-
-			if (automaticCheckingNoTracking != null)
-			{
-				var verdictForMetric = automaticCheckingNoTracking.GetVerdict().Replace(" ", "");
-				metricSender.SendCount($"exercise.{exerciseMetricId}.{verdictForMetric}");
-			}
-
-			return sendToReview;
-		}
-
-		public static string GetExerciseMetricId(string courseId, ExerciseSlide exerciseSlide)
-		{
-			var slideTitleForMetric = exerciseSlide.LatinTitle.Replace(".", "_").ToLower(CultureInfo.InvariantCulture);
-			if (slideTitleForMetric.Length > 25)
-				slideTitleForMetric = slideTitleForMetric.Substring(0, 25);
-			return $"{courseId.ToLower(CultureInfo.InvariantCulture)}.{exerciseSlide.Id.ToString("N").Substring(32 - 25)}.{slideTitleForMetric}";
-		}
-
-		private async Task<List<ExerciseCodeReview>> CreateStyleErrorsReviewsForSubmission(int? submissionId, List<SolutionStyleError> styleErrors, string exerciseMetricId)
-		{
-			var ulearnBotUserId = await usersRepo.GetUlearnBotUserId();
-			var result = new List<ExerciseCodeReview>();
-			foreach (var error in styleErrors)
+			var styleErrors = new List<StyleError>();
+			foreach (var error in buildResult.StyleErrors)
 			{
 				if (!await styleErrorsRepo.IsStyleErrorEnabled(error.ErrorType))
 					continue;
-
-				var review = await slideCheckingsRepo.AddExerciseCodeReview(
-					submissionId,
-					ulearnBotUserId,
-					error.Span.StartLinePosition.Line,
-					error.Span.StartLinePosition.Character,
-					error.Span.EndLinePosition.Line,
-					error.Span.EndLinePosition.Character,
-					error.Message
-				);
-				result.Add(review);
-
-				var errorName = Enum.GetName(typeof(StyleErrorType), error.ErrorType);
-				metricSender.SendCount("exercise.style_error");
-				metricSender.SendCount($"exercise.style_error.{errorName}");
-				metricSender.SendCount($"exercise.{exerciseMetricId}.style_error");
-				metricSender.SendCount($"exercise.{exerciseMetricId}.style_error.{errorName}");
+				styleErrors.Add(new StyleError
+				{
+					ErrorType = Enum.GetName(typeof(StyleErrorType), error.ErrorType),
+					Message = error.Message,
+					Span = new StyleErrorSpan
+					{
+						StartLinePosition = new StyleErrorSpanPosition { Line = error.Span.StartLinePosition.Line, Character = error.Span.StartLinePosition.Character },
+						EndLinePosition = new StyleErrorSpanPosition { Line = error.Span.EndLinePosition.Line, Character = error.Span.EndLinePosition.Character }
+					}
+				});
 			}
-			return result;
+			return styleErrors;
 		}
 	}
 }
