@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Repos;
-using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Vostok.Logging.Abstractions;
 using Ulearn.Common.Api.Models.Responses;
@@ -19,18 +19,18 @@ using Web.Api.Configuration;
 
 namespace Ulearn.Web.Api.Controllers.Runner
 {
-	public class RunnerGetSubmissionsController : BaseController
+	[ApiController]
+	[Produces("application/json")]
+	public class RunnerGetSubmissionsController : ControllerBase
 	{
-		private readonly IUserSolutionsRepo userSolutionsRepo;
+		private readonly IServiceScopeFactory serviceScopeFactory;
 		private readonly WebApiConfiguration configuration;
 		private static ILog log => LogProvider.Get().ForContext(typeof(RunnerGetSubmissionsController));
 
-		public RunnerGetSubmissionsController(IWebCourseManager courseManager, UlearnDb db, IOptions<WebApiConfiguration> options,
-			IUsersRepo usersRepo, IUserSolutionsRepo userSolutionsRepo)
-			: base(courseManager, db, usersRepo)
+		public RunnerGetSubmissionsController(IOptions<WebApiConfiguration> options, IServiceScopeFactory serviceScopeFactory)
 		{
 			configuration = options.Value;
-			this.userSolutionsRepo = userSolutionsRepo;
+			this.serviceScopeFactory = serviceScopeFactory;
 		}
 
 		/// <summary>
@@ -47,37 +47,31 @@ namespace Ulearn.Web.Api.Controllers.Runner
 			var sw = Stopwatch.StartNew();
 			while (true)
 			{
-				var submission = await userSolutionsRepo.GetUnhandledSubmission(agent, sandboxesImageNames).ConfigureAwait(false);
-				if (submission != null || sw.Elapsed > TimeSpan.FromSeconds(10))
+				using (var scope = serviceScopeFactory.CreateScope())
 				{
-					if (submission != null)
-						log.Info($"Отдаю на проверку решение: [{submission.Id}], агент {agent}, только сначала соберу их");
-					else
-						return new List<RunnerSubmission>();
+					var userSolutionsRepo = (IUserSolutionsRepo)scope.ServiceProvider.GetService(typeof(IUserSolutionsRepo));
+					var submission = await userSolutionsRepo.GetUnhandledSubmission(agent, sandboxesImageNames);
+					if (submission != null || sw.Elapsed > TimeSpan.FromSeconds(10))
+					{
+						if (submission != null)
+							log.Info($"Отдаю на проверку решение: [{submission.Id}], агент {agent}, только сначала соберу их");
+						else
+							return new List<RunnerSubmission>();
 
-					var builtSubmissions = new List<RunnerSubmission> { await ToRunnerSubmission(submission) };
-					log.Info($"Собрал решения: [{submission.Id}], отдаю их агенту {agent}");
-					return builtSubmissions;
+						var courseManager = (IWebCourseManager)scope.ServiceProvider.GetService(typeof(IWebCourseManager));
+						var builtSubmissions = new List<RunnerSubmission> { await ToRunnerSubmission(submission, courseManager) };
+						log.Info($"Собрал решения: [{submission.Id}], отдаю их агенту {agent}");
+						return builtSubmissions;
+					}
 				}
 
 				await Task.Delay(TimeSpan.FromMilliseconds(50));
-				await userSolutionsRepo.WaitAnyUnhandledSubmissions(TimeSpan.FromSeconds(8)).ConfigureAwait(false);
+				await UnhandledSubmissionsWaiter.WaitAnyUnhandledSubmissions(TimeSpan.FromSeconds(8));
 			}
 		}
 
-		private async Task<RunnerSubmission> ToRunnerSubmission(UserExerciseSubmission submission)
+		private async Task<RunnerSubmission> ToRunnerSubmission(UserExerciseSubmission submission, IWebCourseManager courseManager)
 		{
-			if (submission.IsWebSubmission)
-			{
-				return new FileRunnerSubmission
-				{
-					Id = submission.Id.ToString(),
-					Code = submission.SolutionCode.Text,
-					Input = "",
-					NeedRun = true
-				};
-			}
-
 			log.Info($"Собираю для отправки в RunCsJob решение {submission.Id}");
 			var slide = (await courseManager.FindCourseAsync(submission.CourseId))?.FindSlideById(submission.SlideId, true);
 

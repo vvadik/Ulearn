@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -26,10 +25,6 @@ namespace Database.Repos
 		private readonly IWorkQueueRepo workQueueRepo;
 		private readonly IWebCourseManager courseManager;
 		private const int queueId = 1;
-
-		private static volatile ConcurrentDictionary<int, DateTime> unhandledSubmissions = new ConcurrentDictionary<int, DateTime>();
-		private static volatile ConcurrentDictionary<int, DateTime> handledSubmissions = new ConcurrentDictionary<int, DateTime>();
-		private static readonly TimeSpan handleTimeout = TimeSpan.FromMinutes(3);
 
 		public UserSolutionsRepo(UlearnDb db,
 			ITextsRepo textsRepo, IWorkQueueRepo workQueueRepo,
@@ -335,7 +330,7 @@ namespace Database.Repos
 			}
 			catch (Exception e)
 			{
-				log.Error("GetUnhandledSubmission() error", e);
+				log.Error(e, "GetUnhandledSubmission() error");
 				return null;
 			}
 		}
@@ -370,7 +365,7 @@ namespace Database.Repos
 					await db.SaveChangesAsync();
 					if (submission.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Error)
 						log.Error($"Не получил ответ от чеккера по проверке {submission.Id} за {minutes} минут");
-					if (!handledSubmissions.TryAdd(submission.Id, DateTime.Now))
+					if (!UnhandledSubmissionsWaiter.HandledSubmissions.TryAdd(submission.Id, DateTime.Now))
 						log.Warn($"Не удалось запомнить, что {submission.Id} не удалось проверить, и этот результат сохранен в базу");
 					submission = null;
 				}
@@ -380,7 +375,7 @@ namespace Database.Repos
 			submission.AutomaticChecking.CheckingAgentName = agentName;
 			await db.SaveChangesAsync();
 
-			unhandledSubmissions.TryRemove(submission.Id, out _);
+			UnhandledSubmissionsWaiter.UnhandledSubmissions.TryRemove(submission.Id, out _);
 			return submission;
 		}
 
@@ -442,10 +437,10 @@ namespace Database.Repos
 				await transaction.CommitAsync();
 				db.ChangeTracker.AcceptAllChanges();
 
-				if (!handledSubmissions.TryAdd(submission.Id, DateTime.Now))
+				if (!UnhandledSubmissionsWaiter.HandledSubmissions.TryAdd(submission.Id, DateTime.Now))
 					log.Warn($"Не удалось запомнить, что проверка {submission.Id} проверена, а результат сохранен в базу");
 
-				log.Info($"Есть информация о следующих проверках, которые ещё не записаны в базу клиентом: [{string.Join(", ", handledSubmissions.Keys)}]");
+				log.Info($"Есть информация о следующих проверках, которые ещё не записаны в базу клиентом: [{string.Join(", ", UnhandledSubmissionsWaiter.HandledSubmissions.Keys)}]");
 			}
 		}
 
@@ -539,7 +534,7 @@ namespace Database.Repos
 		public async Task RunAutomaticChecking(int submissionId, string sandbox, TimeSpan timeout, bool waitUntilChecked, int priority)
 		{
 			log.Info($"Запускаю автоматическую проверку решения. ID посылки: {submissionId}");
-			unhandledSubmissions.TryAdd(submissionId, DateTime.Now);
+			UnhandledSubmissionsWaiter.UnhandledSubmissions.TryAdd(submissionId, DateTime.Now);
 			await workQueueRepo.Add(queueId, submissionId.ToString(), sandbox ?? "csharp", priority);
 
 			if (!waitUntilChecked)
@@ -551,7 +546,7 @@ namespace Database.Repos
 			var sw = Stopwatch.StartNew();
 			while (sw.Elapsed < timeout)
 			{
-				await WaitUntilSubmissionHandled(TimeSpan.FromSeconds(5), submissionId);
+				await UnhandledSubmissionsWaiter.WaitUntilSubmissionHandled(TimeSpan.FromSeconds(5), submissionId);
 				var submissionAutomaticCheckingStatus = await GetSubmissionAutomaticCheckingStatus(submissionId);
 				if (submissionAutomaticCheckingStatus == null)
 					break;
@@ -569,7 +564,7 @@ namespace Database.Repos
 			}
 
 			/* If something is wrong */
-			unhandledSubmissions.TryRemove(submissionId, out _);
+			UnhandledSubmissionsWaiter.UnhandledSubmissions.TryRemove(submissionId, out _);
 			throw new SubmissionCheckingTimeout();
 		}
 
@@ -583,55 +578,6 @@ namespace Database.Repos
 			return solutionsHashes.ToDictSafe(
 				s => s.SubmissionId,
 				s => textsByHash.GetOrDefault(s.Hash, ""));
-		}
-
-		public async Task WaitAnyUnhandledSubmissions(TimeSpan timeout)
-		{
-			var sw = Stopwatch.StartNew();
-			while (sw.Elapsed < timeout)
-			{
-				if (unhandledSubmissions.Count > 0)
-				{
-					log.Info($"Список невзятых пока на проверку решений: [{string.Join(", ", unhandledSubmissions.Keys)}]");
-					ClearHandleDictionaries();
-					return;
-				}
-
-				await Task.Delay(TimeSpan.FromMilliseconds(100));
-			}
-		}
-
-		public async Task WaitUntilSubmissionHandled(TimeSpan timeout, int submissionId)
-		{
-			log.Info($"Вхожу в цикл ожидания результатов проверки решения {submissionId}. Жду {timeout.TotalSeconds} секунд");
-			var sw = Stopwatch.StartNew();
-			while (sw.Elapsed < timeout)
-			{
-				if (handledSubmissions.ContainsKey(submissionId))
-				{
-					DateTime value;
-					handledSubmissions.TryRemove(submissionId, out value);
-					return;
-				}
-
-				await Task.Delay(TimeSpan.FromMilliseconds(100));
-			}
-		}
-
-		private static void ClearHandleDictionaries()
-		{
-			var timeout = DateTime.Now.Subtract(handleTimeout);
-			ClearHandleDictionary(handledSubmissions, timeout);
-			ClearHandleDictionary(unhandledSubmissions, timeout);
-		}
-
-		private static void ClearHandleDictionary(ConcurrentDictionary<int, DateTime> dictionary, DateTime timeout)
-		{
-			foreach (var key in dictionary.Keys)
-			{
-				if (dictionary.TryGetValue(key, out var value) && value < timeout)
-					dictionary.TryRemove(key, out value);
-			}
 		}
 	}
 

@@ -47,7 +47,6 @@ namespace Database.Repos
 		Task SaveResult(RunningResults result, Func<UserExerciseSubmission, Task> onSave);
 		Task RunAutomaticChecking(int submissionId, [CanBeNull]string sandbox, TimeSpan timeout, bool waitUntilChecked, int priority);
 		Task<Dictionary<int, string>> GetSolutionsForSubmissions(IEnumerable<int> submissionsIds);
-		Task WaitAnyUnhandledSubmissions(TimeSpan timeout);
 		Task<UserExerciseSubmission> GetUnhandledSubmission(string agentName, List<string> sandboxes);
 	}
 }
