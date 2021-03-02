@@ -340,7 +340,7 @@ namespace Database.Repos
 			UserExerciseSubmission submission = null;
 			while (submission == null)
 			{
-				var work = await workQueueRepo.Take(queueId, sandboxes);
+				var work = await workQueueRepo.TakeNoTracking(queueId, sandboxes);
 				if (work == null)
 					return null;
 

@@ -43,7 +43,7 @@ namespace Database.Repos
 
 		// http://rusanu.com/2010/03/26/using-tables-as-queues/
 		[ItemCanBeNull]
-		public async Task<WorkQueueItem> Take(int queueId, List<string> types, TimeSpan? timeLimit = null)
+		public async Task<WorkQueueItem> TakeNoTracking(int queueId, List<string> types, TimeSpan? timeLimit = null)
 		{
 			timeLimit = timeLimit ?? TimeSpan.FromMinutes(5);
 			// readpast пропускает заблокированные строки
@@ -69,7 +69,7 @@ output inserted.*";
 					new SqlParameter("@queueId", queueId),
 					new SqlParameter("@now", DateTime.UtcNow),
 					new SqlParameter("@timeLimit", DateTime.UtcNow + timeLimit)
-				).ToListAsync()).FirstOrDefault();
+				).AsNoTracking().ToListAsync()).FirstOrDefault();
 				scope.Complete();
 				return taken;
 			}

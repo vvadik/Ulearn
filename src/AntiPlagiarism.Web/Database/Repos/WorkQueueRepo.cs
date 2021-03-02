@@ -12,7 +12,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 	public interface IWorkQueueRepo
 	{
 		Task Add(QueueIds queueId, string itemId);
-		Task<WorkQueueItem> Take(QueueIds queueId, TimeSpan? timeLimit = null);
+		Task<WorkQueueItem> TakeNoTracking(QueueIds queueId, TimeSpan? timeLimit = null);
 		Task Remove(int id);
 	}
 	
@@ -41,7 +41,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 		}
 
 		// http://rusanu.com/2010/03/26/using-tables-as-queues/
-		public async Task<WorkQueueItem> Take(QueueIds queueId, TimeSpan? timeLimit = null)
+		public async Task<WorkQueueItem> TakeNoTracking(QueueIds queueId, TimeSpan? timeLimit = null)
 		{
 			timeLimit = timeLimit ?? TimeSpan.FromMinutes(5);
 			// readpast пропускает заблокированные строки
@@ -63,7 +63,7 @@ output inserted.*";
 					new SqlParameter("@queueId", queueId),
 					new SqlParameter("@now", DateTime.UtcNow),
 					new SqlParameter("@timeLimit", DateTime.UtcNow + timeLimit)
-				).ToListAsync()).FirstOrDefault();
+				).AsNoTracking().ToListAsync()).FirstOrDefault();
 				scope.Complete();
 				return taken;
 			}
