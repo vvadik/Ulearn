@@ -30,7 +30,7 @@ namespace Ulearn.Core.Helpers
 						csBlock.ExerciseFolder,
 						new[] { "checking", "bin", "obj", ".idea", ".vs" },
 						file => NeedExcludeFromStudentZip(csBlock, file),
-						file => GetFileContentInStudentZip(csBlock, file).ToArray(),
+						file => GetFileContentInStudentZip(csBlock, file)?.ToArray(),
 						ResolveCsprojLinks(csBlock),
 						zipFile);
 					zip.UpdateZip();

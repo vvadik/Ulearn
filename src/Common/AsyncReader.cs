@@ -23,7 +23,7 @@ namespace Ulearn.Common
 			if (resultLength < maxNotLohLength - 1)
 				return resultLength;
 			var bigBuffer = new char[limit];
-			Array.Copy(buffer, bigBuffer, limit);
+			Array.Copy(buffer, bigBuffer, resultLength);
 			buffer = bigBuffer;
 			var bigLength = await reader.ReadBlockAsync(buffer, resultLength, limit - resultLength);
 			return resultLength + bigLength;
