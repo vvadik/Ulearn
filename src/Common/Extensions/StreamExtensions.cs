@@ -12,7 +12,7 @@ namespace Ulearn.Common.Extensions
 
 		public static byte[] ToArray(this Stream inputStream)
 		{
-			var codeBytes = new MemoryStream();
+			var codeBytes = StaticRecyclableMemoryStreamManager.Manager.GetStream();
 			inputStream.CopyTo(codeBytes);
 			return codeBytes.ToArray();
 		}

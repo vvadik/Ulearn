@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Ulearn.Common;
 using Ulearn.Common.Extensions;
 
 namespace Ulearn.Core
@@ -50,7 +51,7 @@ namespace Ulearn.Core
 
 		public byte[] LoadResource(string name)
 		{
-			var buffer = new MemoryStream();
+			var buffer = StaticRecyclableMemoryStreamManager.Manager.GetStream();
 			Stream stream = type.Assembly
 				.GetManifestResourceStream(name);
 			if (stream == null)

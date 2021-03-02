@@ -45,7 +45,7 @@ namespace Ulearn.Core.Helpers
 			return CourseManager.GetCoursesDirectory().GetSubdirectory("ExerciseCheckerZips");
 		}
 
-		public static byte[] GetZip(IExerciseCheckerZipBuilder zipBuilder, string userCodeFilePath, byte[] userCodeFileContent)
+		public static MemoryStream GetZip(IExerciseCheckerZipBuilder zipBuilder, string userCodeFilePath, byte[] userCodeFileContent)
 		{
 			var courseId = zipBuilder.CourseId;
 			var slide = zipBuilder.Slide;
@@ -68,7 +68,7 @@ namespace Ulearn.Core.Helpers
 						}
 						else
 						{
-							ms = new MemoryStream();
+							ms = StaticRecyclableMemoryStreamManager.Manager.GetStream();
 							using (var stream = zipFile.Open(FileMode.Open, FileAccess.Read, FileShare.Read))
 								stream.CopyTo(ms);
 						}
@@ -115,10 +115,10 @@ namespace Ulearn.Core.Helpers
 			}
 		}
 
-		private static byte[] AddUserCodeToZip(MemoryStream inputStream, string userCodeFilePath, byte[] userCodeFileContent, [CanBeNull]string courseId, [CanBeNull]Slide slide)
+		private static MemoryStream AddUserCodeToZip(MemoryStream inputStream, string userCodeFilePath, byte[] userCodeFileContent, [CanBeNull]string courseId, [CanBeNull]Slide slide)
 		{
 			var sw = Stopwatch.StartNew();
-			var resultStream = new MemoryStream();
+			var resultStream = StaticRecyclableMemoryStreamManager.Manager.GetStream();
 			inputStream.Position = 0;
 			using (var zip = ZipFile.Read(inputStream))
 			{
@@ -128,9 +128,8 @@ namespace Ulearn.Core.Helpers
 					zip.AddEntry(userCodeFilePath, userCodeFileContent);
 				zip.Save(resultStream);
 			}
-			var result = resultStream.ToArray();
 			log.Info($"Добавил код студента в zip-архив с упражнением: курс {courseId}, слайд «{slide?.Title}» ({slide?.Id}) elapsed {sw.ElapsedMilliseconds} ms");
-			return result;
+			return resultStream;
 		}
 
 		public static void DeleteCourseZips(string courseId)

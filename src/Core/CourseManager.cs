@@ -439,7 +439,7 @@ namespace Ulearn.Core
 
 		private static void UpdateXmlEntity(ZipEntry entry, string selector, Action<XElement> update, ZipFile zip, IXmlNamespaceResolver nsResolver)
 		{
-			var output = new MemoryStream();
+			var output = StaticRecyclableMemoryStreamManager.Manager.GetStream();
 			using (var entryStream = entry.OpenReader())
 			{
 				var xml = XDocument.Load(entryStream);

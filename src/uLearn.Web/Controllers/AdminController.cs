@@ -240,7 +240,7 @@ namespace uLearn.Web.Controllers
 			if (fileName == null || !fileName.ToLower().EndsWith(".zip"))
 				return RedirectToAction("Packages", new { courseId });
 
-			var (versionId, error) = await UploadCourse(courseId, file.InputStream.ToArray(), User.Identity.GetUserId()).ConfigureAwait(false);
+			var (versionId, error) = await UploadCourse(courseId, file.InputStream, User.Identity.GetUserId()).ConfigureAwait(false);
 			if (error != null)
 			{
 				var errorMessage = error.Message.ToLowerFirstLetter();
@@ -269,7 +269,7 @@ namespace uLearn.Web.Controllers
 			var userId = usersRepo.GetUlearnBotUser().Id;
 			var publicKey = courses[0].PublicKey; // у всех курсов одинаковый repoUrl и ключ
 			var privateKey = courses[0].PrivateKey;
-			var infoForUpload = new List<(string, byte[], CommitInfo, string)>();
+			var infoForUpload = new List<(string, MemoryStream, CommitInfo, string)>();
 			using (IGitRepo git = new GitRepo(repoUrl, reposDirectory, publicKey, privateKey, new DirectoryInfo(Path.GetTempPath())))
 			{
 				git.Checkout(branch);
@@ -291,7 +291,7 @@ namespace uLearn.Web.Controllers
 					if (hasChanges)
 					{
 						log.Info($"Course '{courseRepo.CourseId}' has changes in '{repoUrl}'");
-						infoForUpload.Add((courseRepo.CourseId, zip.ToArray(), commitInfo, courseRepo.PathToCourseXml));
+						infoForUpload.Add((courseRepo.CourseId, zip, commitInfo, courseRepo.PathToCourseXml));
 					}
 					else
 					{
@@ -318,7 +318,7 @@ namespace uLearn.Web.Controllers
 			var courseRepo = coursesRepo.GetCourseRepoSettings(courseId);
 			if (courseRepo == null)
 				return RedirectToAction("Packages", new { courseId, error = "Course repo settings not found" });
-			byte[] zip = null;
+			MemoryStream zip = null;
 			CommitInfo commitInfo = null;
 
 			var publicKey = courseRepo.PublicKey; // у всех курсов одинаковый repoUrl и ключ
@@ -329,7 +329,7 @@ namespace uLearn.Web.Controllers
 				using (IGitRepo git = new GitRepo(courseRepo.RepoUrl, reposDirectory, publicKey, privateKey, new DirectoryInfo(Path.GetTempPath())))
 				{
 					git.Checkout(courseRepo.Branch);
-					zip = git.GetCurrentStateAsZip(courseRepo.PathToCourseXml).ToArray();
+					zip = git.GetCurrentStateAsZip(courseRepo.PathToCourseXml);
 					commitInfo = git.GetCurrentCommitInfo();
 				}
 			}
@@ -363,14 +363,15 @@ namespace uLearn.Web.Controllers
 		}
 
 
-		private async Task<(Guid versionId, Exception error)> UploadCourse(string courseId, byte[] content, string userId,
+		private async Task<(Guid versionId, Exception error)> UploadCourse(string courseId, Stream content, string userId,
 			string uploadedFromRepoUrl = null, CommitInfo commitInfo = null, string pathToCourseXmlInRepo = null)
 		{
 			log.Info($"Start upload course '{courseId}'");
 			var versionId = Guid.NewGuid();
 
 			var destinationFile = courseManager.GetCourseVersionFile(versionId);
-			System.IO.File.WriteAllBytes(destinationFile.FullName, content);
+			using (var file = new FileStream(destinationFile.FullName, FileMode.Create, FileAccess.Write))
+				await content.CopyToAsync(file);
 			Course updatedCourse;
 			try
 			{
