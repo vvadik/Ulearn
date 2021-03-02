@@ -42,7 +42,7 @@ namespace Ulearn.Core
 		private static MemoryStream ModifyCsproj(Project proj, Action<Project> changingAction)
 		{
 			changingAction?.Invoke(proj);
-			using (var memoryStream = StaticRecyclableMemoryStreamManager.Manager.GetStream())
+			var memoryStream = StaticRecyclableMemoryStreamManager.Manager.GetStream();
 			using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8))
 			{
 				proj.Save(streamWriter);
