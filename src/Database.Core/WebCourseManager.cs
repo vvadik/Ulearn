@@ -164,16 +164,6 @@ namespace Database
 			}
 		}
 
-		public new void ReloadCourse(string courseId)
-		{
-			base.ReloadCourse(courseId);
-		}
-
-		public new Course ReloadCourseFromDirectory(DirectoryInfo directory)
-		{
-			return base.ReloadCourseFromDirectory(directory);
-		}
-
 		public void NotifyCourseChanged(string courseId)
 		{
 			CourseChangedEvent?.Invoke(courseId);

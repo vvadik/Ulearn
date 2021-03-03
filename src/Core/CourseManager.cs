@@ -114,7 +114,7 @@ namespace Ulearn.Core
 			return FindCourse(courseId) != null;
 		}
 
-		public bool CourseIsBroken(string courseId)
+		protected bool CourseIsBroken(string courseId)
 		{
 			return brokenCourses.Contains(courseId);
 		}
@@ -253,7 +253,7 @@ namespace Ulearn.Core
 			return course;
 		}
 
-		public Course ReloadCourseFromDirectory(DirectoryInfo directory)
+		private Course ReloadCourseFromDirectory(DirectoryInfo directory)
 		{
 			var course = LoadCourseFromDirectory(directory);
 			courses[course.Id] = course;
@@ -307,7 +307,7 @@ namespace Ulearn.Core
 			return LoadCourseFromDirectory(courseDir);
 		}
 
-		public Course LoadCourseFromDirectory(DirectoryInfo dir)
+		private Course LoadCourseFromDirectory(DirectoryInfo dir)
 		{
 			WaitWhileCourseIsLocked(GetCourseId(dir.Name));
 			return loader.Load(dir);
@@ -335,49 +335,65 @@ namespace Ulearn.Core
 
 		public bool TryCreateCourse(string courseId, string courseTitle, Guid firstVersionId)
 		{
-			if (courseId.Any(GetInvalidCharacters().Contains))
-				return false;
+			try
+			{
+				if (courseId.Any(GetInvalidCharacters().Contains))
+					return false;
 
-			var package = stagedDirectory.GetFile(GetPackageName(courseId));
-			if (package.Exists)
+				var package = stagedDirectory.GetFile(GetPackageName(courseId));
+				if (package.Exists)
+					return true;
+
+				var examplePackage = stagedDirectory.GetFile(GetPackageName(examplePackageName));
+				if (!examplePackage.Exists)
+					CreateEmptyCourse(courseId, courseTitle, package.FullName);
+				else
+					CreateCourseFromExample(courseId, courseTitle, package.FullName, examplePackage);
+
+				ReloadCourseFromZip(package);
+
+				var versionFile = GetCourseVersionFile(firstVersionId);
+				File.Copy(package.FullName, versionFile.FullName);
+
 				return true;
-
-			var examplePackage = stagedDirectory.GetFile(GetPackageName(examplePackageName));
-			if (!examplePackage.Exists)
-				CreateEmptyCourse(courseId, courseTitle, package.FullName);
-			else
-				CreateCourseFromExample(courseId, courseTitle, package.FullName, examplePackage);
-
-			ReloadCourseFromZip(package);
-
-			var versionFile = GetCourseVersionFile(firstVersionId);
-			File.Copy(package.FullName, versionFile.FullName);
-
-			return true;
+			}
+			catch (Exception ex)
+			{
+				log.Error(ex, $"Error on create course {courseId}");
+				return false;
+			}
 		}
 
 		public bool TryCreateTempCourse(string courseId, string courseTitle, Guid firstVersionId)
 		{
-			//todo дубликат метода TryCreateCourse. Можно убрать создание пустой версии и пустого архива в Staging
-			if (courseId.Any(GetInvalidCharacters().Contains))
-				return false;
+			try
+			{
+				//todo дубликат метода TryCreateCourse. Можно убрать создание пустой версии и пустого архива в Staging
+				if (courseId.Any(GetInvalidCharacters().Contains))
+					return false;
 
-			var package = stagedDirectory.GetFile(GetPackageName(courseId));
-			if (package.Exists)
+				var package = stagedDirectory.GetFile(GetPackageName(courseId));
+				if (package.Exists)
+					return true;
+
+				var examplePackage = stagedDirectory.GetFile(GetPackageName(examplePackageName));
+				if (!examplePackage.Exists)
+					CreateEmptyCourse(courseId, courseTitle, package.FullName, Utf8);
+				else
+					CreateCourseFromExample(courseId, courseTitle, package.FullName, examplePackage);
+
+				ReloadCourseFromZip(package, Utf8);
+
+				var versionFile = GetCourseVersionFile(firstVersionId);
+				File.Copy(package.FullName, versionFile.FullName);
+
 				return true;
-
-			var examplePackage = stagedDirectory.GetFile(GetPackageName(examplePackageName));
-			if (!examplePackage.Exists)
-				CreateEmptyCourse(courseId, courseTitle, package.FullName, Utf8);
-			else
-				CreateCourseFromExample(courseId, courseTitle, package.FullName, examplePackage);
-
-			ReloadCourseFromZip(package, Utf8);
-
-			var versionFile = GetCourseVersionFile(firstVersionId);
-			File.Copy(package.FullName, versionFile.FullName);
-
-			return true;
+			}
+			catch (Exception ex)
+			{
+				log.Error(ex, $"Error on create temp course {courseId}");
+				return false;
+			}
 		}
 
 		public void EnsureVersionIsExtracted(Guid versionId)
