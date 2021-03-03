@@ -448,6 +448,7 @@ namespace Ulearn.Core
 				xml.Save(output);
 			}
 
+			output.Position = 0;
 			zip.UpdateEntry(entry.FileName, output.ToArray());
 			zip.Save();
 		}

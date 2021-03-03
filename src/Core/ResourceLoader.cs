@@ -57,6 +57,7 @@ namespace Ulearn.Core
 			if (stream == null)
 				throw new Exception("No resource " + name);
 			stream.CopyTo(buffer);
+			buffer.Position = 0;
 			return buffer.ToArray();
 		}
 	}

@@ -45,6 +45,7 @@ namespace Ulearn.Core
 			using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8, 1024, true)) // Без leaveOpen закрытие StreamWriter закроет memoryStream
 			{
 				proj.Save(streamWriter);
+				memoryStream.Position = 0;
 				return memoryStream;
 			}
 		}

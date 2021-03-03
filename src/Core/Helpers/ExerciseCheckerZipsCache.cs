@@ -81,6 +81,7 @@ namespace Ulearn.Core.Helpers
 				}
 			}
 
+			ms.Position = 0;
 			return AddUserCodeToZip(ms, userCodeFilePath, userCodeFileContent, courseId, slide);
 		}
 
@@ -127,6 +128,7 @@ namespace Ulearn.Core.Helpers
 				else
 					zip.AddEntry(userCodeFilePath, userCodeFileContent);
 				zip.Save(resultStream);
+				resultStream.Position = 0;
 			}
 			log.Info($"Добавил код студента в zip-архив с упражнением: курс {courseId}, слайд «{slide?.Title}» ({slide?.Id}) elapsed {sw.ElapsedMilliseconds} ms");
 			return resultStream;
