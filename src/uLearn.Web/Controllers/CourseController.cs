@@ -35,7 +35,7 @@ namespace uLearn.Web.Controllers
 		private static ILog log => LogProvider.Get().ForContext(typeof(CourseController));
 
 		private readonly ULearnDb db = new ULearnDb();
-		private readonly CourseManager courseManager = WebCourseManager.Instance;
+		private readonly WebCourseManager courseManager = WebCourseManager.Instance;
 
 		private readonly SlideRateRepo slideRateRepo;
 		private readonly UserSolutionsRepo solutionsRepo;
