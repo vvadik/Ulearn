@@ -218,7 +218,7 @@ namespace Ulearn.Web.Api.Controllers
 				IsNotPublished = isNotPublished,
 				PublicationDate = publicationDate,
 				Slides = slides.ToList(),
-				AdditionalScores = GetAdditionalScores(unit)
+				AdditionalScores = GetAdditionalScores(unit),
 			};
 		}
 

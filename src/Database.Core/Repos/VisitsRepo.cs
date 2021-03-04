@@ -38,14 +38,14 @@ namespace Database.Repos
 					IpAddress = ipAddress,
 				});
 			}
-			else if (visit.IpAddress != ipAddress)
-				visit.IpAddress = ipAddress;
+			else if(visit.IpAddress != ipAddress)
+					visit.IpAddress = ipAddress;
 			await db.SaveChangesAsync();
 		}
 
 		private async Task SetLastVisit(string courseId, Guid slideId, string userId)
 		{
-			var lastVisit = await FindLastVisit(courseId, userId);
+			var lastVisit = FindLastVisit(courseId, userId, slideId);
 			if (lastVisit == null)
 			{
 				db.LastVisits.Add(new LastVisit
@@ -58,7 +58,6 @@ namespace Database.Repos
 			}
 			else
 			{
-				lastVisit.SlideId = slideId;
 				lastVisit.Timestamp = DateTime.Now;
 			}
 			await db.SaveChangesAsync();
@@ -69,9 +68,21 @@ namespace Database.Repos
 			return await db.Visits.FirstOrDefaultAsync(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId);
 		}
 
-		public async Task<LastVisit> FindLastVisit(string courseId, string userId)
+		public LastVisit FindLastVisit(string courseId, string userId, Guid? slideId = null)
 		{
-			return await db.LastVisits.FirstOrDefaultAsync(v => v.CourseId == courseId && v.UserId == userId);
+			if (slideId == null)
+				return db.LastVisits
+					.OrderBy(v => v.Timestamp)
+					.FirstOrDefault(v => v.CourseId == courseId && v.UserId == userId);
+			return db.LastVisits
+				.FirstOrDefault(v => v.CourseId == courseId && v.UserId == userId && slideId == v.SlideId);
+		}
+		
+		public Dictionary<Guid,LastVisit> GetLastVisits(string courseId, string userId)
+		{
+			return db.LastVisits
+				.Where(v => v.CourseId == courseId && v.UserId == userId)
+				.ToDictionary(v => v.SlideId);
 		}
 
 		public async Task<Dictionary<string, Visit>> FindLastVisit(List<string> userIds)
@@ -86,6 +97,18 @@ namespace Database.Repos
 					.FirstOrDefault()
 				)
 				.ToDictionaryAsync(v => v.UserId, v => v);
+		}
+		
+		public async Task<Dictionary<Guid, DateTime>> GetLastVisitsTimestampsForSlides(string courseId, string userId, IEnumerable<Guid> slidesIds = null)
+		{
+			var lastVisits = db.LastVisits.Where(v => v.CourseId == courseId && v.UserId == userId);
+			if (slidesIds != null)
+				lastVisits = lastVisits.Where(v => slidesIds.Contains(v.SlideId));
+			return (await lastVisits
+					.Select(v => new {v.SlideId, v.Timestamp})
+					.ToListAsync())
+				.GroupBy(v => v.SlideId, (s, v) => new { Key = s, Value = v.First().Timestamp })
+				.ToDictionary(g => g.Key, g => g.Value);
 		}
 
 		public async Task<HashSet<Guid>> GetIdOfVisitedSlides(string courseId, string userId)

@@ -29,6 +29,7 @@ namespace Database.Repos
 		Task<bool> IsPassed(string courseId, Guid slideId, string userId);
 		Task<bool> IsSkippedOrPassed(string courseId, Guid slideId, string userId);
 		Task AddVisits(IEnumerable<Visit> visits);
+		Task<Dictionary<Guid, DateTime>> GetLastVisitsTimestampsForSlides(string courseId, string userId, IEnumerable<Guid> slidesIds = null);
 		IQueryable<Visit> GetVisitsInPeriod(string courseId, IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish, IEnumerable<string> usersIds = null);
 		IQueryable<Visit> GetVisitsInPeriod(VisitsFilterOptions options);
 		Task<Dictionary<Guid, List<Visit>>> GetVisitsInPeriodForEachSlide(VisitsFilterOptions options);

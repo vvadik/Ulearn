@@ -41,8 +41,12 @@ namespace Ulearn.Web.Api.Models.Common
 		/// </summary>
 		[DataMember]
 		public int QuestionsCount { get; set; }
+		[DataMember]
+		public int QuizMaxTriesCount { get; set; }
 
 		[DataMember(EmitDefaultValue = false)]
 		public string GitEditLink { get; set; }
+		[DataMember]
+		public int VideosCount { get; set; }
 	}
 }

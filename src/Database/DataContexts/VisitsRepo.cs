@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
@@ -25,7 +26,7 @@ namespace Database.DataContexts
 
 		public async Task AddVisit(string courseId, Guid slideId, string userId, string ipAddress)
 		{
-			SetLastVisit(courseId, slideId, userId);
+			await SetLastVisit(courseId, slideId, userId);
 			var visit = FindVisit(courseId, slideId, userId);
 			if (visit == null)
 			{
@@ -40,12 +41,13 @@ namespace Database.DataContexts
 			}
 			else if (visit.IpAddress != ipAddress)
 				visit.IpAddress = ipAddress;
+			
 			await db.SaveChangesAsync();
 		}
 
-		private void SetLastVisit(string courseId, Guid slideId, string userId)
+		private async Task SetLastVisit(string courseId, Guid slideId, string userId)
 		{
-			var lastVisit = FindLastVisit(courseId, userId);
+			var lastVisit = FindLastVisit(courseId, userId, slideId);
 			if (lastVisit == null)
 			{
 				db.LastVisits.Add(new LastVisit
@@ -58,9 +60,9 @@ namespace Database.DataContexts
 			}
 			else
 			{
-				lastVisit.SlideId = slideId;
 				lastVisit.Timestamp = DateTime.Now;
 			}
+			await db.SaveChangesAsync();
 		}
 
 		public Visit FindVisit(string courseId, Guid slideId, string userId)
@@ -68,9 +70,21 @@ namespace Database.DataContexts
 			return db.Visits.FirstOrDefault(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId);
 		}
 
-		public LastVisit FindLastVisit(string courseId, string userId)
+		public LastVisit FindLastVisit(string courseId, string userId, Guid? slideId = null)
 		{
-			return db.LastVisits.FirstOrDefault(v => v.CourseId == courseId && v.UserId == userId);
+			if (slideId == null)
+				return db.LastVisits
+					.OrderBy(v => v.Timestamp)
+					.FirstOrDefault(v => v.CourseId == courseId && v.UserId == userId);
+			return db.LastVisits
+				.FirstOrDefault(v => v.CourseId == courseId && v.UserId == userId && slideId == v.SlideId);
+		}
+		
+		public Dictionary<Guid,LastVisit> GetLastVisits(string courseId, string userId)
+		{
+			return db.LastVisits
+				.Where(v => v.CourseId == courseId && v.UserId == userId)
+				.ToDictionary(v => v.SlideId);
 		}
 
 		public HashSet<Guid> GetIdOfVisitedSlides(string courseId, string userId)
