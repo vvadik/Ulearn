@@ -317,7 +317,6 @@ class Navigation extends Component<Props, State> {
 					<NavigationHeader
 						className={ currentScrollState !== 'top' ? styles.shadow : undefined }
 						title={ courseTitle }
-						description={ description }
 						groupsAsStudent={ groupsAsStudent }
 						courseProgress={ courseProgress }
 						returnToCourseNavigationClicked={ onCourseClick }
