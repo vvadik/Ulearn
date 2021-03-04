@@ -195,16 +195,19 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 
 		public override RunnerSubmission CreateSubmission(string submissionId, string code)
 		{
-			return new CommandRunnerSubmission
+			using (var stream = GetZipForChecker(code))
 			{
-				Id = submissionId,
-				ZipFileData = GetZipForChecker(code).ToArray(),
-// ReSharper disable once PossibleInvalidOperationException
-				Language = Language.Value,
-				DockerImageName = DockerImageName,
-				RunCommand = RunCommand,
-				TimeLimit = TimeLimit
-			};
+				return new CommandRunnerSubmission
+				{
+					Id = submissionId,
+					ZipFileData = stream.ToArray(),
+					// ReSharper disable once PossibleInvalidOperationException
+					Language = Language.Value,
+					DockerImageName = DockerImageName,
+					RunCommand = RunCommand,
+					TimeLimit = TimeLimit
+				};
+			}
 		}
 
 		private MemoryStream GetZipForChecker(string code)

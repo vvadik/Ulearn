@@ -461,18 +461,20 @@ namespace Ulearn.Core
 
 		private static void UpdateXmlEntity(ZipEntry entry, string selector, Action<XElement> update, ZipFile zip, IXmlNamespaceResolver nsResolver)
 		{
-			var output = StaticRecyclableMemoryStreamManager.Manager.GetStream();
-			using (var entryStream = entry.OpenReader())
+			using (var output = StaticRecyclableMemoryStreamManager.Manager.GetStream())
 			{
-				var xml = XDocument.Load(entryStream);
-				var element = xml.XPathSelectElement(selector, nsResolver);
-				update(element.EnsureNotNull($"no element [{selector}] in zip entry {entry.FileName}"));
-				xml.Save(output);
-			}
+				using (var entryStream = entry.OpenReader())
+				{
+					var xml = XDocument.Load(entryStream);
+					var element = xml.XPathSelectElement(selector, nsResolver);
+					update(element.EnsureNotNull($"no element [{selector}] in zip entry {entry.FileName}"));
+					xml.Save(output);
+				}
 
-			output.Position = 0;
-			zip.UpdateEntry(entry.FileName, output.ToArray());
-			zip.Save();
+				output.Position = 0;
+				zip.UpdateEntry(entry.FileName, output.ToArray());
+				zip.Save();
+			}
 		}
 
 		public bool HasPackageFor(string courseId)

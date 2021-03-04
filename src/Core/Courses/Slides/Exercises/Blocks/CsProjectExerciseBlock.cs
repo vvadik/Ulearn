@@ -159,15 +159,18 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 
 		public override RunnerSubmission CreateSubmission(string submissionId, string code)
 		{
-			return new ProjRunnerSubmission
+			using (var stream = GetZipForChecker(code))
 			{
-				Id = submissionId,
-				ZipFileData = GetZipForChecker(code).ToArray(),
-				ProjectFileName = CsprojFileName,
-				Input = "",
-				NeedRun = true,
-				TimeLimit = TimeLimit
-			};
+				return new ProjRunnerSubmission
+				{
+					Id = submissionId,
+					ZipFileData = stream.ToArray(),
+					ProjectFileName = CsprojFileName,
+					Input = "",
+					NeedRun = true,
+					TimeLimit = TimeLimit
+				};
+			}
 		}
 
 		private MemoryStream GetZipForChecker(string code)
@@ -200,11 +203,12 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		{
 			var useNUnitLauncher = NUnitTestClasses != null;
 
-			yield return new FileContent
-			{
-				Path = CsprojFileName,
-				Data = ProjModifier.ModifyCsproj(CsprojFile, ModifyCsproj(excluded, useNUnitLauncher), toolsVersion: BuildEnvironmentOptions.ToolsVersion).ToArray()
-			};
+			using (var stream = ProjModifier.ModifyCsproj(CsprojFile, ModifyCsproj(excluded, useNUnitLauncher), toolsVersion: BuildEnvironmentOptions.ToolsVersion))
+				yield return new FileContent
+				{
+					Path = CsprojFileName,
+					Data = stream.ToArray()
+				};
 
 			if (useNUnitLauncher)
 			{

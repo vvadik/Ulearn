@@ -80,9 +80,8 @@ namespace Ulearn.Core.Helpers
 					ms = zipBuilder.GetZipForChecker();
 				}
 			}
-
-			ms.Position = 0;
-			return AddUserCodeToZip(ms, userCodeFilePath, userCodeFileContent, courseId, slide);
+			using (ms)
+				return AddUserCodeToZip(ms, userCodeFilePath, userCodeFileContent, courseId, slide);
 		}
 
 		private static void SaveFileOnDisk(FileInfo zipFile, MemoryStream ms)

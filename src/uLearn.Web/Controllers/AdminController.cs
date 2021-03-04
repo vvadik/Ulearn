@@ -269,43 +269,50 @@ namespace uLearn.Web.Controllers
 			var userId = usersRepo.GetUlearnBotUser().Id;
 			var publicKey = courses[0].PublicKey; // у всех курсов одинаковый repoUrl и ключ
 			var privateKey = courses[0].PrivateKey;
-			var infoForUpload = new List<(string, MemoryStream, CommitInfo, string)>();
-			using (IGitRepo git = new GitRepo(repoUrl, reposDirectory, publicKey, privateKey, new DirectoryInfo(Path.GetTempPath())))
+			var infoForUpload = new List<(string CourseId, MemoryStream Zip, CommitInfo CommitInfo, string PathToCourseXml)>();
+			try
 			{
-				git.Checkout(branch);
-				var commitInfo = git.GetCurrentCommitInfo();
-				foreach (var courseRepo in courses)
+				using (IGitRepo git = new GitRepo(repoUrl, reposDirectory, publicKey, privateKey, new DirectoryInfo(Path.GetTempPath())))
 				{
-					var zip = git.GetCurrentStateAsZip(courseRepo.PathToCourseXml);
-					var hasChanges = true;
-					if (courses.Count > 1)
+					git.Checkout(branch);
+					var commitInfo = git.GetCurrentCommitInfo();
+					foreach (var courseRepo in courses)
 					{
-						var publishedVersion = coursesRepo.GetPublishedCourseVersion(courseRepo.CourseId);
-						if (publishedVersion?.CommitHash != null)
+						var zip = git.GetCurrentStateAsZip(courseRepo.PathToCourseXml);
+						var hasChanges = true;
+						if (courses.Count > 1)
 						{
-							var changedFiles = git.GetChangedFiles(publishedVersion.CommitHash, commitInfo.Hash, courseRepo.PathToCourseXml);
-							hasChanges = changedFiles?.Any() ?? true;
+							var publishedVersion = coursesRepo.GetPublishedCourseVersion(courseRepo.CourseId);
+							if (publishedVersion?.CommitHash != null)
+							{
+								var changedFiles = git.GetChangedFiles(publishedVersion.CommitHash, commitInfo.Hash, courseRepo.PathToCourseXml);
+								hasChanges = changedFiles?.Any() ?? true;
+							}
+						}
+
+						if (hasChanges)
+						{
+							log.Info($"Course '{courseRepo.CourseId}' has changes in '{repoUrl}'");
+							infoForUpload.Add((courseRepo.CourseId, zip, commitInfo, courseRepo.PathToCourseXml));
+						}
+						else
+						{
+							log.Info($"Course '{courseRepo.CourseId}' has not changes in '{repoUrl}'");
 						}
 					}
+				}
 
-					if (hasChanges)
-					{
-						log.Info($"Course '{courseRepo.CourseId}' has changes in '{repoUrl}'");
-						infoForUpload.Add((courseRepo.CourseId, zip, commitInfo, courseRepo.PathToCourseXml));
-					}
-					else
-					{
-						log.Info($"Course '{courseRepo.CourseId}' has not changes in '{repoUrl}'");
-					}
+				foreach (var info in infoForUpload)
+				{
+					var (courseId, zip, commitInfo, pathToCourseXml) = info;
+					var (_, error) = await UploadCourse(courseId, zip, userId, repoUrl, commitInfo, pathToCourseXml).ConfigureAwait(false);
+					if (error != null)
+						await NotifyAboutCourseUploadFromRepoError(courseId, commitInfo.Hash, repoUrl).ConfigureAwait(false);
 				}
 			}
-
-			foreach (var info in infoForUpload)
+			finally
 			{
-				var (courseId, zip, commitInfo, pathToCourseXml) = info;
-				var (_, error) = await UploadCourse(courseId, zip, userId, repoUrl, commitInfo, pathToCourseXml).ConfigureAwait(false);
-				if (error != null)
-					await NotifyAboutCourseUploadFromRepoError(courseId, commitInfo.Hash, repoUrl).ConfigureAwait(false);
+				infoForUpload.ForEach(i => i.Zip.Dispose());
 			}
 		}
 
@@ -318,19 +325,19 @@ namespace uLearn.Web.Controllers
 			var courseRepo = coursesRepo.GetCourseRepoSettings(courseId);
 			if (courseRepo == null)
 				return RedirectToAction("Packages", new { courseId, error = "Course repo settings not found" });
-			MemoryStream zip = null;
-			CommitInfo commitInfo = null;
 
 			var publicKey = courseRepo.PublicKey; // у всех курсов одинаковый repoUrl и ключ
 			var privateKey = courseRepo.PrivateKey;
-			Exception error = null;
+			var versionId = new Guid();
+			Exception error;
 			try
 			{
 				using (IGitRepo git = new GitRepo(courseRepo.RepoUrl, reposDirectory, publicKey, privateKey, new DirectoryInfo(Path.GetTempPath())))
 				{
 					git.Checkout(courseRepo.Branch);
-					zip = git.GetCurrentStateAsZip(courseRepo.PathToCourseXml);
-					commitInfo = git.GetCurrentCommitInfo();
+					var commitInfo = git.GetCurrentCommitInfo();
+					using (var zip = git.GetCurrentStateAsZip(courseRepo.PathToCourseXml))
+						(versionId, error) = await UploadCourse(courseId, zip, User.Identity.GetUserId(), courseRepo.RepoUrl, commitInfo, courseRepo.PathToCourseXml);
 				}
 			}
 			catch (GitException ex)
@@ -344,9 +351,6 @@ namespace uLearn.Web.Controllers
 					throw;
 			}
 
-			var versionId = new Guid();
-			if (error == null)
-				(versionId, error) = await UploadCourse(courseId, zip, User.Identity.GetUserId(), courseRepo.RepoUrl, commitInfo, courseRepo.PathToCourseXml).ConfigureAwait(false);
 			if (error != null)
 			{
 				var errorMessage = error.Message.ToLowerFirstLetter();
