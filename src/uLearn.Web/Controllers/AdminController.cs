@@ -273,7 +273,7 @@ namespace uLearn.Web.Controllers
 			try
 			{
 				using (IGitRepo git = new GitRepo(repoUrl, reposDirectory, publicKey, privateKey, new DirectoryInfo(Path.GetTempPath())))
-				{
+				{ // В GitRepo используется Monitor. Он должен быть освобожден в том же потоке, что и взят.
 					git.Checkout(branch);
 					var commitInfo = git.GetCurrentCommitInfo();
 					foreach (var courseRepo in courses)
@@ -328,16 +328,17 @@ namespace uLearn.Web.Controllers
 
 			var publicKey = courseRepo.PublicKey; // у всех курсов одинаковый repoUrl и ключ
 			var privateKey = courseRepo.PrivateKey;
-			var versionId = new Guid();
-			Exception error;
+
+			Exception error = null;
+			MemoryStream zip = null;
+			CommitInfo commitInfo = null;
 			try
 			{
 				using (IGitRepo git = new GitRepo(courseRepo.RepoUrl, reposDirectory, publicKey, privateKey, new DirectoryInfo(Path.GetTempPath())))
 				{
 					git.Checkout(courseRepo.Branch);
-					var commitInfo = git.GetCurrentCommitInfo();
-					using (var zip = git.GetCurrentStateAsZip(courseRepo.PathToCourseXml))
-						(versionId, error) = await UploadCourse(courseId, zip, User.Identity.GetUserId(), courseRepo.RepoUrl, commitInfo, courseRepo.PathToCourseXml);
+					commitInfo = git.GetCurrentCommitInfo();
+					zip = git.GetCurrentStateAsZip(courseRepo.PathToCourseXml); 
 				}
 			}
 			catch (GitException ex)
@@ -350,6 +351,11 @@ namespace uLearn.Web.Controllers
 				else
 					throw;
 			}
+
+			var versionId = new Guid();
+			if (error == null)
+				using (zip)
+					(versionId, error) = await UploadCourse(courseId, zip, User.Identity.GetUserId(), courseRepo.RepoUrl, commitInfo, courseRepo.PathToCourseXml);
 
 			if (error != null)
 			{
