@@ -48,11 +48,10 @@ namespace Ulearn.Core
 					{
 						continue;
 					}
-
 					archive.CreateEntryFromFile(filesToAdd[i], entryNames[i], compressionLevel);
 				}
 			}
-
+			zipFileStream.Position = 0;
 			return zipFileStream;
 		}
 

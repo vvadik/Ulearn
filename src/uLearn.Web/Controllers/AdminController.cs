@@ -338,7 +338,7 @@ namespace uLearn.Web.Controllers
 				if (ex.MayBeSSHException)
 				{
 					log.Error(ex.InnerException);
-					error = new Exception("не удалось получить данные из репозитория. Вероятно не настроен деплой ключ. Исходный текст ошибки:", ex.InnerException);
+					error = new Exception("Не удалось получить данные из репозитория. Вероятно не настроен деплой ключ. Исходный текст ошибки:", ex.InnerException);
 				}
 				else
 					throw;
