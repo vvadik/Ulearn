@@ -618,21 +618,26 @@ class Course extends Component<Props, State> {
 	}
 
 	unitClickHandle = (id: string): void => {
-		const { units, history, courseId, } = this.props;
+		const { units, history, courseId, slideId, courseInfo, } = this.props;
 		const { courseStatistics, } = this.state;
 
 		if(units) {
-			const openedUnit = units[id];
+			const newOpenedUnit = units[id];
+			const currentUnitId = findUnitIdBySlideId(slideId, courseInfo);
 
 			this.setState({
-				openedUnit,
+				openedUnit: newOpenedUnit,
 			});
 
-			const unitStatistics = courseStatistics.byUnits[openedUnit.id];
+			if(newOpenedUnit.id === currentUnitId) {
+				return;
+			}
+
+			const unitStatistics = courseStatistics.byUnits[newOpenedUnit.id];
 			if(unitStatistics.startupSlide) {
 				history.push(constructPathToSlide(courseId, unitStatistics.startupSlide.id));
 			} else {
-				history.push(constructPathToSlide(courseId, openedUnit.slides[0].id));
+				history.push(constructPathToSlide(courseId, newOpenedUnit.slides[0].id));
 			}
 		}
 	};
