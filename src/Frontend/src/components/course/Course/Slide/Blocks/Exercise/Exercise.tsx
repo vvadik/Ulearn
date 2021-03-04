@@ -790,7 +790,7 @@ class Exercise extends React.Component<Props, State> {
 				const showAcceptedSolutions = !waitingForManualChecking && !hideSolutions;
 
 				return (
-					score &&
+					score && score > 0 &&
 					<CongratsModal
 						showAcceptedSolutions={ showAcceptedSolutions ? this.openAcceptedSolutionsModal : undefined }
 						score={ score }
