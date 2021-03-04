@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace Ulearn.Common.Extensions
+namespace Database.Extensions
 {
 	public static class DbSetExtensions
 	{

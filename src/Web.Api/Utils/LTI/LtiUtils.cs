@@ -3,8 +3,9 @@ using System.Threading.Tasks;
 using Database.Repos;
 using Vostok.Logging.Abstractions;
 using LtiLibrary.Core.Outcomes.v1;
-using Ulearn.Common.Extensions;
+using Newtonsoft.Json;
 using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Model;
 using Ulearn.Web.Api.Controllers;
 
 namespace Ulearn.Web.Api.Utils.LTI
@@ -13,17 +14,14 @@ namespace Ulearn.Web.Api.Utils.LTI
 	{
 		private static ILog log => LogProvider.Get().ForContext(typeof(LtiUtils));
 
-		public static async Task SubmitScore(string courseId, Slide slide, string userId, int score,
-			ILtiRequestsRepo ltiRequestsRepo,
-			ILtiConsumersRepo consumersRepo)
+		public static async Task SubmitScore(Slide slide, string userId, int score,
+			string ltiRequestJson, ILtiConsumersRepo consumersRepo)
 		{
-			var ltiRequest = await ltiRequestsRepo.Find(courseId, userId, slide.Id);
-			if (ltiRequest == null)
-				throw new Exception("LtiRequest for user '" + userId + "' not found");
+			var ltiRequest = JsonConvert.DeserializeObject<LtiRequest>(ltiRequestJson);
 
 			var consumerSecret = (await consumersRepo.Find(ltiRequest.ConsumerKey)).Secret;
 
-			log.Info($"Надо отправить результаты слайда {slide.Id} пользователя {userId} по LTI. Нашёл LtiRequest: {ltiRequest.JsonSerialize()}");
+			log.Info($"Надо отправить результаты слайда {slide.Id} пользователя {userId} по LTI. Нашёл LtiRequest: {ltiRequestJson}");
 			UriBuilder uri;
 			try
 			{

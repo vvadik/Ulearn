@@ -16,7 +16,7 @@ namespace Ulearn.Web.Api.Controllers.Runner
 	{
 		private readonly IWebCourseManager courseManager;
 		private readonly IXQueueRepo xQueueRepo;
-		private static ILog log => LogProvider.Get().ForContext(typeof(VisitsRepo));
+		private static ILog log => LogProvider.Get().ForContext(typeof(XQueueResultObserver));
 
 		public XQueueResultObserver(IWebCourseManager courseManager, IXQueueRepo xQueueRepo)
 		{

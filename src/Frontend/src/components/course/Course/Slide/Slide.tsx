@@ -181,7 +181,7 @@ class Slide extends React.Component<Props> {
 	};
 
 	addAdditionalPropsToBlocks = (slideBlocks: Block<BlockTypes>[]) => {
-		const { slideId, courseId, showHiddenBlocks, slideInfo, } = this.props;
+		const { slideId, courseId, showHiddenBlocks, slideInfo, isLti, } = this.props;
 		const { autoplay } = queryString.parse(window.location.search);
 		const { maxScore } = slideInfo;
 
@@ -240,6 +240,7 @@ class Slide extends React.Component<Props> {
 					exerciseBlock.courseId = courseId;
 					exerciseBlock.forceInitialCode = !showHiddenBlocks;
 					exerciseBlock.maxScore = maxScore;
+					exerciseBlock.isLti = isLti;
 					break;
 				}
 			}

@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using NHttp;
-using RestSharp.Extensions;
 using Vostok.Logging.Abstractions;
 using Ulearn.Common.Extensions;
 
@@ -145,7 +144,7 @@ namespace Stepik.Api.Tests
 			OnAuthorizationCodeReceived(this, code);
 
 			var response = Encoding.UTF8.GetBytes(
-				$"Authorization code: \"{code.HtmlEncode()}\"<br>" +
+				$"Authorization code: \"{WebUtility.HtmlEncode(code)}\"<br>" +
 				"Теперь эту вкладку можно закрыть"
 			);
 

@@ -129,10 +129,14 @@ namespace Database.DataContexts
 
 		public (int Score, int? Percent) GetExerciseSlideScoreAndPercent(string courseId, ExerciseSlide slide, string userId)
 		{
-			var isRightAnswer = GetSlideCheckingsByUser<AutomaticExerciseChecking>(courseId, slide.Id, userId)
-				.Any(c => c.IsRightAnswer);
-			if (!isRightAnswer)
-				return (0, null);
+			var hasAutomaticChecking = slide.Exercise.HasAutomaticChecking();
+			if (hasAutomaticChecking)
+			{
+				var isRightAnswer = GetSlideCheckingsByUser<AutomaticExerciseChecking>(courseId, slide.Id, userId)
+					.Any(c => c.IsRightAnswer);
+				if (!isRightAnswer)
+					return (0, null);
+			}
 			var checkedScoresAndPercents = GetCheckedScoresAndPercents(courseId, slide, userId, null);
 			var automaticScore = slide.Scoring.PassedTestsScore;
 			if (checkedScoresAndPercents.Count == 0)

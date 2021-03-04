@@ -26,7 +26,7 @@ namespace Ulearn.Core
 
 	public static class ProjModifier
 	{
-		public static byte[] ModifyCsproj(FileInfo csproj, Action<Project> changingAction, string toolsVersion = null)
+		public static MemoryStream ModifyCsproj(FileInfo csproj, Action<Project> changingAction, string toolsVersion = null)
 		{
 			MsBuildLocationHelper.InitPathToMsBuild();
 			return FuncUtils.Using(
@@ -39,14 +39,14 @@ namespace Ulearn.Core
 				projectCollection => projectCollection.UnloadAllProjects());
 		}
 
-		private static byte[] ModifyCsproj(Project proj, Action<Project> changingAction)
+		private static MemoryStream ModifyCsproj(Project proj, Action<Project> changingAction)
 		{
 			changingAction?.Invoke(proj);
-			using (var memoryStream = new MemoryStream())
+			var memoryStream = StaticRecyclableMemoryStreamManager.Manager.GetStream();
 			using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8))
 			{
 				proj.Save(streamWriter);
-				return memoryStream.ToArray();
+				return memoryStream;
 			}
 		}
 

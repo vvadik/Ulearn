@@ -162,7 +162,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			return new ProjRunnerSubmission
 			{
 				Id = submissionId,
-				ZipFileData = GetZipBytesForChecker(code),
+				ZipFileData = GetZipForChecker(code).ToArray(),
 				ProjectFileName = CsprojFileName,
 				Input = "",
 				NeedRun = true,
@@ -170,7 +170,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			};
 		}
 
-		private byte[] GetZipBytesForChecker(string code)
+		private MemoryStream GetZipForChecker(string code)
 		{
 			var codeFile = GetCodeFile(code);
 			return ExerciseCheckerZipsCache.GetZip(this, codeFile.Path, codeFile.Data);
@@ -203,7 +203,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			yield return new FileContent
 			{
 				Path = CsprojFileName,
-				Data = ProjModifier.ModifyCsproj(CsprojFile, ModifyCsproj(excluded, useNUnitLauncher), toolsVersion: BuildEnvironmentOptions.ToolsVersion)
+				Data = ProjModifier.ModifyCsproj(CsprojFile, ModifyCsproj(excluded, useNUnitLauncher), toolsVersion: BuildEnvironmentOptions.ToolsVersion).ToArray()
 			};
 
 			if (useNUnitLauncher)

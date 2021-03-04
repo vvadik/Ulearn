@@ -67,6 +67,7 @@ interface ExerciseBlock extends Block<BlockTypes.exercise> {
 	forceInitialCode: boolean,
 	maxScore?: number,
 	submissions?: SubmissionInfo[],//we're moving this field to other state in redux reducer
+	isLti: boolean,
 }
 
 interface ExerciseBlockProps {

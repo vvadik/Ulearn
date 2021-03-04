@@ -86,37 +86,6 @@ namespace uLearn.Web.Controllers
 			antiPlagiarismClient = new AntiPlagiarismClient(antiplagiarismClientConfiguration.Endpoint, antiplagiarismClientConfiguration.Token);
 		}
 
-		public ActionResult Courses(string courseId = null, string courseTitle = null)
-		{
-			var controllableCourses = new HashSet<string>(User.GetControllableCoursesId());
-			var incorrectChars = new string(CourseManager.GetInvalidCharacters().OrderBy(c => c).Where(c => 32 <= c).ToArray());
-			var courses = courseManager.GetCourses()
-				.Where(course => controllableCourses.Contains(course.Id));
-
-			if (User.IsSystemAdministrator())
-				courses = courses.OrderBy(course => course.Id, StringComparer.InvariantCultureIgnoreCase);
-			else
-				courses = courses.OrderBy(course => course.Title, StringComparer.InvariantCultureIgnoreCase);
-
-			var tempCourses = tempCoursesRepo.GetTempCourses().Select(c => c.CourseId).ToHashSet();
-			var model = new CourseListViewModel
-			{
-				Courses = courses
-					.Select(course => new CourseViewModel
-					{
-						Id = course.Id,
-						Title = course.Title,
-						LastWriteTime = courseManager.GetLastWriteTime(course.Id),
-						IsTemp = tempCourses.Contains(course.Id)
-					})
-					.ToList(),
-				LastTryCourseId = courseId,
-				LastTryCourseTitle = courseTitle,
-				InvalidCharacters = incorrectChars
-			};
-			return View(model);
-		}
-
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public ActionResult SpellingErrors(Guid versionId)
 		{
@@ -271,7 +240,7 @@ namespace uLearn.Web.Controllers
 			if (fileName == null || !fileName.ToLower().EndsWith(".zip"))
 				return RedirectToAction("Packages", new { courseId });
 
-			var (versionId, error) = await UploadCourse(courseId, file.InputStream.ToArray(), User.Identity.GetUserId()).ConfigureAwait(false);
+			var (versionId, error) = await UploadCourse(courseId, file.InputStream, User.Identity.GetUserId()).ConfigureAwait(false);
 			if (error != null)
 			{
 				var errorMessage = error.Message.ToLowerFirstLetter();
@@ -300,7 +269,7 @@ namespace uLearn.Web.Controllers
 			var userId = usersRepo.GetUlearnBotUser().Id;
 			var publicKey = courses[0].PublicKey; // у всех курсов одинаковый repoUrl и ключ
 			var privateKey = courses[0].PrivateKey;
-			var infoForUpload = new List<(string, byte[], CommitInfo, string)>();
+			var infoForUpload = new List<(string, MemoryStream, CommitInfo, string)>();
 			using (IGitRepo git = new GitRepo(repoUrl, reposDirectory, publicKey, privateKey, new DirectoryInfo(Path.GetTempPath())))
 			{
 				git.Checkout(branch);
@@ -322,7 +291,7 @@ namespace uLearn.Web.Controllers
 					if (hasChanges)
 					{
 						log.Info($"Course '{courseRepo.CourseId}' has changes in '{repoUrl}'");
-						infoForUpload.Add((courseRepo.CourseId, zip.ToArray(), commitInfo, courseRepo.PathToCourseXml));
+						infoForUpload.Add((courseRepo.CourseId, zip, commitInfo, courseRepo.PathToCourseXml));
 					}
 					else
 					{
@@ -349,7 +318,7 @@ namespace uLearn.Web.Controllers
 			var courseRepo = coursesRepo.GetCourseRepoSettings(courseId);
 			if (courseRepo == null)
 				return RedirectToAction("Packages", new { courseId, error = "Course repo settings not found" });
-			byte[] zip = null;
+			MemoryStream zip = null;
 			CommitInfo commitInfo = null;
 
 			var publicKey = courseRepo.PublicKey; // у всех курсов одинаковый repoUrl и ключ
@@ -360,7 +329,7 @@ namespace uLearn.Web.Controllers
 				using (IGitRepo git = new GitRepo(courseRepo.RepoUrl, reposDirectory, publicKey, privateKey, new DirectoryInfo(Path.GetTempPath())))
 				{
 					git.Checkout(courseRepo.Branch);
-					zip = git.GetCurrentStateAsZip(courseRepo.PathToCourseXml).ToArray();
+					zip = git.GetCurrentStateAsZip(courseRepo.PathToCourseXml);
 					commitInfo = git.GetCurrentCommitInfo();
 				}
 			}
@@ -394,14 +363,15 @@ namespace uLearn.Web.Controllers
 		}
 
 
-		private async Task<(Guid versionId, Exception error)> UploadCourse(string courseId, byte[] content, string userId,
+		private async Task<(Guid versionId, Exception error)> UploadCourse(string courseId, Stream content, string userId,
 			string uploadedFromRepoUrl = null, CommitInfo commitInfo = null, string pathToCourseXmlInRepo = null)
 		{
 			log.Info($"Start upload course '{courseId}'");
 			var versionId = Guid.NewGuid();
 
 			var destinationFile = courseManager.GetCourseVersionFile(versionId);
-			System.IO.File.WriteAllBytes(destinationFile.FullName, content);
+			using (var file = new FileStream(destinationFile.FullName, FileMode.Create, FileAccess.Write))
+				await content.CopyToAsync(file);
 			Course updatedCourse;
 			try
 			{
@@ -450,7 +420,7 @@ namespace uLearn.Web.Controllers
 			var versionId = Guid.NewGuid();
 
 			if (!courseManager.TryCreateCourse(courseId, courseTitle, versionId))
-				return RedirectToAction("Courses", new { courseId = courseId, courseTitle = courseTitle });
+				return RedirectToAction("Courses", "Course",  new { courseId = courseId, courseTitle = courseTitle });
 
 			var userId = User.Identity.GetUserId();
 			await coursesRepo.AddCourseVersion(courseId, versionId, userId, null, null, null, null).ConfigureAwait(false);
@@ -806,7 +776,7 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 
 			if (string.IsNullOrEmpty(queryModel.CourseId))
-				return RedirectToAction("Courses");
+				return RedirectToAction("Courses", "Course");
 			return View(queryModel);
 		}
 

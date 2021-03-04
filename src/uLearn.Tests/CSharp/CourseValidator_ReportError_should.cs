@@ -93,7 +93,7 @@ namespace uLearn.CSharp
 
 			byte[] ResolveCsprojLink(FileInfo file)
 			{
-				return file.Name.Equals(exerciseBlock.CsprojFileName) ? ProjModifier.ModifyCsproj(file, ProjModifier.ReplaceLinksWithItems) : null;
+				return file.Name.Equals(exerciseBlock.CsprojFileName) ? ProjModifier.ModifyCsproj(file, ProjModifier.ReplaceLinksWithItems).ToArray() : null;
 			}
 		}
 

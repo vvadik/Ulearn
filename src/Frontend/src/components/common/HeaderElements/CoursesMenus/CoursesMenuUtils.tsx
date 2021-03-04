@@ -3,7 +3,7 @@ import React from "react";
 import { MenuHeader, MenuItem, MenuSeparator } from "ui";
 import LinkComponent from "../../LinkComponent";
 
-import { adminCoursePath, coursePath } from "src/consts/routes";
+import { coursesPath, coursePath } from "src/consts/routes";
 
 import { CourseInfo } from "src/models/course";
 import { CourseAccessType, CourseRoleType, } from "src/consts/accessType";
@@ -28,7 +28,7 @@ export function getCourseMenuItems(
 	);
 	if(courseIds.length > visibleCourseIds.length || isSystemAdministrator) {
 		items.push(
-			<MenuItem href={ adminCoursePath } key="-course-list" component={ LinkComponent }>
+			<MenuItem href={ coursesPath } key="-course-list" component={ LinkComponent }>
 				<strong>Все курсы</strong>
 			</MenuItem>);
 	}
