@@ -2,31 +2,30 @@ import React, { Component, CSSProperties } from "react";
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 
-import NavigationHeader from './Unit/NavigationHeader';
 import NavigationContent from './Unit/NavigationContent';
 import NextUnit from "./Unit/NextUnit";
 
-import CourseNavigationHeader from "./Course/CourseNavigationHeader";
+import NavigationHeader from "./NavigationHeader";
 import CourseNavigationContent from "./Course/CourseNavigationContent";
 import Flashcards from "./Course/Flashcards/Flashcards";
 
 import { flashcards } from "src/consts/routes";
 
-import { isMobile, isTablet } from "src/utils/getDeviceType";
 import { toggleNavigationAction } from "src/actions/navigation";
 
-import { CourseMenuItem, MenuItem, Progress } from "./types";
+import { CourseMenuItem, FlashcardsStatistics, MenuItem, Progress, UnitProgress } from "./types";
 
 import { GroupAsStudentInfo } from "src/models/groups";
 import { RootState } from "src/redux/reducers";
 import { UnitInfo } from "src/models/course";
 import { SlideType } from "src/models/slide";
+import { DeviceType } from "src/consts/deviceType";
 
 import styles from './Navigation.less';
 
 const mobileNavigationMenuWidth = 250;//250 is @mobileNavigationMenuWidth, its mobile nav menu width
 
-export type Props = PropsFromRedux & DefaultNavigationProps & (CourseNavigationProps | UnitNavigationProps);
+export type Props = PropsFromRedux & DefaultNavigationProps & CourseNavigationProps & UnitNavigationProps;
 
 interface DefaultNavigationProps {
 	courseTitle: string;
@@ -35,6 +34,7 @@ interface DefaultNavigationProps {
 
 interface PropsFromRedux {
 	groupsAsStudent: GroupAsStudentInfo[];
+	deviceType: DeviceType;
 	toggleNavigation: () => void;
 }
 
@@ -43,6 +43,7 @@ export interface CourseNavigationProps {
 	slideId?: string;
 	description: string;
 
+	flashcardsStatistics: FlashcardsStatistics;
 	containsFlashcards: boolean;
 
 	courseProgress: Progress;
@@ -50,12 +51,14 @@ export interface CourseNavigationProps {
 }
 
 export interface UnitNavigationProps {
-	unitTitle: string;
+	unitTitle?: string;
 
-	unitProgress: Progress;
+	unitProgress?: UnitProgress;
 
-	unitItems: MenuItem<SlideType>[];
-	nextUnit: UnitInfo | null;
+	unitItems?: MenuItem<SlideType>[];
+	nextUnit?: UnitInfo | null;
+
+	unitFlashcardsStatistic?: FlashcardsStatistics;
 
 	onCourseClick: () => void;
 }
@@ -66,12 +69,15 @@ interface State {
 	xDown: null | number;
 	yDown: null | number;
 	touchListenerAdded: boolean,
+	currentScrollState: 'top' | 'scroll' | 'bottom',
 }
 
 class Navigation extends Component<Props, State> {
 	touchDistanceTolerance = 10;
 	touchStartMaxX = 24;//is simmilar to left padding on slide
-	unitHeaderRef: React.RefObject<HTMLElement> = React.createRef();
+	wrapper: React.RefObject<HTMLDivElement> = React.createRef();
+	currentActiveItem: React.RefObject<HTMLLIElement> = React.createRef();
+	header: React.RefObject<HTMLDivElement> = React.createRef();
 	animationDuration = 300;
 
 	constructor(props: Props) {
@@ -81,21 +87,64 @@ class Navigation extends Component<Props, State> {
 			xDown: null,
 			yDown: null,
 			touchListenerAdded: false,
+			currentScrollState: 'top',
 		};
 	}
 
 	componentDidMount() {
 		document.addEventListener('resize', this.handleWindowSizeChange);
 		this.tryAddTouchListener();
+
+		this.tryScrollToActiveItem();
+
+		if(this.wrapper.current) {
+			const wrapper = this.wrapper.current;
+
+			wrapper.addEventListener('scroll', () => {
+				if(wrapper) {
+					const newScrollState = wrapper.scrollTop === 0
+						? 'top'
+						: (wrapper.scrollTop + wrapper.clientHeight >= wrapper.scrollHeight)
+							? 'bottom'
+							: 'scroll';
+					if(newScrollState !== this.state.currentScrollState) {
+						this.setState({
+							currentScrollState: newScrollState,
+						});
+					}
+				}
+			});
+		}
 	}
 
+	tryScrollToActiveItem = () => {
+		if(this.currentActiveItem.current && this.wrapper.current && this.header.current) {
+			const active = this.currentActiveItem.current;
+			const wrapper = this.wrapper.current;
+			const header = this.header.current;
+
+			const activeRect = active.getBoundingClientRect();
+			const wrapperRect = wrapper.getBoundingClientRect();
+			const headerRect = header.getBoundingClientRect();
+
+			if(activeRect.top - wrapperRect.top > wrapperRect.height) {
+				wrapper.scrollTo(
+					{ left: 0, top: activeRect.top - wrapperRect.height + 50, behavior: "auto" });
+			} else if(activeRect.top - wrapperRect.top <= headerRect.height) {
+				wrapper.scrollTo(
+					{ left: 0, top: activeRect.top - activeRect.height - headerRect.height, behavior: "auto" });
+			}
+		}
+	};
+
 	isMobileNavigationMenu = () => {
-		return isMobile() || isTablet();
+		const { deviceType } = this.props;
+		return deviceType === DeviceType.mobile || deviceType === DeviceType.tablet;
 	};
 
 	tryAddTouchListener = () => {
 		if(this.isMobileNavigationMenu() && !this.state.touchListenerAdded) {
-			document.addEventListener('touchstart', this.handleTouchStart);
+			document.addEventListener('touchstart', this.handleTouchStart, { passive: true });
 			this.setState({
 				touchListenerAdded: true,
 			});
@@ -107,8 +156,8 @@ class Navigation extends Component<Props, State> {
 	};
 
 	handleTouchStart = (evt: TouchEvent) => {
-		document.addEventListener('touchmove', this.handleTouchMove);
-		document.addEventListener('touchend', this.handleTouchEnd);
+		document.addEventListener('touchmove', this.handleTouchMove, { passive: true });
+		document.addEventListener('touchend', this.handleTouchEnd, { passive: true });
 
 		const { clientX, clientY, } = this.getTouches(evt)[0];
 		const { navigationOpened } = this.props;
@@ -212,13 +261,16 @@ class Navigation extends Component<Props, State> {
 	}
 
 	componentDidUpdate(prevProps: Props) {
-		const { navigationOpened } = this.props;
+		const { navigationOpened, unitTitle } = this.props;
 
-		if((isMobile() || isTablet()) && prevProps.navigationOpened !== navigationOpened) {
+		if(this.isMobileNavigationMenu() && prevProps.navigationOpened !== navigationOpened) {
 			document.querySelector('body')?.classList.toggle(styles.overflow, navigationOpened);
 			if(!navigationOpened) {
 				this.playHidingOverlayAnimation();
 			}
+		}
+		if(unitTitle !== prevProps.unitTitle) {
+			this.tryScrollToActiveItem();
 		}
 	}
 
@@ -244,90 +296,107 @@ class Navigation extends Component<Props, State> {
 	};
 
 	render() {
-		const { overlayStyle } = this.state;
+		const { overlayStyle, sideMenuStyle, currentScrollState, } = this.state;
+		const {
+			courseTitle,
+			description,
+			groupsAsStudent,
+			courseProgress,
+			unitTitle,
+			onCourseClick,
+			unitProgress,
+			deviceType,
+		} = this.props;
 
-		const courseProps = this.props as CourseNavigationProps;
+		const isInsideCourse = unitTitle === undefined;
 
 		return (
 			<aside>
 				<div className={ styles.overlay } style={ overlayStyle } onClick={ this.hideNavigationMenu }/>
-				{ courseProps.courseItems
-					? this.renderCourseNavigation(this.props as CourseNavigationProps)
-					: this.renderUnitNavigation(this.props as UnitNavigationProps)
-				}
+				<div className={ styles.contentWrapper } style={ sideMenuStyle } ref={ this.wrapper }>
+					<NavigationHeader
+						className={ currentScrollState !== 'top' ? styles.shadow : undefined }
+						title={ courseTitle }
+						description={ description }
+						groupsAsStudent={ groupsAsStudent }
+						courseProgress={ courseProgress }
+						returnToCourseNavigationClicked={ onCourseClick }
+						createRef={ this.header }
+						unitProgress={ unitProgress }
+						unitTitle={ unitTitle }
+						isInsideCourse={ isInsideCourse }
+						deviceType={ deviceType }
+					/>
+					{
+						isInsideCourse
+							? this.renderCourseNavigation()
+							: this.renderUnitNavigation()
+					}
+				</div>
 			</aside>
 		);
 	}
 
-	renderUnitNavigation({
-		unitTitle,
-		onCourseClick,
-		unitItems,
-		nextUnit,
-		unitProgress
-	}: UnitNavigationProps) {
+	renderUnitNavigation() {
 		const {
-			courseTitle,
-			groupsAsStudent,
 			toggleNavigation,
+			unitTitle,
+			unitItems,
+			nextUnit,
 		} = this.props;
-		const { sideMenuStyle } = this.state;
+
+		if(!unitTitle || !unitItems) {
+			return null;
+		}
 
 		return (
-			<div className={ styles.contentWrapper } style={ sideMenuStyle }>
-				<NavigationHeader
-					title={ unitTitle }
-					courseName={ courseTitle }
-					progress={ unitProgress }
-					groupsAsStudent={ groupsAsStudent }
-					createRef={ this.unitHeaderRef }
-					onClick={ onCourseClick }
+			<>
+				<NavigationContent
+					items={ unitItems }
+					onClick={ toggleNavigation }
+					getRefToActive={ this.currentActiveItem }
 				/>
-				<NavigationContent items={ unitItems } onClick={ toggleNavigation }/>
 				{ nextUnit && <NextUnit unit={ nextUnit } onClick={ this.handleToggleNavigation }/> }
-			</div>
+			</>
 		);
 	}
 
 	handleToggleNavigation = () => {
-		this.unitHeaderRef.current?.scrollIntoView();
 		this.hideNavigationMenu();
 	};
 
-	renderCourseNavigation({
-		description,
-		courseItems,
-		containsFlashcards,
-		courseId,
-		slideId,
-		courseProgress
-	}: CourseNavigationProps) {
+	renderCourseNavigation() {
 		const {
-			courseTitle,
+			courseItems,
+			containsFlashcards,
+			courseId,
+			slideId,
 			toggleNavigation,
-			groupsAsStudent,
+			flashcardsStatistics,
 		} = this.props;
-		const { sideMenuStyle } = this.state;
 
 		return (
-			<div className={ styles.contentWrapper } style={ sideMenuStyle }>
-				<CourseNavigationHeader
-					title={ courseTitle }
-					description={ description }
-					groupsAsStudent={ groupsAsStudent }
-					courseProgress={ courseProgress }
-				/>
-				{ courseItems && courseItems.length && <CourseNavigationContent items={ courseItems }/> }
+			<>
+				{ courseItems && courseItems.length &&
+				<CourseNavigationContent
+					getRefToActive={ this.currentActiveItem }
+					items={ courseItems }
+				/> }
 				{ containsFlashcards &&
-				<Flashcards toggleNavigation={ toggleNavigation } courseId={ courseId }
-							isActive={ slideId === flashcards }/> }
-			</div>
+				<Flashcards
+					statistics={ flashcardsStatistics }
+					toggleNavigation={ toggleNavigation }
+					courseId={ courseId }
+					isActive={ slideId === flashcards }
+				/> }
+			</>
 		);
 	}
 }
 
 const mapStateToProps = (state: RootState) => {
-	const { currentCourseId } = state.courses;
+	const { currentCourseId, } = state.courses;
+	const { deviceType, } = state.device;
 	const courseId = currentCourseId
 		? currentCourseId.toLowerCase()
 		: null;
@@ -336,7 +405,7 @@ const mapStateToProps = (state: RootState) => {
 		? groupsAsStudent.filter(group => group.courseId.toLowerCase() === courseId && !group.isArchived)
 		: [];
 
-	return { groupsAsStudent: courseGroupsAsStudent, };
+	return { groupsAsStudent: courseGroupsAsStudent, deviceType };
 };
 
 const mapDispatchToProps = (dispatch: Dispatch) => ({

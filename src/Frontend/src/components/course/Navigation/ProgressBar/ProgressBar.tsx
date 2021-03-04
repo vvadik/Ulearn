@@ -5,15 +5,14 @@ import styles from "./ProgressBar.less";
 interface Props {
 	value: number;
 	small?: boolean;
-	color?: 'green' | 'blue';
 	active?: boolean;
 }
 
-function ProgressBar({ value, small, color = 'green', active, }: Props): React.ReactElement {
+function ProgressBar({ value, small, active, }: Props): React.ReactElement {
 	return (
 		<div className={ classnames(styles.wrapper, { [styles.small]: small }, { [styles.active]: active }) }>
 			<div
-				className={ classnames(styles.value, { [styles.blue]: color === 'blue' }) }
+				className={ styles.value }
 				style={ { width: `${ value * 100 }%` } }/>
 		</div>
 	);

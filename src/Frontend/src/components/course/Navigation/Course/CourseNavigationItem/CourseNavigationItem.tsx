@@ -1,17 +1,19 @@
 import React from "react";
 import classnames from "classnames";
 
-import { isMobile, isTablet } from "src/utils/getDeviceType";
-
-import ProgressBar from "../../ProgressBar";
-import { Calendar, EyeClosed, } from "icons";
-import { Hint, } from "ui";
-
 import { getDateDDMMYY } from "src/utils/momentUtils";
 
-import { CourseMenuItem, Progress } from "../../types";
+import { Calendar, EyeClosed, } from "icons";
+import { Hint, } from "ui";
+import ProgressBarCircle from "../../ProgressBar/ProgressBarCircle";
+
+import { CourseMenuItem, UnitProgress } from "../../types";
 
 import styles from "./CourseNavigationItem.less";
+
+interface Props extends CourseMenuItem {
+	getRefToActive?: React.RefObject<HTMLLIElement>;
+}
 
 function CourseNavigationItem({
 	title,
@@ -21,16 +23,18 @@ function CourseNavigationItem({
 	progress,
 	onClick,
 	id,
-}: CourseMenuItem): React.ReactElement {
+	getRefToActive,
+}: Props): React.ReactElement {
 	const classes = classnames(
 		styles.itemLink,
 		{ [styles.active]: isActive },
 	);
 
 	return (
-		<li className={ styles.root } onClick={ clickHandle }>
+		<li className={ styles.root } onClick={ clickHandle } ref={ isActive ? getRefToActive : undefined }>
 			<div className={ classes }>
 					<span className={ styles.text }>
+						{ title }
 						{ isNotPublished &&
 						<span className={ styles.isNotPublishedIcon } onClick={ hintClickHandle }>
 								{ publicationDate
@@ -45,23 +49,19 @@ function CourseNavigationItem({
 								}
 						</span>
 						}
-						{ title }
 					</span>
 				{ progress && renderProgress(progress) }
 			</div>
 		</li>
 	);
 
-	function renderProgress(progress: Progress) {
-		const percentage = progress.current / progress.max;
-
-		if(percentage > 0) {
+	function renderProgress(progress: UnitProgress) {
+		if(progress.inProgressSlidesCount > 0 || progress.doneSlidesCount > 0) {
 			return (
-				<span className={ styles.progressWrapper } title={ `${ progress.current } из ${ progress.max }` }>
-					<ProgressBar
-						value={ percentage }
-						small
-						color={ percentage >= 1 ? 'green' : 'blue' }
+				<span className={ styles.progressWrapper }>
+					<ProgressBarCircle
+						successValue={ progress.doneSlidesCount / progress.slidesCount }
+						inProgressValue={ progress.inProgressSlidesCount / progress.slidesCount }
 						active={ isActive }
 					/>
 				</span>
@@ -76,9 +76,7 @@ function CourseNavigationItem({
 	}
 
 	function hintClickHandle(e: React.MouseEvent) {
-		if(isMobile() || isTablet()) {
-			e.stopPropagation();
-		}
+		e.stopPropagation();
 	}
 }
 

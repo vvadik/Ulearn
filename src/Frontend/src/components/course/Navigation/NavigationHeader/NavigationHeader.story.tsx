@@ -1,26 +1,26 @@
 import React from "react";
-import CourseNavigationHeader from "./CourseNavigationHeader.js";
+import NavigationHeader from "./NavigationHeader.js";
 
 const _CourseNavigationHeader = (): React.ReactNode => (
 	<div>
-		<CourseNavigationHeader
+		<NavigationHeader
 			title="Основы программирования"
 			description={ getDescription() }
 			courseProgress={ { current: 0, max: 0 } }
 			groupsAsStudent={ [] }
 		/>
-		<CourseNavigationHeader
+		<NavigationHeader
 			title="Основы программирования"
 			description={ getDescription() }
 			courseProgress={ { current: 56, max: 100 } }
 			groupsAsStudent={ [] }
 		/>
-		<CourseNavigationHeader
+		<NavigationHeader
 			title="Основы программирования"
 			courseProgress={ { current: 0, max: 0 } }
 			groupsAsStudent={ [] }
 		/>
-		<CourseNavigationHeader
+		<NavigationHeader
 			title="Основы программирования"
 			courseProgress={ { current: 1, max: 1 } }
 			groupsAsStudent={ [] }

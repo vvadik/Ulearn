@@ -20,11 +20,10 @@ function NextUnit({ onClick, unit, }: Props): React.ReactElement {
 
 	return (
 		<Link to={ slideId } className={ styles.root } onClick={ onClick }>
-			<div className={ styles.wrapper }>
-				<h5 className={ styles.header }>Следующий модуль</h5>
-				<h4 className={ styles.title } title={ title }>{ title }</h4>
-			</div>
-			<ArrowChevronRight size={ 24 } className={ styles.arrow }/>
+			<h3 className={ styles.title } title={ title }>
+				{ title }
+				<ArrowChevronRight size={ 14 }/>
+			</h3>
 		</Link>
 	);
 }
