@@ -612,7 +612,7 @@ class Course extends Component<Props, State> {
 			quizMaxTriesCount: item.quizMaxTriesCount,
 			visited: Boolean(progress && progress[item.id]),
 			hide: item.hide,
-			videosCount: item.videosCount,
+			containsVideo: item.containsVideo,
 			status: statuses ? statuses[item.id] : SlideProgressStatus.notVisited,
 		}));
 	}

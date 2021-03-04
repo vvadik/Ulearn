@@ -47,6 +47,6 @@ namespace Ulearn.Web.Api.Models.Common
 		[DataMember(EmitDefaultValue = false)]
 		public string GitEditLink { get; set; }
 		[DataMember]
-		public int VideosCount { get; set; }
+		public bool ContainsVideo { get; set; }
 	}
 }

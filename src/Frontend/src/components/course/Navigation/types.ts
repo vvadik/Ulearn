@@ -9,7 +9,7 @@ export interface MenuItem<T extends SlideType> {
 	url: string;
 	score: number;
 	maxScore: number;
-	videosCount: number;
+	containsVideo: boolean;
 	questionsCount: number,
 	quizMaxTriesCount: number,
 

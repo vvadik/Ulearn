@@ -33,7 +33,7 @@ function NavigationItem({
 	maxScore,
 	type,
 	status,
-	videosCount,
+	containsVideo,
 	getRefToActive,
 }: Props): React.ReactElement {
 	const classes = {
@@ -73,7 +73,7 @@ function NavigationItem({
 						fill="#A0A0A0"/>
 				</svg>;
 			case SlideType.Lesson:
-				if(videosCount > 0) {
+				if(containsVideo) {
 					return <svg
 						className={ styles.svg }
 						viewBox={ "-2 -2 14 14" }
