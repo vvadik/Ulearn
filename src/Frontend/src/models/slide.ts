@@ -10,7 +10,7 @@ interface ShortSlideInfo {
 	slug: string; // Человекочитаемый фрагмент url для слайда
 	maxScore: number;
 	scoringGroup: string | null;
-	videosCount: number;
+	containsVideo: boolean;
 	type: SlideType;
 	apiUrl: string;
 	questionsCount: number; // Количество вопросов в quiz

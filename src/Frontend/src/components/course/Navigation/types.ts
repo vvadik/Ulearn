@@ -1,5 +1,4 @@
 import { SlideType } from 'src/models/slide';
-import { SlideInfo } from "src/utils/getSlideInfo";
 
 export interface MenuItem<T extends SlideType> {
 	type: T;
