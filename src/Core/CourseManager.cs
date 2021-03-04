@@ -186,7 +186,6 @@ namespace Ulearn.Core
 
 		public void LoadCoursesIfNotYet()
 		{
-			Exception firstException = null;
 			lock (reloadLock)
 			{
 				if (courses.Count != 0)
@@ -201,19 +200,7 @@ namespace Ulearn.Core
 				{
 					log.Info($"Обновляю курс из {zipFile.Name}");
 					var courseId = GetCourseId(zipFile.FullName);
-					if (brokenCourses.Contains(courseId))
-						continue;
-					try
-					{
-						ReloadCourse(courseId);
-					}
-					catch (Exception e)
-					{
-						log.Error(e, $"Не могу загрузить курс из {zipFile.FullName}");
-						brokenCourses.Add(courseId);
-						if (firstException == null)
-							firstException = new CourseLoadingException("Error loading course from " + zipFile.Name, e);
-					}
+					TryReloadCourse(courseId);
 				}
 			}
 		}
@@ -223,14 +210,31 @@ namespace Ulearn.Core
 			// NONE
 		}
 
-		public Course ReloadCourse(string courseId)
+		public bool TryReloadCourse(string courseId)
+		{
+			if (brokenCourses.Contains(courseId))
+				return false;
+			try
+			{
+				ReloadCourseNotSafe(courseId);
+				return true;
+			}
+			catch (Exception e)
+			{
+				log.Error(e, $"Не могу загрузить курс {courseId}");
+				brokenCourses.Add(courseId);
+			}
+			return false;
+		}
+
+		public void ReloadCourseNotSafe(string courseId)
 		{
 			/* First try load course from directory */
 			var courseDir = GetExtractedCourseDirectory(courseId);
 			try
 			{
 				log.Info($"Сначала попробую загрузить уже распакованный курс из {courseDir.FullName}");
-				return ReloadCourseFromDirectory(courseDir);
+				ReloadCourseFromDirectory(courseDir);
 			}
 			catch (Exception e)
 			{
@@ -238,7 +242,7 @@ namespace Ulearn.Core
 				var zipFile = GetStagingCourseFile(courseId);
 				log.Info($"Буду загружать из zip-архива: {zipFile.FullName}");
 				errorsBot.PostToChannel($"Не смог загрузить курс из папки {courseDir}, буду загружать из zip-архива {zipFile.FullName}:\n{e.Message.EscapeMarkdown()}\n```{e.StackTrace}```", ParseMode.Markdown);
-				return ReloadCourseFromZip(zipFile);
+				ReloadCourseFromZip(zipFile);
 			}
 		}
 
@@ -360,6 +364,7 @@ namespace Ulearn.Core
 			catch (Exception ex)
 			{
 				log.Error(ex, $"Error on create course {courseId}");
+				brokenCourses.Add(courseId);
 				return false;
 			}
 		}
@@ -392,6 +397,7 @@ namespace Ulearn.Core
 			catch (Exception ex)
 			{
 				log.Error(ex, $"Error on create temp course {courseId}");
+				brokenCourses.Add(courseId);
 				return false;
 			}
 		}

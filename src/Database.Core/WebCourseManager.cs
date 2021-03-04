@@ -146,7 +146,7 @@ namespace Database
 			tempCourses
 				.Where(tempCourse => !HasCourse(tempCourse.CourseId))
 				.ToList()
-				.ForEach(course => ReloadCourse(course.CourseId));
+				.ForEach(course => TryReloadCourse(course.CourseId));
 		}
 
 		private bool IsCourseVersionWasUpdatedRecent(string courseId)
@@ -178,8 +178,8 @@ namespace Database
 				{
 					var actual = isCourseLoaded ? loadedVersionId.ToString() : "<none>";
 					log.Info($"Загруженная версия курса {courseId} отличается от актуальной ({actual} != {publishedVersion.Id}). Обновляю курс.");
-					ReloadCourse(courseId);
-					NotifyCourseChanged(courseId);
+					if (TryReloadCourse(courseId))
+						NotifyCourseChanged(courseId);
 				}
 
 				loadedCourseVersions[courseId.ToLower()] = publishedVersion.Id;
