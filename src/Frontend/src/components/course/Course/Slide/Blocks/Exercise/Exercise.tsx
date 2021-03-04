@@ -71,7 +71,6 @@ interface FromSlideProps {
 	slideId: string,
 	maxScore: number,
 	forceInitialCode: boolean,
-	isLti: boolean,
 }
 
 interface FromMapStateToProps {
@@ -975,13 +974,13 @@ class Exercise extends React.Component<Props, State> {
 
 	sendExercise = (): void => {
 		const { value, language } = this.state;
-		const { courseId, slideId, sendCode, isLti, } = this.props;
+		const { courseId, slideId, sendCode, } = this.props;
 
 		this.setState({
 			submissionLoading: true,
 		});
 
-		sendCode(courseId, slideId, value, language, isLti);
+		sendCode(courseId, slideId, value, language);
 	};
 
 	addReviewComment = (reviewId: number, text: string): void => {
