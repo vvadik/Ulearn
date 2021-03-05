@@ -197,18 +197,7 @@ namespace uLearn.Web.Controllers
 				ErrorLog.GetDefault(System.Web.HttpContext.Current).Log(new Error(e));
 			}
 
-			var exerciseSlide = slide as ExerciseSlide;
-			if (exerciseSlide != null)
-			{
-				var model = new CodeModel
-				{
-					CourseId = courseId,
-					SlideId = exerciseSlide.Id,
-					ExerciseBlock = exerciseSlide.Exercise,
-					Context = CreateRenderContext(course, exerciseSlide, isLti: true)
-				};
-				return View("LtiExerciseSlide", model);
-			}
+			// Exercise обрабатывается реактом
 
 			var quizSlide = slide as QuizSlide;
 			if (quizSlide != null)

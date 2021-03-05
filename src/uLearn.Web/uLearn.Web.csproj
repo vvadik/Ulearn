@@ -1561,7 +1561,6 @@
       <LastGenOutput>AcceptedSolutionsHtml.generated.cs</LastGenOutput>
     </Content>
     <Content Include="Views\Course\AcceptedAlert.cshtml" />
-    <Content Include="Views\Course\LtiExerciseSlide.cshtml" />
     <Content Include="Views\Sandbox\Index.cshtml" />
     <Content Include="Views\Sandbox\GetDetails.cshtml" />
     <Content Include="Views\Course\LtiQuizSlide.cshtml" />
