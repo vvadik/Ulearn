@@ -13,8 +13,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
 using Ulearn.Web.Api.Models.Parameters;
 using Ulearn.Web.Api.Models.Responses.Users;
+using Ulearn.Web.Api.Utils.LTI;
 
 namespace Ulearn.Web.Api.Controllers
 {
@@ -28,11 +30,13 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly IGroupAccessesRepo groupAccessesRepo;
 		private readonly IGroupMembersRepo groupMembersRepo;
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
+		private readonly ILtiRequestsRepo ltiRequestsRepo;
+		private readonly ILtiConsumersRepo ltiConsumersRepo;
 
 		public UserProgressController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
 			IVisitsRepo visitsRepo, IUserQuizzesRepo userQuizzesRepo, IAdditionalScoresRepo additionalScoresRepo,
 			ICourseRolesRepo courseRolesRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo,
-			ISlideCheckingsRepo slideCheckingsRepo)
+			ISlideCheckingsRepo slideCheckingsRepo, ILtiRequestsRepo ltiRequestsRepo, ILtiConsumersRepo ltiConsumersRepo)
 			: base(courseManager, db, usersRepo)
 		{
 			this.visitsRepo = visitsRepo;
@@ -42,6 +46,8 @@ namespace Ulearn.Web.Api.Controllers
 			this.groupAccessesRepo = groupAccessesRepo;
 			this.groupMembersRepo = groupMembersRepo;
 			this.slideCheckingsRepo = slideCheckingsRepo;
+			this.ltiRequestsRepo = ltiRequestsRepo;
+			this.ltiConsumersRepo = ltiConsumersRepo;
 		}
 
 		/// <summary>
@@ -162,8 +168,18 @@ namespace Ulearn.Web.Api.Controllers
 			}
 			if (slide == null)
 				return StatusCode((int)HttpStatusCode.NotFound, $"No slide with id {slideId}");
-			await visitsRepo.AddVisit(course.Id, slideId, UserId, GetRealClientIp());
+			var visit = await visitsRepo.AddVisit(course.Id, slideId, UserId, GetRealClientIp());
+			await ResendLtiScore(course.Id, slide, visit);
 			return await UserProgress(course.Id, new UserProgressParameters());
+		}
+
+		private async Task ResendLtiScore(string courseId, Slide slide, Visit visit)
+		{
+			if (!visit.IsPassed)
+				return;
+			var ltiRequestJson = await ltiRequestsRepo.Find(courseId, UserId, slide.Id);
+			if (ltiRequestJson != null)
+				await LtiUtils.SubmitScore(slide, UserId, visit.Score, ltiRequestJson, ltiConsumersRepo);
 		}
 
 		private string GetRealClientIp()

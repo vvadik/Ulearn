@@ -22,7 +22,7 @@ namespace Database.Repos
 			this.slideCheckingsRepo = slideCheckingsRepo;
 		}
 
-		public async Task AddVisit(string courseId, Guid slideId, string userId, string ipAddress)
+		public async Task<Visit> AddVisit(string courseId, Guid slideId, string userId, string ipAddress)
 		{
 			courseId = courseId.ToLower();
 			await SetLastVisit(courseId, slideId, userId);
@@ -41,6 +41,7 @@ namespace Database.Repos
 			else if (visit.IpAddress != ipAddress)
 				visit.IpAddress = ipAddress;
 			await db.SaveChangesAsync();
+			return visit;
 		}
 
 		private async Task SetLastVisit(string courseId, Guid slideId, string userId)
