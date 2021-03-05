@@ -40,10 +40,22 @@ function GroupList({
 				{ groups && (JSON.parse(JSON.stringify(groups)) as GroupInfoType[])
 					.sort((a, b) => {
 						if(userId) {
-							const isUserInA = new Set([a.owner.id, ...a.accesses.map(item => item.user.id)]).has(
-								userId);
-							const isUserInB = new Set([b.owner.id, ...b.accesses.map(item => item.user.id)]).has(
-								userId);
+							const teachersInA = new Set([a.owner.id, ...a.accesses.map(item => item.user.id)]);
+							const isUserInA = teachersInA.has(userId);
+							const teachersInB = new Set([b.owner.id, ...b.accesses.map(item => item.user.id)]);
+							const isUserInB = teachersInB.has(userId);
+
+							if(teachersInA.size === 1 && isUserInA && teachersInB.size === 1 && isUserInB) {
+								return 0;
+							}
+
+							if(teachersInA.size === 1 && isUserInA) {
+								return -1;
+							}
+
+							if(teachersInB.size === 1 && isUserInB) {
+								return 1;
+							}
 
 							if(isUserInA && isUserInB) {
 								return 0;
