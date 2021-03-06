@@ -37,10 +37,14 @@ namespace Database.Repos
 					Timestamp = DateTime.Now,
 					IpAddress = ipAddress,
 				});
+				await db.SaveChangesAsync();
+				return await FindVisit(courseId, slideId, userId);
 			}
-			else if (visit.IpAddress != ipAddress)
+			if (visit.IpAddress != ipAddress)
+			{
 				visit.IpAddress = ipAddress;
-			await db.SaveChangesAsync();
+				await db.SaveChangesAsync();
+			}
 			return visit;
 		}
 
