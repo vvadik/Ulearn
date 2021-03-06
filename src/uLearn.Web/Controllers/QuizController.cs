@@ -288,8 +288,8 @@ namespace uLearn.Web.Controllers
 			return Json(new
 			{
 				url = isLti
-					? Url.RouteUrl("Course.SlideById", new { courseId = courseId, slideId = slide.Url, send = 1 })
-					: Url.RouteUrl("Course.LtiSlide", new { courseId = courseId, slideId = slide.Url, send = 1 })
+					? Url.Action("LtiSlide", "Course", new { courseId = courseId, slideId = slide.Id, send = 1 })
+					: Url.RouteUrl("Course.SlideById", new { courseId = courseId, slideId = slide.Url, send = 1 })
 			});
 		}
 
