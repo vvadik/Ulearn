@@ -549,7 +549,6 @@ class Course extends Component<Props, State> {
 		return {
 			courseId: courseInfo.id,
 			slideId: slideId,
-			description: courseInfo.description,
 
 			flashcardsStatistics,
 

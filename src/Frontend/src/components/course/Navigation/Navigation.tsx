@@ -41,7 +41,6 @@ interface PropsFromRedux {
 export interface CourseNavigationProps {
 	courseId: string;
 	slideId?: string;
-	description: string;
 
 	flashcardsStatistics: FlashcardsStatistics;
 	containsFlashcards: boolean;
