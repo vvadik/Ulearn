@@ -202,8 +202,12 @@ class Exercise extends React.Component<Props, State> {
 			this.loadSlideSubmission();
 		}
 
-		window.addEventListener("beforeunload", this.saveCodeDraftToCache);
+		window.addEventListener("beforeunload", this.saveCodeDraftToCacheEvent);
 	}
+
+	saveCodeDraftToCacheEvent = (): void => {
+		this.saveCodeDraftToCache();
+	};
 
 	loadSlideSubmission = (): void => {
 		const { slideId, submissions, } = this.props;
@@ -226,7 +230,7 @@ class Exercise extends React.Component<Props, State> {
 			slideProgress,
 			isAuthenticated,
 		} = this.props;
-		const { currentSubmission, submissionLoading, selectedReviewId, } = this.state;
+		const { currentSubmission, submissionLoading, selectedReviewId, value, } = this.state;
 
 		if(submissionError && submissionError !== prevProps.submissionError) {
 			Toast.push("При добавлении или удалении комментария произошла ошибка");
@@ -234,6 +238,7 @@ class Exercise extends React.Component<Props, State> {
 
 		if(forceInitialCode !== prevProps.forceInitialCode) {
 			if(forceInitialCode) {
+				this.saveCodeDraftToCache();
 				this.resetCode();
 			} else {
 				this.loadSlideSubmission();
@@ -245,6 +250,7 @@ class Exercise extends React.Component<Props, State> {
 			this.setState({
 				submissionLoading: false,
 			});
+			this.saveCodeDraftToCache(prevProps.slideId, value);
 			this.loadSlideSubmission();
 			return;
 		}
@@ -314,18 +320,22 @@ class Exercise extends React.Component<Props, State> {
 		};
 	};
 
-	saveCodeDraftToCache = (): void => {
-		const { slideId, forceInitialCode, isAuthenticated } = this.props;
-		const { value, } = this.state;
+	saveCodeDraftToCache = (slideId?: string, value?: string, language?: Language): void => {
+		const { forceInitialCode, isAuthenticated } = this.props;
+		const { valueChanged, } = this.state;
 
-		if(!forceInitialCode && isAuthenticated) {
-			this.saveCodeToCache(slideId, value);
+		if(valueChanged && !forceInitialCode && isAuthenticated) {
+			saveExerciseCodeToCache(
+				slideId || this.props.slideId,
+				value || this.state.value,
+				moment().format(),
+				language || this.state.language);
 		}
 	};
 
 	componentWillUnmount(): void {
 		this.saveCodeDraftToCache();
-		window.removeEventListener("beforeunload", this.saveCodeDraftToCache);
+		window.removeEventListener("beforeunload", this.saveCodeDraftToCacheEvent);
 	}
 
 	render(): React.ReactElement {
@@ -540,6 +550,7 @@ class Exercise extends React.Component<Props, State> {
 	onSubmissionsSelectValueChange = (id: unknown): void => {
 		const { submissions, } = this.props;
 
+		this.saveCodeDraftToCache();
 		if(id === this.newTry.id) {
 			this.loadNewTry();
 		}
@@ -616,11 +627,6 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	loadSubmissionToState = (submission?: SubmissionInfoRedux): void => {
-		const { valueChanged, } = this.state;
-
-		if(valueChanged) {
-			this.saveCodeDraftToCache();
-		}
 		this.clearAllTextMarkers();
 
 		// Firstly we updating code in code mirror
@@ -906,7 +912,7 @@ class Exercise extends React.Component<Props, State> {
 		const { slideId, exerciseInitialCode, } = this.props;
 
 		this.resetCode();
-		this.saveCodeToCache(slideId, exerciseInitialCode);
+		this.saveCodeDraftToCache(slideId, exerciseInitialCode);
 	};
 
 	resetCode = (): void => {
@@ -916,7 +922,7 @@ class Exercise extends React.Component<Props, State> {
 		this.clearAllTextMarkers();
 		this.setState({
 			value: exerciseInitialCode,
-			valueChanged: false,
+			valueChanged: true,
 			isEditable: true,
 			currentSubmission: null,
 			visibleCheckingResponse: undefined,
@@ -1123,12 +1129,6 @@ class Exercise extends React.Component<Props, State> {
 		}
 	};
 
-	saveCodeToCache = (slideId: string, value: string): void => {
-		const { language, } = this.state;
-
-		saveExerciseCodeToCache(slideId, value, moment().format(), language);
-	};
-
 	loadLatestCode = (slideId: string): void => {
 		const { submissions, } = this.props;
 		const { language, } = this.state;
@@ -1144,7 +1144,7 @@ class Exercise extends React.Component<Props, State> {
 			const codeFromCacheTime = moment(code.time);
 
 			if(lastSubmissionTime.diff(codeFromCacheTime, 'seconds') >= 0) { //if last submission is newer then last saved
-				this.saveCodeToCache(slideId, lastSubmission.code);
+				this.saveCodeDraftToCache(slideId, lastSubmission.code);
 				newValue = lastSubmission.code;
 			}
 
@@ -1157,7 +1157,7 @@ class Exercise extends React.Component<Props, State> {
 
 		if(submissions.length > 0) {
 			const lastSubmission = submissions[this.lastSubmissionIndex];
-			this.saveCodeToCache(slideId, lastSubmission.code);
+			this.saveCodeDraftToCache(slideId, lastSubmission.code);
 			this.setState({
 				value: lastSubmission.code,
 				language: lastSubmission.language,
