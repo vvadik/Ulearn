@@ -82,6 +82,7 @@ interface Props extends RouteComponentProps {
 	loadedCourseIds: Record<string, unknown>;
 	pageInfo: PageInfo;
 	flashcardsStatisticsByUnits?: { [unitId: string]: FlashcardsStatistics },
+	flashcardsLoading: boolean;
 
 	isStudentMode: boolean;
 	navigationOpened: boolean;
@@ -133,17 +134,11 @@ class Course extends Component<Props, State> {
 			courseInfo,
 			progress,
 			user,
-			loadFlashcards,
-			flashcardsStatisticsByUnits
 		} = this.props;
 		const { title } = this.state;
 		const { isAuthenticated } = user;
 
 		this.startSignalRConnection();
-
-		if(!flashcardsStatisticsByUnits) {
-			loadFlashcards(courseId);
-		}
 
 		if(!courseInfo) {
 			loadCourse(courseId);
@@ -199,13 +194,18 @@ class Course extends Component<Props, State> {
 			isHijacked,
 			updateVisitedSlide,
 			loadFlashcards,
+			flashcardsLoading,
+			flashcardsStatisticsByUnits,
 		} = this.props;
 		const { title, currentSlideInfo, } = this.state;
-		const { isAuthenticated } = user;
+		const { isAuthenticated, } = user;
 
 		if(isAuthenticated !== prevProps.user.isAuthenticated && user.id) {
 			loadCourse(courseId);
 			loadUserProgress(courseId, user.id);
+		}
+
+		if(courseInfo !== prevProps.courseInfo && !flashcardsStatisticsByUnits && !flashcardsLoading) {
 			loadFlashcards(courseId);
 		}
 

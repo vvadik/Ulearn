@@ -55,6 +55,7 @@ const mapStateToProps = (state: RootState, { match, location, }: RouteComponentP
 		progress: state.userProgress.progress[courseId],
 		courseLoadingErrorStatus: state.courses.courseLoadingErrorStatus,
 		flashcardsStatisticsByUnits,
+		flashcardsLoading: state.courses.flashcardsLoading,
 
 		navigationOpened: state.navigation.opened,
 		isSlideReady: state.slides.isSlideReady,
