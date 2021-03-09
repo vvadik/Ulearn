@@ -226,7 +226,7 @@ class Exercise extends React.Component<Props, State> {
 			slideProgress,
 			isAuthenticated,
 		} = this.props;
-		const { currentSubmission, submissionLoading, showOutput, selectedReviewId, } = this.state;
+		const { currentSubmission, submissionLoading, selectedReviewId, } = this.state;
 
 		if(submissionError && submissionError !== prevProps.submissionError) {
 			Toast.push("При добавлении или удалении комментария произошла ошибка");
@@ -252,39 +252,42 @@ class Exercise extends React.Component<Props, State> {
 		const hasNewLastCheckingResponse = lastCheckingResponse
 			&& lastCheckingResponse !== prevProps.lastCheckingResponse; // Сравнение по ссылкам
 		if(hasNewLastCheckingResponse && lastCheckingResponse) {
-			const { submission, solutionRunStatus } = lastCheckingResponse;
+			const { submission, solutionRunStatus, } = lastCheckingResponse;
 
-			if(submission) {
+			if(submission && submission.automaticChecking?.result !== AutomaticExerciseCheckingResult.WrongAnswer) {
 				this.loadSubmissionToState(submissions.find(s => s.id === submission.id));
+
+				if(solutionRunStatus === SolutionRunStatus.Success) {
+					const { automaticChecking } = submission;
+
+					if((!automaticChecking || automaticChecking.result === CheckingResult.RightAnswer)
+						&& !slideProgress.isSkipped
+						&& IsFirstRightAnswer(submissions, submission)
+					) {
+						this.openModal({
+							type: ModalType.congrats,
+							score: lastCheckingResponse.score,
+							waitingForManualChecking: lastCheckingResponse.waitingForManualChecking,
+						});
+					}
+				}
 			} else {
 				this.setState({
 					visibleCheckingResponse: lastCheckingResponse,
 				});
 			}
-			if(submissionLoading) {
+
+			if(solutionRunStatus === SolutionRunStatus.CompilationError || submission?.automaticChecking?.result === AutomaticExerciseCheckingResult.WrongAnswer) {
 				this.setState({
-					submissionLoading: false,
-				});
-			}
-			if(!showOutput) {
-				this.setState({
+					isEditable: true,
 					showOutput: true,
 				});
 			}
 
-			if(submission && solutionRunStatus === SolutionRunStatus.Success) {
-				const { automaticChecking } = submission;
-
-				if((!automaticChecking || automaticChecking.result === CheckingResult.RightAnswer)
-					&& !slideProgress.isSkipped
-					&& IsFirstRightAnswer(submissions, submission)
-				) {
-					this.openModal({
-						type: ModalType.congrats,
-						score: lastCheckingResponse.score,
-						waitingForManualChecking: lastCheckingResponse.waitingForManualChecking,
-					});
-				}
+			if(submissionLoading) {
+				this.setState({
+					submissionLoading: false,
+				});
 			}
 		} else if(currentSubmission) {
 			const submission = submissions.find(s => s.id === currentSubmission.id);
@@ -384,7 +387,7 @@ class Exercise extends React.Component<Props, State> {
 		} = this.state;
 
 		const isReview = !isEditable && currentReviews.length > 0;
-		const automaticChecking = currentSubmission?.automaticChecking ?? visibleCheckingResponse?.automaticChecking;
+		const automaticChecking = currentSubmission?.automaticChecking ?? visibleCheckingResponse?.automaticChecking ?? visibleCheckingResponse?.submission?.automaticChecking;
 		const selectedSubmissionIsLast = SubmissionIsLast(submissions, currentSubmission);
 		const selectedSubmissionIsLastSuccess = GetLastSuccessSubmission(submissions) === currentSubmission;
 		const isMaxScore = slideProgress.score === maxScore;
@@ -408,6 +411,7 @@ class Exercise extends React.Component<Props, State> {
 				expectedOutput);
 		const isAcceptedSolutionsWillNotDiscardScore = submissions.filter(
 			s => s.automaticChecking?.result === AutomaticExerciseCheckingResult.RightAnswer).length > 0 || slideProgress.isSkipped;
+		const outputMessage = visibleCheckingResponse?.message || visibleCheckingResponse?.submission?.automaticChecking?.output;
 
 		return (
 			<React.Fragment>
@@ -465,10 +469,10 @@ class Exercise extends React.Component<Props, State> {
 					/> }
 				</Controls>
 				}
-				{ showOutput && HasOutput(visibleCheckingResponse?.message, automaticChecking, expectedOutput) &&
+				{ showOutput && HasOutput(outputMessage, automaticChecking, expectedOutput) &&
 				<ExerciseOutput
 					solutionRunStatus={ visibleCheckingResponse?.solutionRunStatus ?? SolutionRunStatus.Success }
-					message={ visibleCheckingResponse?.message }
+					message={ outputMessage }
 					expectedOutput={ expectedOutput }
 					automaticChecking={ automaticChecking }
 					submissionColor={ submissionColor }
@@ -632,8 +636,7 @@ class Exercise extends React.Component<Props, State> {
 					visibleCheckingResponse: undefined,
 					currentReviews: [],
 				}, () =>
-					this.setCurrentSubmission(submission,
-					)
+					this.setCurrentSubmission(submission)
 			);
 		}
 	};
