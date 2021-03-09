@@ -5,6 +5,7 @@ interface CourseInfo {
 	id: string;
 	title: string;
 	description: string;
+	timestamp?: string;
 	units: UnitInfo[];
 	nextUnitPublishTime: string | null;
 	scoring: ScoringInfo;
