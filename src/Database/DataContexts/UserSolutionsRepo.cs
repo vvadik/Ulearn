@@ -26,13 +26,13 @@ namespace Database.DataContexts
 		private static ILog log => LogProvider.Get().ForContext(typeof(UserSolutionsRepo));
 		private readonly ULearnDb db;
 		private readonly TextsRepo textsRepo;
-		private readonly CourseManager courseManager;
+		private readonly WebCourseManager courseManager;
 
 		private static volatile ConcurrentDictionary<int, DateTime> unhandledSubmissions = new ConcurrentDictionary<int, DateTime>();
 		private static volatile ConcurrentDictionary<int, DateTime> handledSubmissions = new ConcurrentDictionary<int, DateTime>();
 		private static readonly TimeSpan handleTimeout = TimeSpan.FromMinutes(3);
 
-		public UserSolutionsRepo(ULearnDb db, CourseManager courseManager)
+		public UserSolutionsRepo(ULearnDb db, WebCourseManager courseManager)
 		{
 			this.db = db;
 			this.courseManager = courseManager;

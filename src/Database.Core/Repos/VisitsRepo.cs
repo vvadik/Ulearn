@@ -22,7 +22,7 @@ namespace Database.Repos
 			this.slideCheckingsRepo = slideCheckingsRepo;
 		}
 
-		public async Task AddVisit(string courseId, Guid slideId, string userId, string ipAddress)
+		public async Task<Visit> AddVisit(string courseId, Guid slideId, string userId, string ipAddress)
 		{
 			await SetLastVisit(courseId, slideId, userId);
 			var visit = await FindVisit(courseId, slideId, userId);
@@ -36,11 +36,15 @@ namespace Database.Repos
 					Timestamp = DateTime.Now,
 					IpAddress = ipAddress,
 				});
+				await db.SaveChangesAsync();
+				return await FindVisit(courseId, slideId, userId);
 			}
-			else if (visit.IpAddress != ipAddress)
+			if (visit.IpAddress != ipAddress)
+			{
 				visit.IpAddress = ipAddress;
-
+			}
 			await db.SaveChangesAsync();
+			return visit;
 		}
 
 		private async Task SetLastVisit(string courseId, Guid slideId, string userId)

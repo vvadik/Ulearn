@@ -40,7 +40,7 @@ namespace Ulearn.Core
 			var filesToAdd = Directory.GetFiles(sourceDirectoryName, "*", SearchOption.AllDirectories);
 			var entryNames = GetEntryNames(filesToAdd, sourceDirectoryName, includeBaseDirectory);
 			var zipFileStream = StaticRecyclableMemoryStreamManager.Manager.GetStream();
-			using (var archive = new ZipArchive(zipFileStream, ZipArchiveMode.Create))
+			using (var archive = new ZipArchive(zipFileStream, ZipArchiveMode.Create, leaveOpen: true))
 			{
 				for (var i = 0; i < filesToAdd.Length; i++)
 				{
@@ -48,11 +48,10 @@ namespace Ulearn.Core
 					{
 						continue;
 					}
-
 					archive.CreateEntryFromFile(filesToAdd[i], entryNames[i], compressionLevel);
 				}
 			}
-
+			zipFileStream.Position = 0;
 			return zipFileStream;
 		}
 

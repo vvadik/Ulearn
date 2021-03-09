@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.Build.Evaluation;
-using Microsoft.Build.Utilities;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
@@ -43,9 +42,10 @@ namespace Ulearn.Core
 		{
 			changingAction?.Invoke(proj);
 			var memoryStream = StaticRecyclableMemoryStreamManager.Manager.GetStream();
-			using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8))
+			using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8, 1024, true)) // Без leaveOpen закрытие StreamWriter закроет memoryStream
 			{
 				proj.Save(streamWriter);
+				memoryStream.Position = 0;
 				return memoryStream;
 			}
 		}

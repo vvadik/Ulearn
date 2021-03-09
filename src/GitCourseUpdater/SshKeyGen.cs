@@ -58,6 +58,7 @@ namespace GitCourseUpdater
 				ms.Write(new byte[] { 0 }, 0, 1); //Add a 0 to Emulate PuttyGen
 				ms.Write(n, 0, n.Length);
 				ms.Flush();
+				ms.Position = 0;
 				buffer64 = Convert.ToBase64String(ms.ToArray());
 			}
 

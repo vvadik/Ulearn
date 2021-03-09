@@ -9,7 +9,7 @@ namespace Database.Repos
 {
 	public interface IVisitsRepo : ILastVisitsRepo
 	{
-		Task AddVisit(string courseId, Guid slideId, string userId, string ipAddress);
+		Task<Visit> AddVisit(string courseId, Guid slideId, string userId, string ipAddress);
 		Task<Visit> FindVisit(string courseId, Guid slideId, string userId);
 		Task<HashSet<Guid>> GetIdOfVisitedSlides(string courseId, string userId);
 		Task UpdateScoreForVisit(string courseId, Slide slide, string userId);

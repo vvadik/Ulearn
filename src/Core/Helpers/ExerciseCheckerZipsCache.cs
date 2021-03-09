@@ -80,8 +80,8 @@ namespace Ulearn.Core.Helpers
 					ms = zipBuilder.GetZipForChecker();
 				}
 			}
-
-			return AddUserCodeToZip(ms, userCodeFilePath, userCodeFileContent, courseId, slide);
+			using (ms)
+				return AddUserCodeToZip(ms, userCodeFilePath, userCodeFileContent, courseId, slide);
 		}
 
 		private static void SaveFileOnDisk(FileInfo zipFile, MemoryStream ms)
@@ -127,6 +127,7 @@ namespace Ulearn.Core.Helpers
 				else
 					zip.AddEntry(userCodeFilePath, userCodeFileContent);
 				zip.Save(resultStream);
+				resultStream.Position = 0;
 			}
 			log.Info($"Добавил код студента в zip-архив с упражнением: курс {courseId}, слайд «{slide?.Title}» ({slide?.Id}) elapsed {sw.ElapsedMilliseconds} ms");
 			return resultStream;
