@@ -21,8 +21,7 @@ const mapStateToProps = (state: RootState, { match, location, }: RouteComponentP
 
 	const courseInfo = state.courses.fullCoursesInfo[courseId];
 	const flashcardsByUnit = state.courses.flashcardsInfoByCourseByUnits[courseId];
-	const flashcardsStatisticsByUnits: { [unitId: string]: FlashcardsStatistics } | undefined = flashcardsByUnit && Object.keys(
-		flashcardsByUnit).length > 0 ? {} : undefined;
+	const flashcardsStatisticsByUnits: { [unitId: string]: FlashcardsStatistics } | undefined = flashcardsByUnit ? {} : undefined;
 	if(flashcardsStatisticsByUnits) {
 		for (const unitId in flashcardsByUnit) {
 			flashcardsStatisticsByUnits[unitId] = {

@@ -21,7 +21,7 @@ export interface CourseSlideInfo {
 export function getCourseStatistics(
 	units: UnitsInfo | null,
 	progress: { [p: string]: SlideUserProgress },
-scoringGroups: ScoringGroup[],
+	scoringGroups: ScoringGroup[],
 	flashcardsStatisticsByUnits: { [unitId: string]: FlashcardsStatistics }
 ): CourseStatistics {
 	const courseStatistics: CourseStatistics = {
@@ -58,7 +58,10 @@ export const getUnitStatistics = (
 	const visitsGroup = scoringGroups.find(gr => gr.id === ScoringGroupsIds.visits);
 	let unitScore = 0, unitMaxScore = 0, unitDoneSlidesCount = 0, unitInProgressSlidesCount = 0;
 	const statusesBySlides: { [slideId: string]: SlideProgressStatus } = {};
-	let mostPreferablySlideToOpen: null | StartupSlideInfo = null;
+	let mostPreferablySlideToOpen: StartupSlideInfo = {
+		id: unit.slides[0].id,
+		status: SlideProgressStatus.notVisited,
+	};
 
 	for (const { maxScore, id, scoringGroup, type, quizMaxTriesCount, } of unit.slides) {
 		statusesBySlides[id] = SlideProgressStatus.notVisited;
@@ -92,7 +95,7 @@ export const getUnitStatistics = (
 					break;
 				}
 				case SlideType.Exercise: {
-					statusesBySlides[id] = score === maxScore && !waitingForManualChecking && !prohibitFurtherManualChecking || isSkipped
+					statusesBySlides[id] = score === maxScore || !waitingForManualChecking && !prohibitFurtherManualChecking || isSkipped
 						? SlideProgressStatus.done
 						: SlideProgressStatus.canBeImproved;
 					break;
@@ -100,9 +103,8 @@ export const getUnitStatistics = (
 			}
 
 			const timestampAsDate = new Date(timestamp);
-			if(!mostPreferablySlideToOpen
-				|| ((mostPreferablySlideToOpen.timestamp < timestampAsDate || statusesBySlides[id] === SlideProgressStatus.canBeImproved)
-					&& mostPreferablySlideToOpen.status !== SlideProgressStatus.canBeImproved)) {
+			if((mostPreferablySlideToOpen.timestamp && mostPreferablySlideToOpen.timestamp < timestampAsDate || statusesBySlides[id] === SlideProgressStatus.canBeImproved)
+				&& mostPreferablySlideToOpen.status !== SlideProgressStatus.canBeImproved) {
 				mostPreferablySlideToOpen = {
 					id,
 					timestamp: new Date(timestamp),
@@ -133,7 +135,6 @@ export const getUnitStatistics = (
 			}
 		}
 	}
-
 	return {
 		doneSlidesCount: unitDoneSlidesCount,
 		inProgressSlidesCount: unitInProgressSlidesCount,

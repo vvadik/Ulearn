@@ -57,7 +57,7 @@ function NavigationHeader({
 				{ renderCourseProgress() }
 			</>
 			{
-				unitTitle && unitProgress && renderUnitSection(unitProgress)
+				unitTitle && renderUnitSection(unitProgress)
 			}
 		</header>
 	);
@@ -111,13 +111,13 @@ function NavigationHeader({
 			{ [styles.insideModule]: !isInsideCourse }) }>Ведомость { groupsLinks }</p>;
 	}
 
-	function renderUnitSection(unitProgress: UnitProgress) {
+	function renderUnitSection(unitProgress?: UnitProgress) {
 		return (
 			<div className={ styles.unitRoot }>
 				<h2 className={ styles.unitTitle } title={ unitTitle }>
 					{ unitTitle }
 				</h2>
-				{ renderUnitProgress(unitProgress) }
+				{ unitProgress && renderUnitProgress(unitProgress) }
 			</div>
 		);
 	}

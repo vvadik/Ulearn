@@ -299,7 +299,6 @@ class Navigation extends Component<Props, State> {
 		const { overlayStyle, sideMenuStyle, currentScrollState, } = this.state;
 		const {
 			courseTitle,
-			description,
 			groupsAsStudent,
 			courseProgress,
 			unitTitle,

@@ -37,7 +37,7 @@ export interface UnitProgress extends Progress {
 
 export interface StartupSlideInfo {
 	id: string;
-	timestamp: Date;
+	timestamp?: Date;
 	status: SlideProgressStatus;
 }
 
@@ -68,8 +68,8 @@ export interface FlashcardsStatistics {
 
 export interface CourseStatistics {
 	courseProgress: Progress;
-	byUnits: { [unitId: string]: UnitProgressWithLastVisit };
+	byUnits: { [unitId: string]: UnitProgressWithLastVisit | undefined };
 
 	flashcardsStatistics: FlashcardsStatistics;
-	flashcardsStatisticsByUnits: { [unitId: string]: FlashcardsStatistics };
+	flashcardsStatisticsByUnits: { [unitId: string]: FlashcardsStatistics | undefined };
 }

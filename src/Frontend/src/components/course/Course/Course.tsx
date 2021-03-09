@@ -341,7 +341,6 @@ class Course extends Component<Props, State> {
 		if(courseLoadingErrorStatus) {
 			return <Error404/>;
 		}
-
 		if(!courseInfo || !flashcardsStatisticsByUnits) {
 			return <CourseLoader/>;
 		}
@@ -531,7 +530,7 @@ class Course extends Component<Props, State> {
 			navigationOpened,
 			courseTitle: courseInfo.title,
 		};
-		const unitProps = openedUnit && byUnits[openedUnit.id] &&
+		const unitProps = openedUnit &&
 			this.createUnitSettings(byUnits[openedUnit.id], openedUnit, flashcardsStatisticsByUnits[openedUnit.id])
 			|| { onCourseClick: this.returnInUnitsMenu };
 		const courseProps = this.createCourseSettings(byUnits, courseProgress, flashcardsStatistics);
@@ -540,7 +539,7 @@ class Course extends Component<Props, State> {
 	}
 
 	createCourseSettings(
-		scoresByUnits: { [p: string]: UnitProgress },
+		scoresByUnits: { [p: string]: UnitProgress | undefined },
 		courseProgress: Progress,
 		flashcardsStatistics: FlashcardsStatistics,
 	): CourseNavigationProps {
@@ -570,9 +569,9 @@ class Course extends Component<Props, State> {
 	}
 
 	createUnitSettings(
-		unitProgress: UnitProgress,
+		unitProgress: UnitProgress | undefined,
 		openUnit: UnitInfo,
-		unitFlashcardsStatistic: FlashcardsStatistics,
+		unitFlashcardsStatistic: FlashcardsStatistics | undefined,
 	): UnitNavigationProps {
 		const { courseInfo, slideId, courseId, progress, } = this.props;
 
@@ -583,7 +582,7 @@ class Course extends Component<Props, State> {
 				openUnit.slides,
 				progress,
 				courseId,
-				unitProgress.statusesBySlides,
+				unitProgress && unitProgress.statusesBySlides,
 				slideId,
 			),
 			nextUnit: findNextUnit(openUnit, courseInfo),
@@ -634,7 +633,7 @@ class Course extends Component<Props, State> {
 			}
 
 			const unitStatistics = courseStatistics.byUnits[newOpenedUnit.id];
-			if(unitStatistics.startupSlide) {
+			if(unitStatistics && unitStatistics.startupSlide) {
 				history.push(constructPathToSlide(courseId, unitStatistics.startupSlide.id));
 			} else {
 				history.push(constructPathToSlide(courseId, newOpenedUnit.slides[0].id));
