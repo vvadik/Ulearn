@@ -13,7 +13,7 @@ interface Props {
 
 	userId?: string | null;
 
-	children: React.ReactNode;
+	children?: React.ReactNode;
 
 	deleteGroup: (group: GroupInfoType, groupType: 'archiveGroups' | 'groups') => void;
 	toggleArchived: (group: GroupInfoType, isNotArchived: boolean) => void;

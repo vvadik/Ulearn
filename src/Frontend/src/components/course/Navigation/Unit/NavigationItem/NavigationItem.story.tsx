@@ -18,7 +18,6 @@ const _NavigationItem = (): React.ReactNode => (
 			id={ '1' }
 			maxScore={ 1 }
 			type={ SlideType.Lesson }
-			description={ null }
 			visited={ false }
 			metro={ metro }
 			title="Пункт меню со счетом"
@@ -33,7 +32,6 @@ const _NavigationItem = (): React.ReactNode => (
 			metro={ metro }
 			title="Пункт меню со счетом и описанием"
 			url={ "" }
-			description="Задание"
 			score={ 0 }
 		/>
 		<NavigationItem
@@ -44,7 +42,6 @@ const _NavigationItem = (): React.ReactNode => (
 			score={ 0 }
 			visited={ false }
 			type={ SlideType.Lesson }
-			description={ null }
 			title="Пункт меню с метро"
 			url={ "" }
 			metro={ {
@@ -60,7 +57,6 @@ const _NavigationItem = (): React.ReactNode => (
 			isActive={ false }
 			id={ '1' }
 			maxScore={ 1 }
-			description={ null }
 			visited={ false }
 			metro={ metro }
 			score={ 0 }
@@ -73,7 +69,6 @@ const _NavigationItem = (): React.ReactNode => (
 			isActive={ false }
 			id={ '1' }
 			maxScore={ 1 }
-			description={ null }
 			visited={ false }
 			metro={ metro }
 			score={ 0 }
@@ -84,7 +79,6 @@ const _NavigationItem = (): React.ReactNode => (
 			url={ "" }
 			score={ 3 }
 			maxScore={ 5 }
-			description="Ждет код-ревью • 3 попытки осталось"
 			isActive
 			type={ SlideType.Quiz }
 			onClick={ mock }
@@ -98,7 +92,6 @@ const _NavigationItem = (): React.ReactNode => (
 			id={ '1' }
 			score={ 3 }
 			maxScore={ 5 }
-			description={ null }
 			isActive={ false }
 			onClick={ mock }
 			visited={ false }
@@ -112,7 +105,6 @@ const _NavigationItem = (): React.ReactNode => (
 			id={ '1' }
 			score={ 3 }
 			maxScore={ 5 }
-			description={ null }
 			isActive={ false }
 			onClick={ mock }
 			metro={ {
@@ -133,7 +125,6 @@ const _NavigationItem = (): React.ReactNode => (
 			id={ '1' }
 			score={ 3 }
 			maxScore={ 5 }
-			description={ null }
 			isActive={ false }
 			onClick={ mock }
 		/>

@@ -1,14 +1,22 @@
 import React from "react";
 import Navigation from "./Navigation";
 import { SlideType } from "src/models/slide";
-import { MenuItem } from "./types";
+import { MenuItem, } from "./types";
 
 const _Navigation = (): React.ReactNode => (
 	<Navigation
+		courseId={'basic'}
 		navigationOpened
 		courseTitle="Основы программирования"
 		unitTitle="Первое знакомство с C#"
-		unitProgress={ { "current": 191, "max": 3111 } }
+		unitProgress={ {
+			doneSlidesCount: 50,
+			inProgressSlidesCount: 25,
+			slidesCount: 100,
+			statusesBySlides: {},
+			current: 10,
+			max: 20,
+		} }
 		unitItems={ getModuleNav() }
 		nextUnit={ null }
 		onCourseClick={ () => ({}) }

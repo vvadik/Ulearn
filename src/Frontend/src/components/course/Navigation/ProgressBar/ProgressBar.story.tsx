@@ -17,7 +17,7 @@ const ProgressBars = () => (
 		<b>small</b>
 		<ProgressBar value={ 0.45 } small/>
 		<b>blue</b>
-		<ProgressBar value={ 0.45 } color="blue"/>
+		<ProgressBar value={ 0.45 }/>
 	</Gapped>
 );
 

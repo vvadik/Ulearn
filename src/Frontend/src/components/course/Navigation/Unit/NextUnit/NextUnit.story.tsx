@@ -1,5 +1,5 @@
 import React from "react";
-import NextUnit from "./NextUnit.js";
+import NextUnit from "./NextUnit";
 import { SlideType } from "src/models/slide";
 
 

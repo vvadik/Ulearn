@@ -1,5 +1,5 @@
 import React from "react";
-import NavigationContent from "./NavigationContent.js";
+import NavigationContent from "./NavigationContent";
 import { SlideType } from "src/models/slide";
 import { MenuItem } from "../../types";
 
