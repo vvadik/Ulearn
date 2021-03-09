@@ -21,7 +21,7 @@ export default function getSlideInfo(location: { pathname: string, search: strin
 
 	const params = queryString.parse(search);
 	const slideIdInQuery = params.slideId;
-	const slideSlugOrAction = isInsideCourse ? pathname.split('/').slice(-1)[0] : undefined;
+	const slideSlugOrAction = isInsideCourse ? pathname.split('/').slice(-1)[0].toLowerCase() : undefined;
 
 	let slideId;
 	let isLti = false;
