@@ -74,7 +74,7 @@ class ExerciseOutput extends React.Component<OutputTypeProps> {
 				<span className={ styles.outputHeader }>
 					{ <React.Fragment>
 						{ showIcon
-							? <Warning/>
+							? <Warning className={ styles.outputIcon }/>
 							: null }
 						{ header }
 					</React.Fragment>
