@@ -38,7 +38,7 @@ namespace Ulearn.Web.Api.Models.Responses.Users
 		[DataMember]
 		public bool Visited { get; set; }
 		[DataMember]
-		public DateTime Timestamp { get; set; }
+		public DateTime? Timestamp { get; set; }
 		[DataMember]
 		public bool IsSkipped { get; set; }
 	}

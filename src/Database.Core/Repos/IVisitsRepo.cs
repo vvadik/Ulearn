@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
@@ -8,7 +7,7 @@ using Ulearn.Core.Courses.Slides;
 
 namespace Database.Repos
 {
-	public interface IVisitsRepo
+	public interface IVisitsRepo : ILastVisitsRepo
 	{
 		Task AddVisit(string courseId, Guid slideId, string userId, string ipAddress);
 		Task<Visit> FindVisit(string courseId, Guid slideId, string userId);
@@ -29,7 +28,6 @@ namespace Database.Repos
 		Task<bool> IsPassed(string courseId, Guid slideId, string userId);
 		Task<bool> IsSkippedOrPassed(string courseId, Guid slideId, string userId);
 		Task AddVisits(IEnumerable<Visit> visits);
-		Task<Dictionary<Guid, DateTime>> GetLastVisitsTimestampsForSlides(string courseId, string userId, IEnumerable<Guid> slidesIds = null);
 		IQueryable<Visit> GetVisitsInPeriod(string courseId, IEnumerable<Guid> slidesIds, DateTime periodStart, DateTime periodFinish, IEnumerable<string> usersIds = null);
 		IQueryable<Visit> GetVisitsInPeriod(VisitsFilterOptions options);
 		Task<Dictionary<Guid, List<Visit>>> GetVisitsInPeriodForEachSlide(VisitsFilterOptions options);
@@ -37,6 +35,13 @@ namespace Database.Repos
 		Task<HashSet<string>> GetUserCourses(string userId);
 		Task<List<string>> GetCourseUsers(string courseId);
 		Task<List<RatingEntry>> GetCourseRating(string courseId, int minScore, List<Guid> requiredSlides);
+	}
+
+	public interface ILastVisitsRepo
+	{
 		Task<Dictionary<string, Visit>> FindLastVisit(List<string> userIds);
+		Task<Dictionary<Guid, LastVisit>> GetLastVisitsInCourse(string courseId, string userId);
+
+		Task<Dictionary<string, DateTime>> GetLastVisitsForCourses(HashSet<string> courseIds, string userId);
 	}
 }

@@ -41,7 +41,7 @@ namespace Database.DataContexts
 			}
 			else if (visit.IpAddress != ipAddress)
 				visit.IpAddress = ipAddress;
-			
+
 			await db.SaveChangesAsync();
 		}
 
@@ -62,7 +62,6 @@ namespace Database.DataContexts
 			{
 				lastVisit.Timestamp = DateTime.Now;
 			}
-			await db.SaveChangesAsync();
 		}
 
 		public Visit FindVisit(string courseId, Guid slideId, string userId)
@@ -70,21 +69,15 @@ namespace Database.DataContexts
 			return db.Visits.FirstOrDefault(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId);
 		}
 
-		public LastVisit FindLastVisit(string courseId, string userId, Guid? slideId = null)
+		public  LastVisit FindLastVisit(string courseId, string userId, Guid? slideId = null)
 		{
 			if (slideId == null)
 				return db.LastVisits
+					.Where(v => v.CourseId == courseId && v.UserId == userId)	
 					.OrderBy(v => v.Timestamp)
-					.FirstOrDefault(v => v.CourseId == courseId && v.UserId == userId);
+					.FirstOrDefault();
 			return db.LastVisits
 				.FirstOrDefault(v => v.CourseId == courseId && v.UserId == userId && slideId == v.SlideId);
-		}
-		
-		public Dictionary<Guid,LastVisit> GetLastVisits(string courseId, string userId)
-		{
-			return db.LastVisits
-				.Where(v => v.CourseId == courseId && v.UserId == userId)
-				.ToDictionary(v => v.SlideId);
 		}
 
 		public HashSet<Guid> GetIdOfVisitedSlides(string courseId, string userId)
@@ -119,6 +112,7 @@ namespace Database.DataContexts
 				await AddVisit(courseId, slideId, userId, null);
 				visit = FindVisit(courseId, slideId, userId);
 			}
+
 			action(visit);
 			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
