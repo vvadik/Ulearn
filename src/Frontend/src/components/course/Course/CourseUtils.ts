@@ -95,7 +95,7 @@ export const getUnitStatistics = (
 					break;
 				}
 				case SlideType.Exercise: {
-					statusesBySlides[id] = score === maxScore || !waitingForManualChecking && !prohibitFurtherManualChecking || isSkipped
+					statusesBySlides[id] = score === maxScore || !waitingForManualChecking && score > 0 || prohibitFurtherManualChecking || isSkipped
 						? SlideProgressStatus.done
 						: SlideProgressStatus.canBeImproved;
 					break;
