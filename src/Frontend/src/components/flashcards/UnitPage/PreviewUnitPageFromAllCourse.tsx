@@ -21,8 +21,8 @@ import { loadFlashcards, } from "src/actions/flashcards";
 
 import getFlashcardsWithTheorySlides from "src/pages/course/getFlashcardsWithTheorySlides";
 
-import override from './courseToolUnitPage.less';
 import styles from './../Flashcards/flashcards.less';
+import override from './courseToolUnitPage.less';
 
 interface Props {
 	flashcards: Flashcard[],
