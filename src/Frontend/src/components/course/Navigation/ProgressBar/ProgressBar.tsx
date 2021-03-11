@@ -5,12 +5,11 @@ import styles from "./ProgressBar.less";
 interface Props {
 	value: number;
 	small?: boolean;
-	active?: boolean;
 }
 
-function ProgressBar({ value, small, active, }: Props): React.ReactElement {
+function ProgressBar({ value, small, }: Props): React.ReactElement {
 	return (
-		<div className={ classnames(styles.wrapper, { [styles.small]: small }, { [styles.active]: active }) }>
+		<div className={ classnames(styles.wrapper, { [styles.small]: small }) }>
 			<div
 				className={ styles.value }
 				style={ { width: `${ value * 100 }%` } }/>
