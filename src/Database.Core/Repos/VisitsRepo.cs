@@ -24,7 +24,6 @@ namespace Database.Repos
 
 		public async Task<Visit> AddVisit(string courseId, Guid slideId, string userId, string ipAddress)
 		{
-			courseId = courseId.ToLower();
 			await SetLastVisit(courseId, slideId, userId);
 			var visit = await FindVisit(courseId, slideId, userId);
 			if (visit == null)
@@ -43,14 +42,14 @@ namespace Database.Repos
 			if (visit.IpAddress != ipAddress)
 			{
 				visit.IpAddress = ipAddress;
-				await db.SaveChangesAsync();
 			}
+			await db.SaveChangesAsync();
 			return visit;
 		}
 
 		private async Task SetLastVisit(string courseId, Guid slideId, string userId)
 		{
-			var lastVisit = await FindLastVisit(courseId, userId);
+			var lastVisit = await FindLastVisit(courseId, userId, slideId);
 			if (lastVisit == null)
 			{
 				db.LastVisits.Add(new LastVisit
@@ -63,10 +62,8 @@ namespace Database.Repos
 			}
 			else
 			{
-				lastVisit.SlideId = slideId;
 				lastVisit.Timestamp = DateTime.Now;
 			}
-			await db.SaveChangesAsync();
 		}
 
 		public async Task<Visit> FindVisit(string courseId, Guid slideId, string userId)
@@ -74,9 +71,35 @@ namespace Database.Repos
 			return await db.Visits.FirstOrDefaultAsync(v => v.CourseId == courseId && v.SlideId == slideId && v.UserId == userId);
 		}
 
-		public async Task<LastVisit> FindLastVisit(string courseId, string userId)
+		public async Task<LastVisit> FindLastVisit(string courseId, string userId, Guid? slideId = null)
 		{
-			return await db.LastVisits.FirstOrDefaultAsync(v => v.CourseId == courseId && v.UserId == userId);
+			if (slideId == null)
+				return await db.LastVisits
+					.OrderBy(v => v.Timestamp)
+					.FirstOrDefaultAsync(v => v.CourseId == courseId && v.UserId == userId);
+			return await db.LastVisits
+				.FirstOrDefaultAsync(v => v.CourseId == courseId && v.UserId == userId && slideId == v.SlideId);
+		}
+
+		public async Task<Dictionary<Guid, LastVisit>> GetLastVisitsInCourse(string courseId, string userId)
+		{
+			return await db.LastVisits
+				.Where(v => v.CourseId == courseId && v.UserId == userId)
+				.ToDictionaryAsync(v => v.SlideId);
+		}
+
+		public async Task<Dictionary<string, DateTime>> GetLastVisitsForCourses(HashSet<string> courseIds, string userId)
+		{
+			var visits = await db.LastVisits
+				.Where(v => courseIds.Contains(v.CourseId) && v.UserId == userId)
+				.Select(v => v.CourseId)
+				.Distinct()
+				.Select(i => db.LastVisits
+					.Where(v => v.CourseId == i)
+					.OrderByDescending(v => v.Timestamp)
+					.FirstOrDefault())
+				.ToListAsync();
+			return visits.ToDictionary(v => v!.CourseId, v => v!.Timestamp, StringComparer.OrdinalIgnoreCase);
 		}
 
 		public async Task<Dictionary<string, Visit>> FindLastVisit(List<string> userIds)
@@ -109,7 +132,7 @@ namespace Database.Repos
 			if (await IsSkipped(courseId, slide.Id, userId))
 				newScore = 0;
 			log.Info($"Обновляю количество баллов пользователя {userId} за слайд {slide.Id} в курсе \"{courseId}\". " +
-				$"Новое количество баллов: {newScore}, слайд пройден: {isPassed}");
+					$"Новое количество баллов: {newScore}, слайд пройден: {isPassed}");
 			await UpdateAttempts(courseId, slide.Id, userId, visit =>
 			{
 				visit.Score = newScore;
@@ -125,6 +148,7 @@ namespace Database.Repos
 				await AddVisit(courseId, slideId, userId, null);
 				visit = await FindVisit(courseId, slideId, userId);
 			}
+
 			action(visit);
 			await db.SaveChangesAsync();
 		}
@@ -144,8 +168,8 @@ namespace Database.Repos
 			if (slidesIds != null)
 				visits = visits.Where(v => slidesIds.Contains(v.SlideId));
 			return (await visits
-				.Select(v => new {v.SlideId, v.Score})
-				.ToListAsync())
+					.Select(v => new { v.SlideId, v.Score })
+					.ToListAsync())
 				.GroupBy(v => v.SlideId, (s, v) => new { Key = s, Value = v.First().Score })
 				.ToDictionary(g => g.Key, g => g.Value);
 		}
@@ -156,11 +180,11 @@ namespace Database.Repos
 			if (slidesIds != null)
 				visits = visits.Where(v => slidesIds.Contains(v.SlideId));
 			return (await visits
-				.Select(v => new {v.UserId, v.SlideId, v.Score})
-				.ToListAsync())
-				.GroupBy(v => new {v.UserId, v.SlideId}, (s, v) => new { s.UserId, s.SlideId, Value = v.First().Score })
+					.Select(v => new { v.UserId, v.SlideId, v.Score })
+					.ToListAsync())
+				.GroupBy(v => new { v.UserId, v.SlideId }, (s, v) => new { s.UserId, s.SlideId, Value = v.First().Score })
 				.GroupBy(g => g.UserId)
-				.ToDictionary(g => g.Key, g => g.ToDictionary(k => k.SlideId, k=> k.Value));
+				.ToDictionary(g => g.Key, g => g.ToDictionary(k => k.SlideId, k => k.Value));
 		}
 
 		public async Task<Dictionary<string, HashSet<Guid>>> GetSkippedSlides(string courseId, IEnumerable<string> userIds, IEnumerable<Guid> slidesIds = null)
@@ -200,9 +224,9 @@ namespace Database.Repos
 		public async Task<Dictionary<string, int>> GetScore(string courseId, Guid slideId, List<string> userIds)
 		{
 			var scores = (await db.Visits
-				.Where(v => v.CourseId == courseId && v.SlideId == slideId && userIds.Contains(v.UserId))
-				.Select(v => new { v.UserId, v.Score })
-				.ToListAsync())
+					.Where(v => v.CourseId == courseId && v.SlideId == slideId && userIds.Contains(v.UserId))
+					.Select(v => new { v.UserId, v.Score })
+					.ToListAsync())
 				.GroupBy(v => v.UserId)
 				.ToDictionary(v => v.Key, v => v.First().Score);
 			foreach (var userId in userIds)
@@ -259,6 +283,7 @@ namespace Database.Repos
 					continue;
 				db.Visits.Add(visit);
 			}
+
 			await db.SaveChangesAsync();
 		}
 
@@ -286,13 +311,14 @@ namespace Database.Repos
 				else
 					filteredVisits = filteredVisits.Where(v => options.UserIds.Contains(v.UserId));
 			}
+
 			return filteredVisits;
 		}
 
 		public async Task<Dictionary<Guid, List<Visit>>> GetVisitsInPeriodForEachSlide(VisitsFilterOptions options)
 		{
 			return (await GetVisitsInPeriod(options)
-				.ToListAsync())
+					.ToListAsync())
 				.GroupBy(v => v.SlideId)
 				.ToDictionary(g => g.Key, g => g.ToList());
 		}
@@ -340,9 +366,9 @@ namespace Database.Repos
 			if (requiredSlides.Count > 0)
 			{
 				usersWithAllRequiredSlides = (await db.Visits
-					.Where(v => v.CourseId == courseId && requiredSlides.Contains(v.SlideId) && userIds.Contains(v.UserId))
-					.GroupBy(v => v.UserId)
-					.ToListAsync())
+						.Where(v => v.CourseId == courseId && requiredSlides.Contains(v.SlideId) && userIds.Contains(v.UserId))
+						.GroupBy(v => v.UserId)
+						.ToListAsync())
 					.Where(g => g.DistinctBy(v => v.SlideId).Count() >= requiredSlides.Count)
 					.Select(g => g.Key)
 					.ToList();

@@ -76,6 +76,7 @@ namespace Ulearn.Web.Api.Controllers
 			var visibleSlides = course.GetSlides(isInstructor).Select(s => s.Id).ToHashSet();
 
 			var scores = await visitsRepo.GetScoresForSlides(course.Id, userIds);
+			var visitsTimestamps = await visitsRepo.GetLastVisitsInCourse(course.Id, UserId);
 			var additionalScores = await GetAdditionalScores(course.Id, userIds).ConfigureAwait(false);
 			var attempts = await userQuizzesRepo.GetUsedAttemptsCountAsync(course.Id, userIds).ConfigureAwait(false);
 			var waitingQuizSlides = await userQuizzesRepo.GetSlideIdsWaitingForManualCheckAsync(course.Id, userIds).ConfigureAwait(false);
@@ -91,7 +92,8 @@ namespace Ulearn.Web.Api.Controllers
 						.Where(kvp => visibleSlides.Contains(kvp.Key))
 						.ToDictionary(kvp => kvp.Key, kvp => new UserProgressSlideResult
 					{
-						Visited = true,
+						Visited = true, 
+						Timestamp = visitsTimestamps.TryGetValue(kvp.Key, out var visit) ? visit.Timestamp : null,
 						Score = kvp.Value,
 						IsSkipped = skippedSlides.GetValueOrDefault(userId)?.Contains(kvp.Key) ?? false,
 						UsedAttempts = attempts.GetValueOrDefault(userId)?.GetValueOrDefault(kvp.Key) ?? 0,
