@@ -74,7 +74,7 @@ namespace Database.DataContexts
 			if (slideId == null)
 				return db.LastVisits
 					.Where(v => v.CourseId == courseId && v.UserId == userId)	
-					.OrderBy(v => v.Timestamp)
+					.OrderByDescending(v => v.Timestamp)
 					.FirstOrDefault();
 			return db.LastVisits
 				.FirstOrDefault(v => v.CourseId == courseId && v.UserId == userId && slideId == v.SlideId);

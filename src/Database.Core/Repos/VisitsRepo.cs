@@ -75,7 +75,7 @@ namespace Database.Repos
 		{
 			if (slideId == null)
 				return await db.LastVisits
-					.OrderBy(v => v.Timestamp)
+					.OrderByDescending(v => v.Timestamp)
 					.FirstOrDefaultAsync(v => v.CourseId == courseId && v.UserId == userId);
 			return await db.LastVisits
 				.FirstOrDefaultAsync(v => v.CourseId == courseId && v.UserId == userId && slideId == v.SlideId);
