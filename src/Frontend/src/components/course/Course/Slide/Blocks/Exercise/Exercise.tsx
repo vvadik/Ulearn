@@ -260,12 +260,12 @@ class Exercise extends React.Component<Props, State> {
 		if(hasNewLastCheckingResponse && lastCheckingResponse) {
 			const { submission, solutionRunStatus, } = lastCheckingResponse;
 
-			if(submission && submission.automaticChecking?.result !== AutomaticExerciseCheckingResult.WrongAnswer) {
+			if(submission && submission.automaticChecking?.result !== AutomaticExerciseCheckingResult.WrongAnswer
+				&& submission.automaticChecking?.result !== AutomaticExerciseCheckingResult.CompilationError) {
 				this.loadSubmissionToState(submissions.find(s => s.id === submission.id));
 
 				if(solutionRunStatus === SolutionRunStatus.Success) {
 					const { automaticChecking } = submission;
-
 					if((!automaticChecking || automaticChecking.result === CheckingResult.RightAnswer)
 						&& !slideProgress.isSkipped
 						&& IsFirstRightAnswer(submissions, submission)
@@ -283,7 +283,9 @@ class Exercise extends React.Component<Props, State> {
 				});
 			}
 
-			if(solutionRunStatus === SolutionRunStatus.CompilationError || submission?.automaticChecking?.result === AutomaticExerciseCheckingResult.WrongAnswer) {
+			if(solutionRunStatus === SolutionRunStatus.CompilationError
+				|| submission?.automaticChecking?.result === AutomaticExerciseCheckingResult.WrongAnswer
+				|| submission?.automaticChecking?.result === AutomaticExerciseCheckingResult.CompilationError) {
 				this.setState({
 					isEditable: true,
 					showOutput: true,
@@ -987,6 +989,7 @@ class Exercise extends React.Component<Props, State> {
 
 		this.setState({
 			submissionLoading: true,
+			showOutput: false,
 		});
 
 		sendCode(courseId, slideId, value, language);
