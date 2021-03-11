@@ -37,7 +37,7 @@ export interface UnitProgress extends Progress {
 
 export interface StartupSlideInfo {
 	id: string;
-	timestamp?: Date;
+	timestamp: Date;
 	status: SlideProgressStatus;
 }
 

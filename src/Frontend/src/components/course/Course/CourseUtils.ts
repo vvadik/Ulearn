@@ -58,10 +58,7 @@ export const getUnitStatistics = (
 	const visitsGroup = scoringGroups.find(gr => gr.id === ScoringGroupsIds.visits);
 	let unitScore = 0, unitMaxScore = 0, unitDoneSlidesCount = 0, unitInProgressSlidesCount = 0;
 	const statusesBySlides: { [slideId: string]: SlideProgressStatus } = {};
-	let mostPreferablySlideToOpen: StartupSlideInfo = {
-		id: unit.slides[0].id,
-		status: SlideProgressStatus.notVisited,
-	};
+	let mostPreferablySlideToOpen: StartupSlideInfo | null = null;
 
 	for (const { maxScore, id, scoringGroup, type, quizMaxTriesCount, } of unit.slides) {
 		statusesBySlides[id] = SlideProgressStatus.notVisited;
@@ -103,7 +100,13 @@ export const getUnitStatistics = (
 			}
 
 			const timestampAsDate = new Date(timestamp);
-			if((mostPreferablySlideToOpen.timestamp && mostPreferablySlideToOpen.timestamp < timestampAsDate || statusesBySlides[id] === SlideProgressStatus.canBeImproved)
+			if(!mostPreferablySlideToOpen) {
+				mostPreferablySlideToOpen = {
+					id,
+					timestamp: new Date(timestamp),
+					status: statusesBySlides[id],
+				};
+			} else if((mostPreferablySlideToOpen.timestamp.getTime() < timestampAsDate.getTime() || statusesBySlides[id] === SlideProgressStatus.canBeImproved)
 				&& mostPreferablySlideToOpen.status !== SlideProgressStatus.canBeImproved) {
 				mostPreferablySlideToOpen = {
 					id,
