@@ -99,7 +99,7 @@ namespace Database.Repos
 					.OrderByDescending(v => v.Timestamp)
 					.FirstOrDefault())
 				.ToListAsync();
-			return visits.ToDictionary(v => v!.CourseId, v => v!.Timestamp);
+			return visits.ToDictionary(v => v!.CourseId, v => v!.Timestamp, StringComparer.OrdinalIgnoreCase);
 		}
 
 		public async Task<Dictionary<string, Visit>> FindLastVisit(List<string> userIds)
