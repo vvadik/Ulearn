@@ -96,7 +96,7 @@ function NavigationHeader({
 			groupsLinks.push(
 				<Link
 					key={ id }
-					href={ courseStatistics + buildQuery({ courseIdInLowerCase, group: id }) }>
+					href={ courseStatistics + buildQuery({ courseId: courseIdInLowerCase, group: id }) }>
 					{ name }
 				</Link>
 			);
