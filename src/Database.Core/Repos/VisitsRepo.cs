@@ -83,9 +83,10 @@ namespace Database.Repos
 
 		public async Task<Dictionary<Guid, LastVisit>> GetLastVisitsInCourse(string courseId, string userId)
 		{
-			return await db.LastVisits
+			return (await db.LastVisits
 				.Where(v => v.CourseId == courseId && v.UserId == userId)
-				.ToDictionaryAsync(v => v.SlideId);
+				.ToListAsync())
+				.ToDictSafe(v => v.SlideId, v => v);
 		}
 
 		public async Task<Dictionary<string, DateTime>> GetLastVisitsForCourses(HashSet<string> courseIds, string userId)
