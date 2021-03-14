@@ -167,16 +167,16 @@ namespace Ulearn.Web.Api.Controllers.Runner
 			{
 				if (!submissionsByIds.ContainsKey(result.Id))
 					continue;
-				await SendResultToObservers(submissionsByIds[result.Id], result).ConfigureAwait(false);
+				await SendResultToObservers(submissionsByIds[result.Id], result);
 			}
 
 			return StatusCode((int)HttpStatusCode.Accepted);
 		}
 
-		private Task SendResultToObservers(UserExerciseSubmission submission, RunningResults result)
+		private async Task SendResultToObservers(UserExerciseSubmission submission, RunningResults result)
 		{
-			var tasks = resultObservers.Select(o => o.ProcessResult(submission, result));
-			return Task.WhenAll(tasks);
+			foreach (var o in resultObservers)
+				await o.ProcessResult(submission, result);
 		}
 	}
 }

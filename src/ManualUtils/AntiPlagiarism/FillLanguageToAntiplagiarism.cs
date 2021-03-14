@@ -14,17 +14,21 @@ namespace ManualUtils.AntiPlagiarism
 		private static Language GetLanguageByTaskId(Guid taskId, AntiPlagiarismDb adb)
 		{
 			if (!taskIdToSubmission.ContainsKey(taskId))
-				taskIdToSubmission[taskId] = adb.Submissions.First(s => s.TaskId == taskId).Language;
+				taskIdToSubmission[taskId] = adb.Submissions.OrderByDescending(s => s.AddingTime).First(s => s.TaskId == taskId).Language;
 			return taskIdToSubmission[taskId];
 		}
 
 		private static void FillLanguageTasksStatisticsParameters(AntiPlagiarismDb adb)
 		{
+			Console.WriteLine("FillLanguageTasksStatisticsParameters");
+
 			var parameterses = adb
 				.TasksStatisticsParameters
 				.Where(p => p.Language == 0);
 
 			var count = parameterses.Count();
+
+			Console.WriteLine($"Count {parameterses.Count}");
 
 			adb.DisableAutoDetectChanges();
 			var completed = 0;
@@ -54,11 +58,15 @@ namespace ManualUtils.AntiPlagiarism
 
 		private static void FillLanguageSnippetsStatistics(AntiPlagiarismDb adb)
 		{
+			Console.WriteLine("FillLanguageSnippetsStatistics");
+
 			var snippets = adb
 				.SnippetsStatistics
 				.Where(p => p.Language == 0);
 
 			var count = snippets.Count();
+
+			Console.WriteLine($"Count snippets {snippets.Count}");
 
 			adb.DisableAutoDetectChanges();
 			var completed = 0;
@@ -88,11 +96,15 @@ namespace ManualUtils.AntiPlagiarism
 
 		private static void FillLanguageManualSuspicionLevels(AntiPlagiarismDb adb)
 		{
+			Console.WriteLine("FillLanguageManualSuspicionLevels");
+
 			var suspicionLevels = adb
 				.ManualSuspicionLevels
 				.Where(p => p.Language == 0);
 
 			var count = suspicionLevels.Count();
+
+			Console.WriteLine($"Count {suspicionLevels.Count}");
 
 			adb.DisableAutoDetectChanges();
 			var completed = 0;
