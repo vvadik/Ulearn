@@ -1,32 +1,53 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AntiPlagiarism.Web.Database;
+using Ulearn.Common;
 
 namespace ManualUtils.AntiPlagiarism
 {
+
 	public class FillLanguageToAntiplagiarism
 	{
+		private static Dictionary<Guid, Language> taskIdToSubmission = new Dictionary<Guid, Language>();
+
+		private static Language GetLanguageByTaskId(Guid taskId, AntiPlagiarismDb adb)
+		{
+			if (!taskIdToSubmission.ContainsKey(taskId))
+				taskIdToSubmission[taskId] = adb.Submissions.First(s => s.TaskId == taskId).Language;
+			return taskIdToSubmission[taskId];
+		}
+
 		private static void FillLanguageTasksStatisticsParameters(AntiPlagiarismDb adb)
 		{
 			var parameterses = adb
 				.TasksStatisticsParameters
-				.Where(p => p.Language == 0)
-				.ToList();
+				.Where(p => p.Language == 0);
+
+			var count = parameterses.Count();
 
 			adb.DisableAutoDetectChanges();
+			var completed = 0;
 			foreach (var parameterse in parameterses)
 			{
-				var submission = adb.Submissions.First(s => s.TaskId == parameterse.TaskId);
+				completed++;
 				try
 				{
-					parameterse.Language = submission.Language;
+					parameterse.Language = GetLanguageByTaskId(parameterse.TaskId, adb);
 					adb.TasksStatisticsParameters.Update(parameterse);
 				}
 				catch (Exception ex)
 				{
-					Console.WriteLine($"Error on id {parameterse.TaskId} \"{submission.AdditionalInfo}\"");
+					Console.WriteLine($"Error on id {parameterse.TaskId}: {ex}");
+				}
+
+				if (count % 1000 == 0)
+				{
+					Console.WriteLine($"FillLanguageTasksStatisticsParameters - Completed {completed} / {count}");
+					adb.SaveChanges();
 				}
 			}
+
 			adb.SaveChanges();
 			adb.EnableAutoDetectChanges();
 		}
@@ -35,23 +56,32 @@ namespace ManualUtils.AntiPlagiarism
 		{
 			var snippets = adb
 				.SnippetsStatistics
-				.Where(p => p.Language == 0)
-				.ToList();
+				.Where(p => p.Language == 0);
+
+			var count = snippets.Count();
 
 			adb.DisableAutoDetectChanges();
+			var completed = 0;
 			foreach (var snippet in snippets)
 			{
-				var submission = adb.Submissions.First(s => s.TaskId == snippet.TaskId);
+				completed++;
 				try
 				{
-					snippet.Language = submission.Language;
+					snippet.Language = GetLanguageByTaskId(snippet.TaskId, adb);
 					adb.SnippetsStatistics.Update(snippet);
 				}
 				catch (Exception ex)
 				{
-					Console.WriteLine($"Error on id {snippet.TaskId} \"{submission.AdditionalInfo}\"");
+					Console.WriteLine($"Error on id {snippet.TaskId}: {ex}");
+				}
+
+				if (count % 1000 == 0)
+				{
+					Console.WriteLine($"FillLanguageSnippetsStatistics - Completed {completed} / {count}");
+					adb.SaveChanges();
 				}
 			}
+
 			adb.SaveChanges();
 			adb.EnableAutoDetectChanges();
 		}
@@ -60,23 +90,32 @@ namespace ManualUtils.AntiPlagiarism
 		{
 			var suspicionLevels = adb
 				.ManualSuspicionLevels
-				.Where(p => p.Language == 0)
-				.ToList();
+				.Where(p => p.Language == 0);
+
+			var count = suspicionLevels.Count();
 
 			adb.DisableAutoDetectChanges();
+			var completed = 0;
 			foreach (var level in suspicionLevels)
 			{
-				var submission = adb.Submissions.First(s => s.TaskId == level.TaskId);
+				completed++;
 				try
 				{
-					level.Language = submission.Language;
+					level.Language = GetLanguageByTaskId(level.TaskId, adb);;
 					adb.ManualSuspicionLevels.Update(level);
 				}
 				catch (Exception ex)
 				{
-					Console.WriteLine($"Error on id {level.TaskId} \"{submission.AdditionalInfo}\"");
+					Console.WriteLine($"Error on id {level.TaskId}: {ex}");
+				}
+
+				if (count % 1000 == 0)
+				{
+					Console.WriteLine($"FillLanguageManualSuspicionLevels - Completed {completed} / {count}");
+					adb.SaveChanges();
 				}
 			}
+
 			adb.SaveChanges();
 			adb.EnableAutoDetectChanges();
 		}
