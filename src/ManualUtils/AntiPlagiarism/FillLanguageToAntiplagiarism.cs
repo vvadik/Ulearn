@@ -14,7 +14,12 @@ namespace ManualUtils.AntiPlagiarism
 		private static Language GetLanguageByTaskId(Guid taskId, AntiPlagiarismDb adb)
 		{
 			if (!taskIdToSubmission.ContainsKey(taskId))
-				taskIdToSubmission[taskId] = adb.Submissions.OrderByDescending(s => s.AddingTime).First(s => s.TaskId == taskId).Language;
+			{
+				taskIdToSubmission[taskId] = adb.Submissions
+						.OrderByDescending(s => s.AddingTime)
+						.FirstOrDefault(s => s.TaskId == taskId)
+					!.Language;
+			}
 			return taskIdToSubmission[taskId];
 		}
 
@@ -24,25 +29,26 @@ namespace ManualUtils.AntiPlagiarism
 
 			var parameterses = adb
 				.TasksStatisticsParameters
-				.Where(p => p.Language == 0);
+				.Where(p => p.Language == 0)
+				.ToList();
 
-			var count = parameterses.Count();
+			var count = parameterses.Count;
 
 			Console.WriteLine($"Count {parameterses.Count}");
 
 			adb.DisableAutoDetectChanges();
 			var completed = 0;
-			foreach (var parameterse in parameterses)
+			foreach (var parameters in parameterses)
 			{
 				completed++;
 				try
 				{
-					parameterse.Language = GetLanguageByTaskId(parameterse.TaskId, adb);
-					adb.TasksStatisticsParameters.Update(parameterse);
+					parameters.Language = GetLanguageByTaskId(parameters.TaskId, adb);
+					adb.TasksStatisticsParameters.Update(parameters);
 				}
 				catch (Exception ex)
 				{
-					Console.WriteLine($"Error on id {parameterse.TaskId}: {ex}");
+					Console.WriteLine($"Error on id {parameters.TaskId}: {ex}");
 				}
 
 				if (count % 1000 == 0)
@@ -66,7 +72,7 @@ namespace ManualUtils.AntiPlagiarism
 
 			var count = snippets.Count();
 
-			Console.WriteLine($"Count snippets {snippets.Count}");
+			Console.WriteLine($"Count snippets {count}");
 
 			adb.DisableAutoDetectChanges();
 			var completed = 0;
@@ -100,11 +106,12 @@ namespace ManualUtils.AntiPlagiarism
 
 			var suspicionLevels = adb
 				.ManualSuspicionLevels
-				.Where(p => p.Language == 0);
+				.Where(p => p.Language == 0)
+				.ToList();
 
-			var count = suspicionLevels.Count();
+			var count = suspicionLevels.Count;
 
-			Console.WriteLine($"Count {suspicionLevels.Count}");
+			Console.WriteLine($"Count {count}");
 
 			adb.DisableAutoDetectChanges();
 			var completed = 0;
