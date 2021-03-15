@@ -2588,10 +2588,10 @@
   dependencies:
     tslib "^1.9.2"
 
-"@skbkontur/react-ui@2.14.0":
-  version "2.14.0"
-  resolved "https://registry.yarnpkg.com/@skbkontur/react-ui/-/react-ui-2.14.0.tgz#8c86996f96416831e8ae2a4a2fba42977e98b436"
-  integrity sha512-gr00B5eAE6MYM8M5HMaBBEcQ3b6Md9b3XVj0sS8FT+/kL4QhGBAafi6tDWK+yfAubrPQMmADXhgd+Yr8R72Gxg==
+"@skbkontur/react-ui@2.14.1":
+  version "2.14.1"
+  resolved "https://registry.yarnpkg.com/@skbkontur/react-ui/-/react-ui-2.14.1.tgz#1ca8799719e13d5727c54463afdd567430b142ff"
+  integrity sha512-FxfjP6vPL7Z8WS2QUYV58oHwR0gNHgUoYPwHtKpIxZmNLAqm5lUqtzCuWD9VL2yFhUSxKXWCiosAT45nQ/2C/Q==
   dependencies:
     "@babel/runtime" "7.12.5"
     classnames "^2.2.6"
