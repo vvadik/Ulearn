@@ -3,5 +3,6 @@
 INSERT INTO public."__EFMigrationsHistory"
     ("MigrationId", "ProductVersion")
 VALUES
-('20210225124814_InitPostgres', '5.0.3'),
-('20210312120452_Init', '5.0.3');
+('20210319103352_Init', '5.0.3'),
+('20210319103454_InitAntiPlagiarism', '5.0.3')
+;
