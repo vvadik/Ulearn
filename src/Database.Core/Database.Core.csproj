@@ -44,12 +44,6 @@
 		<Content Include="create_database\01_create_db.sql" />
 	</ItemGroup>
 	<ItemGroup>
-		<ContentWithTargetPath Include="migrate_database_to_core/01_add_migrations_history.sql">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<TargetPath>add_migrations_history.sql</TargetPath>
-		</ContentWithTargetPath>
-	</ItemGroup>
-	<ItemGroup>
 		<None Update="appsettings.local.json">
 			<DependentUpon>appsettings.json</DependentUpon>
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

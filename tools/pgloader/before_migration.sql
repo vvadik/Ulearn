@@ -2971,3 +2971,23 @@ ALTER TABLE ONLY public."__EFMigrationsHistory"
 
 ALTER TABLE ONLY public."__MigrationHistory"
     ADD CONSTRAINT "PK_public.__MigrationHistory" PRIMARY KEY ("MigrationId", "ContextKey");
+
+
+
+
+
+
+
+
+
+
+-- Временные изменения для того, чтобы pgloader справился с миграцией.
+
+ALTER TABLE public."AspNetUsers"
+    DROP COLUMN "Names";
+
+ALTER TABLE public."AspNetUsers"
+    ADD "Names" text COLLATE public.case_insensitive;
+
+ALTER TABLE public."Likes"
+    RENAME COLUMN "Id" TO "ID";

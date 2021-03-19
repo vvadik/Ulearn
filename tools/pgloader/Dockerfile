@@ -42,4 +42,4 @@ WORKDIR /pgloader/build/bin/
 
 COPY ./files/ /pgloader/build/bin/
 
-# ./pgloader c
+# ./pgloader commands

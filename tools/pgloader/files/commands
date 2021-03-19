@@ -4,7 +4,7 @@ load database
 
 set work_mem to '64MB', maintenance_work_mem to '512 MB'
 
-WITH include no drop, no truncate, reset sequences, create no schemas, create no tables, create no indexes, no foreign keys, quote identifiers, data only
+with include no drop, no truncate, reset no sequences, create no schemas, create no tables, create no indexes, no foreign keys, quote identifiers, data only
 
 cast
 	type datetime2 to timestamp,
@@ -13,9 +13,6 @@ cast
 	type varchar when (<= precision 4000) to varchar keep typemod,
 	type nvarchar when (<= precision 4000) to varchar keep typemod
 
---including only table names like '%' in schema 'antiplagiarism'
---including only table names like '%' in schema 'dbo'
---excluding table names like 'AspNetRoleClaims', 'AspNetUserTokens', '__EFMigrationsHistory', '__MigrationHistory' in schema 'dbo'
-
 alter schema 'dbo' rename to 'public'
+
 ;
