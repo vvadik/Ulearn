@@ -22,7 +22,6 @@ const {
 const openBrowser = require('react-dev-utils/openBrowser');
 const ignoredFiles = require('react-dev-utils/ignoredFiles');
 const errorOverlayMiddleware = require('react-dev-utils/errorOverlayMiddleware');
-const noopServiceWorkerMiddleware = require('react-dev-utils/noopServiceWorkerMiddleware');
 const paths = require('../config/paths');
 const config = require('../config/webpack.config.dev');
 
@@ -86,7 +85,6 @@ choosePort(HOST, DEFAULT_PORT)
 			publicPath: config.output.publicPath,
 			before(app) {
 				app.use(errorOverlayMiddleware());
-				app.use(noopServiceWorkerMiddleware(paths.serviceWorker));
 			},
 		};
 		webpackDevServer.addDevServerEntrypoints(config, options);

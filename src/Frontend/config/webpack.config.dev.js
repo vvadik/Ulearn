@@ -6,6 +6,8 @@ const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
+const { GenerateSW } = require('workbox-webpack-plugin');
+const WebpackPwaManifest = require('webpack-pwa-manifest')
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
 
@@ -60,7 +62,7 @@ module.exports = merge([base, {
 						loader: 'url-loader',
 						options: {
 							limit: 10000,
-							name: 'static/media/[name].[hash:8].[ext]',
+							name: paths.static.media + '/[name].[hash:8].[ext]',
 						},
 					},
 					{
@@ -138,7 +140,7 @@ module.exports = merge([base, {
 						loader: 'file-loader',
 						exclude: [/\.(js|jsx|mjs|ts|tsx)$/, /\.html$/, /\.json$/],
 						options: {
-							name: 'static/media/[name].[hash:8].[ext]',
+							name: paths.static.media + '/[name].[hash:8].[ext]',
 						},
 					},
 				],
@@ -167,7 +169,52 @@ module.exports = merge([base, {
 		new webpack.IgnorePlugin({
 			resourceRegExp: /^\.\/locale$/,
 			contextRegExp: /moment$/,
-		})
+		}),
+		new WebpackPwaManifest({
+			filename: "manifest.json",
+			inject: true,
+			fingerprints: false,
+			start_url: '/index.html',
+			scope: '/',
+
+			name: 'Ulearn.me',
+			short_name: 'Ulearn',
+			description: 'Интерактивные онлайн-курсы по программированию',
+			background_color: '#ffffff',
+			theme_color: "#000000",
+			prefer_related_applications: true,
+			related_applications: [],
+			ios: true,
+
+			icons: [
+				{
+					src: paths.appPublic + '/logo.png',
+					sizes: [512, 256, 192, 128, 64, 32],
+					type: "image/png",
+					purpose: "any maskable",
+					destination: paths.static.media + '/icons',
+					ios: true,
+				},
+				{
+					src: paths.appPublic + '/favicon.ico',
+					sizes: [16],
+					type: "image/x-icon",
+					purpose: "any maskable",
+					destination: paths.static.media + '/icons',
+					ios: 'startup',
+				}
+			],
+		}),
+		new GenerateSW({
+			swDest: '/sw',
+			directoryIndex: '/index.html',
+			navigateFallbackAllowlist: [/^(?!\/__).*/],
+			exclude: [/\.map$/, /asset-manifest\.json$/],
+			clientsClaim: true,
+			skipWaiting: true,
+			maximumFileSizeToCacheInBytes: 1024 * 1024 * 3,
+			cleanupOutdatedCaches: true,
+		}),
 	],
 	performance: {
 		hints: false,

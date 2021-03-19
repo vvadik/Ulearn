@@ -38,6 +38,7 @@ function getServedPath(appPackageJson) {
 	return ensureSlash(servedUrl, true);
 }
 
+const contentPath = 'static';
 // config after eject: we're in ./config/
 module.exports = {
 	dotenv: resolveApp('.env'),
@@ -45,6 +46,7 @@ module.exports = {
 	appPublic: resolveApp('public'),
 	appHtml: resolveApp('public/index.html'),
 	appIndexTsx: resolveApp('src/index.tsx'),
+	legacy: resolveApp('src/legacy/legacy.ts'),
 	appPackageJson: resolveApp('package.json'),
 	appSrc: resolveApp('src'),
 	yarnLockFile: resolveApp('yarn.lock'),
@@ -54,5 +56,10 @@ module.exports = {
 	servedPath: getServedPath(resolveApp('package.json')),
 
 	oldBrowserJs: resolveApp('src/oldBrowser.js'),
-	serviceWorker: resolveApp('src/registerServiceWorker.js'),
+
+	static: {
+		css: contentPath + '/css',
+		js: contentPath + '/js',
+		media: contentPath + '/media',
+	}
 };

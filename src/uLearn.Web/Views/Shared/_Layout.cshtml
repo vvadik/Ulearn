@@ -43,25 +43,5 @@
 
 @RenderSection("scripts", required: false)
 
-<script>
-	/* Temporary bug workaround: unregister all service workers */
-	function unregisterServiceWorker() {
-		if (window.navigator && navigator.serviceWorker) {
-			navigator.serviceWorker.getRegistrations()
-				.then(function (registrations) {
-					for (var registrationId in registrations) {
-						if (registrations.hasOwnProperty(registrationId)) {
-							var registration = registrations[registrationId];
-							registration.unregister();
-							window.location.reload();
-						}
-					}
-				});
-		}
-	}
-
-	unregisterServiceWorker();
-</script>
-
 </body>
 </html>

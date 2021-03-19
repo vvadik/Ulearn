@@ -6,6 +6,7 @@ const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin')
 const { GenerateSW } = require('workbox-webpack-plugin');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const WebpackPwaManifest = require('webpack-pwa-manifest')
 const paths = require('./paths');
 const getClientEnvironment = require('./env');
 
@@ -16,7 +17,7 @@ const publicPath = paths.servedPath;
 // For these, "homepage" can be set to "." to enable relative asset paths.
 const shouldUseRelativeAssetPaths = publicPath === './';
 // Source maps are resource heavy and can cause out of memory issue for large source files.
-const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
+const shouldUseSourceMap = true;//process.env.GENERATE_SOURCEMAP !== 'false';
 // `publicUrl` is just like `publicPath`, but we will provide it to our app
 // as %PUBLIC_URL% in `index.html` and `process.env.PUBLIC_URL` in JavaScript.
 // Omit trailing slash as %PUBLIC_URL%/xyz looks better than %PUBLIC_URL%xyz.
@@ -31,8 +32,8 @@ if(env.stringified['process.env'].NODE_ENV !== '"production"') {
 }
 
 // Note: defined here because it will be used more than once.
-const cssFilename = 'static/css/[name].[contenthash:8].css';
-const chunkCssFilename = 'static/css/[id].[contenthash:8].css';
+const cssFilename = paths.static.css + '/[name].[contenthash:8].css';
+const chunkCssFilename = paths.static.css + '/[id].[contenthash:8].css';
 
 // ExtractTextPlugin expects the build output to be flat.
 // (See https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/27)
@@ -57,13 +58,14 @@ module.exports = merge([base, {
 		],
 		oldBrowser: [
 			paths.oldBrowserJs,
-		]
+		],
 	},
 	output: {
 		path: paths.appBuild,
-		filename: 'static/js/[name].[chunkhash:8].js',
-		chunkFilename: 'static/js/[name].[chunkhash:8].chunk.js',
+		filename: paths.static.js + '/[name].[chunkhash:8].js',
+		chunkFilename: paths.static.js + '/[name].[chunkhash:8].chunk.js',
 		publicPath: publicPath,
+		clean: true,
 	},
 	resolve: {
 		extensions: ['.ts', '.tsx', '.js', '.json']
@@ -88,7 +90,7 @@ module.exports = merge([base, {
 						loader: 'url-loader',
 						options: {
 							limit: 10000,
-							name: 'static/media/[name].[hash:8].[ext]',
+							name: paths.static.media + '/[name].[hash:8].[ext]',
 						},
 					},
 					{
@@ -174,7 +176,7 @@ module.exports = merge([base, {
 						loader: 'file-loader',
 						exclude: [/\.(js|jsx|mjs|ts|tsx)$/, /\.html$/, /\.json$/],
 						options: {
-							name: 'static/media/[name].[hash:8].[ext]',
+							name: paths.static.media + '/[name].[hash:8].[ext]',
 						},
 					},
 					// ** STOP ** Are you adding a new loader?
@@ -235,17 +237,6 @@ module.exports = merge([base, {
 		new WebpackManifestPlugin({
 			fileName: 'asset-manifest.json',
 		}),
-		// Generate a service worker script that will precache, and keep up to date,
-		// the HTML & assets that are part of the Webpack build.
-		new GenerateSW({
-			// For unknown URLs, fallback to the index page
-			navigateFallback: publicUrl + '/index.html',
-			// Ignores URLs starting from /__ (useful for Firebase):
-			// https://github.com/facebookincubator/create-react-app/issues/2237#issuecomment-302693219
-			navigateFallbackAllowlist: [/^(?!\/__).*/],
-			// Don't precache sourcemaps (they're large) and build asset manifest:
-			exclude: [/\.map$/, /asset-manifest\.json$/],
-		}),
 		// Moment.js is an extremely popular library that bundles large locale files
 		// by default due to how Webpack interprets its code. This is a practical
 		// solution that requires the user to opt into importing specific locales.
@@ -254,7 +245,53 @@ module.exports = merge([base, {
 		new webpack.IgnorePlugin({
 			resourceRegExp: /^\.\/locale$/,
 			contextRegExp: /moment$/,
-		})
+		}),
+		new WebpackPwaManifest({
+			filename: "manifest.json",
+			inject: true,
+			fingerprints: false,
+			start_url: '/index.html',
+			scope: '/',
+
+			name: 'Ulearn.me',
+			short_name: 'Ulearn',
+			description: 'Интерактивные онлайн-курсы по программированию',
+			background_color: '#ffffff',
+			theme_color: "#000000",
+			prefer_related_applications: true,
+			related_applications: [],
+			ios: true,
+
+			icons: [
+				{
+					src: paths.appPublic + '/logo.png',
+					sizes: [512, 256, 192, 128, 64, 32],
+					type: "image/png",
+					purpose: "any maskable",
+					destination: paths.static.media + '/icons',
+					ios: true,
+				},
+				{
+					src: paths.appPublic + '/favicon.ico',
+					sizes: [16],
+					type: "image/x-icon",
+					purpose: "any maskable",
+					destination: paths.static.media + '/icons',
+					ios: 'startup',
+				}
+			],
+		}),
+		// Generate a service worker script that will precache, and keep up to date,
+		// the HTML & assets that are part of the Webpack build.
+		new GenerateSW({
+			swDest: '/sw',
+			directoryIndex: '/index.html',
+			exclude: [/\.map$/, /asset-manifest\.json$/],
+			navigateFallbackAllowlist: [/^(?!\/__).*/],
+			clientsClaim: true,
+			skipWaiting: true,
+			maximumFileSizeToCacheInBytes: 1024 * 1024 * 3,
+		}),
 	],
 	optimization: {
 		minimize: true,
