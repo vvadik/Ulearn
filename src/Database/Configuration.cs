@@ -1,21 +1,15 @@
-using System.Data.Entity.Migrations;
-using System.Linq;
+﻿using System.Linq;
 using Database.DataContexts;
 using Database.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 
-namespace Database.Migrations
+namespace Database
 {
-	internal sealed class Configuration : DbMigrationsConfiguration<ULearnDb>
+	public static class Configuration
 	{
-		public Configuration()
-		{
-			AutomaticMigrationsEnabled = false;
-			CommandTimeout = 60 * 60; // in seconds
-		}
-
-		protected override void Seed(ULearnDb db)
+		// Вообще-то достаточно вызвать доин раз на новой базе
+		public static void Seed(ULearnDb db)
 		{
 			var roleStore = new RoleStore<IdentityRole>(db);
 			var roleManager = new RoleManager<IdentityRole>(roleStore);
@@ -38,6 +32,9 @@ namespace Database.Migrations
 
 			var usersRepo = new UsersRepo(db);
 			usersRepo.CreateUlearnBotUserIfNotExists();
+
+			var feedRepo = new FeedRepo(db);
+			feedRepo.AddFeedNotificationTransportIfNeeded(null).GetAwaiter().GetResult(); // Feed for comments
 
 			db.SaveChanges();
 		}

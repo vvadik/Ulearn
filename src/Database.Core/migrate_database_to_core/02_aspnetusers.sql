@@ -1,28 +1,27 @@
-﻿BEGIN TRANSACTION
+﻿BEGIN TRANSACTION;
 
 
 -- AspNetRoles
 
-ALTER TABLE AspNetRoles
-ADD [ConcurrencyStamp] [nvarchar](max) NULL
+ALTER TABLE public."AspNetRoles"
+ADD "ConcurrencyStamp" text COLLATE pg_catalog."default";
 
-ALTER TABLE AspNetRoles 
-ADD [NormalizedName] [nvarchar](256) NULL
+ALTER TABLE public."AspNetRoles" 
+ADD "NormalizedName" character varying(256) COLLATE pg_catalog."default";
 
 -- AspNetUsers
 
-ALTER TABLE AspNetUsers
-ADD [ConcurrencyStamp] [nvarchar](max) NULL
+ALTER TABLE public."AspNetUsers"
+ADD "ConcurrencyStamp" text COLLATE pg_catalog."default";
 
-ALTER TABLE AspNetUsers
-ADD [LockoutEnd] [datetimeoffset](7) NULL
+ALTER TABLE public."AspNetUsers"
+ADD "LockoutEnd" timestamp with time zone;
 
-ALTER TABLE AspNetUsers
-ADD [NormalizedEmail] [nvarchar](256) NULL
+ALTER TABLE public."AspNetUsers"
+ADD "NormalizedEmail" character varying(256) COLLATE pg_catalog."default";
 
-ALTER TABLE AspNetUsers
-ADD [NormalizedUserName] [nvarchar](256) NULL
+ALTER TABLE public."AspNetUsers"
+ADD "NormalizedUserName" character varying(256) COLLATE pg_catalog."default";
 
 
-
-COMMIT TRANSACTION
+COMMIT TRANSACTION;
