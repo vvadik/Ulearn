@@ -17,5 +17,5 @@ export enum CourseAccessType {
 	apiViewCodeReviewStatistics = 'apiViewCodeReviewStatistics',
 }
 
-export const AccessType = { ...CourseAccessType, ...SystemAccessType };
-export type AccessType = typeof AccessType;
+export const Access = { ...CourseAccessType, ...SystemAccessType };
+export type AccessType = SystemAccessType | CourseAccessType;

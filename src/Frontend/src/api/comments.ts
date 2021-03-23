@@ -4,8 +4,8 @@ import { buildQuery } from "src/utils";
 import { convertCamelCaseToSnakeCase } from "src/utils/caseConverter";
 import { SlideComments, Comment, CommentPolicy, } from "src/models/comments";
 
-export function getComments(courseId: string, slideId: string, forInstructors: boolean, offset: number,
-	count: number
+export function getComments(courseId: string, slideId: string, forInstructors: boolean, offset?: number,
+	count?: number
 ): Promise<SlideComments> {
 	const query = buildQuery({ courseId, slideId, forInstructors, count, offset }, convertCamelCaseToSnakeCase);
 	const url = commentsPath + query;
@@ -19,7 +19,7 @@ export function getComment(commentId: string): Promise<Comment> {
 	return api.get(url);
 }
 
-export function addComment(courseId: string, slideId: string, text: string, parentCommentId: string,
+export function addComment(courseId: string, slideId: string, text: string, parentCommentId: string | null,
 	forInstructors: boolean
 ): Promise<Comment> {
 	const query = buildQuery({ courseId }, convertCamelCaseToSnakeCase);

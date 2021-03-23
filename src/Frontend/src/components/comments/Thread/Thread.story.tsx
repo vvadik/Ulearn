@@ -1,5 +1,6 @@
 import React from "react";
-import Thread from "./Thread.js";
+import Thread from "./Thread";
+import { CommentPolicy, ResponseStatus, Comment as CommentType } from "src/models/comments";
 
 const actions = {
 	handleLikeClick: () => console.log("likeComment"),
@@ -63,15 +64,15 @@ for (let i = 0; i < 5; i++) {
 	});
 }
 
-const commentPolicy = {
+const commentPolicy : CommentPolicy = {
 	areCommentsEnabled: true,
 	moderationPolicy: "postmoderation",
 	onlyInstructorsCanReply: false,
-	status: "ok",
+	status: ResponseStatus.ok,
 };
 
-const comment = {
-	id: 1,
+const comment :CommentType= {
+	id: '1',
 	text:
 		"Решать эти задачи **можно** прямо в браузере, а специальная проверяющая система тут же проверит ваше решение.",
 	renderedText:
@@ -80,6 +81,9 @@ const comment = {
 		id: "11",
 		visibleName: "Louisa",
 		avatarUrl: null,
+		firstName:"Louisa",
+		gender:null,
+		lastName:'',
 	},
 	publishTime: "2019-01-18T14:12:41.947",
 	isApproved: false,

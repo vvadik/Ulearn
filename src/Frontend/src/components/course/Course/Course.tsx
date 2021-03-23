@@ -12,7 +12,7 @@ import CourseFlashcardsPage from 'src/pages/course/CourseFlashcardsPage.js';
 import PreviewUnitPageFromAllCourse from "src/components/flashcards/UnitPage/PreviewUnitPageFromAllCourse";
 import SlideHeader from "./Slide/SlideHeader/SlideHeader";
 import { BlocksWrapper } from "src/components/course/Course/Slide/Blocks";
-import CommentsView from "src/components/comments/CommentsView/CommentsView.js";
+import CommentsView from "src/components/comments/CommentsView/CommentsView";
 import Slide from './Slide/Slide';
 
 import { UrlError } from "src/components/common/Error/NotFoundErrorBoundary";
@@ -48,6 +48,7 @@ import {
 } from "../Navigation/types";
 
 import styles from "./Course.less";
+import { UserRoles, UserRolesWithCourseAccesses } from "../../../utils/courseRoles";
 
 const slideNavigationButtonTitles = {
 	next: "Далее",
@@ -384,7 +385,11 @@ class Course extends Component<Props, State> {
 		const { isSystemAdministrator, accessesByCourse, roleByCourse } = user;
 		const courseAccesses = accessesByCourse[courseId] ? accessesByCourse[courseId] : [];
 		const courseRole = roleByCourse[courseId] ? roleByCourse[courseId] : CourseRoleType.student;
-		const userRoles = { isSystemAdministrator, courseRole, courseAccesses, };
+		const userRoles: UserRolesWithCourseAccesses = {
+			isSystemAdministrator,
+			courseRole,
+			courseAccesses,
+		};
 		return (
 			<main className={ wrapperClassName }>
 				{ (isNavigationVisible || isReview) && title &&
@@ -419,8 +424,9 @@ class Course extends Component<Props, State> {
 					}
 				</div>
 				{ currentSlideInfo && isNavigationVisible && this.renderNavigationButtons(currentSlideInfo) }
-				{ currentSlideInfo && currentSlideInfo.current && slideInfo && slideInfo.id && isNavigationVisible && this.renderComments(
-					currentSlideInfo.current, userRoles) }
+				{ currentSlideInfo && currentSlideInfo.current
+				&& slideInfo && slideInfo.id && isNavigationVisible
+				&& this.renderComments(currentSlideInfo.current, userRoles) }
 				{ isNavigationVisible && this.renderFooter() }
 			</main>
 		);
@@ -489,7 +495,7 @@ class Course extends Component<Props, State> {
 	};
 
 	renderComments(currentSlide: ShortSlideInfo,
-		userRoles: { isSystemAdministrator: boolean, courseRole: CourseRoleType, courseAccesses: CourseAccessType[] },
+		userRoles: UserRolesWithCourseAccesses,
 	): React.ReactElement {
 		const { user, courseId, isSlideReady, } = this.props;
 

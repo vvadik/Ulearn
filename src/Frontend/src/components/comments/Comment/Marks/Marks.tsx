@@ -1,12 +1,19 @@
 import React from "react";
-import PropTypes from "prop-types";
-import { comment, group } from "../../commonPropTypes";
 import { EyeClosed, Ok, Pin, People } from "icons";
 import { TooltipMenu, MenuItem } from "ui";
 
+import { Comment, ShortGroupInfo } from "src/models/comments";
+
 import styles from "./Marks.less";
 
-export default function Marks({ courseId, comment, canViewStudentsGroup, authorGroups }) {
+
+interface MarksProps {
+	authorGroups: ShortGroupInfo[];
+	courseId: string;
+	comment: Comment;
+}
+
+export default function Marks({ courseId, comment, authorGroups }: MarksProps): React.ReactElement {
 	const windowUrl = `${ window.location.origin }/${ courseId }`;
 	return (
 		<>
@@ -15,8 +22,8 @@ export default function Marks({ courseId, comment, canViewStudentsGroup, authorG
 			{ comment.isPinnedToTop && <PinnedToTopMark/> }
 			{ authorGroups && <GroupMark url={ windowUrl } groups={ authorGroups }/> }
 		</>
-	)
-};
+	);
+}
 
 const HiddenMark = () => (
 	<div className={ `${ styles.mark } ${ styles.approvedComment }` }>
@@ -45,7 +52,12 @@ const PinnedToTopMark = () => (
 	</div>
 );
 
-export function GroupMark({ url, groups }) {
+interface GroupProps {
+	url: string;
+	groups: ShortGroupInfo[];
+}
+
+export function GroupMark({ url, groups }: GroupProps): React.ReactElement {
 	const groupsNumber = groups.length;
 
 	return (
@@ -69,10 +81,10 @@ export function GroupMark({ url, groups }) {
 				<GroupsMenu url={ url } groups={ groups }/>
 			</div>
 		</>
-	)
-};
+	);
+}
 
-const GroupsMenu = ({ url, groups }) => (
+const GroupsMenu = ({ url, groups }: GroupProps) => (
 	<TooltipMenu
 		menuWidth="150px"
 		positions={ ["bottom right"] }
@@ -83,24 +95,19 @@ const GroupsMenu = ({ url, groups }) => (
 					Группы
 				</span>
 			</div> }>
-		{ groups.map(group => !group.isArchived &&
-			<MenuItem
-				key={ group.id }
-				href={ group.apiUrl && `${ url }${ group.apiUrl }` }>
-				{ group.name }
-			</MenuItem>) }
-		{ groups.map(group => group.isArchived &&
-			<MenuItem
-				key={ group.id }
-				href={ group.apiUrl && `${ url }${ group.apiUrl }` }>
-				{ group.name }
-			</MenuItem>) }
+		<>
+			{ groups.map(group => !group.isArchived &&
+				<MenuItem
+					key={ group.id }
+					href={ group.apiUrl && `${ url }${ group.apiUrl }` }>
+					{ group.name }
+				</MenuItem>) }
+			{ groups.map(group => group.isArchived &&
+				<MenuItem
+					key={ group.id }
+					href={ group.apiUrl && `${ url }${ group.apiUrl }` }>
+					{ group.name }
+				</MenuItem>) }
+		</>
 	</TooltipMenu>
 );
-
-Marks.propTypes = {
-	authorGroups: PropTypes.arrayOf(group),
-	courseId: PropTypes.string,
-	comment: comment.isRequired,
-	canViewStudentsGroup: PropTypes.func,
-};

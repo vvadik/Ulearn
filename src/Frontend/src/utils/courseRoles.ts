@@ -1,4 +1,4 @@
-import { CourseRoleType } from "src/consts/accessType";
+import { CourseAccessType, CourseRoleType } from "src/consts/accessType";
 
 function isCourseAdmin(userRoles: UserRoles): boolean {
 	return userRoles.isSystemAdministrator ||
@@ -11,8 +11,12 @@ function isInstructor(userRoles: UserRoles): boolean {
 }
 
 interface UserRoles {
-	isSystemAdministrator: boolean,
-	courseRole: CourseRoleType,
+	isSystemAdministrator: boolean;
+	courseRole: CourseRoleType;
 }
 
-export { isCourseAdmin, isInstructor, UserRoles };
+interface UserRolesWithCourseAccesses extends UserRoles {
+	courseAccesses: CourseAccessType[];
+}
+
+export { isCourseAdmin, isInstructor, UserRoles, UserRolesWithCourseAccesses, };

@@ -1,42 +1,111 @@
 import React, { Component } from "react";
-import PropTypes from "prop-types";
-import { userType, userRoles, commentPolicy } from "../commonPropTypes";
-import { TransitionGroup, CSSTransition } from "react-transition-group";
 import { debounce } from "debounce";
+import { CSSTransition, TransitionGroup } from "react-transition-group";
+
+import api from "src/api";
+
 import { CommentLite } from "icons";
 import { Toast } from "ui";
 import CourseLoader from "src/components/course/Course/CourseLoader/CourseLoader";
 import Thread from "../Thread/Thread";
 import CommentSendForm from "../CommentSendForm/CommentSendForm";
-import Error404 from "../../common/Error/Error404";
 import Stub from "../Stub/Stub";
+import Error404 from "../../common/Error/Error404";
+
 import scrollToView from "src/utils/scrollToView";
+import { buildQuery } from "src/utils";
+
+import { TabsType } from "src/consts/tabsType";
+import { AccountState } from "src/redux/account";
+import { UserRolesWithCourseAccesses } from "src/utils/courseRoles";
+import { Comment, CommentPolicy } from "src/models/comments";
+import { SlideType } from "src/models/slide";
+import { CommentStatus } from "src/consts/comments";
+import { userSolutions } from "src/consts/routes";
 
 import styles from "./CommentsList.less";
-import { TabsType } from "src/consts/tabsType";
 
-const defaultCommentsData = {
+
+const defaultCommentsData: {
+	commentsPerPack: number;
+	scrollDistance: number;
+	threadsToRender: Comment[],
+	repliesToRender: Comment[],
+} = {
 	commentsPerPack: 15,
 	scrollDistance: 500,
 	threadsToRender: [],
 	repliesToRender: [],
 };
 
-function throttle(fn, wait) {
+function throttle(fn: () => void, wait: number) {
 	let time = Date.now();
 	return function () {
 		if((time + wait - Date.now()) < 0) {
 			fn();
 			time = Date.now();
 		}
-	}
+	};
 }
 
-class CommentsList extends Component {
-	constructor(props) {
-		super(props);
+interface Props {
+	key?: string;
+	commentsApi: typeof api.comments;
+	headerRef: React.RefObject<HTMLDivElement>;
 
-		this.commentsData = { ...defaultCommentsData };
+	courseId: string;
+	slideId: string;
+	slideType: SlideType;
+
+	user: AccountState;
+	userRoles: UserRolesWithCourseAccesses;
+
+	forInstructors: boolean;
+	isSlideReady: boolean;
+
+	commentPolicy: CommentPolicy | null;
+	handleInstructorsCommentCount: (operation: 'add' | string) => void;
+	handleTabChange: (tab: TabsType, bool: boolean) => void;
+}
+
+interface State {
+	status: string;
+	newCommentId: number;
+	saveCommentLikeStatus: null,
+	threads: Comment[],
+	commentEditing: CommentStatus;
+	reply: CommentStatus;
+
+	showFocus: boolean;
+	sending: boolean;
+	animation: boolean;
+	loadingComments: boolean;
+}
+
+export interface ActionsType {
+	handleLikeClick: (commentId: string, isLiked: boolean) => void;
+	handleCorrectAnswerMark: (commentId: string, isRightAnswer: boolean) => void;
+	handleApprovedMark: (commentId: string, isApproved: boolean) => void;
+	handlePinnedToTopMark: (commentId: string, isPinnedToTop: boolean) => void;
+	handleEditComment: (commentId: string, text: string) => void;
+	handleAddReplyComment: (commentId: string, text: string) => void;
+	handleDeleteComment: (comment: Comment) => void;
+	handleShowEditForm: (commentId: string | null) => void;
+	handleShowReplyForm: (commentId: string | null) => void;
+}
+
+class CommentsList extends Component<Props, State> {
+	private lastThreadRef: React.RefObject<HTMLDivElement> = React.createRef();
+	private commentsListRef: React.RefObject<HTMLDivElement> = React.createRef();
+	private commentsData: typeof defaultCommentsData = { ...defaultCommentsData };
+	private throttleScroll: (() => void) | null = null;
+	private readonly debouncedSendData: null
+		| ((method: (commentId: string) => Promise<Comment> | Promise<string>, commentId: string,
+		property?: Record<string, unknown>
+	) => void) = null;
+
+	constructor(props: Props) {
+		super(props);
 
 		this.state = {
 			newCommentId: 1,
@@ -57,13 +126,10 @@ class CommentsList extends Component {
 			animation: false,
 		};
 
-		this.lastThreadRef = React.createRef();
-		this.commentsListRef = React.createRef();
-
 		this.debouncedSendData = debounce(this.sendData, 300);
 	}
 
-	componentDidMount() {
+	componentDidMount(): void {
 		const { courseId, slideId, forInstructors } = this.props;
 		this.loadComments(courseId, slideId, forInstructors)
 			.then(() => {
@@ -76,37 +142,42 @@ class CommentsList extends Component {
 
 		window.addEventListener("scroll", this.throttleScroll);
 		window.addEventListener("hashchange", this.handleScrollToCommentByHashFormUrl);
-	};
+	}
 
-	componentWillUnmount() {
-		window.removeEventListener("scroll", this.throttleScroll);
+	componentWillUnmount(): void {
+		if(this.throttleScroll) {
+			window.removeEventListener("scroll", this.throttleScroll);
+		}
 		window.removeEventListener("hashchange", this.handleScrollToCommentByHashFormUrl);
 	}
 
-	componentDidUpdate(prevProps, prevState) {
-		if(this.props.slideId !== prevProps.slideId) {
+	componentDidUpdate(prevProps: Props): void {
+		const { slideId, courseId, forInstructors, } = this.props;
+
+		if(slideId !== prevProps.slideId) {
 			this.commentsData = { ...defaultCommentsData };
 			this.setStateIfMounted({
 				threads: [],
 			});
-			const { courseId, slideId, forInstructors } = this.props;
 			this.loadComments(courseId, slideId, forInstructors);
 		}
 	}
 
-	get commentIds() {
+	get commentIds(): string[] {
 		const { threads } = this.state;
 		return this.getAllCommentsIds(threads);
 	}
 
-	getAllCommentsIds(threads) {
+	getAllCommentsIds(threads: Comment[]): string[] {
 		const commentIds = [];
 
 		for (let i = 0; i < threads.length; i++) {
 			const thread = threads[i];
 			commentIds.push(thread.id);
 
-			if(!thread.replies) continue;
+			if(!thread.replies) {
+				continue;
+			}
 
 			for (let j = 0; j < thread.replies.length; j++) {
 				const reply = thread.replies[j];
@@ -117,16 +188,21 @@ class CommentsList extends Component {
 		return commentIds;
 	}
 
-	loadComments = (courseId, slideId, forInstructors, offset, count) => {
-		if(this.state.loadingComments) {
-			return;
+	loadComments = (courseId: string, slideId: string,
+		forInstructors: boolean, offset?: number, count?: number
+	): Promise<Comment[]> => {
+		const { loadingComments, } = this.state;
+		const { commentsApi, } = this.props;
+
+		if(loadingComments) {
+			return Promise.reject();
 		}
 
 		this.setStateIfMounted({
 			loadingComments: true,
 		});
 
-		const commentsApiRequest = this.props.commentsApi.getComments(courseId, slideId, forInstructors, offset, count)
+		const commentsApiRequest = commentsApi.getComments(courseId, slideId, forInstructors, offset, count)
 			.then(json => {
 				const comments = json.topLevelComments;
 
@@ -154,7 +230,7 @@ class CommentsList extends Component {
 		return commentsApiRequest;
 	};
 
-	renderPackOfComments() {
+	renderPackOfComments(): void {
 		const { threadsToRender, repliesToRender, commentsPerPack } = this.commentsData;
 		const { threads } = this.state;
 		const newThreads = [...threads];
@@ -164,14 +240,18 @@ class CommentsList extends Component {
 			const newReplies = repliesToRender.splice(0, commentsPerPack);
 			countOfCommentsToRender += newReplies.length;
 			lastThread.replies = [...lastThread.replies, ...newReplies];
-			lastThread.replies.sort((r1, r2) => r1.publishTime - r2.publishTime);
+			lastThread.replies.sort(
+				(r1, r2) => new Date(r1.publishTime).getTime() - new Date(r2.publishTime).getTime());
 		}
 
 		while (countOfCommentsToRender < commentsPerPack && threadsToRender.length !== 0) {
 			const thread = threadsToRender.shift();
+			if(!thread) {
+				break;
+			}
 			countOfCommentsToRender++;
 			const threadReplies = thread.replies;
-			let countOfCommentsLeftInPack = commentsPerPack - countOfCommentsToRender;
+			const countOfCommentsLeftInPack = commentsPerPack - countOfCommentsToRender;
 
 			if(threadReplies.length > countOfCommentsLeftInPack) {
 				thread.replies = threadReplies.splice(0, countOfCommentsLeftInPack);
@@ -189,14 +269,14 @@ class CommentsList extends Component {
 		});
 	}
 
-	setStateIfMounted(updater, callback) {
+	setStateIfMounted(updater: Partial<State>, callback?: () => void): void {
 		if(this.commentsListRef.current) {
-			this.setState(updater, callback);
+			this.setState(updater as State, callback);
 		}
 	}
 
-	handleScrollToBottom = () => {
-		const { scrollDistance } = this.commentsData;
+	handleScrollToBottom = (): void => {
+		const { scrollDistance, } = this.commentsData;
 
 		const element = document.documentElement;
 		const windowRelativeBottom = element.getBoundingClientRect().bottom;
@@ -205,12 +285,12 @@ class CommentsList extends Component {
 		}
 	};
 
-	handleScrollToCommentByHashFormUrl = () => {
-		const { courseId, slideId, forInstructors, handleTabChange } = this.props;
+	handleScrollToCommentByHashFormUrl = (): void => {
+		const { courseId, slideId, forInstructors, handleTabChange, } = this.props;
 
 		if(window.location.hash.includes("#comment")) {
 			const startIndex = window.location.hash.indexOf('-') + 1;
-			const commentIdFromHash = +window.location.hash.slice(startIndex);
+			const commentIdFromHash = window.location.hash.slice(startIndex);
 			const nameChangesTab = forInstructors ? TabsType.allComments : TabsType.instructorsComments;
 
 			const { threadsToRender, repliesToRender } = this.commentsData;
@@ -233,7 +313,7 @@ class CommentsList extends Component {
 		}
 	};
 
-	render() {
+	render(): React.ReactNode {
 		const { threads, loadingComments } = this.state;
 		const { user, courseId, slideId, commentPolicy, key, } = this.props;
 		const replies = threads.reduce((sum, current) => sum + current.replies.length, 0);
@@ -253,34 +333,34 @@ class CommentsList extends Component {
 					<>
 						{ !user.id &&
 						<Stub hasThreads={ threads.length > 0 } courseId={ courseId } slideId={ slideId }/> }
-						{ (user.id && !commentPolicy.areCommentsEnabled) && this.renderMessageIfCommentsDisabled() }
+						{ (user.id && commentPolicy && !commentPolicy.areCommentsEnabled) && this.renderMessageIfCommentsDisabled() }
 						{ this.renderSendForm() }
 						{ this.renderThreads() }
 					</> }
-				{ (commentPolicy.areCommentsEnabled && user.id && (threads.length + replies) > 7) &&
+				{ (commentPolicy && commentPolicy.areCommentsEnabled && user.id && (threads.length + replies) > 7) &&
 				<button className={ styles.sendButton } onClick={ this.handleShowSendForm }>
 					<CommentLite color="#3072C4"/>
 					Оставить комментарий
 				</button> }
 			</div>
-		)
+		);
 	}
 
-	renderMessageIfCommentsDisabled() {
+	renderMessageIfCommentsDisabled(): React.ReactElement {
 		return (
 			<div className={ styles.textForDisabledComments }>
 				В данный момент комментарии выключены.
 			</div>
-		)
-	};
+		);
+	}
 
-	renderSendForm() {
+	renderSendForm(): React.ReactNode {
 		const { sending, status, newCommentId, showFocus } = this.state;
 		const { user, forInstructors, commentPolicy } = this.props;
 		const focusedSendForm = { inSendForm: showFocus, };
 
 		return (
-			user.id && (commentPolicy.areCommentsEnabled || commentPolicy.onlyInstructorsCanReply) &&
+			user.id && commentPolicy && (commentPolicy.areCommentsEnabled || commentPolicy.onlyInstructorsCanReply) &&
 			<CommentSendForm
 				key={ showFocus }
 				isShowFocus={ focusedSendForm }
@@ -290,12 +370,13 @@ class CommentsList extends Component {
 				handleSubmit={ this.handleAddComment }
 				sending={ sending }
 				sendStatus={ status }/>
-		)
-	};
+		);
+	}
 
-	renderThreads() {
+	renderThreads(): React.ReactElement {
 		const { threads, commentEditing, reply, animation } = this.state;
 		const { user, userRoles, slideType, courseId, commentPolicy, isSlideReady, } = this.props;
+
 		const transitionStyles = {
 			enter: styles.enter,
 			exit: styles.exit,
@@ -308,7 +389,7 @@ class CommentsList extends Component {
 			exit: 500,
 		};
 
-		const actions = {
+		const actions: ActionsType = {
 			handleLikeClick: this.handleLikeClick,
 			handleCorrectAnswerMark: this.handleCorrectAnswerMark,
 			handleApprovedMark: this.handleApprovedMark,
@@ -349,46 +430,51 @@ class CommentsList extends Component {
 							</section>
 						</CSSTransition>) }
 			</TransitionGroup>
-		)
+		);
 	}
 
-	findCommentPosition(id, threads) {
+	findCommentPosition(id: string, threads: Comment[]): { parentArray: Comment[], index: number } | undefined {
 		for (let i = 0; i < threads.length; i++) {
 			const thread = threads[i];
 			if(thread.id === id) {
-				return [threads, i];
+				return { parentArray: threads, index: i };
 			}
 
-			if(!thread.replies) continue;
+			if(!thread.replies) {
+				continue;
+			}
 
 			for (let j = 0; j < thread.replies.length; j++) {
 				const reply = thread.replies[j];
 				if(reply.id === id) {
-					return [thread.replies, j];
+					return { parentArray: thread.replies, index: j };
 				}
 			}
 		}
 	}
 
-	findComment(id, threads) {
-		const [parentArray, index] = this.findCommentPosition(id, threads);
+	findComment(id: string, threads: Comment[]): Comment | undefined {
+		const commentPosition = this.findCommentPosition(id, threads);
 
-		return parentArray[index];
-	}
-
-	deleteComment(id, threads) {
-		const [parentArray, index] = this.findCommentPosition(id, threads);
-		const comment = parentArray[index];
-		parentArray.splice(index, 1);
-
-		function restoreComment() {
-			parentArray.splice(index, 0, comment);
+		if(commentPosition) {
+			return commentPosition.parentArray[commentPosition.index];
 		}
-
-		return restoreComment;
 	}
 
-	compareThreads(a, b) {
+	deleteComment(id: string, threads: Comment[]): (() => void) | undefined {
+		const commentPosition = this.findCommentPosition(id, threads);
+		if(commentPosition) {
+			const { parentArray, index } = commentPosition;
+			const comment = parentArray[index];
+			parentArray.splice(index, 1);
+
+			return () => {
+				parentArray.splice(index, 0, comment);
+			};
+		}
+	}
+
+	compareThreads(a: Comment, b: Comment): number {
 		if(a.isPinnedToTop && !b.isPinnedToTop) {
 			return -1;
 		}
@@ -408,20 +494,22 @@ class CommentsList extends Component {
 		return 0;
 	}
 
-	updateComment(id, reducer) {
+	updateComment(id: string, reducer: (comment: Comment) => Partial<Comment>): void {
 		const threads = [...this.state.threads];
 		const comment = this.findComment(id, threads);
 
-		Object.assign(comment, reducer(comment));
+		if(comment) {
+			Object.assign(comment, reducer(comment));
 
-		if(!comment.parentCommentId) {
-			threads.sort(this.compareThreads)
+			if(!comment.parentCommentId) {
+				threads.sort(this.compareThreads);
+			}
 		}
 
 		this.setState({ threads });
 	}
 
-	handleAddComment = async (commentId, text) => {
+	handleAddComment = async (commentId: string, text: string): Promise<void> => {
 		const { commentsApi, courseId, slideId, forInstructors, handleInstructorsCommentCount } = this.props;
 		const threads = [...this.state.threads];
 
@@ -434,7 +522,7 @@ class CommentsList extends Component {
 			const newComment = await commentsApi.addComment(courseId, slideId, text, null, forInstructors);
 			const pinnedComments = threads.filter(comment => comment.isPinnedToTop);
 			const filteredComments = threads.filter(comment => !comment.isPinnedToTop)
-				.sort((a, b) => new Date(b.publishTime) - new Date(a.publishTime));
+				.sort((a, b) => new Date(b.publishTime).getTime() - new Date(a.publishTime).getTime());
 
 			this.setState({
 				threads: [
@@ -459,11 +547,11 @@ class CommentsList extends Component {
 		} finally {
 			this.setState({
 				sending: false,
-			})
+			});
 		}
 	};
 
-	handleLikeClick = (commentId, isLiked) => {
+	handleLikeClick = (commentId: string, isLiked: boolean): void => {
 		const { commentsApi } = this.props;
 
 		this.updateComment(commentId, ({ likesCount }) => ({
@@ -471,41 +559,42 @@ class CommentsList extends Component {
 			isLiked: !isLiked,
 		}));
 
-		this.debouncedSendData(isLiked ? commentsApi.dislikeComment : commentsApi.likeComment, commentId);
+		this.debouncedSendData?.(isLiked ? commentsApi.dislikeComment : commentsApi.likeComment, commentId);
 	};
 
-	handleApprovedMark = (commentId, isApproved) => {
+	handleApprovedMark = (commentId: string, isApproved: boolean): void => {
 		this.updateComment(commentId, () => ({
 			isApproved: !isApproved,
 		}));
 
-		this.debouncedSendData(this.props.commentsApi.updateComment, commentId, { "isApproved": !isApproved });
+		this.debouncedSendData?.(this.props.commentsApi.updateComment, commentId, { "isApproved": !isApproved });
 	};
 
-	handleCorrectAnswerMark = (commentId, isCorrectAnswer) => {
+	handleCorrectAnswerMark = (commentId: string, isCorrectAnswer: boolean): void => {
 		this.updateComment(commentId, () => ({
 			isCorrectAnswer: !isCorrectAnswer,
 		}));
 
-		this.debouncedSendData(this.props.commentsApi.updateComment, commentId, { "isCorrectAnswer": !isCorrectAnswer });
+		this.debouncedSendData?.(this.props.commentsApi.updateComment, commentId,
+			{ "isCorrectAnswer": !isCorrectAnswer });
 	};
 
-	handlePinnedToTopMark = (commentId, isPinnedToTop) => {
+	handlePinnedToTopMark = (commentId: string, isPinnedToTop: boolean): void => {
 		this.updateComment(commentId, () => ({
 			isPinnedToTop: !isPinnedToTop,
 		}));
 
-		this.debouncedSendData(this.props.commentsApi.updateComment, commentId, { isPinnedToTop: !isPinnedToTop });
+		this.debouncedSendData?.(this.props.commentsApi.updateComment, commentId, { isPinnedToTop: !isPinnedToTop });
 	};
 
-	handleShowSendForm = () => {
+	handleShowSendForm = (): void => {
 		this.handleScroll(this.props.headerRef);
 		this.setState({
 			showFocus: true,
 		});
 	};
 
-	handleShowEditForm = (commentId) => {
+	handleShowEditForm = (commentId: string | null): void => {
 		this.setState({
 			commentEditing: {
 				...this.state.commentEditing,
@@ -514,7 +603,7 @@ class CommentsList extends Component {
 		});
 	};
 
-	handleShowReplyForm = (commentId) => {
+	handleShowReplyForm = (commentId: string | null): void => {
 		this.setState({
 			reply: {
 				...this.state.reply,
@@ -523,7 +612,7 @@ class CommentsList extends Component {
 		});
 	};
 
-	handleEditComment = async (commentId, text) => {
+	handleEditComment = async (commentId: string, text: string): Promise<void> => {
 		const { commentsApi } = this.props;
 
 		this.setState({
@@ -544,6 +633,7 @@ class CommentsList extends Component {
 			this.setState({
 				commentEditing: {
 					commentId: null,
+					sending: false,
 				},
 			});
 		} catch (e) {
@@ -559,11 +649,11 @@ class CommentsList extends Component {
 				commentEditing: {
 					sending: false,
 				},
-			})
+			});
 		}
 	};
 
-	handleAddReplyComment = async (commentId, text) => {
+	handleAddReplyComment = async (commentId: string, text: string): Promise<void> => {
 		const { commentsApi, courseId, slideId, forInstructors } = this.props;
 
 		this.setState({
@@ -608,9 +698,9 @@ class CommentsList extends Component {
 		}
 	};
 
-	handleDeleteComment = (comment) => {
+	handleDeleteComment = (comment: Comment): void => {
 		const threads = JSON.parse(JSON.stringify(this.state.threads));
-		const { forInstructors, handleInstructorsCommentCount } = this.props;
+		const { forInstructors, handleInstructorsCommentCount, commentsApi, } = this.props;
 
 		this.setState({
 			animation: true,
@@ -620,7 +710,7 @@ class CommentsList extends Component {
 		this.setState({ threads });
 
 		try {
-			this.props.commentsApi.deleteComment(comment.id);
+			commentsApi.deleteComment(comment.id);
 
 			if(forInstructors && !comment.parentCommentId) {
 				handleInstructorsCommentCount("delete");
@@ -629,7 +719,7 @@ class CommentsList extends Component {
 			Toast.push("Комментарий удалён", {
 				label: "Восстановить",
 				handler: () => {
-					restoreComment();
+					restoreComment?.();
 					this.setState({ threads });
 
 					if(forInstructors && !comment.parentCommentId) {
@@ -638,9 +728,9 @@ class CommentsList extends Component {
 
 					Toast.push("Комментарий восстановлен");
 
-					this.props.commentsApi.updateComment(comment.id);
+					commentsApi.updateComment(comment.id);
 				}
-			})
+			});
 		} catch (e) {
 			Toast.push("Комментарий не удалён. Произошла ошибка, попробуйте снова");
 			this.setState({ threads });
@@ -648,35 +738,23 @@ class CommentsList extends Component {
 		}
 	};
 
-	handleScroll = (ref) => {
+	handleScroll = (ref: React.RefObject<HTMLDivElement>): void => {
 		scrollToView(ref);
 	};
 
-	getUserSolutionsUrl = (userId) => {
-		const { courseId, slideId } = this.props;
-		return `${ window.location.origin }/Analytics/UserSolutions?courseId=${ courseId }&slideId=${ slideId }&userId=${ userId }`;
+	getUserSolutionsUrl = (userId: string): string => {
+		const { courseId, slideId, } = this.props;
+		return userSolutions + buildQuery({ courseId, slideId, userId });
 	};
 
-	sendData = (method, commentId, property) =>
+	sendData = (method: (commentId: string, property: unknown) => Promise<unknown>, commentId: string,
+		property: unknown
+	): Promise<unknown> =>
 		method(commentId, property)
 			.catch(e => {
 				Toast.push("Не удалось изменить комментарий. Произошла ошибка, попробуйте снова");
 				console.error(e);
 			});
 }
-
-CommentsList.propTypes = {
-	key: PropTypes.string,
-	user: userType.isRequired,
-	userRoles: userRoles.isRequired,
-	slideId: PropTypes.string.isRequired,
-	slideType: PropTypes.string.isRequired,
-	forInstructors: PropTypes.bool,
-	handleInstructorsCommentCount: PropTypes.func,
-	commentsApi: PropTypes.objectOf(PropTypes.func),
-	commentPolicy: commentPolicy,
-	courseId: PropTypes.string.isRequired,
-	isSlideReady: PropTypes.bool,
-};
 
 export default CommentsList;

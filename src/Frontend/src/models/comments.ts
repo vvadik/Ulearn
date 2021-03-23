@@ -28,7 +28,7 @@ export interface ShortGroupInfo {
 export interface Comment {
 	id: string,
 	author: ShortUserInfo,
-	AuthorGroups: ShortGroupInfo[],
+	authorGroups: ShortGroupInfo[],
 	text: string,
 	renderedText: string,
 	publishTime: string,

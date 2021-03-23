@@ -1,7 +1,7 @@
 import React from "react";
 import classNames from "classnames";
 
-import Avatar from "src/components/common/Avatar/Avatar.js";
+import Avatar from "src/components/common/Avatar/Avatar";
 import { Textarea, ThemeContext, } from "ui";
 import { Send3, Trash, Delete, } from "icons";
 
