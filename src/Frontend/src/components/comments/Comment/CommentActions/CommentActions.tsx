@@ -2,12 +2,11 @@ import React from "react";
 import { Link, Button } from "ui";
 import { ArrowCorner1, Edit, DocumentLite } from "icons";
 
-import { Access, CourseAccessType } from "src/consts/accessType";
+import { CourseAccessType, } from "src/consts/accessType";
 import { SlideType, } from "src/models/slide";
 import { Comment } from "src/models/comments";
 import { ActionsType } from "../../CommentsList/CommentsList";
-import { AccountState } from "src/redux/account";
-import { UserRolesWithCourseAccesses } from "src/utils/courseRoles";
+import { UserInfo, } from "src/utils/courseRoles";
 
 import styles from "./CommentActions.less";
 
@@ -46,8 +45,7 @@ interface Props {
 	url: string;
 	slideType: SlideType;
 
-	user: AccountState;
-	userRoles: UserRolesWithCourseAccesses;
+	user: UserInfo;
 
 	comment: Comment;
 
@@ -55,12 +53,12 @@ interface Props {
 	canReply: boolean;
 
 	actions: ActionsType;
-	canModerateComments: (userRoles: UserRolesWithCourseAccesses, access: CourseAccessType) => boolean;
+	canModerateComments: (user: UserInfo, access: CourseAccessType) => boolean;
 }
 
 export default function CommentActions(props: Props): React.ReactElement | null {
 	const {
-		user, comment, userRoles, url, hasReplyAction, canModerateComments,
+		user, comment, url, hasReplyAction, canModerateComments,
 		actions, slideType, canReply
 	} = props;
 
@@ -76,7 +74,7 @@ export default function CommentActions(props: Props): React.ReactElement | null 
 			</ActionButton>);
 	}
 
-	if(user.id === comment.author.id || canModerateComments(userRoles, Access.editPinAndRemoveComments)) {
+	if(user.id === comment.author.id || canModerateComments(user, CourseAccessType.editPinAndRemoveComments)) {
 		commentActions.push(
 			<div className={ styles.visibleOnDesktopAndTablet } key="Редактировать">
 				<ActionButton
@@ -87,7 +85,7 @@ export default function CommentActions(props: Props): React.ReactElement | null 
 			</div>);
 	}
 
-	if(slideType === SlideType.Exercise && canModerateComments(userRoles, Access.viewAllStudentsSubmissions)) {
+	if(slideType === SlideType.Exercise && canModerateComments(user, CourseAccessType.viewAllStudentsSubmissions)) {
 		commentActions.push(
 			<div className={ styles.visibleOnDesktopAndTablet } key="Решения">
 				<ActionLink

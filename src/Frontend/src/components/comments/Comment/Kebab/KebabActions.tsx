@@ -3,10 +3,9 @@ import { Kebab, MenuItem } from "ui";
 import { EyeClosed, Delete, Pin, Edit, DocumentLite, Ok } from "icons";
 
 import { SlideType } from "src/models/slide";
-import { Access, CourseAccessType } from "src/consts/accessType";
+import { CourseAccessType } from "src/consts/accessType";
 import { Comment } from "src/models/comments";
-import { AccountState } from "src/redux/account";
-import { UserRolesWithCourseAccesses } from "src/utils/courseRoles";
+import { UserInfo, } from "src/utils/courseRoles";
 import { ActionsType } from "../../CommentsList/CommentsList";
 
 import styles from "./KebabActions.less";
@@ -16,22 +15,21 @@ interface Props {
 	url: string;
 	slideType: SlideType;
 
-	user: AccountState;
-	userRoles: UserRolesWithCourseAccesses;
+	user: UserInfo;
 
 	comment: Comment;
 
 	actions: ActionsType;
-	canModerateComments: (userRoles: UserRolesWithCourseAccesses, access: CourseAccessType) => boolean;
+	canModerateComments: (user: UserInfo, access: CourseAccessType) => boolean;
 	handleCommentBackGround: (commentId: string, isApproved: boolean) => void;
 }
 
 export default function KebabActions(props: Props): React.ReactElement {
-	const { user, comment, userRoles, url, canModerateComments, actions, slideType, handleCommentBackGround } = props;
-	const canModerate = canModerateComments(userRoles, Access.editPinAndRemoveComments);
+	const { user, comment, url, canModerateComments, actions, slideType, handleCommentBackGround } = props;
+	const canModerate = canModerateComments(user, CourseAccessType.editPinAndRemoveComments);
 	const canDeleteAndEdit = (user.id === comment.author.id || canModerate);
 	const canSeeSubmissions = (slideType === SlideType.Exercise &&
-		canModerateComments(userRoles, Access.viewAllStudentsSubmissions));
+		canModerateComments(user, CourseAccessType.viewAllStudentsSubmissions));
 
 	return (
 		<div className={ styles.instructorsActions }>

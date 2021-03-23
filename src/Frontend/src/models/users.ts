@@ -1,26 +1,26 @@
 export enum Gender {
 	Male = 'male',
-	Female = 'female'
+	Female = 'female',
 }
 
 export interface ShortUserInfo {
-	id: string
-	login?: string
-	email?: string
-	firstName: string
-	lastName: string
-	visibleName: string
-	avatarUrl?: string | null
-	gender: Gender | null
+	id: string;
+	login: string;
+	email: string;
+	firstName: string;
+	lastName: string;
+	visibleName: string;
+	avatarUrl: string;
+	gender?: Gender;
 }
 
 export interface UsersSearchResponse {
-	users: FoundUserResponse[],
+	users: FoundUserResponse[];
 }
 
 export interface FoundUserResponse {
-	user: ShortUserInfo,
-	fields: SearchField[],
+	user: ShortUserInfo;
+	fields: SearchField[];
 }
 
 export enum SearchField {

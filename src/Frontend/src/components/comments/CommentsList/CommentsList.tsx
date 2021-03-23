@@ -16,8 +16,7 @@ import scrollToView from "src/utils/scrollToView";
 import { buildQuery } from "src/utils";
 
 import { TabsType } from "src/consts/tabsType";
-import { AccountState } from "src/redux/account";
-import { UserRolesWithCourseAccesses } from "src/utils/courseRoles";
+import { UserInfo, } from "src/utils/courseRoles";
 import { Comment, CommentPolicy } from "src/models/comments";
 import { SlideType } from "src/models/slide";
 import { CommentStatus } from "src/consts/comments";
@@ -57,8 +56,7 @@ interface Props {
 	slideId: string;
 	slideType: SlideType;
 
-	user: AccountState;
-	userRoles: UserRolesWithCourseAccesses;
+	user: UserInfo;
 
 	forInstructors: boolean;
 	isSlideReady: boolean;
@@ -70,7 +68,7 @@ interface Props {
 
 interface State {
 	status: string;
-	newCommentId: number;
+	newCommentId: string;
 	saveCommentLikeStatus: null,
 	threads: Comment[],
 	commentEditing: CommentStatus;
@@ -108,7 +106,7 @@ class CommentsList extends Component<Props, State> {
 		super(props);
 
 		this.state = {
-			newCommentId: 1,
+			newCommentId: '1',
 			saveCommentLikeStatus: null,
 			threads: [],
 			commentEditing: {
@@ -362,7 +360,6 @@ class CommentsList extends Component<Props, State> {
 		return (
 			user.id && commentPolicy && (commentPolicy.areCommentsEnabled || commentPolicy.onlyInstructorsCanReply) &&
 			<CommentSendForm
-				key={ showFocus }
 				isShowFocus={ focusedSendForm }
 				isForInstructors={ forInstructors }
 				commentId={ newCommentId }
@@ -375,7 +372,7 @@ class CommentsList extends Component<Props, State> {
 
 	renderThreads(): React.ReactElement {
 		const { threads, commentEditing, reply, animation } = this.state;
-		const { user, userRoles, slideType, courseId, commentPolicy, isSlideReady, } = this.props;
+		const { user, slideType, courseId, commentPolicy, isSlideReady, } = this.props;
 
 		const transitionStyles = {
 			enter: styles.enter,
@@ -416,7 +413,6 @@ class CommentsList extends Component<Props, State> {
 							<section className={ styles.thread } key={ comment.id } ref={ this.lastThreadRef }>
 								<Thread
 									user={ user }
-									userRoles={ userRoles }
 									slideType={ slideType }
 									courseId={ courseId }
 									animation={ animation }

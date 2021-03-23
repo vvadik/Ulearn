@@ -3,9 +3,8 @@ import { TransitionGroup, CSSTransition } from "react-transition-group";
 import Comment from "../Comment/Comment";
 import CommentSendForm from "../CommentSendForm/CommentSendForm";
 
-import { UserRolesWithCourseAccesses } from "src/utils/courseRoles";
+import { UserInfo, } from "src/utils/courseRoles";
 import { CommentStatus } from "src/consts/comments";
-import { AccountState } from "src/redux/account";
 import { SlideType } from "src/models/slide";
 import { Comment as CommentType, CommentPolicy } from "src/models/comments";
 import { ActionsType } from "../CommentsList/CommentsList";
@@ -17,8 +16,7 @@ interface Props {
 	courseId: string;
 	slideType: SlideType;
 
-	user: AccountState;
-	userRoles: UserRolesWithCourseAccesses;
+	user: UserInfo;
 
 	comment: CommentType;
 	reply: CommentStatus;
@@ -33,7 +31,7 @@ interface Props {
 }
 
 function Thread({
-	comment, user, userRoles, reply, commentEditing, actions, slideType,
+	comment, user, reply, commentEditing, actions, slideType,
 	getUserSolutionsUrl, commentPolicy, courseId, isSlideReady, animation,
 }: Props): React.ReactElement {
 	const replies = comment.replies || [];
@@ -56,7 +54,6 @@ function Thread({
 				slideType={ slideType }
 				courseId={ courseId }
 				user={ user }
-				userRoles={ userRoles }
 				isSlideReady={ isSlideReady }>
 				{ comment.replies.length > 0 && renderReplies(comment) }
 				{ (isParentComment && comment.id === reply.commentId) &&

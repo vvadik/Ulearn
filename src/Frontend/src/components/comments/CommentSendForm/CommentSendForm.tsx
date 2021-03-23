@@ -7,16 +7,17 @@ import MarkdownEditor from "./MarkdownEditor/MarkdownEditor";
 
 import { isMobile } from "src/utils/getDeviceType";
 
+import { UserInfo } from "src/utils/courseRoles";
 import { ShortUserInfo } from "src/models/users";
 
 import styles from "./CommentSendForm.less";
 
 interface Props {
-	text: string;
-	author?: ShortUserInfo;
+	text?: string;
+	author?: UserInfo;
 	commentId: string;
 	sendStatus?: string;
-	submitTitle: string;
+	submitTitle?: string;
 	cancelTitle?: string;
 	className?: string;
 
@@ -28,7 +29,7 @@ interface Props {
 	};
 	sending?: boolean;
 
-	handleCancel: () => void;
+	handleCancel?: () => void;
 	handleSubmit: (commentId: string, text: string) => void;
 }
 
@@ -67,11 +68,10 @@ class CommentSendForm extends Component<Props, State> {
 		const { error, text } = this.state;
 
 		const classes = classNames(className, styles.formContainer);
-		const avatarClasses = classNames(styles.avatar, styles.visibleOnDesktopAndTablet);
 
 		return (
 			<div className={ classes }>
-				{ author && (<Avatar className={ avatarClasses } user={ author } size="big"/>) }
+				{ author && !isMobile() && (<Avatar className={ styles.avatar } user={ author as ShortUserInfo } size="big"/>) }
 				<form className={ styles.form } onSubmit={ this.handleSubmit }>
 					<MarkdownEditor
 						isShowFocus={ isShowFocus }

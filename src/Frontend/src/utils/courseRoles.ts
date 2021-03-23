@@ -1,4 +1,5 @@
-import { CourseAccessType, CourseRoleType } from "src/consts/accessType";
+import { CourseAccessType, CourseRoleType, SystemAccessType } from "src/consts/accessType";
+import { ShortUserInfo } from "../models/users";
 
 function isCourseAdmin(userRoles: UserRoles): boolean {
 	return userRoles.isSystemAdministrator ||
@@ -15,8 +16,10 @@ interface UserRoles {
 	courseRole: CourseRoleType;
 }
 
-interface UserRolesWithCourseAccesses extends UserRoles {
+interface UserInfo extends Partial<ShortUserInfo>, UserRoles {
+	isAuthenticated: boolean;
+	systemAccesses: SystemAccessType[];
 	courseAccesses: CourseAccessType[];
 }
 
-export { isCourseAdmin, isInstructor, UserRoles, UserRolesWithCourseAccesses, };
+export { isCourseAdmin, isInstructor, UserRoles, UserInfo, };

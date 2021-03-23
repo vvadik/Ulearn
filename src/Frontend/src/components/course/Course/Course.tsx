@@ -37,7 +37,7 @@ import Meta from "src/consts/Meta";
 import { CourseInfo, PageInfo, UnitInfo, UnitsInfo } from "src/models/course";
 import { SlideUserProgress, } from "src/models/userProgress";
 import { AccountState } from "src/redux/account";
-import { CourseAccessType, CourseRoleType } from "src/consts/accessType";
+import { CourseRoleType } from "src/consts/accessType";
 import {
 	CourseStatistics,
 	FlashcardsStatistics,
@@ -48,7 +48,8 @@ import {
 } from "../Navigation/types";
 
 import styles from "./Course.less";
-import { UserRoles, UserRolesWithCourseAccesses } from "../../../utils/courseRoles";
+import { UserInfo, UserRoles } from "../../../utils/courseRoles";
+import { ShortUserInfo } from "../../../models/users";
 
 const slideNavigationButtonTitles = {
 	next: "Далее",
@@ -382,13 +383,11 @@ class Course extends Component<Props, State> {
 			? currentSlideInfo.current
 			: null;
 
-		const { isSystemAdministrator, accessesByCourse, roleByCourse } = user;
-		const courseAccesses = accessesByCourse[courseId] ? accessesByCourse[courseId] : [];
+		const { isSystemAdministrator, roleByCourse } = user;
 		const courseRole = roleByCourse[courseId] ? roleByCourse[courseId] : CourseRoleType.student;
-		const userRoles: UserRolesWithCourseAccesses = {
+		const userRoles: UserRoles = {
 			isSystemAdministrator,
 			courseRole,
-			courseAccesses,
 		};
 		return (
 			<main className={ wrapperClassName }>
@@ -426,7 +425,7 @@ class Course extends Component<Props, State> {
 				{ currentSlideInfo && isNavigationVisible && this.renderNavigationButtons(currentSlideInfo) }
 				{ currentSlideInfo && currentSlideInfo.current
 				&& slideInfo && slideInfo.id && isNavigationVisible
-				&& this.renderComments(currentSlideInfo.current, userRoles) }
+				&& this.renderComments(currentSlideInfo.current) }
 				{ isNavigationVisible && this.renderFooter() }
 			</main>
 		);
@@ -494,18 +493,27 @@ class Course extends Component<Props, State> {
 		return baseHref + buildQuery({ autoplay: true });
 	};
 
-	renderComments(currentSlide: ShortSlideInfo,
-		userRoles: UserRolesWithCourseAccesses,
-	): React.ReactElement {
+	renderComments(currentSlide: ShortSlideInfo,): React.ReactElement {
 		const { user, courseId, isSlideReady, } = this.props;
+		const { isSystemAdministrator, accessesByCourse, roleByCourse, systemAccesses, } = user;
+		const courseAccesses = accessesByCourse[courseId] ? accessesByCourse[courseId] : [];
+
+		const userInfo: UserInfo = {
+			...user as ShortUserInfo,
+
+			isAuthenticated: user.isAuthenticated,
+			isSystemAdministrator,
+			courseRole: roleByCourse[courseId],
+			courseAccesses,
+			systemAccesses
+		};
 
 		return (
 			<BlocksWrapper className={ styles.commentsWrapper }>
 				<CommentsView
-					user={ user }
+					user={ userInfo }
 					slideType={ currentSlide.type }
 					slideId={ currentSlide.id }
-					userRoles={ userRoles }
 					courseId={ courseId }
 					isSlideReady={ isSlideReady }
 				/>

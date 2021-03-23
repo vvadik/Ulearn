@@ -10,13 +10,12 @@ import Header from "./Header/Header";
 import Marks from "./Marks/Marks";
 import CommentActions from "./CommentActions/CommentActions";
 
-import { UserRolesWithCourseAccesses } from "src/utils/courseRoles";
+import { UserInfo, } from "src/utils/courseRoles";
 import scrollToView from "src/utils/scrollToView";
 import { convertDefaultTimezoneToLocal } from "src/utils/momentUtils";
 
-import { AccountState } from "src/redux/account";
 import { CommentStatus } from "src/consts/comments";
-import { Access, CourseAccessType, CourseRoleType } from "src/consts/accessType";
+import { CourseAccessType, CourseRoleType, SystemAccessType } from "src/consts/accessType";
 import { Comment as CommentType, CommentPolicy } from "src/models/comments";
 import { SlideType } from "src/models/slide";
 import { ActionsType } from "../CommentsList/CommentsList";
@@ -28,8 +27,7 @@ interface Props {
 	courseId: string;
 	slideType: SlideType;
 
-	user: AccountState;
-	userRoles: UserRolesWithCourseAccesses;
+	user: UserInfo;
 
 	comment: CommentType;
 	commentEditing: CommentStatus;
@@ -81,9 +79,9 @@ class Comment extends Component<Props, State> {
 	};
 
 	render(): React.ReactNode {
-		const { children, commentEditing, comment, userRoles, user } = this.props;
-		const canViewProfiles = (user.systemAccesses && user.systemAccesses.includes(Access.viewAllProfiles)) ||
-			userRoles.isSystemAdministrator;
+		const { children, commentEditing, comment, user, } = this.props;
+		const canViewProfiles = (user.systemAccesses.includes(SystemAccessType.viewAllProfiles)) ||
+			user.isSystemAdministrator;
 		const profileUrl = `${ window.location.origin }/Account/Profile?userId=${ comment.author.id }`;
 
 		return (
@@ -110,10 +108,10 @@ class Comment extends Component<Props, State> {
 	}
 
 	renderHeader(profileUrl: string, canViewProfiles: boolean): React.ReactElement {
-		const { actions, comment, userRoles, user, slideType, getUserSolutionsUrl, courseId } = this.props;
+		const { actions, comment, user, slideType, getUserSolutionsUrl, courseId } = this.props;
 		const canSeeKebabActions = user.id && (user.id === comment.author.id ||
-			this.canModerateComments(userRoles, Access.editPinAndRemoveComments) ||
-			this.canModerateComments(userRoles, Access.viewAllStudentsSubmissions));
+			this.canModerateComments(user, CourseAccessType.editPinAndRemoveComments) ||
+			this.canModerateComments(user, CourseAccessType.viewAllStudentsSubmissions));
 
 		return (
 			<Header
@@ -134,7 +132,6 @@ class Comment extends Component<Props, State> {
 					user={ user }
 					url={ getUserSolutionsUrl(comment.author.id) }
 					canModerateComments={ this.canModerateComments }
-					userRoles={ userRoles }
 					slideType={ slideType }
 					comment={ comment }
 					actions={ actions }
@@ -151,7 +148,7 @@ class Comment extends Component<Props, State> {
 
 	renderComment(): React.ReactNode {
 		const {
-			comment, user, userRoles, hasReplyAction, actions, slideType,
+			comment, user, hasReplyAction, actions, slideType,
 			getUserSolutionsUrl
 		} = this.props;
 
@@ -165,10 +162,9 @@ class Comment extends Component<Props, State> {
 				<CommentActions
 					slideType={ slideType }
 					comment={ comment }
-					canReply={ this.canReply(userRoles) }
+					canReply={ this.canReply(user) }
 					user={ user }
 					url={ getUserSolutionsUrl(comment.author.id) }
-					userRoles={ userRoles }
 					hasReplyAction={ hasReplyAction }
 					actions={ actions }
 					canModerateComments={ this.canModerateComments }/> }
@@ -196,12 +192,12 @@ class Comment extends Component<Props, State> {
 		this.props.actions.handleShowEditForm(null);
 	};
 
-	canModerateComments = (role: UserRolesWithCourseAccesses, accesses: CourseAccessType): boolean => {
+	canModerateComments = (role: UserInfo, accesses: CourseAccessType): boolean => {
 		return role.isSystemAdministrator || role.courseRole === CourseRoleType.courseAdmin ||
 			(role.courseRole === CourseRoleType.instructor && role.courseAccesses.includes(accesses));
 	};
 
-	canReply = (role: UserRolesWithCourseAccesses): boolean => {
+	canReply = (role: UserInfo): boolean => {
 		const { commentPolicy } = this.props;
 		if(!commentPolicy) {
 			return false;
@@ -213,10 +209,10 @@ class Comment extends Component<Props, State> {
 	};
 
 	canViewStudentsGroup = (): boolean => {
-		const { userRoles, user } = this.props;
+		const { user } = this.props;
 
-		return (user.systemAccesses && user.systemAccesses.includes(Access.viewAllGroupMembers)) ||
-			userRoles.isSystemAdministrator;
+		return (user.systemAccesses && user.systemAccesses.includes(SystemAccessType.viewAllGroupMembers)) ||
+			user.isSystemAdministrator;
 	};
 
 	handleCommentBackground = (commentId: string, isApproved: boolean): void => {

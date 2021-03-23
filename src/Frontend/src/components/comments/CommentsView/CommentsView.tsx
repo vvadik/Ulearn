@@ -5,15 +5,13 @@ import api from "src/api";
 import { Tabs } from "ui";
 import CommentsList from "../CommentsList/CommentsList";
 
-import { isInstructor, UserRolesWithCourseAccesses } from "src/utils/courseRoles";
+import { isInstructor, UserInfo, } from "src/utils/courseRoles";
 
 import { TabsType } from "src/consts/tabsType";
-import { AccountState } from "src/redux/account";
 import { SlideType } from "src/models/slide";
 import { Comment, CommentPolicy } from "src/models/comments";
 
 import styles from "./CommentsView.less";
-
 
 
 interface Props {
@@ -21,8 +19,7 @@ interface Props {
 	slideId: string;
 	slideType: SlideType;
 
-	user: AccountState;
-	userRoles: UserRolesWithCourseAccesses;
+	user: UserInfo;
 
 	commentsApi: typeof api.comments;
 
@@ -61,20 +58,20 @@ class CommentsView extends Component<Props, State> {
 	};
 
 	componentDidMount(): void {
-		const { courseId, slideId, userRoles } = this.props;
+		const { courseId, slideId, user, } = this.props;
 
 		this.loadCommentPolicy(courseId);
 
-		if(isInstructor(userRoles)) {
+		if(isInstructor(user)) {
 			this.loadComments(courseId, slideId);
 		}
 	}
 
 	componentDidUpdate(prevProps: Props): void {
-		const { slideId, courseId, userRoles, } = this.props;
+		const { slideId, courseId, user, } = this.props;
 
 		if(slideId !== prevProps.slideId) {
-			if(isInstructor(userRoles)) {
+			if(isInstructor(user)) {
 				this.loadComments(courseId, slideId);
 			}
 		}
@@ -107,7 +104,7 @@ class CommentsView extends Component<Props, State> {
 	};
 
 	render(): React.ReactElement {
-		const { user, userRoles, courseId, slideId, slideType, commentsApi, isSlideReady, } = this.props;
+		const { user, courseId, slideId, slideType, commentsApi, isSlideReady, } = this.props;
 		const { activeTab, commentPolicy, } = this.state;
 
 		return (
@@ -123,7 +120,6 @@ class CommentsView extends Component<Props, State> {
 						commentsApi={ commentsApi }
 						commentPolicy={ commentPolicy }
 						user={ user }
-						userRoles={ userRoles }
 						slideId={ slideId }
 						courseId={ courseId }
 						isSlideReady={ isSlideReady }>
@@ -134,12 +130,12 @@ class CommentsView extends Component<Props, State> {
 	}
 
 	renderHeader(): React.ReactElement {
-		const { userRoles, } = this.props;
+		const { user, } = this.props;
 		const { activeTab, instructorsCommentCount, } = this.state;
 
 		return (
 			<header className={ styles.header } ref={ this.headerRef }>
-				{ isInstructor(userRoles) &&
+				{ isInstructor(user) &&
 				<div className={ styles.tabs }>
 					<Tabs value={ activeTab } onValueChange={ this.handleTabChangeByUser }>
 						<Tabs.Tab id={ TabsType.allComments }>К слайду</Tabs.Tab>
@@ -162,10 +158,10 @@ class CommentsView extends Component<Props, State> {
 		this.handleTabChange(id as TabsType, true);
 
 	handleTabChange = (id: TabsType, isUserAction: boolean): void => {
-		const { userRoles, } = this.props;
+		const { user, } = this.props;
 		const { activeTab, tabHasAutomaticallyChanged, } = this.state;
 
-		if(isInstructor(userRoles)) {
+		if(isInstructor(user)) {
 			if(!isUserAction && tabHasAutomaticallyChanged) {
 				return;
 			}
