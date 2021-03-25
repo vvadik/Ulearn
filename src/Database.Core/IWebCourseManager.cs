@@ -36,7 +36,7 @@ namespace Database
 		void WaitWhileCourseIsLocked(string courseId);
 		void MoveCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory);
 		bool TryReloadCourse(string courseId);
-		void ReloadCourseNotSafe(string courseId);
+		void ReloadCourseNotSafe(string courseId, bool notifyAboutErrors = true);
 		void ExtractTempCourseChanges(string tempCourseId);
 		bool TryCreateTempCourse(string courseId, string courseTitle, Guid firstVersionId);
 		void NotifyCourseChanged(string courseId);
