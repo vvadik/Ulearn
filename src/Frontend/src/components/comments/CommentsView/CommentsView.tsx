@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 
 import api from "src/api";
 
@@ -7,9 +8,11 @@ import CommentsList from "../CommentsList/CommentsList";
 
 import { isInstructor, UserInfo, } from "src/utils/courseRoles";
 
+import { RootState } from "src/redux/reducers";
 import { TabsType } from "src/consts/tabsType";
 import { SlideType } from "src/models/slide";
 import { Comment, CommentPolicy } from "src/models/comments";
+import { DeviceType } from "src/consts/deviceType";
 
 import styles from "./CommentsView.less";
 
@@ -25,6 +28,8 @@ interface Props {
 
 	openInstructorsComments?: boolean;
 	isSlideReady: boolean;
+
+	deviceType: DeviceType;
 }
 
 interface State {
@@ -130,7 +135,7 @@ class CommentsView extends Component<Props, State> {
 	}
 
 	renderHeader(): React.ReactElement {
-		const { user, } = this.props;
+		const { user, deviceType, } = this.props;
 		const { activeTab, instructorsCommentCount, } = this.state;
 
 		return (
@@ -144,8 +149,8 @@ class CommentsView extends Component<Props, State> {
 							{ instructorsCommentCount > 0 &&
 							<span className={ styles.commentsCount }>{ instructorsCommentCount }</span> }
 						</Tabs.Tab>
-						{ activeTab === TabsType.instructorsComments &&
-						<span className={ styles.textForInstructors }> {/*TODO DO NOT SHOW ON MOBILE*/ }
+						{ activeTab === TabsType.instructorsComments && deviceType !== DeviceType.mobile &&
+						<span className={ styles.textForInstructors }>
 							Студенты не видят эти комментарии
 						</span> }
 					</Tabs>
@@ -195,4 +200,4 @@ class CommentsView extends Component<Props, State> {
 	};
 }
 
-export default CommentsView;
+export default connect((state: RootState) => ({ deviceType: state.device.deviceType }))(CommentsView);
