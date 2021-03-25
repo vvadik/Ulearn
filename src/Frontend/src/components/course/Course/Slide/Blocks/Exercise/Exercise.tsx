@@ -284,6 +284,7 @@ class Exercise extends React.Component<Props, State> {
 			}
 
 			if(solutionRunStatus === SolutionRunStatus.CompilationError
+				|| solutionRunStatus === SolutionRunStatus.Ignored
 				|| submission?.automaticChecking?.result === AutomaticExerciseCheckingResult.WrongAnswer
 				|| submission?.automaticChecking?.result === AutomaticExerciseCheckingResult.CompilationError) {
 				this.setState({

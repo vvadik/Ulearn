@@ -26,6 +26,9 @@ function GetSubmissionColor(
 		|| checkingResult === CheckingResult.CompilationError || checkingResult === CheckingResult.WrongAnswer || checkingResult == CheckingResult.RuntimeError) {
 		return SubmissionColor.WrongAnswer;
 	}
+	if(solutionRunStatus === SolutionRunStatus.Ignored) {
+		return SubmissionColor.NeedImprovements;
+	}
 	if(isSkipped) {
 		return selectedSubmissionIsLast ? SubmissionColor.MaxResult : SubmissionColor.Message;
 	}
