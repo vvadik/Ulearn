@@ -5,3 +5,6 @@ CREATE EXTENSION IF NOT EXISTS "pg_trgm"; --gin индекс с триграмм
 
 CREATE OR REPLACE FUNCTION immutable_concat_ws(text, VARIADIC text[])
 RETURNS text AS 'text_concat_ws' LANGUAGE internal IMMUTABLE PARALLEL SAFE;
+
+CREATE SCHEMA IF NOT EXISTS antiplagiarism;
+ALTER SCHEMA antiplagiarism OWNER TO ulearn;
