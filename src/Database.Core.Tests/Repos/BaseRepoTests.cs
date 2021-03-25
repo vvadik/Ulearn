@@ -91,7 +91,7 @@ namespace Database.Core.Tests.Repos
 		private async Task CreateInitialDataInDatabaseAsync()
 		{
 			var initialDataCreator = serviceProvider.GetService<InitialDataCreator>();
-			await initialDataCreator.CreateRolesAsync().ConfigureAwait(false);
+			await initialDataCreator.CreateRoles().ConfigureAwait(false);
 		}
 
 		private async Task CreateTestUsersAsync()

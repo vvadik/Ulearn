@@ -19,7 +19,6 @@ namespace uLearn.Web
 			FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
 			RouteConfig.RegisterRoutes(RouteTable.Routes);
 			BundleConfig.RegisterBundles(BundleTable.Bundles);
-			Database.Configuration.Seed(new ULearnDb());
 
 			/* Disable identity checks for CSRF tokens.
 			 * See http://stackoverflow.com/questions/14970102/anti-forgery-token-is-meant-for-user-but-the-current-user-is-username for details

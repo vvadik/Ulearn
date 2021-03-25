@@ -79,7 +79,7 @@ namespace Ulearn.Web.Api
 
 		protected override IApplicationBuilder ConfigureWebApplication(IApplicationBuilder app)
 		{
-			// MigrateAndCreateInitialData(app); // NOTE: Миграции в Api отключены пока выполняются в Web
+			MigrateAndCreateInitialData(app);
 			ConfigureWebsockets(app);
 			return app;
 		}
