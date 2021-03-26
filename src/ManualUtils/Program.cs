@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -50,6 +51,7 @@ namespace ManualUtils
 			//GetIps(db);
 			//FillAntiplagFields.FillClientSubmissionId(adb);
 			//await XQueueRunAutomaticChecking(db);
+			//TextBlobsWithZeroByte(db);
 		}
 
 		private static async Task ResendLti(UlearnDb db)
@@ -190,6 +192,30 @@ namespace ManualUtils
 			// Где взять GeoLite2-City.mmdb читай в GeoLite2-City.mmdb.readme.txt
 			var courses = new[] { "BasicProgramming", "BasicProgramming2", "Linq", "complexity", "CS2" };
 			GetIpAddresses.Run(db, lastMonthCount: 13, courses, isNotMembersOfGroups: true, onlyRegisteredFrom: true);
+		}
+
+		private static void TextBlobsWithZeroByte(UlearnDb db)
+		{
+			int i = 0;
+			var hashes = new List<string>();
+			foreach (var text in db.Texts.AsNoTracking())
+			{
+				if (text.Text.Contains('\0'))
+				{
+					Console.WriteLine(i);
+					hashes.Add(text.Hash);
+					i++;
+				}
+			}
+			i = 0;
+			foreach (var hash in hashes)
+			{
+				var temp = db.Texts.Find(hash);
+				temp.Text = temp.Text.Replace("\0", "");
+				Console.WriteLine("s" + i);
+				i++;
+				db.SaveChanges(); 
+			}
 		}
 	}
 }
