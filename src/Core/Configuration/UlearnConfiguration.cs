@@ -132,6 +132,8 @@ namespace Ulearn.Core.Configuration
 
 		[CanBeNull] public VideoAnnotationsClientConfiguration VideoAnnotationsClient { get; set; }
 		
+		[CanBeNull] public NotificationsConfiguration Notifications { get; set; }
+		
 		public bool DisableKonturServices { get; set; }
 	}
 
@@ -145,6 +147,11 @@ namespace Ulearn.Core.Configuration
 		public bool Enabled { get; set; }
 		public string Endpoint { get; set; }
 		public string Token { get; set; }
+	}
+
+	public class NotificationsConfiguration
+	{
+		public bool Enabled { get; set; }
 	}
 
 	public class HerculesSinkConfiguration
