@@ -92,7 +92,6 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 		/// Уведомление в плашке под шапкой
 		/// </summary>
 		[HttpGet("global")]
-		[Authorize]
 		public ActionResult<NotificationBarResponse> GlobalNotification()
 		{
 			return new NotificationBarResponse
