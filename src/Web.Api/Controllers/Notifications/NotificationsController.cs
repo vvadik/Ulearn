@@ -9,10 +9,12 @@ using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Options;
 using Vostok.Logging.Abstractions;
 using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Models.Parameters.Notifications;
 using Ulearn.Web.Api.Models.Responses.Notifications;
+using Web.Api.Configuration;
 
 namespace Ulearn.Web.Api.Controllers.Notifications
 {
@@ -22,6 +24,7 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 		private readonly IFeedRepo feedRepo;
 		private readonly IServiceProvider serviceProvider;
 		private readonly INotificationDataPreloader notificationDataPreloader;
+		private readonly WebApiConfiguration configuration;
 		private static int? commentsFeedNotificationTransportId;
 		private static ILog log => LogProvider.Get().ForContext(typeof(NotificationsController));
 
@@ -29,12 +32,14 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 			IUsersRepo usersRepo,
 			IFeedRepo feedRepo,
 			IServiceProvider serviceProvider,
-			INotificationDataPreloader notificationDataPreloader)
+			INotificationDataPreloader notificationDataPreloader,
+			IOptions<WebApiConfiguration> options)
 			: base(courseManager, db, usersRepo)
 		{
 			this.feedRepo = feedRepo;
 			this.serviceProvider = serviceProvider;
 			this.notificationDataPreloader = notificationDataPreloader;
+			this.configuration = options.Value;
 		}
 
 		public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -80,6 +85,20 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 			{
 				Count = unreadCountAndLastTimestamp.Item1,
 				LastTimestamp = unreadCountAndLastTimestamp.Item2,
+			};
+		}
+		
+		/// <summary>
+		/// Уведомление в плашке под шапкой
+		/// </summary>
+		[HttpGet("global")]
+		[Authorize]
+		public ActionResult<NotificationBarResponse> GlobalNotification()
+		{
+			return new NotificationBarResponse
+			{
+				Message = configuration.NotificationBar,
+				Force = configuration.ForceNotificationBar,
 			};
 		}
 

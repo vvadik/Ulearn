@@ -11,6 +11,10 @@ namespace Web.Api.Configuration
 		public UlearnWebConfiguration Web { get; set; }
 
 		public FrontendConfiguration Frontend { get; set; }
+		
+		public string NotificationBar { get; set; } // сообщение в плашке на фронте
+			
+		public bool ForceNotificationBar { get; set; } // запретить скрытие плашки
 	}
 
 	public class UlearnWebConfiguration
