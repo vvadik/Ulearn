@@ -55,6 +55,7 @@ namespace ManualUtils
 			//GetIps(db);
 			//FillAntiplagFields.FillClientSubmissionId(adb);
 			//await XQueueRunAutomaticChecking(db);
+			//TextBlobsWithZeroByte(db);
 		}
 
 		private static void GenerateUpdateSequences()
@@ -243,6 +244,30 @@ namespace ManualUtils
 				postgres[table].SymmetricExceptWith(sqlserver[table]);
 				if (postgres[table].Count > 0)
 					Console.WriteLine($"{table}:" + string.Join(", ", postgres[table]));
+			}
+		}
+
+		private static void TextBlobsWithZeroByte(UlearnDb db)
+		{
+			int i = 0;
+			var hashes = new List<string>();
+			foreach (var text in db.Texts.AsNoTracking())
+			{
+				if (text.Text.Contains('\0'))
+				{
+					Console.WriteLine(i);
+					hashes.Add(text.Hash);
+					i++;
+				}
+			}
+			i = 0;
+			foreach (var hash in hashes)
+			{
+				var temp = db.Texts.Find(hash);
+				temp.Text = temp.Text.Replace("\0", "");
+				Console.WriteLine("s" + i);
+				i++;
+				db.SaveChanges(); 
 			}
 		}
 	}

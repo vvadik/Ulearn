@@ -90,8 +90,7 @@ namespace uLearn.Web.Controllers
 			if (selectedUnit == null)
 				return HttpNotFound();
 
-			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
-			var slides = selectedUnit.GetSlides(isInstructor);
+			var slides = selectedUnit.GetSlides(false);
 			var slidesIds = slides.Select(s => s.Id).ToList();
 
 			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
