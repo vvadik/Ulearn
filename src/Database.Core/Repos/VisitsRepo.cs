@@ -96,7 +96,7 @@ namespace Database.Repos
 				.Select(v => v.CourseId)
 				.Distinct()
 				.Select(i => db.LastVisits
-					.Where(v => v.CourseId == i)
+					.Where(v => v.CourseId == i && v.UserId == userId)
 					.OrderByDescending(v => v.Timestamp)
 					.FirstOrDefault())
 				.ToListAsync();
