@@ -85,7 +85,7 @@ function openPopup(target, toggleClass) {
 		isGrant = false;
 	}
 
-	if (className === "li-info" || className === "li-warning") {
+	if (className === "li-info" || className === "li-warning" || className === "li-success") {
 		isGrant = false;
 	}
 
