@@ -58,14 +58,17 @@ namespace XQueueWatcher
 
 			while (true)
 			{
-				var xQueueRepo = serviceProvider.GetService<IXQueueRepo>();
-				var dbWatchers = await xQueueRepo.GetXQueueWatchers();
+				if (configuration.XQueueWatcher == null || configuration.XQueueWatcher.Enabled == true)
+				{
+					var xQueueRepo = serviceProvider.GetService<IXQueueRepo>();
+					var dbWatchers = await xQueueRepo.GetXQueueWatchers();
 
-				var tasks = dbWatchers.Select(SafeGetAndProcessSubmissionFromXQueue);
+					var tasks = dbWatchers.Select(SafeGetAndProcessSubmissionFromXQueue);
 
-				Task.WaitAll(tasks.ToArray(), cancellationToken);
-				if (cancellationToken.IsCancellationRequested)
-					break;
+					Task.WaitAll(tasks.ToArray(), cancellationToken);
+					if (cancellationToken.IsCancellationRequested)
+						break;
+				}
 
 				Task.Delay(pauseBetweenRequests, cancellationToken).Wait(cancellationToken);
 				keepAliver.Ping(keepAliveInterval);

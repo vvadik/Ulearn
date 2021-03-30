@@ -134,6 +134,8 @@ namespace Ulearn.Core.Configuration
 		
 		[CanBeNull] public NotificationsConfiguration Notifications { get; set; }
 		
+		[CanBeNull] public XQueueWatcherConfiguration XQueueWatcher { get; set; }
+		
 		public bool DisableKonturServices { get; set; }
 	}
 
@@ -150,6 +152,11 @@ namespace Ulearn.Core.Configuration
 	}
 
 	public class NotificationsConfiguration
+	{
+		public bool Enabled { get; set; }
+	}
+	
+	public class XQueueWatcherConfiguration
 	{
 		public bool Enabled { get; set; }
 	}
