@@ -2713,6 +2713,13 @@ CREATE INDEX "IX_Visits_UserId" ON public."Visits" USING btree ("UserId");
 
 
 --
+-- Name: IX_Visits_CourseId_UserId; Type: INDEX; Schema: public; Owner: ulearn
+--
+
+CREATE INDEX "IX_Visits_CourseId_UserId" ON public."Visits" USING btree ("CourseId", "UserId");
+
+
+--
 -- TOC entry 3678 (class 1259 OID 58429)
 -- Name: IX_XQueueExerciseSubmissions_SubmissionId; Type: INDEX; Schema: public; Owner: ulearn
 --
@@ -2760,7 +2767,8 @@ INSERT INTO public."__EFMigrationsHistory"
 VALUES
 ('20210319103352_Init', '5.0.3'),
 ('20210319103454_InitAntiPlagiarism', '5.0.3'),
-('20210319105825_AddDiffFromDatabase', '5.0.3')
+('20210319105825_AddDiffFromDatabase', '5.0.3'),
+('20210330093143_AddCourseUserIndexToVisits', '5.0.3')
 ;
 
 SELECT print_notice('analize');

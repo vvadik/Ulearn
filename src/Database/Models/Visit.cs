@@ -15,11 +15,13 @@ namespace Database.Models
 		[Required]
 		[Index("IDX_Visits_BySlideAndUser", 1)]
 		[Index("IDX_Visits_ByCourseSlideAndUser", 3)]
+		[Index("IDX_Visits_ByCourseAndUser", 2)]
 		public string UserId { get; set; }
 
 		[Required]
 		[StringLength(100)]
 		[Index("IDX_Visits_ByCourseSlideAndUser", 1)]
+		[Index("IDX_Visits_ByCourseAndUser", 1)]
 		public string CourseId { get; set; }
 
 		[Required]

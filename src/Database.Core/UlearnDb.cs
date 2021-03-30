@@ -356,6 +356,7 @@ namespace Database
 			AddIndex<Visit>(modelBuilder, c => new { c.SlideId, c.UserId });
 			AddIndex<Visit>(modelBuilder, c => new { c.CourseId, c.SlideId, c.UserId });
 			AddIndex<Visit>(modelBuilder, c => new { c.SlideId, c.Timestamp });
+			AddIndex<Visit>(modelBuilder, c => new { c.CourseId, c.UserId });
 
 			AddIndex<LastVisit>(modelBuilder, c => new { c.CourseId, c.UserId });
 
