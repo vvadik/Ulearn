@@ -290,7 +290,6 @@ class CommentsList extends Component<Props, State> {
 			const startIndex = window.location.hash.indexOf('-') + 1;
 			const commentIdFromHash = window.location.hash.slice(startIndex);
 			const nameChangesTab = forInstructors ? TabsType.allComments : TabsType.instructorsComments;
-
 			const { threadsToRender, repliesToRender } = this.commentsData;
 			const notRenderedComments = [...repliesToRender, ...threadsToRender];
 			const notRenderedCommentIds = this.getAllCommentsIds(notRenderedComments);
@@ -301,7 +300,7 @@ class CommentsList extends Component<Props, State> {
 				this.commentsData.commentsPerPack = indexOfComment + commentsPerPack;
 				this.renderPackOfComments();
 				this.commentsData.commentsPerPack = commentsPerPack;
-			} else if(!allCommentIds.includes(commentIdFromHash)) {
+			} else if(allCommentIds.indexOf(commentIdFromHash) < 0) {
 				handleTabChange(nameChangesTab, false);
 				this.loadComments(courseId, slideId, forInstructors);
 				this.setStateIfMounted({
