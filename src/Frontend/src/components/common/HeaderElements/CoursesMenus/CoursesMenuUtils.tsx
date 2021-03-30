@@ -171,7 +171,7 @@ export function sysAdminMenuItems(courseIds: string[],
 		</MenuItem>,
 
 		<MenuItem href="/Sandbox" component={ LinkComponent } key="Sandbox">
-			Песочница C#
+			Последние отправки
 		</MenuItem>,
 
 		<MenuItem href="/Admin/StyleValidations" component={ LinkComponent } key="StyleValidations">
