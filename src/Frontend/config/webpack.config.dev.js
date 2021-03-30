@@ -23,6 +23,7 @@ module.exports = merge([base, {
 	devtool: 'eval-cheap-source-map',
 	entry: {
 		main: [
+			paths.legacy,
 			'react-dev-utils/webpackHotDevClient',
 			paths.appIndexTsx,
 		],
@@ -163,6 +164,10 @@ module.exports = merge([base, {
 		new webpack.DefinePlugin(env.stringified),
 		new webpack.ProvidePlugin({
 			process: 'process/browser',
+			$: 'jquery',
+			jQuery: 'jquery',
+			"window.$": 'jquery',
+			"window.jQuery": 'jquery',
 		}),
 		new CaseSensitivePathsPlugin(),
 		new WatchMissingNodeModulesPlugin(paths.appNodeModules),

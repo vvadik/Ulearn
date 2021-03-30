@@ -24,32 +24,3 @@
 	</tbody>
 </table>
 <div class="clearfix"></div>
-<script>
-	$(function() {
-		$('#timelineChart').highcharts({
-			data: {
-				table: document.getElementById('timelineTable')
-			},
-			chart: {
-				type: 'line'
-			},
-			title: {
-				text: ''
-			},
-			xAxis: {
-				type: 'datetime',
-				tickInterval: 24 * 3600000
-			},
-			yAxis: {
-				allowDecimals: false,
-				title: {
-					text: 'Пройдено слайдов'
-				}
-			},
-			credits: {
-				enabled: false,
-			},
-		});
-	});
-
-</script>

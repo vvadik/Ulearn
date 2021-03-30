@@ -30,6 +30,7 @@ function getUrlParts(url) {
 }
 
 function safeEval(code) {
+	if(!$) console.error('jQuery is not initialized');
 	try {
 // eslint-disable-next-line
 		eval(code)

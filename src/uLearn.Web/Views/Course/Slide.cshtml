@@ -72,33 +72,3 @@ else
 	}
 }
 </div>
-
-@section scripts{
-	@if (!Model.IsGuest)
-	{
-		<script>
-			$("#selectGroupModal").modal();
-			displayVisits();
-			uploadVisits("@Url.Action("Upload", "Visits")");
-		</script>
-	}
-	else
-	{
-		<script>
-			saveVisits("@Model.CourseId @Model.Slide.Id", "@DateTime.Now.ToString("u")");
-			displayVisits();
-		</script>
-	}
-	@if (Model.Slide is ExerciseSlide)
-	{
-		var slide = (ExerciseSlide)Model.Slide;
-		<script>
-			getHints("@Model.CourseId", "@Model.Slide.Id", '@slide.Exercise.HintsMd.Count')
-		</script>
-		<script>
-			$(document).ready(function() {
-				refreshPreviousDraft('@Model.Slide.Id');
-			});
-		</script>
-	}
-}

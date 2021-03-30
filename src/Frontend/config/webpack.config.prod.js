@@ -54,7 +54,8 @@ module.exports = merge([base, {
 	bail: true,
 	entry: {
 		main: [
-			paths.appIndexTsx
+			paths.legacy,
+			paths.appIndexTsx,
 		],
 		oldBrowser: [
 			paths.oldBrowserJs,
@@ -223,6 +224,8 @@ module.exports = merge([base, {
 		new webpack.DefinePlugin(env.stringified),
 		new webpack.ProvidePlugin({
 			process: 'process/browser',
+			$: 'jquery',
+			jQuery: 'jquery',
 		}),
 		// See https://github.com/webpack-contrib/mini-css-extract-plugin for details
 		new MiniCssExtractPlugin({

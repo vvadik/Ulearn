@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 
+import { toggleRoleOrCourseAccess } from "src/legacy/Scripts/users-list";
+
 import { Modal, Button, Textarea, Tooltip } from 'ui';
 
 class ToggleRolesModal extends Component {
@@ -176,7 +178,7 @@ class ToggleRolesModal extends Component {
 			return;
 		}
 
-		window.toggleRoleOrCourseAccess(trimmedComment);
+		toggleRoleOrCourseAccess(trimmedComment);
 
 		this.onClose();
 	}
