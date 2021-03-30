@@ -1,6 +1,7 @@
 .legacy-page .student-submissions {
     font-size: 15px;
     margin-top: 30px;
+	overflow: auto;
 }
 
 @media(max-width: 720px) {
