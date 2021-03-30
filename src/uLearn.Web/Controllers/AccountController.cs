@@ -316,9 +316,10 @@ namespace uLearn.Web.Controllers
 			var logins = await userManager.GetLoginsAsync(userId);
 
 			var userCoursesIds = visitsRepo.GetUserCourses(user.Id).Select(s => s.ToLower());
-			var userCourses = courseManager.GetCourses().Where(c => userCoursesIds.Contains(c.Id.ToLower())).OrderBy(c => c.Title).ToList();
+			var courses = courseManager.GetCourses().ToList();
+			var userCourses = courses.Where(c => userCoursesIds.Contains(c.Id.ToLower())).OrderBy(c => c.Title).ToList();
 
-			var allCourses = courseManager.GetCourses().ToDictionary(c => c.Id, c => c, StringComparer.InvariantCultureIgnoreCase);
+			var allCourses = courses.ToDictionary(c => c.Id, c => c, StringComparer.InvariantCultureIgnoreCase);
 			var tempCourseIds = tempCoursesRepo.GetTempCourses()
 				.Select(c => c.CourseId)
 				.Where(c => allCourses.ContainsKey(c))
