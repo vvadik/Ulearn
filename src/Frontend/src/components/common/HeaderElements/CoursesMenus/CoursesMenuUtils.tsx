@@ -166,10 +166,6 @@ export function sysAdminMenuItems(courseIds: string[],
 			Пользователи
 		</MenuItem>,
 
-		<MenuItem href="/Analytics/SystemStatistics" component={ LinkComponent } key="Statistics">
-			Статистика
-		</MenuItem>,
-
 		<MenuItem href="/Sandbox" component={ LinkComponent } key="Sandbox">
 			Последние отправки
 		</MenuItem>,
