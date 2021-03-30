@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -57,7 +58,16 @@ namespace Ulearn.Common.Api
 
 					/* Configure swagger documentation. Now it's available at /swagger/v1/swagger.json.
 					 * See https://github.com/domaindrivendev/Swashbuckle.AspNetCore for details */
-					app.UseSwagger(c => { c.RouteTemplate = "documentation/{documentName}/swagger.json"; });
+					app.UseSwagger(c =>
+					{
+						c.RouteTemplate = "documentation/{documentName}/swagger.json";
+						c.PreSerializeFilters.Add((swagger, httpReq) =>
+						{
+							var isLocalhost = httpReq.Host.Host.StartsWith("localhost");
+							var schemas = isLocalhost ? new[] { "http", "https" } : new[] { "https", "http" };
+							swagger.Servers = schemas.Select(s => new OpenApiServer { Url = $"{s}://{httpReq.Host.Host}" }).ToList();
+						});
+					});
 					/* And add swagger UI, available at /documentation */
 					app.UseSwaggerUI(c =>
 					{

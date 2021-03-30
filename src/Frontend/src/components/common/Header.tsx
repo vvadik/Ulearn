@@ -17,6 +17,7 @@ import SysAdminMenu from "./HeaderElements/SysAdminMenu";
 import MyCoursesMenu from "./HeaderElements/CoursesMenus/MyCoursesMenu";
 import CourseMenu from "./HeaderElements/CoursesMenus/CourseMenu";
 import MobileCourseMenu from "./HeaderElements/CoursesMenus/MobileCourseMenu";
+import NotificationBar from "../notificationBar/NotificationBar";
 import { Menu as MenuIcon } from 'icons';
 
 import { CourseAccessType, CourseRoleType } from "src/consts/accessType";
@@ -149,6 +150,7 @@ class Header extends Component<Props, State> {
 						/>
 					</HeaderComponentErrorBoundary>
 				</div>
+				<NotificationBar/>
 			</React.Fragment>
 		);
 	}
