@@ -256,7 +256,7 @@
 					<td class="small-table__student-progress-cell hidden-xs-table-cell">
 						<div class="student-progress progress">
 							<div class="progress-bar progress-bar-warning"
-								style="width: @(100 * (visitedSlidesCountAllTime - visitedSlidesCount) / Model.Slides.Count)%"
+								style="width: @(100 * (visitedSlidesCountAllTime - visitedSlidesCount) / Math.Max(1, Model.Slides.Count))%"
 								title="Посмотрел(а) @((visitedSlidesCountAllTime - visitedSlidesCount).PluralizeInRussian(new RussianPluralizationOptions
 								                    {
 									                    One = "слайд",
@@ -266,7 +266,7 @@
 								                    })) вне указанного период">
 							</div>
 							<div class="progress-bar progress-bar-success"
-								style="width: @(100 * visitedSlidesCount / Model.Slides.Count)%"
+								style="width: @(100 * visitedSlidesCount / Math.Max(1, Model.Slides.Count))%"
 								title="Посмотрел(а) @visitedSlidesCount.PluralizeInRussian(new RussianPluralizationOptions
 								                    {
 									                    One = "слайд",

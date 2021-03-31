@@ -599,7 +599,7 @@ namespace uLearn.Web.Controllers
 			[IsError(true)]
 			EmailAlreadyTaken,
 
-			[Display(Name = "Не все поля заполнены верны. Проверьте, пожалуйста, и попробуйте ещё раз")]
+			[Display(Name = "Не все поля заполнены верно. Проверьте, пожалуйста, и попробуйте ещё раз")]
 			[IsError(true)]
 			NotAllFieldsFilled
 		}
