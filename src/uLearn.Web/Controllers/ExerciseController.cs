@@ -8,21 +8,17 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Mvc;
 using Database;
-using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
-using Elmah;
 using JetBrains.Annotations;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
-using uLearn.Web.LTI;
 using uLearn.Web.Models;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
-using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Helpers;
@@ -228,11 +224,11 @@ namespace uLearn.Web.Controllers
 					await slideCheckingsRepo.DisableProhibitFurtherManualCheckings(checking.CourseId, checking.UserId, checking.SlideId).ConfigureAwait(false);
 				await visitsRepo.UpdateScoreForVisit(checking.CourseId, slide, checking.UserId).ConfigureAwait(false);
 
-				transaction.Commit();
-
 				var unit = course.FindUnitBySlideId(checking.SlideId, true);
 				if (unit != null && unitsRepo.IsUnitVisibleForStudents(course, unit.Id))
 					await NotifyAboutManualExerciseChecking(checking).ConfigureAwait(false);
+
+				transaction.Commit();
 			}
 
 			return Json(new ScoreExerciseOperationResult { Status = "ok" });

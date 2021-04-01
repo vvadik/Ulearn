@@ -238,7 +238,7 @@ namespace Ulearn.Core
 			}
 			catch (Exception e)
 			{
-				log.Warn(e, "Не смог загрузить курс из папки");
+				log.Warn(e, $"Не смог загрузить курс из папки {courseDir}");
 				var zipFile = GetStagingCourseFile(courseId);
 				log.Info($"Буду загружать из zip-архива: {zipFile.FullName}");
 				if (notifyAboutErrors)
