@@ -35,14 +35,14 @@ namespace Database.DataContexts
 			return db.TempCourses.AsNoTracking().ToList();
 		}
 
-		public async Task UpdateTempCourseLastUpdateTimeAsync(string courseId)
+		public void UpdateTempCourseLastUpdateTime(string courseId)
 		{
-			var course = await db.TempCourses.FindAsync(courseId).ConfigureAwait(false);
+			var course = db.TempCourses.Find(courseId);
 			if (course == null)
 				return;
 
 			course.LastUpdateTime = DateTime.Now;
-			await db.SaveChangesAsync().ConfigureAwait(false);
+			db.SaveChanges();
 		}
 	}
 }
