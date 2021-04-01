@@ -1,9 +1,12 @@
 import React, { Component } from "react";
-import { YMInitializer } from "react-yandex-metrika";
-import ym from 'react-yandex-metrika';
+import ym, { YMInitializer } from "react-yandex-metrika";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 
 class YandexMetrika extends Component<RouteComponentProps> {
+	componentDidMount() {
+		window.ym = ym; //using in legacy cshtml scripts (register etc)
+	}
+
 	componentDidUpdate() {
 		const { location, } = this.props;
 		ym('hit', location.pathname + location.search);
