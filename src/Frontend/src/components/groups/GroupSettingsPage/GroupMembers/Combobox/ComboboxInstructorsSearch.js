@@ -41,7 +41,8 @@ class ComboboxInstructorsSearch extends Component {
 			.filter(item => {
 				return (isAddedUser(item)) &&
 					(includes(item.visibleName, query) ||
-						includes(item.login, query))
+						includes(item.login, query) ||
+						includes(item.email, query))
 			})
 			.map(item => ({
 						value: item.id,

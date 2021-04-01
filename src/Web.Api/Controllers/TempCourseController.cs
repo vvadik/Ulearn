@@ -214,7 +214,7 @@ namespace Ulearn.Web.Api.Controllers
 
 			try
 			{
-				courseManager.ReloadCourseNotSafe(courseId);
+				courseManager.ReloadCourseNotSafe(courseId, notifyAboutErrors: false);
 				courseManager.UpdateCourseVersion(courseId, Guid.Empty);
 				courseManager.NotifyCourseChanged(courseId);
 			}

@@ -4,7 +4,6 @@ using System.Data.Entity.Validation;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Database.Migrations;
 using Database.Models;
 using EntityFramework.Functions;
 using Vostok.Logging.Abstractions;
@@ -25,13 +24,17 @@ namespace Database.DataContexts
 		public ULearnDb(string database)
 			: base(database, throwIfV1Schema: false)
 		{
-			System.Data.Entity.Database.SetInitializer(new MigrateDatabaseToLatestVersion<ULearnDb, Configuration>());
+			System.Data.Entity.Database.SetInitializer(new NullDatabaseInitializer<ULearnDb>());
 			Database.Log = log.Debug;
 		}
 
 		protected override void OnModelCreating(DbModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
+
+			modelBuilder.HasDefaultSchema("public");
+
+			modelBuilder.Entity<UserFlashcardsUnlocking>().ToTable("UserFlashcardsUnlocking"); // Так не будет добавлено s в конец, в отличие от объявления поля.
 
 			/* See https://weblogs.asp.net/dixin/entityframework.functions
 			 * for detailed description about working with stored functions and procedures */
@@ -248,7 +251,7 @@ namespace Database.DataContexts
 		public DbSet<StyleErrorSettings> StyleErrorSettings { get; set; }
 
 		public DbSet<UserFlashcardsVisit> UserFlashcardsVisits { get; set; }
-		
+
 		public DbSet<TempCourse> TempCourses { get; set; }
 
 		public DbSet<TempCourseError> TempCourseErrors { get; set; }

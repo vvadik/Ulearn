@@ -227,7 +227,7 @@ namespace Ulearn.Core
 			return false;
 		}
 
-		public void ReloadCourseNotSafe(string courseId)
+		public void ReloadCourseNotSafe(string courseId, bool notifyAboutErrors = true)
 		{
 			/* First try load course from directory */
 			var courseDir = GetExtractedCourseDirectory(courseId);
@@ -238,10 +238,11 @@ namespace Ulearn.Core
 			}
 			catch (Exception e)
 			{
-				log.Warn(e, "Не смог загрузить курс из папки");
+				log.Warn(e, $"Не смог загрузить курс из папки {courseDir}");
 				var zipFile = GetStagingCourseFile(courseId);
 				log.Info($"Буду загружать из zip-архива: {zipFile.FullName}");
-				errorsBot.PostToChannel($"Не смог загрузить курс из папки {courseDir}, буду загружать из zip-архива {zipFile.FullName}:\n{e.Message.EscapeMarkdown()}\n```{e.StackTrace}```", ParseMode.Markdown);
+				if (notifyAboutErrors)
+					errorsBot.PostToChannel($"Не смог загрузить курс из папки {courseDir}, буду загружать из zip-архива {zipFile.FullName}:\n{e.Message.EscapeMarkdown()}\n```{e.StackTrace}```", ParseMode.Markdown);
 				ReloadCourseFromZip(zipFile);
 			}
 		}

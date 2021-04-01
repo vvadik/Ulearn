@@ -33,6 +33,9 @@ namespace Database.Repos
 			if (text.Length > MaxTextSize)
 				text = text.Substring(0, MaxTextSize);
 
+			if (text.Contains('\0'))
+				text = text.Replace("\0", ""); // postgres не поддерживает \0 в строках
+
 			var hash = GetHash(text);
 			var blob = await db.Texts.FindAsync(hash);
 			if (blob != null)

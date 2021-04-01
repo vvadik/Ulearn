@@ -42,7 +42,7 @@ namespace XQueueWatcher
 			services.AddDbContext<UlearnDb>( // AddDbContextPool: DbContext Pooling does not dispose LazyLoader https://github.com/dotnet/efcore/issues/11308
 				options => options
 					.UseLazyLoadingProxies()
-					.UseSqlServer(configuration.Database)
+					.UseNpgsql(configuration.Database, o => o.SetPostgresVersion(13, 2))
 			);
 		}
 
@@ -58,14 +58,17 @@ namespace XQueueWatcher
 
 			while (true)
 			{
-				var xQueueRepo = serviceProvider.GetService<IXQueueRepo>();
-				var dbWatchers = await xQueueRepo.GetXQueueWatchers();
+				if (configuration.XQueueWatcher == null || configuration.XQueueWatcher.Enabled == true)
+				{
+					var xQueueRepo = serviceProvider.GetService<IXQueueRepo>();
+					var dbWatchers = await xQueueRepo.GetXQueueWatchers();
 
-				var tasks = dbWatchers.Select(SafeGetAndProcessSubmissionFromXQueue);
+					var tasks = dbWatchers.Select(SafeGetAndProcessSubmissionFromXQueue);
 
-				Task.WaitAll(tasks.ToArray(), cancellationToken);
-				if (cancellationToken.IsCancellationRequested)
-					break;
+					Task.WaitAll(tasks.ToArray(), cancellationToken);
+					if (cancellationToken.IsCancellationRequested)
+						break;
+				}
 
 				Task.Delay(pauseBetweenRequests, cancellationToken).Wait(cancellationToken);
 				keepAliver.Ping(keepAliveInterval);

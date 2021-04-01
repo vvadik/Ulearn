@@ -143,7 +143,7 @@ namespace uLearn.Web.Controllers
 			if (User.HasAccessFor(courseId, CourseRole.CourseAdmin))
 			{
 				var choiceBlocks =  slide.Blocks.OfType<ChoiceBlock>().ToList();
-				var answersFrequency = userQuizzesRepo.GetAnswersFrequencyForChoiceBlocks(courseId, slide.Id, choiceBlocks).Result;
+				var answersFrequency = userQuizzesRepo.GetAnswersFrequencyForChoiceBlocks(courseId, slide.Id, choiceBlocks);
 				questionAnswersFrequency = answersFrequency.Keys.ToDictionary(
 					blockId => blockId,
 					blockId => answersFrequency[blockId].ToDefaultDictionary()
@@ -346,7 +346,6 @@ namespace uLearn.Web.Controllers
 				await slideCheckingsRepo.MarkManualQuizCheckingAsChecked(checking, totalScore).ConfigureAwait(false);
 
 				await visitsRepo.UpdateScoreForVisit(checking.CourseId, slide, checking.UserId).ConfigureAwait(false);
-				transaction.Commit();
 
 				metricSender.SendCount($"quiz.manual_score.score", totalScore);
 				metricSender.SendCount($"quiz.manual_score.{checking.CourseId}.score", totalScore);
@@ -360,6 +359,8 @@ namespace uLearn.Web.Controllers
 
 				if (unit != null && unitsRepo.IsUnitVisibleForStudents(course, unit.Id))
 					await NotifyAboutManualQuizChecking(checking).ConfigureAwait(false);
+
+				transaction.Commit();
 			}
 
 			return Redirect(nextUrl);

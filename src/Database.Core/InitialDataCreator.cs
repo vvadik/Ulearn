@@ -13,6 +13,7 @@ namespace Database
 		private readonly RoleManager<IdentityRole> roleManager;
 		private readonly UlearnUserManager userManager;
 		private readonly IUsersRepo usersRepo;
+		private readonly IFeedRepo feedRepo;
 
 		private readonly string sysAdminRole = LmsRoleType.SysAdmin.ToString();
 
@@ -20,16 +21,26 @@ namespace Database
 			UlearnDb db,
 			RoleManager<IdentityRole> roleManager,
 			UlearnUserManager userManager,
-			IUsersRepo usersRepo
+			IUsersRepo usersRepo,
+			IFeedRepo feedRepo
 		)
 		{
 			this.db = db;
 			this.roleManager = roleManager;
 			this.userManager = userManager;
 			this.usersRepo = usersRepo;
+			this.feedRepo = feedRepo;
 		}
 
-		public async Task CreateRolesAsync()
+		public async Task CreateAllAsync()
+		{
+			await CreateRoles().ConfigureAwait(false);
+			await CreateUsers().ConfigureAwait(false);
+			await CreateUlearnBotUser().ConfigureAwait(false);
+			await AddFeedNotificationTransport();
+		}
+
+		public async Task CreateRoles()
 		{
 			if (!await db.Roles.AnyAsync(r => r.Name == sysAdminRole).ConfigureAwait(false))
 			{
@@ -39,7 +50,7 @@ namespace Database
 			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
-		public async Task CreateUsersAsync()
+		private async Task CreateUsers()
 		{
 			if (!await db.Users.AnyAsync(u => u.UserName == "user").ConfigureAwait(false))
 			{
@@ -54,21 +65,19 @@ namespace Database
 				await userManager.AddToRoleAsync(user, sysAdminRole).ConfigureAwait(false);
 			}
 
-			await CreateRolesAsync().ConfigureAwait(false);
+			await CreateRoles().ConfigureAwait(false);
 		}
 
-		public async Task CreateUlearnBotUserAsync()
+		public async Task CreateUlearnBotUser()
 		{
 			await usersRepo.CreateUlearnBotUserIfNotExistsAsync().ConfigureAwait(false);
 
 			await db.SaveChangesAsync().ConfigureAwait(false);
 		}
 
-		public async Task CreateAllAsync()
+		private async Task AddFeedNotificationTransport()
 		{
-			await CreateRolesAsync().ConfigureAwait(false);
-			await CreateUsersAsync().ConfigureAwait(false);
-			await CreateUlearnBotUserAsync().ConfigureAwait(false);
+			await feedRepo.AddFeedNotificationTransportIfNeeded(null);
 		}
 	}
 }

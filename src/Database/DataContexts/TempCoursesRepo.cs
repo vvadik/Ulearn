@@ -30,6 +30,11 @@ namespace Database.DataContexts
 			return db.TempCourses.ToList();
 		}
 
+		public List<TempCourse> GetTempCoursesNoTracking()
+		{
+			return db.TempCourses.AsNoTracking().ToList();
+		}
+
 		public async Task UpdateTempCourseLastUpdateTimeAsync(string courseId)
 		{
 			var course = await db.TempCourses.FindAsync(courseId).ConfigureAwait(false);
