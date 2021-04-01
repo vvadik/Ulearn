@@ -29,7 +29,7 @@ class ComboboxInstructorsSearch extends Component {
 	getItems = (query) => {
 		const {accesses, owner} = this.props;
 		const includes = (str, substr) => str.toLowerCase().includes(substr.toLowerCase());
-		const isAddedUser = (item) => {
+		const isNotAddedUser = (item) => {
 			return (owner.id !== item.id) &&
 				(accesses.filter(i => i.user.id === item.id)).length === 0;
 		};
@@ -39,10 +39,10 @@ class ComboboxInstructorsSearch extends Component {
 			return json.users
 			.map(item => item.user)
 			.filter(item => {
-				return (isAddedUser(item)) &&
+				return (isNotAddedUser(item)) &&
 					(includes(item.visibleName, query) ||
 						includes(item.login, query) ||
-						includes(item.email, query))
+						item.email && includes(item.email, query))
 			})
 			.map(item => ({
 						value: item.id,
