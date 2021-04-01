@@ -7,6 +7,7 @@ using Database.Models;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
 using Z.EntityFramework.Plus;
 using static Database.Models.WorkQueueItem;
 
@@ -68,17 +69,21 @@ set ""{TakeAfterTimeColumnName}"" = @timeLimit
 from next_task
 where ""{nameof(db.WorkQueueItems)}"".""{IdColumnName}"" = next_task.""{IdColumnName}""
 returning next_task.""{IdColumnName}"", ""{QueueIdColumnName}"", ""{ItemIdColumnName}"", ""{PriorityColumnName}"", ""{TypeColumnName}"", ""{TakeAfterTimeColumnName}"";"; // Если написать *, Id возвращается дважды
-			using (var scope = new TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions { IsolationLevel = IsolationLevel.Serializable }, TransactionScopeAsyncFlowOption.Enabled))
+			var executionStrategy = new NpgsqlRetryingExecutionStrategy(db, 3);
+			return await executionStrategy.ExecuteAsync(async () =>
 			{
-				var taken = (await db.WorkQueueItems.FromSqlRaw(
-					sql,
-					new NpgsqlParameter<int>("@queueId", queueId),
-					new NpgsqlParameter<DateTime>("@now", DateTime.UtcNow),
-					new NpgsqlParameter<DateTime>("@timeLimit", (DateTime.UtcNow + timeLimit).Value)
-				).AsNoTracking().ToListAsync()).FirstOrDefault();
-				scope.Complete();
-				return taken;
-			}
+				using (var scope = new TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions { IsolationLevel = IsolationLevel.Serializable }, TransactionScopeAsyncFlowOption.Enabled))
+				{
+					var taken = (await db.WorkQueueItems.FromSqlRaw(
+						sql,
+						new NpgsqlParameter<int>("@queueId", queueId),
+						new NpgsqlParameter<DateTime>("@now", DateTime.UtcNow),
+						new NpgsqlParameter<DateTime>("@timeLimit", (DateTime.UtcNow + timeLimit).Value)
+					).AsNoTracking().ToListAsync()).FirstOrDefault();
+					scope.Complete();
+					return taken;
+				}
+			});
 		}
 	}
 }
