@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -76,10 +75,10 @@ namespace Database.Repos.Users.Search
 			if (string.IsNullOrEmpty(term))
 				return Enumerable.Empty<ApplicationUser>().AsQueryable();
 
-			if (strict)
-				return users.Search(userProperties).EqualTo(term);
+			//if (strict)
+			return users.Search(userProperties).EqualTo(term);
 
-			return users.Search(userProperties).StartsWith(term).OrderBy(u => u.Id).Take(limit);
+			//return users.Search(userProperties).StartsWith(term).OrderBy(u => u.Id).Take(limit); TODO like не работает в postgres на полях с ignore case
 		}
 	}
 }
