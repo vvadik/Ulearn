@@ -6,6 +6,7 @@ using AntiPlagiarism.Web.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using Npgsql.EntityFrameworkCore.PostgreSQL;
+using Ulearn.Common;
 using static AntiPlagiarism.Web.Database.Models.WorkQueueItem;
 using IsolationLevel = System.Transactions.IsolationLevel;
 
@@ -62,8 +63,7 @@ set ""{TakeAfterTimeColumnName}"" = @timeLimit
 from next_task
 where {AntiPlagiarismDb.DefaultSchema}.""{nameof(db.WorkQueueItems)}"".""{IdColumnName}"" = next_task.""{IdColumnName}""
 returning next_task.""{IdColumnName}"", ""{QueueIdColumnName}"", ""{ItemIdColumnName}"", ""{TakeAfterTimeColumnName}"";"; // Если написать *, Id возвращается дважды
-			var executionStrategy = new NpgsqlRetryingExecutionStrategy(db, 3);
-			return await executionStrategy.ExecuteAsync(async () =>
+			return await FuncUtils.TrySeveralTimesAsync(async () =>
 			{
 				using (var scope = new TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions { IsolationLevel = IsolationLevel.RepeatableRead }, TransactionScopeAsyncFlowOption.Enabled))
 				{
@@ -76,7 +76,7 @@ returning next_task.""{IdColumnName}"", ""{QueueIdColumnName}"", ""{ItemIdColumn
 					scope.Complete();
 					return taken;
 				}
-			});
+			}, 3, () => Task.Delay(30));
 		}
 	}
 }

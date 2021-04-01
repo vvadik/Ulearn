@@ -7,7 +7,7 @@ using AntiPlagiarism.Api.Models.Results;
 using AntiPlagiarism.Web.Database.Extensions;
 using AntiPlagiarism.Web.Database.Models;
 using Microsoft.EntityFrameworkCore;
-using Npgsql.EntityFrameworkCore.PostgreSQL;
+using Ulearn.Common;
 using Ulearn.Core.Extensions;
 
 namespace AntiPlagiarism.Web.Database.Repos
@@ -29,16 +29,16 @@ namespace AntiPlagiarism.Web.Database.Repos
 		
 		public async Task SaveMostSimilarSubmissionAsync(MostSimilarSubmission mostSimilarSubmission)
 		{
-			var executionStrategy = new NpgsqlRetryingExecutionStrategy(db, 3);
-			await executionStrategy.ExecuteAsync(async () =>
+			await FuncUtils.TrySeveralTimesAsync(async () =>
 			{
 				using (var ts = new TransactionScope(TransactionScopeOption.Required, TimeSpan.FromSeconds(30), TransactionScopeAsyncFlowOption.Enabled))
 				{
 					db.AddOrUpdate(mostSimilarSubmission, p => p.SubmissionId == mostSimilarSubmission.SubmissionId);
 					await db.SaveChangesAsync().ConfigureAwait(false);
 					ts.Complete();
+					return 0;
 				}
-			});
+			}, 3, () => Task.Delay(30));
 		}
 
 		public async Task<List<MostSimilarSubmissions>> GetMostSimilarSubmissionsByTaskAsync(int clientId, Guid taskId)
