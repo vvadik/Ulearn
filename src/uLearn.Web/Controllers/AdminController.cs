@@ -696,6 +696,7 @@ namespace uLearn.Web.Controllers
 
 		private async Task<ActionResult> CheckNextManualCheckingForSlide<T>(string courseId, Guid slideId, List<string> groupsIds, int previousCheckingId) where T : AbstractManualSlideChecking
 		{
+			int itemToCheckId;
 			using (var transaction = db.Database.BeginTransaction())
 			{
 				var filterOptions = GetManualCheckingFilterOptionsByGroup(courseId, groupsIds);
@@ -710,11 +711,10 @@ namespace uLearn.Web.Controllers
 					return RedirectToAction("CheckingQueue", new { courseId, group = string.Join(",", groupsIds), message = "slide_checked" });
 
 				await slideCheckingsRepo.LockManualChecking(itemToCheck, User.Identity.GetUserId()).ConfigureAwait(false);
-
+				itemToCheckId = itemToCheck.Id;
 				transaction.Commit();
-
-				return await InternalManualChecking<T>(courseId, itemToCheck.Id, ignoreLock: true, groupsIds: groupsIds).ConfigureAwait(false);
 			}
+			return await InternalManualChecking<T>(courseId, itemToCheckId, ignoreLock: true, groupsIds: groupsIds).ConfigureAwait(false);
 		}
 
 		public Task<ActionResult> QuizChecking(string courseId, int id, bool recheck = false)
