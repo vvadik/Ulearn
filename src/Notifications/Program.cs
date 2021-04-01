@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Database;
 using Database.DataContexts;
@@ -49,6 +50,12 @@ namespace Notifications
 			{
 				var sender = new OneTimeEmailSender();
 				sender.SendEmailsAsync().Wait();
+				return;
+			}
+
+			if (configuration.Notifications != null && configuration.Notifications.Enabled == false)
+			{
+				Thread.Sleep(Timeout.Infinite);
 				return;
 			}
 

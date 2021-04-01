@@ -1,7 +1,7 @@
 import api from "./index";
 import { Dispatch } from "redux";
 import { notificationUpdateAction } from "src/actions/notifications";
-import { NotificationsInfo } from "src/models/notifications";
+import { NotificationBarResponse, NotificationsInfo } from "src/models/notifications";
 
 export function getNotificationsCount(lastTimestamp?: string) {
 	return (dispatch: Dispatch): Promise<void> => {
@@ -10,4 +10,8 @@ export function getNotificationsCount(lastTimestamp?: string) {
 				dispatch(notificationUpdateAction(json.count, json.lastTimestamp));
 			});
 	};
+}
+
+export async function getGlobalNotification(): Promise<NotificationBarResponse> {
+	return await api.get<NotificationBarResponse>("notifications/global");
 }

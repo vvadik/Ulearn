@@ -35,10 +35,9 @@ namespace Database.Repos
 					Timestamp = DateTime.Now,
 				};
 				db.AdditionalScores.Add(additionalScore);
-
-				transaction.Commit();
 				await db.SaveChangesAsync();
 
+				transaction.Commit();
 				return additionalScore;
 			}
 		}

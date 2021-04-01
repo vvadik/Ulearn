@@ -76,8 +76,8 @@ namespace Web.Api.Tests.Controllers
 		private async Task CreateInitialDataInDatabaseAsync()
 		{
 			var initialDataCreator = serviceProvider.GetService<InitialDataCreator>();
-			await initialDataCreator.CreateRolesAsync().ConfigureAwait(false);
-			await initialDataCreator.CreateUlearnBotUserAsync().ConfigureAwait(false);
+			await initialDataCreator.CreateRoles().ConfigureAwait(false);
+			await initialDataCreator.CreateUlearnBotUser().ConfigureAwait(false);
 		}
 
 		private static UlearnDb CreateDbContext(ILoggerFactory loggerFactory)

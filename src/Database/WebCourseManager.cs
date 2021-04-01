@@ -2,8 +2,11 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using Database.DataContexts;
+using Database.Models;
+using JetBrains.Annotations;
 using Vostok.Logging.Abstractions;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
@@ -19,8 +22,13 @@ namespace Database
 		private readonly ConcurrentDictionary<string, DateTime> courseVersionFetchTime = new ConcurrentDictionary<string, DateTime>();
 		private readonly TimeSpan fetchCourseVersionEvery = TimeSpan.FromMinutes(1);
 		private readonly ConcurrentDictionary<string, DateTime> tempCourseUpdateTime = new ConcurrentDictionary<string, DateTime>();
-		private long tempCoursesUpdateTime;
 		private readonly TimeSpan tempCourseUpdateEvery = TimeSpan.FromSeconds(1);
+		private long allTempCoursesUpdateTime;
+		private readonly TimeSpan allTempCoursesUpdateEvery = TimeSpan.FromMinutes(1);
+
+		private List<TempCourse> tempCoursesCache;
+		private readonly TimeSpan tempCoursesCacheUpdateEvery = TimeSpan.FromSeconds(0.5);
+		private long tempCoursesCacheUpdateTime;
 
 		private WebCourseManager()
 			: base(GetCoursesDirectory())
@@ -35,7 +43,7 @@ namespace Database
 			try
 			{
 				LoadCoursesIfNotYet();
-				TryCheckTempCoursesAndReloadIfNecessary(courseId);
+				TryReloadTempCourseIfNecessary(courseId);
 				course = base.GetCourse(courseId);
 			}
 			catch (Exception e) when (e is KeyNotFoundException || e is CourseNotFoundException || e is CourseLoadingException)
@@ -119,7 +127,7 @@ namespace Database
 			try
 			{
 				LoadCoursesIfNotYet();
-				TryCheckTempCoursesAndReloadIfNecessary(null);
+				TryCheckTempCoursesAndReloadIfNecessary();
 			}
 			catch (Exception e)
 			{
@@ -128,22 +136,57 @@ namespace Database
 			return base.GetCourses();
 		}
 
-		private void TryCheckTempCoursesAndReloadIfNecessary(string courseIdToUpdate = null)
+		private void TryReloadTempCourseIfNecessary([NotNull]string courseId)
 		{
 			try
 			{
-				if (new DateTime(tempCoursesUpdateTime) > DateTime.Now.Subtract(tempCourseUpdateEvery))
+				if (CourseIsBroken(courseId))
 					return;
-				if (courseIdToUpdate != null && IsTempCourseUpdatedRecent(courseIdToUpdate))
+				if (IsTempCourseUpdatedRecent(courseId))
 					return;
-				if (courseIdToUpdate == null)
-					Interlocked.Exchange(ref tempCoursesUpdateTime, DateTime.Now.Ticks);
 
-				var tempCoursesRepo = new TempCoursesRepo();
-				var tempCourses = tempCoursesRepo.GetTempCourses();
+				var tempCourses = GetTempCoursesWithCache();
+				var tempCourse = tempCourses.FirstOrDefault(tc => tc.CourseId == courseId);
+				if (tempCourse == null)
+					return;
+				Course course = null;
+				try
+				{
+					course = base.GetCourse(courseId); // Не используется FindCourse, иначе бесконечная рекурсия
+				}
+				catch (Exception ex)
+				{
+					log.Error(ex);
+				}
+				if (course == null || tempCourse.LastUpdateTime < tempCourse.LoadingTime)
+				{
+					TryReloadCourse(courseId);
+					var tempCoursesRepo = new TempCoursesRepo();
+					tempCoursesRepo.UpdateTempCourseLastUpdateTimeAsync(courseId).Wait();
+					courseVersionFetchTime[courseId] = DateTime.Now;
+				} else if (tempCourse.LastUpdateTime > tempCourse.LoadingTime)
+					courseVersionFetchTime[courseId] = DateTime.Now;
+			}
+			catch (Exception ex)
+			{
+				log.Error(ex);
+			}
+		}
+		
+		private void TryCheckTempCoursesAndReloadIfNecessary()
+		{
+			try
+			{
+				if (new DateTime(allTempCoursesUpdateTime) > DateTime.Now.Subtract(allTempCoursesUpdateEvery))
+					return;
+				Interlocked.Exchange(ref allTempCoursesUpdateTime, DateTime.Now.Ticks);
+
+				var tempCourses = GetTempCoursesWithCache();
 				foreach (var tempCourse in tempCourses)
 				{
 					var courseId = tempCourse.CourseId;
+					if (CourseIsBroken(courseId))
+						continue;
 					Course course = null;
 					try
 					{
@@ -153,10 +196,10 @@ namespace Database
 					{
 						log.Error(ex);
 					}
-					if (course == null || course.GetSlides(true).Count == 0
-						|| courseId == courseIdToUpdate && tempCourse.LastUpdateTime < tempCourse.LoadingTime)
+					if (course == null || course.GetSlides(true).Count == 0)
 					{
 						TryReloadCourse(courseId);
+						var tempCoursesRepo = new TempCoursesRepo();
 						tempCoursesRepo.UpdateTempCourseLastUpdateTimeAsync(courseId).Wait();
 						courseVersionFetchTime[courseId] = DateTime.Now;
 					} else if (tempCourse.LastUpdateTime > tempCourse.LoadingTime)
@@ -167,6 +210,17 @@ namespace Database
 			{
 				log.Error(ex);
 			}
+		}
+
+		private List<TempCourse> GetTempCoursesWithCache()
+		{
+			if (tempCoursesCache != null && new DateTime(tempCoursesCacheUpdateTime) > DateTime.Now.Subtract(tempCoursesCacheUpdateEvery))
+				return tempCoursesCache;
+			Interlocked.Exchange(ref tempCoursesCacheUpdateTime, DateTime.Now.Ticks);
+
+			var tempCoursesRepo = new TempCoursesRepo();
+			tempCoursesCache = tempCoursesRepo.GetTempCoursesNoTracking();
+			return tempCoursesCache;
 		}
 
 		private bool IsTempCourseUpdatedRecent(string courseId)
