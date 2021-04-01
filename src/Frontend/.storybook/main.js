@@ -58,7 +58,10 @@ module.exports = {
 					{
 						loader: 'css-loader',
 						options: {
-							modules: 'global',
+							modules: {
+								auto: (resourcePath) => !resourcePath.endsWith('.global.css'),
+								mode: 'global',
+							},
 							importLoaders: 1,
 						},
 					},

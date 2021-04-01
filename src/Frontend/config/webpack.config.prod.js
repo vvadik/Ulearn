@@ -153,7 +153,10 @@ module.exports = merge([base, {
 							{
 								loader: 'css-loader',
 								options: {
-									modules: 'global',
+									modules: {
+										auto: (resourcePath) => !resourcePath.endsWith('.global.css'),
+										mode: 'global',
+									},
 									importLoaders: 1,
 								},
 							},
@@ -226,6 +229,8 @@ module.exports = merge([base, {
 			process: 'process/browser',
 			$: 'jquery',
 			jQuery: 'jquery',
+			"window.$": 'jquery',
+			"window.jQuery": 'jquery',
 		}),
 		// See https://github.com/webpack-contrib/mini-css-extract-plugin for details
 		new MiniCssExtractPlugin({

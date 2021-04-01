@@ -12,7 +12,7 @@ import ReactDOM from "react-dom";
  *
  * 	Child components are not supported now.
  *
- * 	See Ulearn.Web/Scripts/react-renderer.js for the second part of this module.
+ * 	See src/legacy/scripts/react-renderer.js for the second part of this module.
  */
 
 /* Import all components you want to insert into legacy (cshtml+jquery) layout */

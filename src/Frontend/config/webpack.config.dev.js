@@ -87,7 +87,7 @@ module.exports = merge([base, {
 										mode: 'local',
 										localIdentName: '[name]__[local]--[hash:5]',
 									},
-									importLoaders: 1,
+									importLoaders: 2,
 								},
 							},
 							{
@@ -117,7 +117,10 @@ module.exports = merge([base, {
 							{
 								loader: 'css-loader',
 								options: {
-									modules: 'global',
+									modules: {
+										auto: (resourcePath) => !resourcePath.endsWith('.global.css'),
+										mode: 'global',
+									},
 									importLoaders: 1,
 								},
 							},

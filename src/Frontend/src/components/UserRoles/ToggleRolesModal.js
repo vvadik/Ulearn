@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-import { toggleRoleOrCourseAccess } from "src/legacy/Scripts/users-list";
+import { toggleRoleOrCourseAccess } from "src/legacy/scripts/users-list";
 
 import { Modal, Button, Textarea, Tooltip } from 'ui';
 
