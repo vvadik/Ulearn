@@ -40,7 +40,6 @@
 		<ProjectReference Include="..\Core\Core.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="Database\Migrations" />
 	  <Folder Include="Migrations" />
 	</ItemGroup>
 
