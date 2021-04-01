@@ -1,10 +1,8 @@
 ﻿import * as katex from "katex";
 
-window.documentReadyFunctions = window.documentReadyFunctions || [];
-
 const katexTransformed = 'katex';
 
-window.documentReadyFunctions.push(function () {
+export default function () {
 	$(".tex").each(function (index, element) {
 		const latex = $(element).text();
 		if(latex && element.dataset.transformation !== katexTransformed) {
@@ -13,4 +11,4 @@ window.documentReadyFunctions.push(function () {
 			katex.render(latex, element);
 		}
 	});
-});
+}

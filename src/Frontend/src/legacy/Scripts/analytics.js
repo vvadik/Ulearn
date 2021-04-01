@@ -1,6 +1,4 @@
-﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
-
-window.documentReadyFunctions.push(function () {
+﻿export default function () {
 	let submittingData = false;
 
 	const errorOnUpdateAdditionalScore = function ($input, error) {
@@ -99,14 +97,14 @@ window.documentReadyFunctions.push(function () {
 		});
 	};
 
-	$('.additional-score-link').click(function(e) {
+	$('.additional-score-link').click(function (e) {
 		e.preventDefault();
 
 		const $self = $(this);
 
-		if ($('.additional-score-input:visible').length) {
+		if($('.additional-score-input:visible').length) {
 			const $first = $('.additional-score-input:visible').first();
-			if (! validateAdditionalScoreInput($first))
+			if(!validateAdditionalScoreInput($first))
 				return;
 		}
 
@@ -117,7 +115,7 @@ window.documentReadyFunctions.push(function () {
 
 	$('.additional-score-input').blur(function () {
 		const $self = $(this);
-		if (validateAdditionalScoreInput($self)) {
+		if(validateAdditionalScoreInput($self)) {
 			$self.hide();
 			saveAdditionalScore($self);
 		}
@@ -129,48 +127,48 @@ window.documentReadyFunctions.push(function () {
 		const $studentRow = $self.closest('.student');
 		let $nextStudentRow;
 		let needToSave = false;
-		if (e.which === 9) // Tab or Shift+Tab
+		if(e.which === 9) // Tab or Shift+Tab
 		{
 			needToSave = true;
 
 			const $additionalScore = $self.closest('.additional-score');
 			let $nextAdditionalScore = nextUntilHasChild($additionalScore, '.additional-score-link');
-			if (e.shiftKey)
+			if(e.shiftKey)
 				$nextAdditionalScore = prevUntilHasChild($additionalScore, '.additional-score-link');
-			if ($nextAdditionalScore) {
+			if($nextAdditionalScore) {
 				$next = $nextAdditionalScore.find('.additional-score-link');
 			} else {
 				/* Jump to next (or previous) row if current cell is last (or first) */
-				if (!e.shiftKey) {
+				if(!e.shiftKey) {
 					$nextStudentRow = nextUntilHasChild($studentRow, '.additional-score-link');
-					if ($nextStudentRow)
+					if($nextStudentRow)
 						$next = $nextStudentRow.find('.additional-score-link').first();
 				} else {
 					$nextStudentRow = prevUntilHasChild($studentRow, '.additional-score-link');
-					if ($nextStudentRow)
+					if($nextStudentRow)
 						$next = $nextStudentRow.find('.additional-score-link').last();
 				}
 			}
 		}
-		if (e.which === 13 || e.which === 38 || e.which === 40) // Enter, Up or Down
+		if(e.which === 13 || e.which === 38 || e.which === 40) // Enter, Up or Down
 		{
 			needToSave = true;
 
 			const scoringType = $self.data('scoringType');
 			const selector = '.additional-score-link[data-scoring-type=' + scoringType + ']';
 			$nextStudentRow = nextUntilHasChild($studentRow, selector);
-			if (e.which === 38) // Up
+			if(e.which === 38) // Up
 				$nextStudentRow = prevUntilHasChild($studentRow, selector);
-			if ($nextStudentRow) {
+			if($nextStudentRow) {
 				$next = $nextStudentRow.find(selector);
 			}
 		}
-		if (needToSave) {
+		if(needToSave) {
 			e.preventDefault();
 
-			if ($next && $next.length)
+			if($next && $next.length)
 				$self.data('openNext', $next);
 			$self.blur();
 		}
 	});
-});
+}

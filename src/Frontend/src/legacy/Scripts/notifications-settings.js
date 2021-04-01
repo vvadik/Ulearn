@@ -1,6 +1,4 @@
-﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
-
-window.documentReadyFunctions.push(function () {
+﻿export default function () {
 	const $modal = $('#notifications__transport-settings__modal');
 	const $panel = $modal.find('.notifications__transport-settings__panel');
 	const saveUrl = $modal.data('saveUrl');
@@ -8,11 +6,11 @@ window.documentReadyFunctions.push(function () {
 
 	function getNotificationSettings(courseId, transportId, notificationType) {
 		for (let idx in window.notificationTransportsSettings) {
-			if (!window.notificationTransportsSettings.hasOwnProperty(idx))
+			if(!window.notificationTransportsSettings.hasOwnProperty(idx))
 				continue;
 
 			const setting = window.notificationTransportsSettings[idx];
-			if (setting.courseId === courseId &&
+			if(setting.courseId === courseId &&
 				setting.transportId === transportId &&
 				setting.notificationType === notificationType)
 				return setting.isEnabled;
@@ -67,14 +65,14 @@ window.documentReadyFunctions.push(function () {
 			$checkboxWrapper.toggle(notificationTypesForCourse.indexOf(notificationType) !== -1);
 
 			let isEnabled = getNotificationSettings(courseId, transportId, notificationType);
-			if (isEnabled === undefined)
+			if(isEnabled === undefined)
 				isEnabled = $checkbox.data('default');
 
 			$checkbox.prop('checked', isEnabled);
 		});
 	});
 
-	$panel.find('input[type="checkbox"]').change(function(e) {
+	$panel.find('input[type="checkbox"]').change(function (e) {
 		e.preventDefault();
 
 		const $checkbox = $(this);
@@ -86,14 +84,14 @@ window.documentReadyFunctions.push(function () {
 		const isEnabled = $checkbox.prop('checked');
 
 		$.post(saveUrl,
-				{
-					'transportId': transportId,
-					'courseId': courseId,
-					'notificationType': notificationType,
-					'isEnabled': isEnabled,
-				}, null, 'json')
+			{
+				'transportId': transportId,
+				'courseId': courseId,
+				'notificationType': notificationType,
+				'isEnabled': isEnabled,
+			}, null, 'json')
 			.done(function (result) {
-				if (result.status === 'ok') {
+				if(result.status === 'ok') {
 					window.notificationTransportsSettings = result.notificationTransportsSettings;
 
 					$status.addClass('text-success').text('Сохранено!');
@@ -112,4 +110,4 @@ window.documentReadyFunctions.push(function () {
 
 		return false;
 	});
-});
+}

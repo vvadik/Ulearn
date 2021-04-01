@@ -1,6 +1,4 @@
-﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
-
-window.documentReadyFunctions.push(function () {
+﻿export default function () {
 	const $modal = $('#createOrUpdateCertificateTemplateModal');
 	const $form = $('#createOrUpdateCertificateTemplateModal form');
 	const token = $('input[name="__RequestVerificationToken"]').val();
@@ -161,7 +159,7 @@ window.documentReadyFunctions.push(function () {
 		$selectUserBlock.hide();
 	};
 
-	$('.preview-certificates .cancel-select-another-user-link').click(function(e) {
+	$('.preview-certificates .cancel-select-another-user-link').click(function (e) {
 		e.preventDefault();
 
 		const $self = $(this);
@@ -191,7 +189,7 @@ window.documentReadyFunctions.push(function () {
 		});
 	});
 
-	$('.preview-certificates .select-another-user-predefined-select').change(function() {
+	$('.preview-certificates .select-another-user-predefined-select').change(function () {
 		const $self = $(this);
 		const $certificateUserBlock = $self.closest('.certificate__user');
 		const $userIdInput = $certificateUserBlock.find('.user-id');
@@ -200,7 +198,7 @@ window.documentReadyFunctions.push(function () {
 		const $selected = $self.find('option:selected');
 		const userId = $selected.attr('value');
 		const userName = $selected.text();
-		if (userId !== '') {
+		if(userId !== '') {
 			$userIdInput.val(userId);
 			$userNameDiv.text(userName);
 			$certificateUserBlock.find('.select-another-user-predefined-select').remove();
@@ -210,13 +208,13 @@ window.documentReadyFunctions.push(function () {
 		}
 	});
 
-	$('.preview-certificates .remove-certificate-preview-link').click(function(e) {
+	$('.preview-certificates .remove-certificate-preview-link').click(function (e) {
 		e.preventDefault();
 		$(this).closest('.certificate').remove();
 		validateIfAllUsersFilled();
 	});
 
-	$('.preview-certificates .remove-certificate-preview-parameter-link').click(function(e) {
+	$('.preview-certificates .remove-certificate-preview-parameter-link').click(function (e) {
 		e.preventDefault();
 		const parameter = $(this).closest('th').data('parameter');
 		$('[data-parameter="' + parameter + '"]').remove();
@@ -233,4 +231,4 @@ window.documentReadyFunctions.push(function () {
 
 	initBuiltinParametersValues();
 	validateIfAllUsersFilled();
-});
+}

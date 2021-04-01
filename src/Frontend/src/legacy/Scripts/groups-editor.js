@@ -1,6 +1,4 @@
-﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
-
-window.documentReadyFunctions.push(function () {
+﻿export default function () {
 	const updateMassOperationsControlsState = function () {
 		const $countChecked = $('.modal__edit-group__members').find('.group__member.checked').length;
 		const $massOperationsPanel = $('.modal__edit-group__mass-operations');
@@ -564,4 +562,4 @@ window.documentReadyFunctions.push(function () {
 		$self.addClass('active');
 		$('.groups .group').toggle();
 	});
-})
+}

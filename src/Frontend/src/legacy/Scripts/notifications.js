@@ -1,6 +1,4 @@
-﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
-
-window.documentReadyFunctions.push(function () {
+﻿export default function () {
 	const $notificaticationsIconLink = $('.notifications__icon-link');
 	const $counter = $('.notifications__counter');
 	const $dropdownContent = $('.notifications__dropdown');
@@ -12,7 +10,7 @@ window.documentReadyFunctions.push(function () {
 	};
 
 	/* On mobile layout close notification area on user menu showing */
-	$('.greeting-collapse-class').on('show.bs.collapse', function() {
+	$('.greeting-collapse-class').on('show.bs.collapse', function () {
 		$('.notifications__mobile-dropdown').removeClass('in');
 	});
 
@@ -21,25 +19,25 @@ window.documentReadyFunctions.push(function () {
 		const $dropdown = $self.closest('.dropdown');
 		const isDesktopVersionOpened = $dropdown.hasClass('open');
 		const isMobileVersionOpened = $('.notifications__mobile-dropdown').hasClass('in');
-		if (!isDesktopVersionOpened && !isMobileVersionOpened) {
+		if(!isDesktopVersionOpened && !isMobileVersionOpened) {
 			const loadUrl = $self.data('notificationsUrl');
 			$dropdownContent.html('<li class="notifications__info">Загружаю последние уведомления...</li>');
-			$.get(loadUrl, function(data) {
-                $dropdownContent.html(data);
+			$.get(loadUrl, function (data) {
+				$dropdownContent.html(data);
 				$counter.text('0').hide();
 			});
 		}
 
 		hideUserMenu();
 	});
-	
-	$(document).on('click', '.notifications__notification', function(e) {
+
+	$(document).on('click', '.notifications__notification', function (e) {
 		e.preventDefault();
 
 		const linkElem = $(this).find('> *');
 		const link = linkElem.data('href');
 
-		if (link) {
+		if(link) {
 			const getLocation = function (href) {
 				const l = document.createElement("a");
 				l.href = href;
@@ -58,11 +56,11 @@ window.documentReadyFunctions.push(function () {
 
 		const $self = $(this);
 		const feed = $self.data('feed');
-		if ($self.hasClass('active'))
+		if($self.hasClass('active'))
 			return;
 
 		const updateTimestampUrl = $self.data('updateTimestampUrl');
-		if (updateTimestampUrl) {
+		if(updateTimestampUrl) {
 			$.post(updateTimestampUrl);
 		}
 
@@ -92,6 +90,6 @@ window.documentReadyFunctions.push(function () {
 		});
 	};
 
-	if ($('.notifications__icon-link').length > 0)
+	if($('.notifications__icon-link').length > 0)
 		setInterval(updateNotificationUnreadCount, 60 * 1000);
-});
+}

@@ -1,7 +1,5 @@
-﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
+﻿require('webpack-jquery-ui/tooltip');
 
-require('webpack-jquery-ui/tooltip');
-
-window.documentReadyFunctions.push(function() {
+export default function() {
 	$('[data-toggle="tooltip"]').tooltip();
-});
+}

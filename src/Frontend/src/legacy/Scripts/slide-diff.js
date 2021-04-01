@@ -1,4 +1,4 @@
-﻿window.diffHtml = function diffHtml(actual, expected, actualHeader, expectedHeader, hideEqualsLines) {
+﻿export default function diffHtml(actual, expected, actualHeader, expectedHeader, hideEqualsLines) {
 	actualHeader = actualHeader || 'Вывод вашей программы';
 	expectedHeader = expectedHeader || 'Ожидаемый вывод';
 	hideEqualsLines = hideEqualsLines === undefined ? false : hideEqualsLines;

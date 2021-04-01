@@ -3,9 +3,9 @@
 	placeCodeReviews,
 	refreshPreviousDraft,
 	saveExerciseCodeDraft
-} from "src/legacy/Scripts/slide-editor";
-import { fetchAntiPlagiarismStatus } from "src/legacy/Scripts/antiplagiarism";
-import { selectSetAutoWidth } from "src/legacy/Scripts/slide-utils";
+} from "src/legacy/scripts/slide-editor";
+import { fetchAntiPlagiarismStatus } from "src/legacy/scripts/antiplagiarism";
+import { selectSetAutoWidth } from "src/legacy/scripts/slide-utils";
 
 
 function updateExerciseVersionUrl(versionId) {
@@ -76,9 +76,7 @@ export function setExerciseVersion(versionId, showOutput) {
 	});
 }
 
-window.documentReadyFunctions = window.documentReadyFunctions || [];
-
-window.documentReadyFunctions.push(function () {
+export default function () {
 	$('.exercise__submission').on('click', '.exercise-version-link', function (e) {
 		e.preventDefault();
 
@@ -91,4 +89,4 @@ window.documentReadyFunctions.push(function () {
 		const $self = $(this);
 		setExerciseVersion(parseInt($self.val()));
 	});
-});
+}

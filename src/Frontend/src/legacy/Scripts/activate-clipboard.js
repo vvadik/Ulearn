@@ -1,17 +1,17 @@
-﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
+﻿import ClipboardJS from "clipboard";
 
-import ClipboardJS from "clipboard";
+window.ClipboardJS = ClipboardJS;
 
-window.documentReadyFunctions.push(function () {
+export default function () {
 	new ClipboardJS('.clipboard-link').on('success', function (e) {
 		const $trigger = $(e.trigger);
-		if ($trigger.data('show-copied')) {
+		if($trigger.data('show-copied')) {
 			const oldValue = $trigger.text();
 			$trigger.text('скопировано!');
-			setTimeout(function() {
-				$trigger.text(oldValue);
+			setTimeout(function () {
+					$trigger.text(oldValue);
 				},
 				1000);
 		}
 	});
-});
+};

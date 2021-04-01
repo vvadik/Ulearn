@@ -11,20 +11,17 @@
  * 	
  * 	See Frontend/src/externalComponentRenderer.js for the second part of this module.
  */
-
-window.documentReadyFunctions = window.documentReadyFunctions || [];
-
-window.documentReadyFunctions.push(function () {
+export default function () {
 	$('.react-render').each(function () {
 		const $this = $(this);
 		$this.removeClass('react-render').addClass('react-rendered');
 		const componentType = $this.data('component');
 		let props = $this.data('props');
-		if (! props)
+		if(!props)
 			props = {};
-		
-		if (componentType) {
+
+		if(componentType) {
 			window.renderReactComponent(componentType, this, props);
 		}
 	});
-});
+}

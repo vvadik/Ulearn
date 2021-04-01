@@ -1,10 +1,8 @@
-﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
-
-import Highcharts from 'highcharts';
+﻿import Highcharts from 'highcharts';
 import Data from 'highcharts/modules/data';
 Data(Highcharts); //initializing module
 
-window.documentReadyFunctions.push(function () {
+export default function () {
 	const $chart = $('#usersByCountVisitedSlidesChart');
 
 	function showChartByDataFrom(id) {
@@ -77,4 +75,4 @@ window.documentReadyFunctions.push(function () {
 
 			return false;
 		});
-});
+}

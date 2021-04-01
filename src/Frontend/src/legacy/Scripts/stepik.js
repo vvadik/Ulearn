@@ -1,9 +1,7 @@
-﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
-
-window.documentReadyFunctions.push(function () {
+﻿export default function () {
 	/* Course export */
 
-	$('.stepik__course-export__select-course li').click(function() {
+	$('.stepik__course-export__select-course li').click(function () {
 		const $self = $(this);
 
 		const $ul = $('.stepik__course-export__select-course');
@@ -25,14 +23,14 @@ window.documentReadyFunctions.push(function () {
 		$form.submit();
 	});
 
-	$('.stepik__course-export__lessons-partitions .strike-line').click(function(e) {
+	$('.stepik__course-export__lessons-partitions .strike-line').click(function (e) {
 		e.preventDefault();
 
 		const $self = $(this);
 		$self.toggleClass('selected');
 	});
 
-	$('.stepik__course-export__initial__buttons button').click(function(e) {
+	$('.stepik__course-export__initial__buttons button').click(function (e) {
 		e.preventDefault();
 
 		const $self = $(this);
@@ -49,8 +47,8 @@ window.documentReadyFunctions.push(function () {
 
 	/* Course updating */
 
-	$('.stepik__course-update__slide').click(function(e) {
-		if ($(e.target).closest('.checkbox').length > 0)
+	$('.stepik__course-update__slide').click(function (e) {
+		if($(e.target).closest('.checkbox').length > 0)
 			return;
 
 		e.preventDefault();
@@ -59,7 +57,7 @@ window.documentReadyFunctions.push(function () {
 		$checkbox.click();
 	});
 
-	$('.stepik__course-update__slide .checkbox input[type="checkbox"]').click(function() {
+	$('.stepik__course-update__slide .checkbox input[type="checkbox"]').click(function () {
 		const $checkbox = $(this);
 		const isChecked = $checkbox.is(':checked');
 		const $row = $checkbox.closest('.stepik__course-update__slide');
@@ -80,4 +78,4 @@ window.documentReadyFunctions.push(function () {
 		$form.find('[name="updateSlidesIds"]').val(selectedSlidesIds);
 		$form.submit();
 	});
-});
+}

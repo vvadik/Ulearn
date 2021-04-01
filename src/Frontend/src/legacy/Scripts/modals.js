@@ -1,12 +1,10 @@
-﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
-
-window.documentReadyFunctions.push(function() {
-	$('.modal-header__tabs a').click(function(e) {
+﻿export default function () {
+	$('.modal-header__tabs a').click(function (e) {
 		e.preventDefault();
 
 		const $self = $(this);
 		const $li = $self.closest('li');
-		if ($li.hasClass('active'))
+		if($li.hasClass('active'))
 			return;
 
 		const $tabs = $li.closest('.modal-header__tabs');
@@ -19,11 +17,11 @@ window.documentReadyFunctions.push(function() {
 		$target.addClass('active');
 	});
 
-	$('.modal').on('show.bs.modal', function() {
+	$('.modal').on('show.bs.modal', function () {
 		$(this).find('.field-validation-error').text('');
 	});
 
 	$('.modal').on('shown.bs.modal', function () {
 		$(this).find('[autofocus]').focus();
 	});
-});
+}

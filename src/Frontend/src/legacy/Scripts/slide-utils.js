@@ -40,9 +40,7 @@ function setAutoUpdater($element) {
 	}, interval);
 }
 
-window.documentReadyFunctions = window.documentReadyFunctions || [];
-
-window.documentReadyFunctions.push(function() {
+export default function() {
 	$('.js__onchange-send-form').change(function () {
 		$(this).closest('form').submit();
 	});
@@ -58,4 +56,4 @@ window.documentReadyFunctions.push(function() {
 	$('.js__auto-update').each(function() {
 		setAutoUpdater($(this));
 	});
-});
+}

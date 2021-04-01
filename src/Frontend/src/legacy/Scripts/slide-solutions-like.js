@@ -1,4 +1,4 @@
-﻿window.likeSolution = function likeSolution(solutionId) {
+﻿export default function likeSolution(solutionId) {
 	$.ajax({
 		type: "POST",
 		url: $("#LikeSolutionUrl").data("url"),

@@ -15,7 +15,7 @@
 		dataType: 'json',
 	})
 		.done(function (result) {
-			if (result.status !== 'ok') {
+			if(result.status !== 'ok') {
 				alert(result.message);
 				return;
 			}
@@ -24,7 +24,7 @@
 		});
 }
 
-window.ToggleSystemRoleOrAccess = function ToggleSystemRoleOrAccess(target, toggleClass) {
+export function ToggleSystemRoleOrAccess(target, toggleClass) {
 	const $object = $(target);
 	const url = $object.data("toggleUrl");
 	const token = $('#AntiForgeryTokenContainer input[name="__RequestVerificationToken"]').val();
@@ -38,7 +38,7 @@ window.ToggleSystemRoleOrAccess = function ToggleSystemRoleOrAccess(target, togg
 		dataType: 'json',
 	})
 		.done(function (result) {
-			if (result.status !== 'ok') {
+			if(result.status !== 'ok') {
 				console.error(result.message);
 				return;
 			}
@@ -47,11 +47,11 @@ window.ToggleSystemRoleOrAccess = function ToggleSystemRoleOrAccess(target, togg
 		});
 }
 
-window.ToggleButtonClass = function ToggleButtonClass(button) {
+export function ToggleButtonClass(button) {
 	button.toggleClass(button.data("css-class"));
 }
 
-window.ToggleDropDownClass = function ToggleDropDownClass(dropdownElement) {
+export function ToggleDropDownClass(dropdownElement) {
 	const parent = $(dropdownElement.parents()[0]);
 	const cssClass = parent.data("css-class");
 	dropdownElement.toggleClass(cssClass);
@@ -61,15 +61,15 @@ window.ToggleDropDownClass = function ToggleDropDownClass(dropdownElement) {
 	button.removeClass(buttonCss);
 	for (let i = 0; i < elements.length; ++i) {
 		const elem = $(elements[i]);
-		if (elem.hasClass(cssClass)) {
+		if(elem.hasClass(cssClass)) {
 			button.addClass(buttonCss);
 			break;
 		}
 	}
 }
 
-window.openPopup = function openPopup(target, toggleClass) {
-	if (($(target)).data("css-class") === "btn-danger") {
+export function openPopup(target, toggleClass) {
+	if(($(target)).data("css-class") === "btn-danger") {
 		ToggleSystemRoleOrAccess(target, toggleClass);
 		return;
 	}
@@ -81,11 +81,11 @@ window.openPopup = function openPopup(target, toggleClass) {
 	const courseTitle = $object.data("toggleCoursetitle");
 	let isGrant = true;
 	const className = ((target)).className;
-	if (className.indexOf("btn-success") > -1 || className.indexOf("btn-warning") > -1 || className.indexOf("btn-info") > -1) {
+	if(className.indexOf("btn-success") > -1 || className.indexOf("btn-warning") > -1 || className.indexOf("btn-info") > -1) {
 		isGrant = false;
 	}
 
-	if (className === "li-info" || className === "li-warning" || className === "li-success") {
+	if(className === "li-info" || className === "li-warning" || className === "li-success") {
 		isGrant = false;
 	}
 
@@ -103,8 +103,7 @@ window.openPopup = function openPopup(target, toggleClass) {
 	root.setAttribute('modalOpened', true);
 }
 
-window.closePopup = function closePopup() {
+export function closePopup() {
 	const root = document.querySelector('.react-rendered');
 	root.setAttribute('modalOpened', false);
 }
-

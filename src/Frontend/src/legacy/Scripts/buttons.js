@@ -1,10 +1,8 @@
-﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
-
-import 'bootstrap-fileinput/js/fileinput.min';
+﻿import 'bootstrap-fileinput/js/fileinput.min';
 import 'bootstrap-fileinput/js/locales/ru';
 import 'bootstrap-fileinput/css/fileinput.min.css';
 
-window.documentReadyFunctions.push(function () {
+export default function () {
 	$('.btn').button();
 	$('.btn-hover').hover(
 		function () {
@@ -32,4 +30,4 @@ window.documentReadyFunctions.push(function () {
 		language: 'ru',
 		browseOnZoneClick: true,
 	});
-});
+}

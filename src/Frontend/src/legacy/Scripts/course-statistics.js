@@ -1,9 +1,7 @@
-window.documentReadyFunctions = window.documentReadyFunctions || [];
-
 require('webpack-jquery-ui/selectable');
 require('webpack-jquery-ui/selectmenu');
 
-window.documentReadyFunctions.push(function () {
+export default function () {
 	const $courseStatistics = $('.course-statistics');
 
 	/* Sticky header functions */
@@ -197,7 +195,7 @@ window.documentReadyFunctions.push(function () {
 		callFunctionForPairedCells(_toggleUnitScoringGroup, $scoringGroupTitle);
 	};
 
-	$courseStatistics.find('.expand-scoring-group__link').click(function(e) {
+	$courseStatistics.find('.expand-scoring-group__link').click(function (e) {
 		e.preventDefault();
 		const $parent = $(this).closest('.scoring-group-title');
 		toggleUnitScoringGroup($parent);
@@ -219,10 +217,10 @@ window.documentReadyFunctions.push(function () {
 		const $loadingIcon = $self.closest('.checkbox').find('.loading-icon');
 		$loadingIcon.show();
 
-		setTimeout(function() {
-			$courseStatistics.find('.scoring-group-title[data-scoring-group="' + scoringGroupId + '"]').each(function() {
+		setTimeout(function () {
+			$courseStatistics.find('.scoring-group-title[data-scoring-group="' + scoringGroupId + '"]').each(function () {
 				/* Collapse if expanded */
-				if ($(this).data('expanded'))
+				if($(this).data('expanded'))
 					toggleUnitScoringGroup($(this));
 
 				const unitId = $(this).data('unitId');
@@ -387,7 +385,7 @@ window.documentReadyFunctions.push(function () {
 		const isGrouppingEnabled = $self.is(':checked');
 		const $loadingIcon = $self.closest('.checkbox').find('.loading-icon').show();
 		const sortingFunctions = getCurrentSortingFunctions();
-		setTimeout(function() {
+		setTimeout(function () {
 			sortTable($courseStatistics, sortingFunctions, isGrouppingEnabled ? groupingFunction : undefined);
 			$loadingIcon.hide();
 			$self.removeAttr('disabled');
@@ -398,9 +396,9 @@ window.documentReadyFunctions.push(function () {
 		const $self = $(this);
 		const $loadingIcon = $self.closest('.checkbox').find('.loading-icon').show();
 		$self.attr('disabled', 'disabled');
-		setTimeout(function() {
+		setTimeout(function () {
 			$courseStatistics.toggleClass('only-full-scores', $self.is(':checked'));
-			$courseStatistics.find('[data-only-full-value]').each(function() {
+			$courseStatistics.find('[data-only-full-value]').each(function () {
 				const $self = $(this);
 				const text = $self.text();
 				$self.text($self.data('onlyFullValue'));
@@ -408,15 +406,15 @@ window.documentReadyFunctions.push(function () {
 			});
 			$self.removeAttr('disabled');
 			$loadingIcon.hide();
-		},  0);
+		}, 0);
 	});
-	
+
 	$courseStatistics.find('thead th[data-sorter="true"]').click(function (e) {
 		/* Original $courseStatistics and it's pair from sticky header */
 		const $courseStatisticsAll = $('.course-statistics');
 
 		/* Cancel event if user clicked on link */
-		if ($(e.target).closest('a').length > 0)
+		if($(e.target).closest('a').length > 0)
 			return;
 
 		e.preventDefault();
@@ -430,32 +428,32 @@ window.documentReadyFunctions.push(function () {
 		const isGrouppingEnabled = $('#grouping-by-group').is(':checked');
 
 		let sortingFunctions = [];
-		if (e.shiftKey) {
+		if(e.shiftKey) {
 			sortingFunctions = getCurrentSortingFunctions();
 		} else {
 			$courseStatisticsAll.find('thead th[data-sorter="true"].sorted').data('order', undefined).removeClass('sorted sorted-asc sorted-desc');
 		}
 		/* Find maximum of sorting index of current sorting columns */
 		let maxSortingIndex = 0;
-		$courseStatistics.find('thead th[data-sorter="true"].sorted').each(function() {
-			if ($(this).data('sorting-index') > maxSortingIndex)
+		$courseStatistics.find('thead th[data-sorter="true"].sorted').each(function () {
+			if($(this).data('sorting-index') > maxSortingIndex)
 				maxSortingIndex = $(this).data('sorting-index');
 		});
 
 		const order = changeOrder($self.data('order'));
 		sortingFunctions.push(getSortingFunction($self, order));
 		$selfWithPair.data('order', order).data('sorting-index', maxSortingIndex + 1).addClass('sorted sorted-' + order);
-		
+
 		/* Run in another thread */
-		setTimeout(function() {
+		setTimeout(function () {
 			sortTable($courseStatistics, sortingFunctions, isGrouppingEnabled ? groupingFunction : undefined);
 		}, 0);
 	});
 
-	if ($courseStatistics.length > 0) {
+	if($courseStatistics.length > 0) {
 		disableScoringGroupFilterIfNeeded();
 
-		setTimeout(function() {
+		setTimeout(function () {
 			/* Init sticky header. Should be at the end of the file because all event listeners should be set already */
 			rerenderStickyHeaderAndColumn($courseStatistics, documentHeaderHeight);
 
@@ -464,4 +462,4 @@ window.documentReadyFunctions.push(function () {
 			});
 		}, 0);
 	}
-});
+}

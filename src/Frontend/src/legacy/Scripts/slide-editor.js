@@ -1,10 +1,8 @@
 import CodeMirror from "codemirror";
-import { autoEnlargeTextarea } from "src/legacy/Scripts/slide-comments";
+import { autoEnlargeTextarea } from "src/legacy/scripts/slide-comments";
 import { Exercise } from "src/components/course/Course/Slide/Blocks";
 
-window.documentReadyFunctions = window.documentReadyFunctions || [];
-
-window.documentReadyFunctions.push(function () {
+export default function () {
 	initCodeEditor();
 
 	$('.exercise__add-review').each(function () {
@@ -54,7 +52,7 @@ window.documentReadyFunctions.push(function () {
 
 	if($('.exercise__reviews').length > 0)
 		placeCodeReviews();
-});
+}
 
 var editorLastRange, currentReviewTextMarker, reviewsTextMarkers, exerciseCodeDoc, $exerciseCodeBlock;
 

@@ -1,4 +1,4 @@
-﻿import { setExerciseVersion } from "src/legacy/Scripts/slide-versions";
+﻿import { setExerciseVersion } from "src/legacy/scripts/slide-versions";
 
 let $runResults, $serviceError, $compileError, $styleError, $waError, $waErrorNoDiff, $success;
 

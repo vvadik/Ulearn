@@ -59,7 +59,6 @@ window.submitQuiz = function submitQuiz(courseId, slideId, expectedCount, isLti)
 		alert("Выполните все задания перед отправкой теста");
 }
 
-
 window.areAllAnswered = function areAllAnswered(needingCount) {
 	let realCount = 0;
 	$(".quiz-block-mark").each(function () {
@@ -84,7 +83,6 @@ window.areAllAnswered = function areAllAnswered(needingCount) {
 	return realCount >= needingCount;
 }
 
-
 function QuizAnswer(type, blockId, itemId, text) {
 	this.BlockType = type;
 	this.BlockId = blockId;
@@ -92,9 +90,7 @@ function QuizAnswer(type, blockId, itemId, text) {
 	this.Text = text;
 }
 
-window.documentReadyFunctions = window.documentReadyFunctions || [];
-
-window.documentReadyFunctions.push(function () {
+export default function () {
 	$.fn.moveUp = function () {
 		$.each(this, function () {
 			$(this).after($(this).prev());
@@ -224,4 +220,4 @@ window.documentReadyFunctions.push(function () {
 		urlObject.searchParams.delete('send');
 		window.history.replaceState({}, '', urlObject.href);
 	}
-});
+}

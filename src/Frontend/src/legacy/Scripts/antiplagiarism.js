@@ -117,10 +117,7 @@ function getDiff(a, b, ignoreWhitespace) {
 }
 
 /* End of extracted from merge addon for codemirror */
-
-window.documentReadyFunctions = window.documentReadyFunctions || [];
-
-window.documentReadyFunctions.push(function () {
+export function antiplagiarism() {
 	$('.antiplagiarism__data').each(function () {
 		const $self = $(this);
 		const originalSubmissionId = $self.data('originalSubmissionId');
@@ -412,11 +409,11 @@ window.documentReadyFunctions.push(function () {
 				   Bad full-matched blocks are marked with special value of diffType: -100. It means that it should be marked in both texts, but as not-matched */
 				const BAD_FULL_MATCHED = -100;
 				let badFullMatchedLength = 0;
-				console.log('Diff is', diffItem);
+				//console.log('Diff is', diffItem);
 				if(diffType === 0) {
 					const firstChar = diffString[0];
 					const previousChar = originalCharIndex > 0 ? originalLine[originalCharIndex - 1] : '';
-					console.log('Checking full-matched substring "' + diffString + '" for badness. First char is', firstChar, 'previous char is', previousChar);
+					//console.log('Checking full-matched substring "' + diffString + '" for badness. First char is', firstChar, 'previous char is', previousChar);
 					if(isLatinChar(firstChar)) {
 						const isFirstLetter = previousChar === '' || isLatinUppercase(firstChar) || !isLatinChar(previousChar);
 						if(!isFirstLetter) {
@@ -451,7 +448,7 @@ window.documentReadyFunctions.push(function () {
 						line: lineId,
 						ch: originalCharIndex + badFullMatchedLength
 					}, notMatchedTextMarkerOptions);
-					console.log('originalCharIndex:', originalCharIndex, '+', badFullMatchedLength, '=', originalCharIndex + badFullMatchedLength);
+					//console.log('originalCharIndex:', originalCharIndex, '+', badFullMatchedLength, '=', originalCharIndex + badFullMatchedLength);
 					originalCharIndex += badFullMatchedLength;
 					plagiarismCodeMirror.markText({
 						line: bestMatchedLine,
@@ -460,7 +457,7 @@ window.documentReadyFunctions.push(function () {
 						line: bestMatchedLine,
 						ch: plagiarismCharIndex + badFullMatchedLength
 					}, notMatchedTextMarkerOptions);
-					console.log('plagiarismCharIndex:', plagiarismCharIndex, '+', badFullMatchedLength, '=', plagiarismCharIndex + badFullMatchedLength);
+					//console.log('plagiarismCharIndex:', plagiarismCharIndex, '+', badFullMatchedLength, '=', plagiarismCharIndex + badFullMatchedLength);
 					plagiarismCharIndex += badFullMatchedLength;
 
 					diffString = diffString.substring(badFullMatchedLength);
@@ -473,7 +470,7 @@ window.documentReadyFunctions.push(function () {
 						line: lineId,
 						ch: originalCharIndex + diffString.length
 					}, fullMatchedTextMarkerOptions);
-					console.log('originalCharIndex:', originalCharIndex, '+', diffString.length, '=', originalCharIndex + diffString.length);
+					//console.log('originalCharIndex:', originalCharIndex, '+', diffString.length, '=', originalCharIndex + diffString.length);
 					originalCharIndex += diffString.length;
 					plagiarismCodeMirror.markText({
 						line: bestMatchedLine,
@@ -482,7 +479,7 @@ window.documentReadyFunctions.push(function () {
 						line: bestMatchedLine,
 						ch: plagiarismCharIndex + diffString.length
 					}, fullMatchedTextMarkerOptions);
-					console.log('plagiarismCharIndex:', plagiarismCharIndex, '+', diffString.length, '=', plagiarismCharIndex + diffString.length);
+					//console.log('plagiarismCharIndex:', plagiarismCharIndex, '+', diffString.length, '=', plagiarismCharIndex + diffString.length);
 					plagiarismCharIndex += diffString.length;
 				}
 				let markerOptions;
@@ -493,7 +490,7 @@ window.documentReadyFunctions.push(function () {
 						line: lineId,
 						ch: originalCharIndex + diffString.length
 					}, markerOptions);
-					console.log('originalCharIndex:', originalCharIndex, '+', diffString.length, '=', originalCharIndex + diffString.length);
+					//console.log('originalCharIndex:', originalCharIndex, '+', diffString.length, '=', originalCharIndex + diffString.length);
 					originalCharIndex += diffString.length;
 				}
 				if(diffType === 1) {
@@ -502,7 +499,7 @@ window.documentReadyFunctions.push(function () {
 						line: bestMatchedLine,
 						ch: plagiarismCharIndex
 					}, { line: bestMatchedLine, ch: plagiarismCharIndex + diffString.length }, markerOptions);
-					console.log('plagiarismCharIndex:', plagiarismCharIndex, '+', diffString.length, '=', plagiarismCharIndex + diffString.length);
+					//console.log('plagiarismCharIndex:', plagiarismCharIndex, '+', diffString.length, '=', plagiarismCharIndex + diffString.length);
 					plagiarismCharIndex += diffString.length;
 				}
 			});
@@ -596,9 +593,9 @@ window.documentReadyFunctions.push(function () {
 		const $form = $self.closest('form');
 		$form.submit();
 	});
-});
+}
 
-window.documentReadyFunctions.push(function () {
+export function antiplagiarismChart() {
 	const $chart = $('#mostSimilarSubmissionsChart');
 
 	const $element = $("#mostSimilarSubmissionsTable")[0];
@@ -609,7 +606,7 @@ window.documentReadyFunctions.push(function () {
 	const strongSuspicion = $("#strongSuspicion")[0].value;
 	const maxAuthorSubmissionWeight = $("#maxAuthorSubmissionWeight")[0].value;
 
-	Highcharts.chart($chart, {
+	Highcharts.chart($chart[0], {
 		data: {
 			table: document.getElementById($element.id)
 		},
@@ -694,4 +691,4 @@ window.documentReadyFunctions.push(function () {
 				alert("Ошибка");
 			});
 	});
-});
+}

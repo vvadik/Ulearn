@@ -1,3 +1,3 @@
-﻿window.loginForContinue = function loginForContinue() {
+﻿export default function loginForContinue() {
 	$('#LoginForContinue').modal('show');
 }

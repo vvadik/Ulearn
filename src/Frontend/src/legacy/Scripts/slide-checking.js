@@ -1,6 +1,4 @@
-﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
-
-window.documentReadyFunctions.push(function () {
+﻿export default function () {
 	const $exerciseScoreFormWrapper = $('.exercise__score-form-wrapper');
 	const $exerciseScoreForm = $('.exercise__score-form');
 	const $exerciseSimpleScoreForm = $('.exercise__simple-score-form');
@@ -299,4 +297,4 @@ window.documentReadyFunctions.push(function () {
 			$submissionInfo.closest('.user-submission').find('.status').text('');
 		}
 	});
-});
+}

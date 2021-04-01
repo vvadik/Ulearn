@@ -1,6 +1,4 @@
-﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
-
-window.documentReadyFunctions.push(function () {
+﻿export default function () {
 	function initSpoilerBlock($spoilerBlock) {
 		const $button = $spoilerBlock.find('.spoiler-block__button button');
 		const $content = $spoilerBlock.find('.spoiler-block__content');
@@ -33,4 +31,4 @@ window.documentReadyFunctions.push(function () {
 	toggleQuizButton();
 
 	$spoilerBlocks.each(function () { initSpoilerBlock($(this)) });
-});
+}

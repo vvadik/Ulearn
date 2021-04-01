@@ -1,11 +1,9 @@
-﻿window.documentReadyFunctions = window.documentReadyFunctions || [];
-
-window.documentReadyFunctions.push(function() {
+﻿export default function () {
 	$(document).on('click', 'button[data-replace-action],a[data-replace-action]', function (e) {
 		const $self = $(this);
 
 		const $form = $self.closest('form');
-		if ($form.length === 0)
+		if($form.length === 0)
 			return;
 
 		e.preventDefault();
@@ -13,4 +11,4 @@ window.documentReadyFunctions.push(function() {
 		$form.attr('action', newAction);
 		$form.submit();
 	});
-});
+}
