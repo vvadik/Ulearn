@@ -71,7 +71,7 @@ where ""{nameof(db.WorkQueueItems)}"".""{IdColumnName}"" = next_task.""{IdColumn
 returning next_task.""{IdColumnName}"", ""{QueueIdColumnName}"", ""{ItemIdColumnName}"", ""{PriorityColumnName}"", ""{TypeColumnName}"", ""{TakeAfterTimeColumnName}"";"; // Если написать *, Id возвращается дважды
 			return await FuncUtils.TrySeveralTimesAsync(async () =>
 			{
-				using (var scope = new TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions { IsolationLevel = IsolationLevel.Serializable }, TransactionScopeAsyncFlowOption.Enabled))
+				using (var scope = new TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions { IsolationLevel = IsolationLevel.RepeatableRead }, TransactionScopeAsyncFlowOption.Enabled))
 				{
 					var taken = (await db.WorkQueueItems.FromSqlRaw(
 						sql,
