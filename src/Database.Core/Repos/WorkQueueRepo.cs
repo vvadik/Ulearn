@@ -46,6 +46,7 @@ namespace Database.Repos
 		[ItemCanBeNull]
 		public async Task<WorkQueueItem> TakeNoTracking(int queueId, List<string> types, TimeSpan? timeLimit = null)
 		{
+			
 			timeLimit = timeLimit ?? TimeSpan.FromMinutes(5);
 			// skip locked пропускает заблокированные строки
 			// for update подсказывает блокировать строки, а не страницы
@@ -67,7 +68,7 @@ set ""{TakeAfterTimeColumnName}"" = @timeLimit
 from next_task
 where ""{nameof(db.WorkQueueItems)}"".""{IdColumnName}"" = next_task.""{IdColumnName}""
 returning next_task.""{IdColumnName}"", ""{QueueIdColumnName}"", ""{ItemIdColumnName}"", ""{PriorityColumnName}"", ""{TypeColumnName}"", ""{TakeAfterTimeColumnName}"";"; // Если написать *, Id возвращается дважды
-			using (var scope = new TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions { IsolationLevel = IsolationLevel.RepeatableRead }, TransactionScopeAsyncFlowOption.Enabled))
+			using (var scope = new TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions { IsolationLevel = IsolationLevel.Serializable }, TransactionScopeAsyncFlowOption.Enabled))
 			{
 				var taken = (await db.WorkQueueItems.FromSqlRaw(
 					sql,
