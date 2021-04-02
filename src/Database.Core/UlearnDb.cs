@@ -19,6 +19,7 @@ namespace Database
 		static UlearnDb()
 		{
 			NpgsqlLogManager.Provider = new UlearnDbLoggingProvider();
+			NpgsqlLogManager.IsParameterLoggingEnabled = true;
 		}
 
 		public UlearnDb(DbContextOptions<UlearnDb> options)

@@ -11,6 +11,7 @@ namespace AntiPlagiarism.Web.Database
 		static AntiPlagiarismDb()
 		{
 			NpgsqlLogManager.Provider = new AntiPlagiarismDbLoggingProvider();
+			NpgsqlLogManager.IsParameterLoggingEnabled = true;
 		}
 
 		public AntiPlagiarismDb(DbContextOptions<AntiPlagiarismDb> options)
