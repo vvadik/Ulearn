@@ -1,11 +1,18 @@
 ﻿using AntiPlagiarism.Web.Database.Models;
 using Microsoft.EntityFrameworkCore;
+using Npgsql.Logging;
 
 namespace AntiPlagiarism.Web.Database
 {
 	public class AntiPlagiarismDb : DbContext
 	{
 		public static readonly string DefaultSchema = "antiplagiarism";
+
+		static AntiPlagiarismDb()
+		{
+			NpgsqlLogManager.Provider = new AntiPlagiarismDbLoggingProvider();
+		}
+
 		public AntiPlagiarismDb(DbContextOptions<AntiPlagiarismDb> options)
 			: base(options)
 		{

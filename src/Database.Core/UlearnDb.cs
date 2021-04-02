@@ -10,11 +10,17 @@ using Database.Models.Quizzes;
 using Database.Models.Comments;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Npgsql.Logging;
 
 namespace Database
 {
 	public class UlearnDb : IdentityDbContext<ApplicationUser>
 	{
+		static UlearnDb()
+		{
+			NpgsqlLogManager.Provider = new UlearnDbLoggingProvider();
+		}
+
 		public UlearnDb(DbContextOptions<UlearnDb> options)
 			: base(options)
 		{
