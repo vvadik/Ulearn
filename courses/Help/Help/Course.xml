@@ -3,9 +3,6 @@
   <enableCodeReviewAndQuizManualCheckForEveryone>false</enableCodeReviewAndQuizManualCheckForEveryone>
   <dictionaryFile>dictionary.txt</dictionaryFile>
   <defaultLanguage>csharp</defaultLanguage>
-  <preludes>
-    <prelude language="csharp">Prelude.cs</prelude>
-  </preludes>
   <units>
     <add>*/unit.xml</add>
   </units>

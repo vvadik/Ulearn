@@ -1,38 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <slide.quiz xmlns="https://ulearn.me/schema/v2" title="Пример теста" id="41138C54848F4F49856BB738B7E39D28">
   <scoring tries="3" group="laboratory"/>
-  <markdown xml:space="preserve">
-Можно использовать TeX: $\Theta(n)$
-
-__Markdown__ разметку `текста`.
-
-Изображения:
-![logo](img/markdown.png)
-
-Список:
-
-* элемент раз
-* элемент два
-* элемент три
-
-[Markdown Extra](https://michelf.ca/projects/php-markdown/extra) фичи. В частности, простые таблицы:
-
-Header 1				| h2
--------------		| -------------:
-*Content1*				| 42
-`Content Cell`	| 100500
-	</markdown>
-  <html>
-     Можно вставлять произвольный HTML
-     <div>Вложенный тег</div>
-     <iframe width="560" height="315" src="https://www.youtube.com/embed/9NcPvmk4vfo" frameborder="0"
-				allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="allowfullscreen"/>
-  </html>
-  <spoiler text="Можно прятать спойлер под кнопку">
-    <markdown>
-       Под спойлером могут быть *любые блоки*.
-    </markdown>
-  </spoiler>
   <question.text id="fillInQuestion" explanation="Описание правильного ответа" maxScore="2" multiline="true">
     <text>Введите корректное число</text>
     <sample>42</sample>
@@ -46,21 +14,22 @@ Header 1				| h2
     <item id="1" isCorrect="true">
 Первый вариант
 Вторая строка первого варианта
-		</item>
+    </item>
     <item id="2" isCorrect="false">Второй вариант. Формула TeX: $a \times b$</item>
     <item id="3" isCorrect="false">Третий вариант</item>
     <item id="4" isCorrect="false">Четвёртый вариант</item>
   </question.choice>
   <question.choice id="choiceQuestionMultiple" multiple="true" shuffle="true">
-    <allowedMistakes checkedUnnecessary="1" notCheckedNecessary="0"/>
     <text>Выберите варианты</text>
+    <allowedMistakes checkedUnnecessary="1" notCheckedNecessary="0"/>
     <item id="1" isCorrect="true">Первый вариант</item>
     <item id="2" isCorrect="false">Второй вариант</item>
     <item id="3" isCorrect="maybe">Третий вариант. Его можно как выбрать, так и не выбирать</item>
     <item id="4" isCorrect="false">Четвёртый вариант</item>
   </question.choice>
-  <question.order id="OrderingQuestion" explanation="Объяснение правильного ответа">
+  <question.order id="OrderingQuestion">
     <text>Упорядочите элементы</text>
+    <explanation>Объяснение правильного ответа</explanation>
     <item id="1">Первый длинный вариант, очень длинный, самый длинный, многострочный и никуда не влазящий</item>
     <item id="2">Второй $a \times b$</item>
     <item id="3">Третий</item>

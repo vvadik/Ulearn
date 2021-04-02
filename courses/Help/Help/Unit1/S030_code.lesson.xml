@@ -41,4 +41,10 @@
   <includeCode file="HelloWorld.py">
     <display>main</display>
   </includeCode>
+  <markdown>###Java весь файл</markdown>
+  <includeCode file="_Code.java"/>
+  <markdown>###Java регион main</markdown>
+  <includeCode file="_Code.java">
+    <display>main</display>
+  </includeCode>
 </slide>
