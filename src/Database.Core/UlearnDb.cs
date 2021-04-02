@@ -315,6 +315,7 @@ namespace Database
 			AddIndex<AutomaticExerciseChecking>(modelBuilder, c => new { c.CourseId, c.SlideId, c.Timestamp });
 			AddIndex<AutomaticExerciseChecking>(modelBuilder, c => new { c.CourseId, c.UserId });
 			AddIndex<AutomaticExerciseChecking>(modelBuilder, c => c.IsRightAnswer);
+			AddIndex<AutomaticExerciseChecking>(modelBuilder, c => new { c.CourseId, c.SlideId, c.IsRightAnswer });
 			AddIndex<ManualQuizChecking>(modelBuilder, c => new { c.CourseId, c.SlideId });
 			AddIndex<ManualQuizChecking>(modelBuilder, c => new { c.CourseId, c.SlideId, c.UserId });
 			AddIndex<ManualQuizChecking>(modelBuilder, c => new { c.CourseId, c.SlideId, c.Timestamp });
