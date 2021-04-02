@@ -368,8 +368,9 @@ namespace Database.Repos
 			{
 				usersWithAllRequiredSlides = (await db.Visits
 						.Where(v => v.CourseId == courseId && requiredSlides.Contains(v.SlideId) && userIds.Contains(v.UserId))
-						.GroupBy(v => v.UserId)
+						.Select(v => new { v.UserId, v.SlideId })
 						.ToListAsync())
+					.GroupBy(v => v.UserId)
 					.Where(g => g.DistinctBy(v => v.SlideId).Count() >= requiredSlides.Count)
 					.Select(g => g.Key)
 					.ToList();
