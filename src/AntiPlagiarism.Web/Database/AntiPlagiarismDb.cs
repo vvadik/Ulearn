@@ -1,6 +1,7 @@
 ﻿using AntiPlagiarism.Web.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Npgsql.Logging;
+using Ulearn.Core.Configuration;
 
 namespace AntiPlagiarism.Web.Database
 {
@@ -10,8 +11,12 @@ namespace AntiPlagiarism.Web.Database
 
 		static AntiPlagiarismDb()
 		{
-			NpgsqlLogManager.Provider = new AntiPlagiarismDbLoggingProvider();
-			NpgsqlLogManager.IsParameterLoggingEnabled = true;
+			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
+			if (configuration.HostLog != null)
+			{
+				NpgsqlLogManager.Provider = new AntiPlagiarismDbLoggingProvider();
+				NpgsqlLogManager.IsParameterLoggingEnabled = true;
+			}
 		}
 
 		public AntiPlagiarismDb(DbContextOptions<AntiPlagiarismDb> options)

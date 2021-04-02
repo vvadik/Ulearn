@@ -11,6 +11,7 @@ using Database.Models.Comments;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Npgsql.Logging;
+using Ulearn.Core.Configuration;
 
 namespace Database
 {
@@ -18,8 +19,12 @@ namespace Database
 	{
 		static UlearnDb()
 		{
-			NpgsqlLogManager.Provider = new UlearnDbLoggingProvider();
-			NpgsqlLogManager.IsParameterLoggingEnabled = true;
+			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
+			if (configuration.HostLog != null)
+			{
+				NpgsqlLogManager.Provider = new UlearnDbLoggingProvider();
+				NpgsqlLogManager.IsParameterLoggingEnabled = true;
+			}
 		}
 
 		public UlearnDb(DbContextOptions<UlearnDb> options)
@@ -309,6 +314,7 @@ namespace Database
 			AddIndex<AutomaticExerciseChecking>(modelBuilder, c => new { c.CourseId, c.SlideId, c.UserId });
 			AddIndex<AutomaticExerciseChecking>(modelBuilder, c => new { c.CourseId, c.SlideId, c.Timestamp });
 			AddIndex<AutomaticExerciseChecking>(modelBuilder, c => new { c.CourseId, c.UserId });
+			AddIndex<AutomaticExerciseChecking>(modelBuilder, c => c.IsRightAnswer);
 			AddIndex<ManualQuizChecking>(modelBuilder, c => new { c.CourseId, c.SlideId });
 			AddIndex<ManualQuizChecking>(modelBuilder, c => new { c.CourseId, c.SlideId, c.UserId });
 			AddIndex<ManualQuizChecking>(modelBuilder, c => new { c.CourseId, c.SlideId, c.Timestamp });
@@ -317,8 +323,6 @@ namespace Database
 			AddIndex<AutomaticQuizChecking>(modelBuilder, c => new { c.CourseId, c.SlideId, c.UserId });
 			AddIndex<AutomaticQuizChecking>(modelBuilder, c => new { c.CourseId, c.SlideId, c.Timestamp });
 			AddIndex<AutomaticQuizChecking>(modelBuilder, c => new { c.CourseId, c.UserId });
-
-			AddIndex<AutomaticExerciseChecking>(modelBuilder, c => c.IsRightAnswer);
 
 			AddIndex<ExerciseCodeReviewComment>(modelBuilder, c => new { c.ReviewId, c.IsDeleted });
 			AddIndex<ExerciseCodeReviewComment>(modelBuilder, c => c.AddingTime);
