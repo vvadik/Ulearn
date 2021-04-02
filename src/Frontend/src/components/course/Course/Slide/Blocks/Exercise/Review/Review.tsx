@@ -98,8 +98,13 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 				innerCommentsIds: r.comments.map(c => c.id),
 			}));
 
-			for (const [i, { id, innerCommentsIds }] of newReviews.entries()) {
-				const oldReview = oldReviews[i];
+			for (const { id, innerCommentsIds } of newReviews.values()) {
+				const oldReview = oldReviews.find(or => or.id === id);
+				if(!oldReview) {
+					sameReviews = false;
+					break;
+				}
+
 				if(oldReview.id !== id || innerCommentsIds.length !== oldReview.innerCommentsIds.length) {
 					sameReviews = false;
 					break;
