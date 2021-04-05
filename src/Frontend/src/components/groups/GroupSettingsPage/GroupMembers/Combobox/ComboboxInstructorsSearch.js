@@ -28,34 +28,27 @@ class ComboboxInstructorsSearch extends Component {
 
 	getItems = (query) => {
 		const {accesses, owner} = this.props;
-		const includes = (str, substr) => str.toLowerCase().includes(substr.toLowerCase());
 		const isNotAddedUser = (item) => {
-			return (owner.id !== item.id) &&
-				(accesses.filter(i => i.user.id === item.id)).length === 0;
+			return (owner.id !== item.id) && accesses.all(i => i.user.id !== item.id);
 		};
 
 		return api.users.getCourseInstructors(this.props.courseId, query)
-		.then(json => {
-			return json.users
-			.map(item => item.user)
-			.filter(item => {
-				return (isNotAddedUser(item)) &&
-					(includes(item.visibleName, query) ||
-						includes(item.login, query) ||
-						item.email && includes(item.email, query))
+			.then(json => {
+				return json.users
+					.map(item => item.user)
+					.filter(isNotAddedUser)
+					.map(item => ({
+								value: item.id,
+								label: item.visibleName,
+								...item,
+							}
+						)
+					)
 			})
-			.map(item => ({
-						value: item.id,
-						label: item.visibleName,
-						...item,
-					}
-				)
-			)
-		})
-		.catch(error => {
-			console.error(error);
-			return [];
-		});
+			.catch(error => {
+				console.error(error);
+				return [];
+			});
 	};
 
 	renderItem = (item) => {
