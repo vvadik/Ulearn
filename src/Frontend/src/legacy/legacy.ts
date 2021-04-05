@@ -12,7 +12,7 @@ import 'webpack-jquery-ui/selectmenu';
 import 'bootstrap';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-require('src/legacy/styles/font-awesome.global.css');
+import 'src/legacy/styles/font-awesome.global.css';
 import 'src/legacy/styles/ulearn.global.css';
 
 //libs overrides
