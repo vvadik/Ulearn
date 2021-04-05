@@ -84,7 +84,7 @@ export function menuItems(courseId: string, role: CourseRoleType, accesses: Cour
 			Ведомость курса
 		</MenuItem>,
 
-		<MenuItem href={ "/Analytics/UnitStatistics?courseId=" + courseId } key="UnitStatistics"
+		<MenuItem href={ "/Analytics/UnitSheet?courseId=" + courseId } key="UnitStatistics"
 				  component={ LinkComponent }>
 			Ведомость модуля
 		</MenuItem>,

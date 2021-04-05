@@ -167,7 +167,7 @@
 				<div class="unit-title" data-unit-id="@unit.Id">
 					@if (Model.IsInstructor)
 					{
-						@Html.ActionLink(unit.Title.TruncateWithEllipsis(20), "UnitStatistics", "Analytics", new { courseId = Model.CourseId, unitId = unit.Id, group = Model.SelectedGroupsIdsJoined }, new { })
+						@Html.ActionLink(unit.Title.TruncateWithEllipsis(20), "UnitSheet", "Analytics", new { courseId = Model.CourseId, unitId = unit.Id, group = Model.SelectedGroupsIdsJoined }, new { })
 					}
 					else
 					{
