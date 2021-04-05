@@ -1,8 +1,7 @@
 ﻿using System;
-using Database.Models;
 using System.ComponentModel.DataAnnotations;
 
-namespace Database
+namespace Database.Models
 {
 	public class LastVisit : ITimedSlideAction
 	{
