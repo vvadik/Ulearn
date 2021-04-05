@@ -29,7 +29,7 @@ class ComboboxInstructorsSearch extends Component {
 	getItems = (query) => {
 		const {accesses, owner} = this.props;
 		const isNotAddedUser = (item) => {
-			return (owner.id !== item.id) && accesses.all(i => i.user.id !== item.id);
+			return (owner.id !== item.id) && accesses.every(i => i.user.id !== item.id);
 		};
 
 		return api.users.getCourseInstructors(this.props.courseId, query)
