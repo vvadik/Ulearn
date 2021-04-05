@@ -117,7 +117,7 @@
 			data-toggle-role="@courseRoles.Role.GetDisplayName()"
 			data-toggle-isRole="@true"
 			data-toggle-courseTitle="@isTempLabel@courseRoles.CourseTitle"
-			onclick="openPopup(this, ToggleButtonClass)">
+			onclick="window.legacy.openPopup(this, window.legacy.ToggleButtonClass)">
 		@role
 
 	</button>
@@ -147,7 +147,7 @@
 					data-toggle-role="@course.Role"
 					data-toggle-isRole="@true"
 					data-toggle-courseTitle="@isTempLabel@course.CourseTitle."
-					onclick="openPopup(this, ToggleDropDownClass)">
+					onclick="window.legacy.openPopup(this, window.legacy.ToggleDropDownClass)">
 
 					<a>@isTempLabel@course.CourseTitle</a>
 				</li>
@@ -182,7 +182,7 @@
 						data-css-class="li-info"
 						data-has-access="@( courseAccess.HasAccess ? "true" : "false")"
 
-						onclick="openPopup(this, ToggleButtonClass)">
+						onclick="window.legacy.openPopup(this, window.legacy.ToggleButtonClass)">
 						<a>@isTempLabel@courseAccessType.GetDisplayName()</a>
 					</li>
 				}
@@ -209,7 +209,7 @@
 					data-toggle-url="@systemAccess.ToggleUrl"
 					data-css-class="li-info"
 					data-has-access="@( systemAccess.HasAccess ? "true" : "false")"
-					onclick="ToggleSystemRoleOrAccess(this, ToggleButtonClass, '')">
+					onclick="window.legacy.ToggleSystemRoleOrAccess(this, window.legacy.ToggleButtonClass)">
 					<a>@systemAccessType.GetDisplayName()</a>
 				</li>
 			}

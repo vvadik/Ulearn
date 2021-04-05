@@ -913,7 +913,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>UserAvatar.cshtml</DependentUpon>
     </Compile>
-    <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
@@ -963,21 +962,14 @@
     </Content>
 	  <Content Include="Content\loading-ring.gif" />
 	  <Content Include="Content\loading.gif" />
-	  <Content Include="Content\login_and_registration.css" />
 	  <Content Include="Content\logo.png" />
-    <Content Include="Content\certificates.css" />
-    <Content Include="Content\libs\likely.css" />
-    <Content Include="Content\likely.css" />
-    <Content Include="Content\stepik.css" />
     <Content Include="Global.asax" />
-    <Content Include="Content\main.css" />
     <None Include="Hunspellx64.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Hunspellx86.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <Content Include="Jsdifflib\jsdifflib.css" />
     <Content Include="Content\certificate-template.zip" />
     <None Include="encoding.xsd">
       <SubType>Designer</SubType>
@@ -988,11 +980,6 @@
     <None Include="Properties\PublishProfiles\ulearn-dev.pubxml" />
     <None Include="Properties\PublishProfiles\ulearn.pubxml" />
     <Content Include="Properties\webjobs-list.json" />
-    <Content Include="Scripts\libs\likely.js" />
-    <Content Include="Scripts\libs\likely.README.txt">
-      <DependentUpon>likely.js</DependentUpon>
-    </Content>
-    <Content Include="Scripts\likely.js" />
     <Content Include="..\schema.xsd">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -1110,7 +1097,6 @@
     <Content Include="Views\Account\UserMenuPartial.cshtml" />
     <Content Include="Views\Admin\PreviewCertificates.cshtml" />
     <Content Include="Views\Admin\GenerateCertificatesError.cshtml" />
-    <Content Include="Views\Shared\_YandexMetrika.cshtml" />
     <Content Include="Views\Analytics\CourseStatistics.cshtml" />
     <Content Include="Views\Shared\_GroupsFilter.cshtml" />
     <Content Include="Views\Exercise\_TopUserReviewComments.cshtml" />
@@ -1145,7 +1131,6 @@
     <Folder Include="Courses.Staging\" />
     <Folder Include="Courses.Versions\" />
     <Folder Include="Courses\" />
-    <Folder Include="tablesorter-master\docs\" />
     <Folder Include="Views\Telegram\" />
   </ItemGroup>
   <ItemGroup>

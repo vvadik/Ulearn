@@ -852,7 +852,7 @@
 
 	public static string GetGuestOnclick(bool isGuest)
 	{
-		return isGuest ? "onclick=loginForContinue()" : "";
+		return isGuest ? "onclick=window.legacy.loginForContinue()" : "";
 	}
 
 	public static string GetGuestDisable(bool isGuest)

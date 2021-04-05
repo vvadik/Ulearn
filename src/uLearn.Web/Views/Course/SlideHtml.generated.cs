@@ -2691,7 +2691,7 @@ WriteLiteralTo(__razor_helper_writer, "\t</p>\r\n");
 
 	public static string GetGuestOnclick(bool isGuest)
 	{
-		return isGuest ? "onclick=loginForContinue()" : "";
+		return isGuest ? "onclick=window.legacy.loginForContinue()" : "";
 	}
 
 	public static string GetGuestDisable(bool isGuest)

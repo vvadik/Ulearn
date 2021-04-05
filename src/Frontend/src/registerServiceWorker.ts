@@ -24,7 +24,7 @@ type Config = {
 };
 
 export function register(config?: Config): void {
-	if( 'serviceWorker' in navigator) {
+	if('serviceWorker' in navigator) {
 		// The URL constructor is available in all browsers that support SW.
 		const publicUrl = new URL(process.env.PUBLIC_URL || '', window.location.href);
 		if(publicUrl.origin !== window.location.origin) {
@@ -76,7 +76,6 @@ function registerValidSW(swUrl: string, config?: Config) {
 								'New content is available and will be used when all ' +
 								'tabs for this page are closed. See https://cra.link/PWA.'
 							);
-
 							// Execute callback
 							if(config && config.onUpdate) {
 								config.onUpdate(registration);

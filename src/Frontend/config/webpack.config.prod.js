@@ -200,6 +200,7 @@ module.exports = merge([base, {
 		new HtmlWebpackPlugin({
 			inject: true,
 			template: paths.appHtml,
+			favicon: paths.appPublic + '/favicon.ico',
 			minify: {
 				removeComments: true,
 				collapseWhitespace: true,
@@ -257,8 +258,8 @@ module.exports = merge([base, {
 		new WebpackPwaManifest({
 			filename: "manifest.json",
 			inject: true,
-			fingerprints: false,
-			start_url: '/index.html',
+			fingerprints: true,
+			start_url: '/',
 			scope: '/',
 
 			name: 'Ulearn.me',
@@ -273,7 +274,7 @@ module.exports = merge([base, {
 			icons: [
 				{
 					src: paths.appPublic + '/logo.png',
-					sizes: [512, 256, 192, 128, 64, 32],
+					sizes: [512, 256, 192, 128, 64, 32,],
 					type: "image/png",
 					purpose: "any maskable",
 					destination: paths.static.media + '/icons',
@@ -281,7 +282,7 @@ module.exports = merge([base, {
 				},
 				{
 					src: paths.appPublic + '/favicon.ico',
-					sizes: [16],
+					sizes: [16,],
 					type: "image/x-icon",
 					purpose: "any maskable",
 					destination: paths.static.media + '/icons',
@@ -292,13 +293,27 @@ module.exports = merge([base, {
 		// Generate a service worker script that will precache, and keep up to date,
 		// the HTML & assets that are part of the Webpack build.
 		new GenerateSW({
-			swDest: '/sw',
-			directoryIndex: '/index.html',
+			swDest: 'sw',
 			exclude: [/\.map$/, /asset-manifest\.json$/],
 			navigateFallbackAllowlist: [/^(?!\/__).*/],
 			clientsClaim: true,
 			skipWaiting: true,
-			maximumFileSizeToCacheInBytes: 1024 * 1024 * 3,
+			maximumFileSizeToCacheInBytes: 1024 * 1024 * 4,
+			// Define runtime caching rules.
+			runtimeCaching: [{
+				// Match any request that ends with .png, .jpg, .jpeg or .svg.
+				urlPattern: /\.(?:png|jpg|jpeg|svg)$/,
+				// Apply a cache-first strategy.
+				handler: 'CacheFirst',
+				options: {
+					// Use a custom cache name.
+					cacheName: 'images',
+					// Only cache 10 images.
+					expiration: {
+						maxEntries: 10,
+					},
+				},
+			}],
 		}),
 	],
 	optimization: {

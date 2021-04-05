@@ -1,6 +1,3 @@
-require('webpack-jquery-ui/selectable');
-require('webpack-jquery-ui/selectmenu');
-
 export default function () {
 	const $courseStatistics = $('.course-statistics');
 

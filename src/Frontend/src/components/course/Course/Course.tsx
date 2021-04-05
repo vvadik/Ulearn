@@ -30,6 +30,8 @@ import {
 	getSlideInfoById,
 } from "./CourseUtils";
 import { buildQuery } from "src/utils";
+import { UserInfo, UserRoles } from "src/utils/courseRoles";
+import documentReadyFunctions from "src/legacy/legacy";
 
 import { constructPathToSlide, flashcards, flashcardsPreview, signalrWS, } from 'src/consts/routes';
 import { ShortSlideInfo, SlideType, } from 'src/models/slide';
@@ -38,6 +40,7 @@ import { CourseInfo, PageInfo, UnitInfo, UnitsInfo } from "src/models/course";
 import { SlideUserProgress, } from "src/models/userProgress";
 import { AccountState } from "src/redux/account";
 import { CourseRoleType } from "src/consts/accessType";
+import { ShortUserInfo } from "src/models/users";
 import {
 	CourseStatistics,
 	FlashcardsStatistics,
@@ -48,8 +51,6 @@ import {
 } from "../Navigation/types";
 
 import styles from "./Course.less";
-import { UserInfo, UserRoles } from "../../../utils/courseRoles";
-import { ShortUserInfo } from "../../../models/users";
 
 const slideNavigationButtonTitles = {
 	next: "Далее",
@@ -156,7 +157,7 @@ class Course extends Component<Props, State> {
 		}
 
 		/* TODO: (rozentor) for now it copied from downloadedHtmlContetn, which run documentReadyFunctions scripts. In future, we will have no scripts in back, so it can be removed totally ( in other words, remove it when DownloadedHtmlContent will be removed)  */
-		(window.documentReadyFunctions || []).forEach(f => f());
+		documentReadyFunctions.forEach(f => f());
 	}
 
 	startSignalRConnection = (): void => {
@@ -296,7 +297,7 @@ class Course extends Component<Props, State> {
 			return AnyPage;
 		}
 
-		if(!slideType) {
+		if(slideType === SlideType.NotFound) {
 			throw new UrlError();
 		}
 

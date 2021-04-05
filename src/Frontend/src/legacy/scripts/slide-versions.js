@@ -19,7 +19,7 @@ function updateExerciseVersionUrl(versionId) {
 	window.history.replaceState({}, null, url.pathname + url.search);
 }
 
-export function setExerciseVersion(versionId, showOutput) {
+function setExerciseVersion(versionId, showOutput) {
 	showOutput = showOutput || false;
 	let url = $('.exercise__submission').data('version-update-url');
 

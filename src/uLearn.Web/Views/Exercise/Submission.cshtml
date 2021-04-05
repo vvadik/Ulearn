@@ -182,7 +182,7 @@
 				var acceptedSolutionsUrl = Model.Url != null
 					? Model.Url.Action("AcceptedSolutions", "Course", new { courseId = Model.CourseId, slideId = Model.Slide.Id })
 					: "";
-				var acceptedSolutionsAction = !Model.IsSkippedOrPassed ? "$('#ShowSolutionsAlert').modal('show')" : $"window.reactHistory.push('{acceptedSolutionsUrl}')";
+				var acceptedSolutionsAction = !Model.IsSkippedOrPassed ? "$('#ShowSolutionsAlert').modal('show')" : $"window.legacy.reactHistory.push('{acceptedSolutionsUrl}')";
 				@SlideHtml.ExerciseControls(new ExerciseControlsModel(Model.CourseId, Model.Slide)
 				{
 					IsLti = Model.IsLti,

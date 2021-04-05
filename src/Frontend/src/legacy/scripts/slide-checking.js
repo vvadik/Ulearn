@@ -156,10 +156,10 @@
 						if (buttonType === "next") {
 							loadNextReview();
 						} else {
-							window.reactHistory.push(nextUrl);
+							window.legacy.reactHistory.push(nextUrl);
 						}
 					} else {
-						window.reactHistory.push(data.redirect);
+						window.legacy.reactHistory.push(data.redirect);
 					}
 				})
 				.fail(function() {
@@ -171,7 +171,7 @@
 		function loadNextReview() {
 			$.post(nextUrl)
 				.done(function (data) {
-					window.reactHistory.push(data.url);
+					window.legacy.reactHistory.push(data.url);
 				})
 				.fail(function () {
 					alert("Ошибка на сервере");

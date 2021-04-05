@@ -4,7 +4,7 @@ import { RouteComponentProps, withRouter } from "react-router-dom";
 
 class YandexMetrika extends Component<RouteComponentProps> {
 	componentDidMount() {
-		window.ym = ym; //using in legacy cshtml scripts (register etc)
+		window.legacy.ym = ym; //using in legacy cshtml scripts (register etc)
 	}
 
 	componentDidUpdate() {

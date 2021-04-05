@@ -1,16 +1,22 @@
 import React, { Component, PureComponent } from 'react';
 import { Helmet } from "react-helmet";
-import CourseLoader from "src/components/course/Course/CourseLoader/CourseLoader";
-import * as PropTypes from "prop-types";
 import { saveAs } from "file-saver";
 import { connect } from "react-redux";
-import api from "src/api";
-import { getQueryStringParameter } from "src/utils";
 import { withRouter } from "react-router-dom";
+import * as PropTypes from "prop-types";
+
+import api from "src/api";
+
+import CourseLoader from "src/components/course/Course/CourseLoader/CourseLoader";
 import { UrlError } from "./Error/NotFoundErrorBoundary";
 import Error404 from "./Error/Error404";
-import { changeCurrentCourseAction } from "src/actions/course";
+
+import { getQueryStringParameter } from "src/utils";
 import { exerciseSolutions, removeFromCache, setBlockCache, } from "src/utils/localStorageManager";
+import documentReadyFunctions from "src/legacy/legacy";
+
+
+import { changeCurrentCourseAction } from "src/actions/course";
 
 
 function getUrlParts(url) {
@@ -120,6 +126,9 @@ class DownloadedHtmlContent extends Component {
 					});
 					return;
 				}
+				if(response.status === 404) {
+					throw new UrlError();
+				}
 				if(response.redirected) {
 					/* If it was a redirect from external login callback, then update user information */
 					const oldUrlPathname = getUrlParts(url).pathname;
@@ -152,7 +161,7 @@ class DownloadedHtmlContent extends Component {
 					}
 				}
 				/* Process content files: also download them and return url back */
-				if(url.startsWith('/Content/') || url.startsWith('/Certificates/')) {
+				if(url.toLowerCase().startsWith('/content/') || url.toLowerCase().startsWith('/certificates/')) {
 					response.blob().then(blob => this.downloadFile(blob, url));
 					return Promise.resolve(undefined);
 				}
@@ -168,8 +177,9 @@ class DownloadedHtmlContent extends Component {
 				}
 
 				this.processNewHtmlContent(url, data);
-			}).catch(function (error) {
+			}).catch((error) => {
 			console.error(error);
+			this.setState({ error });
 		});
 	}
 
@@ -196,7 +206,7 @@ class DownloadedHtmlContent extends Component {
 		DownloadedHtmlContent.removeStickyHeaderAndColumn();
 
 		/* Run scripts */
-		(window.documentReadyFunctions || []).forEach(f => f());
+		documentReadyFunctions.forEach(f => f());
 
 		window.meta = undefined;
 		let allScriptTags = Array.from(body.getElementsByTagName('script'));

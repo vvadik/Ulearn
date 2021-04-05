@@ -68,7 +68,7 @@ WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 364),
 , 388), false)
 );
 
-WriteLiteralTo(__razor_helper_writer, " onclick=\"ShowPanel(event)\"");
+WriteLiteralTo(__razor_helper_writer, " onclick=\"window.legacy.ShowPanel(event)\"");
 
 WriteLiteralTo(__razor_helper_writer, " data-div-id=\"");
 

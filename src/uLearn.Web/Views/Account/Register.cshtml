@@ -83,7 +83,7 @@ else
 @section scripts {
 	<script>
 		$(document).ready(function() {
-			window.ym('reachGoal', 'registration');
+			window.legacy.ym('reachGoal', 'registration');
 			window.location.replace("@Html.AttributeEncode(Model.ReturnUrl)");
 		});
 	</script>

@@ -69,7 +69,7 @@ class ResetLimitsForStudentsModal extends Component {
 
 ResetLimitsForStudentsModal.propTypes = {
 	onClose: PropTypes.func,
-	groupId: PropTypes.string,
+	groupId: PropTypes.number,
 	studentIds: PropTypes.object,
 };
 

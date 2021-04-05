@@ -1,4 +1,4 @@
-﻿window.ShowPanel = function ShowPanel(e) {
+﻿export function ShowPanel(e) {
 	e.preventDefault();
 	const button = $(e.target);
 	button.siblings().removeClass('btn-primary');

@@ -1,7 +1,4 @@
-﻿require('webpack-jquery-ui/sortable');
-require('webpack-jquery-ui/draggable');
-
-window.submitQuiz = function submitQuiz(courseId, slideId, expectedCount, isLti) {
+﻿export function submitQuiz(courseId, slideId, expectedCount, isLti) {
 	if(areAllAnswered(expectedCount)) {
 		/* Disable quiz submit button */
 		$('.quiz-submit-btn').prop('disabled', true);
@@ -59,7 +56,7 @@ window.submitQuiz = function submitQuiz(courseId, slideId, expectedCount, isLti)
 		alert("Выполните все задания перед отправкой теста");
 }
 
-window.areAllAnswered = function areAllAnswered(needingCount) {
+function areAllAnswered(needingCount) {
 	let realCount = 0;
 	$(".quiz-block-mark").each(function () {
 		if($(this).children().children().is(':checked')) {

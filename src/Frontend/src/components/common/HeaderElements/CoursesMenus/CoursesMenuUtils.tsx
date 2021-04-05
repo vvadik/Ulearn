@@ -68,7 +68,7 @@ function sortCoursesByTitle(courseInfo: CourseInfo, otherCourseInfo: CourseInfo)
 export function menuItems(courseId: string, role: CourseRoleType, accesses: CourseAccessType[],
 	isTempCourse: boolean
 ): React.ReactNode {
-	let items = [
+	const items = [
 		<MenuItem href={ "/Course/" + courseId } key="Course" component={ LinkComponent }>
 			Просмотр курса
 		</MenuItem>,
@@ -113,14 +113,14 @@ export function menuItems(courseId: string, role: CourseRoleType, accesses: Cour
 
 	if(hasCourseAdminMenuItems) {
 		if(isTempCourse) {
-			items = items.concat([
+			items.push(
 				<MenuItem href={ "/Admin/TempCourseDiagnostics?courseId=" + courseId } key="Diagnostics"
 						  component={ LinkComponent }>
 					Диагностика
 				</MenuItem>
-			]);
+			);
 		} else {
-			items = items.concat([
+			items.push(
 				<MenuItem href={ "/Admin/Packages?courseId=" + courseId } key="Packages"
 						  component={ LinkComponent }>
 					Экспорт и импорт курса
@@ -130,18 +130,11 @@ export function menuItems(courseId: string, role: CourseRoleType, accesses: Cour
 						  component={ LinkComponent }>
 					Модули
 				</MenuItem>
-			]);
+			);
 		}
-
-		items = items.concat([
-			<MenuItem href={ "/Grader/Clients?courseId=" + courseId } key="GraderClients"
-					  component={ LinkComponent }>
-				Клиенты грейдера
-			</MenuItem>
-		]);
 	}
 
-	items = items.concat([
+	items.push(
 		<MenuSeparator key="CourseMenuSeparator3"/>,
 
 		<MenuItem href={ "/Admin/Comments?courseId=" + courseId } key="Comments"
@@ -153,7 +146,7 @@ export function menuItems(courseId: string, role: CourseRoleType, accesses: Cour
 				  component={ LinkComponent }>
 			Код-ревью и проверка тестов
 		</MenuItem>,
-	]);
+	);
 
 	return items;
 }

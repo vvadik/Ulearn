@@ -32,7 +32,6 @@ module.exports = merge([base, {
 		],
 	},
 	output: {
-		pathinfo: true,
 		filename: '[name].[hash:8].js',
 		sourceMapFilename: '[name].[hash:8].map',
 		chunkFilename: 'chunk_[id].[hash:8].js',
@@ -157,6 +156,7 @@ module.exports = merge([base, {
 		new HtmlWebpackPlugin({
 			inject: true,
 			template: paths.appHtml,
+			favicon: paths.appPublic + '/favicon.ico',
 			chunksSortMode: (chunk1, chunk2) => {
 				if(chunk1 === 'oldBrowser') return -1;
 				if(chunk2 === 'oldBrowser') return 1;
@@ -181,8 +181,8 @@ module.exports = merge([base, {
 		new WebpackPwaManifest({
 			filename: "manifest.json",
 			inject: true,
-			fingerprints: false,
-			start_url: '/index.html',
+			fingerprints: true,
+			start_url: '/',
 			scope: '/',
 
 			name: 'Ulearn.me',
@@ -197,7 +197,7 @@ module.exports = merge([base, {
 			icons: [
 				{
 					src: paths.appPublic + '/logo.png',
-					sizes: [512, 256, 192, 128, 64, 32],
+					sizes: [512, 256, 192, 128, 64, 32,],
 					type: "image/png",
 					purpose: "any maskable",
 					destination: paths.static.media + '/icons',
@@ -205,7 +205,7 @@ module.exports = merge([base, {
 				},
 				{
 					src: paths.appPublic + '/favicon.ico',
-					sizes: [16],
+					sizes: [16,],
 					type: "image/x-icon",
 					purpose: "any maskable",
 					destination: paths.static.media + '/icons',
@@ -214,14 +214,28 @@ module.exports = merge([base, {
 			],
 		}),
 		new GenerateSW({
-			swDest: '/sw',
-			directoryIndex: '/index.html',
+			swDest: 'sw',
 			navigateFallbackAllowlist: [/^(?!\/__).*/],
-			exclude: [/\.map$/, /asset-manifest\.json$/],
+			exclude: [/\.map$/, /asset-manifest\.json$/, /\.(?:png|jpg|jpeg|svg)$/],
 			clientsClaim: true,
 			skipWaiting: true,
-			maximumFileSizeToCacheInBytes: 1024 * 1024 * 3,
+			maximumFileSizeToCacheInBytes: 1024 * 1024 * 4,
 			cleanupOutdatedCaches: true,
+			// Define runtime caching rules.
+			runtimeCaching: [{
+				// Match any request that ends with .png, .jpg, .jpeg or .svg.
+				urlPattern: /\.(?:png|jpg|jpeg|svg)$/,
+				// Apply a cache-first strategy.
+				handler: 'CacheFirst',
+				options: {
+					// Use a custom cache name.
+					cacheName: 'images',
+					// Only cache 10 images.
+					expiration: {
+						maxEntries: 10,
+					},
+				},
+			}],
 		}),
 	],
 	performance: {

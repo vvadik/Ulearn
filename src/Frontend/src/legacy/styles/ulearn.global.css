@@ -5541,3 +5541,8 @@ body.lti-component {
 .legacy-page .page-header {
 	margin-top: 0;
 }
+
+/* bootsrtap override*/
+label {
+	font-weight: 400;
+}
