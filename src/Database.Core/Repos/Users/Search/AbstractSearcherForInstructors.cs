@@ -1,9 +1,6 @@
-using System;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Database.Models;
-using NinjaNye.SearchExtensions;
 
 namespace Database.Repos.Users.Search
 {
@@ -19,18 +16,12 @@ namespace Database.Repos.Users.Search
 		private readonly bool hasInstructorAccessToCourseInstructors;
 		private readonly SearchField searchField;
 
-		private readonly Expression<Func<ApplicationUser, string>>[] userProperties;
-
-		public AbstractSearcherForInstructors(
+		protected AbstractSearcherForInstructors(
 			IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, IAccessRestrictor accessRestrictor,
 			bool hasSystemAdministratorAccess, bool hasCourseAdminAccess, bool hasInstructorAccessToGroupMembers, bool hasInstructorAccessToCourseInstructors,
-			SearchField searchField,
-			params Expression<Func<ApplicationUser, string>>[] userProperties
+			SearchField searchField
 		)
 		{
-			if (userProperties.Length == 0)
-				throw new ArgumentException("UserProperties should be specified", nameof(userProperties));
-
 			this.usersRepo = usersRepo;
 			this.courseRolesRepo = courseRolesRepo;
 			this.accessRestrictor = accessRestrictor;
@@ -41,7 +32,6 @@ namespace Database.Repos.Users.Search
 			this.hasInstructorAccessToCourseInstructors = hasInstructorAccessToCourseInstructors;
 
 			this.searchField = searchField;
-			this.userProperties = userProperties;
 		}
 
 		public SearchField GetSearchField()
@@ -68,17 +58,6 @@ namespace Database.Repos.Users.Search
 			return courseRolesRepo.HasUserAccessTo_Any_CourseAsync(currentUser.Id, CourseRoleType.Instructor);
 		}
 
-#pragma warning disable 1998
-		public virtual async Task<IQueryable<ApplicationUser>> SearchAsync(IQueryable<ApplicationUser> users, string term, bool strict = false, int limit = 1000)
-#pragma warning restore 1998
-		{
-			if (string.IsNullOrEmpty(term))
-				return Enumerable.Empty<ApplicationUser>().AsQueryable();
-
-			//if (strict)
-			return users.Search(userProperties).EqualTo(term);
-
-			//return users.Search(userProperties).StartsWith(term).OrderBy(u => u.Id).Take(limit); TODO like не работает в postgres на полях с ignore case
-		}
+		public abstract Task<IQueryable<ApplicationUser>> SearchAsync(IQueryable<ApplicationUser> users, string term, bool strict = false, int limit = 1000);
 	}
 }

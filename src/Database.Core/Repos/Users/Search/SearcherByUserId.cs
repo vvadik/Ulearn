@@ -7,13 +7,6 @@ namespace Database.Repos.Users.Search
 {
 	public class SearcherByUserId : ISearcher
 	{
-		private readonly UlearnDb db;
-
-		public SearcherByUserId(UlearnDb db)
-		{
-			this.db = db;
-		}
-
 		public SearchField GetSearchField()
 		{
 			return SearchField.UserId;
