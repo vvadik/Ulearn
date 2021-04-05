@@ -123,7 +123,7 @@ namespace Database.DataContexts
 			return db.SaveChangesAsync();
 		}
 
-		private static Regex nonWordChars = new Regex(@"[^\w\s\-\.]*", RegexOptions.Compiled);
+		private static Regex nonWordChars = new Regex(@"[^\w\s\-\.@_]*", RegexOptions.Compiled);
 		private List<string> GetUsersByNamePrefix(string name, int limit = 100)
 		{
 			name = name.ToLower();
