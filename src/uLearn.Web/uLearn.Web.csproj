@@ -1502,6 +1502,7 @@
     <Content Include="Views\Account\ToggleRolesHistory.cshtml" />
     <Content Include="Views\Admin\StyleValidations.cshtml" />
     <Content Include="Views\Analytics\RatingByPoints.cshtml" />
+    <Content Include="Views\Analytics\UnitStatistics.cshtml" />
     <Content Include="Views\AntiPlagiarism\Details.cshtml" />
     <Content Include="Views\Certificates\ListPartial.cshtml" />
     <Content Include="Views\Course\Courses.cshtml" />
@@ -1543,7 +1544,7 @@
     <Content Include="Views\Hint\UseHint.cshtml" />
     <Content Include="Views\Account\List.cshtml" />
     <Content Include="Views\Admin\Units.cshtml" />
-    <Content Include="Views\Analytics\UnitStatistics.cshtml" />
+    <Content Include="Views\Analytics\UnitSheet.cshtml" />
     <Content Include="Views\Course\InstructorNote.cshtml" />
     <Content Include="Views\Questions\Items.cshtml" />
     <Content Include="Views\Analytics\DailyStatistics.cshtml" />
@@ -1607,7 +1608,7 @@
     <Content Include="Views\Exercise\Submission.cshtml" />
     <Content Include="Views\Exercise\_ExerciseScoreForm.cshtml" />
     <Content Include="Views\Analytics\UserUnitStatistics.cshtml" />
-    <Content Include="Views\Analytics\UnitStatisticsList.cshtml" />
+    <Content Include="Views\Analytics\UnitSheetList.cshtml" />
     <Content Include="Views\Home\Terms.cshtml" />
     <Content Include="Web.Kontur.config">
       <DependentUpon>Web.config</DependentUpon>

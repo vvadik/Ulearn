@@ -1,4 +1,4 @@
-﻿@model UnitStatisticPageModel
+﻿@model UnitSheetPageModel
 
 @{
 	ViewBag.Title = "Аналитика";
@@ -7,14 +7,14 @@
 <body>
 <div class="container">
 
-	<h1 class="hidden-xs">Аналитика</h1>
+	<h1 class="hidden-xs">Ведомость модуля</h1>
 
 	<h3>Выберите модуль</h3>
 
 	@foreach (var unit in Model.Units)
 	{
 		<div>
-			@Html.ActionLink(unit.Title, "UnitStatistics", new { courseId = Model.CourseId, unitId = unit.Id })
+			@Html.ActionLink(unit.Title, "UnitSheet", new { courseId = Model.CourseId, unitId = unit.Id })
 		</div>
 	}
 </div>

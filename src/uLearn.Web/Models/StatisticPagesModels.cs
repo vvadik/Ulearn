@@ -98,7 +98,7 @@ namespace uLearn.Web.Models
 		}
 	}
 
-	public class UnitStatisticPageModel : StatisticPageModel
+	public class UnitSheetPageModel : StatisticPageModel
 	{
 		public Unit Unit { get; set; }
 		public List<Slide> Slides { get; set; }
@@ -109,10 +109,11 @@ namespace uLearn.Web.Models
 
 		/* Dictionary<(userId, scoringGroupId), additionalScore> */
 		public Dictionary<Tuple<string, string>, int> AdditionalScores { get; set; }
-		public UnitStatSectionModel UnitStatSectionModel { get; set; }
+
+		public bool ShowStatisticsLink { get; set; }
 	}
 
-	public class UnitStatSectionModel
+	public class UnitStatModel : UnitSheetPageModel
 	{
 		public int UsersVisitedAllSlidesInPeriodCount { get; set; }
 		public Dictionary<Guid, int> QuizzesAverageScore { get; set; }
