@@ -15,7 +15,7 @@ namespace Database.Repos.Users.Search
 
 		public SearchField GetSearchField()
 		{
-			return SearchField.UserId;
+			return SearchField.Email;
 		}
 
 		public Task<IQueryable<ApplicationUser>> GetSearchScopeAsync(IQueryable<ApplicationUser> users, ApplicationUser currentUser, string courseId)
