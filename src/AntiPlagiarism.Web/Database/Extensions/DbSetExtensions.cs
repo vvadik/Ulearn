@@ -8,6 +8,7 @@ namespace AntiPlagiarism.Web.Database.Extensions
 {
 	public static class DbSetExtensions
 	{
+		// AddOrUpdate может привести к неуспешной транзакции. Нужно использовать NpgsqlRetryingExecutionStrategy
 		public static EntityEntry<TEntity> AddOrUpdate<TEntity>(this DbContext dbContext, TEntity entity, Expression<Func<TEntity, bool>> findFunction) where TEntity : class
 		{
 			var dbSet = dbContext.Set<TEntity>();

@@ -7,38 +7,48 @@ using AntiPlagiarism.Api.Models.Results;
 using AntiPlagiarism.Web.Database.Extensions;
 using AntiPlagiarism.Web.Database.Models;
 using Microsoft.EntityFrameworkCore;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
 using Ulearn.Common;
 using Ulearn.Core.Extensions;
+using Vostok.Logging.Abstractions;
 
 namespace AntiPlagiarism.Web.Database.Repos
 {
 	public interface IMostSimilarSubmissionsRepo
 	{
-		Task SaveMostSimilarSubmissionAsync(MostSimilarSubmission mostSimilarSubmission);
+		Task TrySaveMostSimilarSubmissionAsync(MostSimilarSubmission mostSimilarSubmission);
 		Task<List<MostSimilarSubmissions>> GetMostSimilarSubmissionsByTaskAsync(int clientId, Guid taskId);
 	}
 
 	public class MostSimilarSubmissionsRepo : IMostSimilarSubmissionsRepo
 	{
 		private readonly AntiPlagiarismDb db;
+		private static ILog log => LogProvider.Get().ForContext(typeof(MostSimilarSubmissionsRepo));
 
 		public MostSimilarSubmissionsRepo(AntiPlagiarismDb db)
 		{
 			this.db = db;
 		}
 		
-		public async Task SaveMostSimilarSubmissionAsync(MostSimilarSubmission mostSimilarSubmission)
+		public async Task TrySaveMostSimilarSubmissionAsync(MostSimilarSubmission mostSimilarSubmission)
 		{
-			await FuncUtils.TrySeveralTimesAsync(async () =>
+			try
 			{
-				using (var ts = new TransactionScope(TransactionScopeOption.Required, TimeSpan.FromSeconds(30), TransactionScopeAsyncFlowOption.Enabled))
+				var executionStrategy = new NpgsqlRetryingExecutionStrategy(db, 3);
+				await executionStrategy.ExecuteAsync(async () =>
 				{
-					db.AddOrUpdate(mostSimilarSubmission, p => p.SubmissionId == mostSimilarSubmission.SubmissionId);
-					await db.SaveChangesAsync().ConfigureAwait(false);
-					ts.Complete();
-					return 0;
-				}
-			}, 3, () => Task.Delay(30));
+					using (var ts = new TransactionScope(TransactionScopeOption.Required, TimeSpan.FromSeconds(30), TransactionScopeAsyncFlowOption.Enabled))
+					{
+						db.AddOrUpdate(mostSimilarSubmission, p => p.SubmissionId == mostSimilarSubmission.SubmissionId);
+						await db.SaveChangesAsync().ConfigureAwait(false);
+						ts.Complete();
+						return 0;
+					}
+				});
+			} catch (InvalidOperationException ex)
+			{
+				log.Warn(ex);
+			}
 		}
 
 		public async Task<List<MostSimilarSubmissions>> GetMostSimilarSubmissionsByTaskAsync(int clientId, Guid taskId)
