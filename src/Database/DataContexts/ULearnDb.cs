@@ -107,7 +107,6 @@ namespace Database.DataContexts
 			CancelCascaseDeleting<CreatedGroupNotification, Group, int>(modelBuilder, c => c.Group, c => c.GroupId);
 			CancelCascaseDeleting<PassedManualExerciseCheckingNotification, ManualExerciseChecking, int>(modelBuilder, c => c.Checking, c => c.CheckingId);
 			CancelCascaseDeleting<PassedManualQuizCheckingNotification, ManualQuizChecking, int>(modelBuilder, c => c.Checking, c => c.CheckingId);
-			CancelCascaseDeleting<ReceivedAdditionalScoreNotification, AdditionalScore, int?>(modelBuilder, c => c.Score, c => c.ScoreId, isRequired: false);
 
 			CancelCascaseDeleting<NewCommentNotification, Comment, int>(modelBuilder, c => c.Comment, c => c.CommentId);
 			CancelCascaseDeleting<NewCommentFromYourGroupStudentNotification, Comment, int>(modelBuilder, c => c.Comment, c => c.CommentId);

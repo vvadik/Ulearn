@@ -185,7 +185,7 @@ namespace Database
 			SetDeleteBehavior<CreatedGroupNotification, Group>(modelBuilder, c => c.Group, c => c.GroupId);
 			SetDeleteBehavior<PassedManualExerciseCheckingNotification, ManualExerciseChecking>(modelBuilder, c => c.Checking, c => c.CheckingId);
 			SetDeleteBehavior<PassedManualQuizCheckingNotification, ManualQuizChecking>(modelBuilder, c => c.Checking, c => c.CheckingId);
-			SetDeleteBehavior<ReceivedAdditionalScoreNotification, AdditionalScore>(modelBuilder, c => c.Score, c => c.ScoreId, DeleteBehavior.SetNull);
+			SetDeleteBehavior<ReceivedAdditionalScoreNotification, AdditionalScore>(modelBuilder, c => c.Score, c => c.ScoreId, DeleteBehavior.Cascade);
 
 			SetDeleteBehavior<NewCommentNotification, Comment>(modelBuilder, c => c.Comment, c => c.CommentId);
 			SetDeleteBehavior<NewCommentFromYourGroupStudentNotification, Comment>(modelBuilder, c => c.Comment, c => c.CommentId);
