@@ -26,6 +26,7 @@ import slideEditor from './scripts/slide-editor.js'; //code mirror editor
 import slideModals from './scripts/slide-modals.js'; //модалки
 import slideQuiz from './scripts/slide-quiz.js'; // слайд с квизами
 import slideSpoilers from './scripts/slide-spoilers.js'; //спойлеры, TODO reuse react
+import slideComments from './scripts/slide-comments.js'; //обработчики для комментариев, который рисует бэк на странице /Admin/Comments
 import slideTex from './scripts/slide-tex.js'; //tex, TODO reuse react
 import slideUtils from './scripts/slide-utils.js'; // панельки статистик, авто апдейтеры
 import slideVersions from './scripts/slide-versions.js'; //версии сабмитов к задачкам
@@ -63,7 +64,6 @@ import { ShowPanel } from './scripts/slide-utils.js';
 name -> status, description, reason for status
 respond -> deleted, полифил для matchMedia, не поддерживаем старые браузеры
 likely -> deleted, кнопки поделиться с друзьями в сертификатах, переехал в шаблон сертификата
-slide-comments > deleted, комментарии, переехали на реакт
 slide-hints -> deleted, подсказки к задачкам, на реакте
 slide-popovers -> deleted, подсказка к ускорение видео, на реакте
 slide-run -> deleted, запуск задачи, на реакте
@@ -85,6 +85,7 @@ const documentReadyFunctions = [
 	slideQuiz,
 	slideSpoilers,
 	slideTex,
+	slideComments,
 	slideUtils,
 	slideVersions,
 	certificatesEditor,
