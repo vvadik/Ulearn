@@ -63,6 +63,7 @@ const createReplyForm = function (e) {
 };
 
 const showCommentsRulesIfNeeded = function ($textarea) {
+	const $commentsRules = $('.comments__rules');
 	/* Don't show comments rules if they are already shown or under instructors-only comments */
 	if($('.comments__rules:visible').length === 0 && $textarea.closest('.comments-for-instructors-only').length === 0)
 		$textarea.after($commentsRules.clone());
@@ -305,7 +306,6 @@ const scrollToCommentFromHash = function () {
 
 export default function (events, handler) {
 	const $comments = $('.comments');
-	const $commentsRules = $('.comments__rules');
 
 	/* Set up handlers */
 	$comments.on('click', '.reply-form input[name=commentText]', expandReplyForm);
