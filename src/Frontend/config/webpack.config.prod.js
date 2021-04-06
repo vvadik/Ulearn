@@ -53,8 +53,11 @@ module.exports = merge([base, {
 	bail: true,
 	entry: {
 		oldBrowser: paths.oldBrowserJs,
-		legacy: paths.legacy,
 		main: paths.appIndexTsx,
+		legacy: {
+			import: paths.legacy,
+			dependOn: 'main',
+		},
 	},
 	output: {
 		path: paths.appBuild,
@@ -254,5 +257,6 @@ module.exports = merge([base, {
 	],
 	optimization: {
 		minimize: true,
+		runtimeChunk: 'single',
 	},
 }]);
