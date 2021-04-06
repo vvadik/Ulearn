@@ -7,7 +7,7 @@ const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const paths = require('./paths');
 const getClientEnvironment = require('./env');
-const pwaPlugins = require('./pwa.webpack.plugins');
+const pwaPlugins = require('./pwa.webpack.plugins.ts');
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // It requires a trailing slash, or the file assets will get an incorrect path.
@@ -52,13 +52,9 @@ module.exports = merge([base, {
 	mode: 'production',
 	bail: true,
 	entry: {
-		main: [
-			paths.legacy,
-			paths.appIndexTsx,
-		],
-		oldBrowser: [
-			paths.oldBrowserJs,
-		],
+		oldBrowser: paths.oldBrowserJs,
+		legacy: paths.legacy,
+		main: paths.appIndexTsx,
 	},
 	output: {
 		path: paths.appBuild,

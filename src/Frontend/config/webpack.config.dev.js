@@ -21,14 +21,10 @@ module.exports = merge([base, {
 	mode: 'development',
 	devtool: 'eval-cheap-source-map',
 	entry: {
-		main: [
-			paths.legacy,
-			'react-dev-utils/webpackHotDevClient',
-			paths.appIndexTsx,
-		],
-		oldBrowser: [
-			paths.oldBrowserJs
-		],
+		oldBrowser: paths.oldBrowserJs,
+		legacy: paths.legacy,
+		hmr: 'react-dev-utils/webpackHotDevClient',
+		main: paths.appIndexTsx,
 	},
 	output: {
 		filename: '[name].[hash:8].js',
