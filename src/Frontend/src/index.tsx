@@ -7,16 +7,6 @@ import '../config/polyfills.js';
 import { register } from './registerServiceWorker';
 import { Toast } from 'ui';
 
-const swUpdateHandler = () => window.location.reload();
-register({
-	onUpdate: () => {
-		Toast.push('Доступно обновление', {
-			label: 'Обновить',
-			handler: swUpdateHandler,
-		});
-	}
-});
-
 Sentry.init({
 	dsn: "https://62e9c6b9ae6a47399a2b79600f1cacc5@sentry.skbkontur.ru/781",
 	integrations: [new Integrations.BrowserTracing()],
@@ -32,3 +22,13 @@ if(root) {
 		<UlearnApp/>
 	), root);
 }
+
+const swUpdateHandler = () => window.location.reload();
+register({
+	onUpdate: () => {
+		Toast.push('Доступно обновление', {
+			label: 'Обновить',
+			handler: swUpdateHandler,
+		});
+	}
+});
