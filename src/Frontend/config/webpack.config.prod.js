@@ -53,11 +53,7 @@ module.exports = merge([base, {
 	bail: true,
 	entry: {
 		oldBrowser: paths.oldBrowserJs,
-		main: paths.appIndexTsx,
-		legacy: {
-			import: paths.legacy,
-			dependOn: 'main',
-		},
+		main: [paths.legacy, paths.appIndexTsx],
 	},
 	output: {
 		path: paths.appBuild,
