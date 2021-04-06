@@ -52,7 +52,7 @@ module.exports = [
 			// Match any request that ends with .png, .jpg, .jpeg or .svg.
 			// serve only images from static or content, such as logo, icons, 404 and others
 			// do not cache images from /course route as there can be a lot of images in galleries
-			urlPattern: /^(\/static|\/content|\/Content).*\.(?:png|jpg|jpeg|svg)/i,
+			urlPattern: /(\/static|\/content).*\.(?:png|jpg|jpeg|svg)/i,
 			// Apply a cache-first strategy.
 			handler: 'CacheFirst',
 			options: {

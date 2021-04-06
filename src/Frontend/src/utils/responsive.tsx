@@ -5,9 +5,9 @@ import Responsive from 'react-responsive';
 
 type propType = unknown & { children?: React.ReactNode };
 
-export const Desktop = (props: propType): React.ReactElement => <Responsive { ...props } minWidth={ 992 }/>;
-export const Tablet = (props: propType): React.ReactElement => <Responsive { ...props } minWidth={ 768 }
-																		   maxWidth={ 991 }/>;
-export const Mobile = (props: propType): React.ReactElement => <Responsive { ...props } maxWidth={ 767 }/>;
+export const Desktop = (props: propType): React.ReactElement => <Responsive { ...props } minWidth={ 1280 }/>;
+export const Tablet = (props: propType): React.ReactElement => <Responsive { ...props } minWidth={ 800 }
+																		   maxWidth={ 1280 }/>;
+export const Mobile = (props: propType): React.ReactElement => <Responsive { ...props } maxWidth={ 800 }/>;
 export const NotMobile = (props: propType): React.ReactElement => <Responsive { ...props } minWidth={ 768 }/>;
 
