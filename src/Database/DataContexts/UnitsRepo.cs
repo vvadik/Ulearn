@@ -11,10 +11,12 @@ namespace Database.DataContexts
 	public class UnitsRepo
 	{
 		private readonly ULearnDb db;
+		private readonly WebCourseManager courseManager;
 
 		public UnitsRepo(ULearnDb db)
 		{
 			this.db = db;
+			courseManager = WebCourseManager.Instance;
 		}
 
 		public IEnumerable<Guid> GetVisibleUnitIds(Course course, IPrincipal user)
@@ -43,6 +45,24 @@ namespace Database.DataContexts
 			return db.UnitAppearances.Where(u => u.CourseId == courseId && u.PublishTime > DateTime.Now)
 				.Select(u => u.PublishTime)
 				.Concat(new[] { DateTime.MaxValue }).Min();
+		}
+
+		public HashSet<string> GetVisibleCourses()
+		{
+			var appearances = db.UnitAppearances
+				.Where(u => u.PublishTime <= DateTime.Now)
+				.Select(u => new { u.CourseId, u.UnitId })
+				.AsEnumerable()
+				.GroupBy(p => p.CourseId)
+				.Where(g => courseManager.FindCourse(g.Key) != null)
+				.Where(g =>
+				{
+					var units = courseManager.GetCourse(g.Key).GetUnitsNotSafe().Select(u => u.Id).ToHashSet();
+					units.IntersectWith(g.Select(p => p.UnitId));
+					return units.Any();
+				})
+				.Select(g => g.Key);
+			return new HashSet<string>(appearances, StringComparer.OrdinalIgnoreCase);
 		}
 	}
 }

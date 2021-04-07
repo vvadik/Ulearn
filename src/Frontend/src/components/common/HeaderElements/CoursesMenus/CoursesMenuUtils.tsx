@@ -3,13 +3,14 @@ import React from "react";
 import { MenuHeader, MenuItem, MenuSeparator } from "ui";
 import LinkComponent from "../../LinkComponent";
 
-import { adminCoursePath, coursePath } from "src/consts/routes";
+import { coursesPath, coursePath } from "src/consts/routes";
 
 import { CourseInfo } from "src/models/course";
 import { CourseAccessType, CourseRoleType, } from "src/consts/accessType";
 import { DeviceType } from "src/consts/deviceType";
 
 const VISIBLE_COURSES_COUNT = 10;
+const COURSES_TO_BE_SORTED_BY_LAST_VISIT_COUNT = 4;
 
 export function getCourseMenuItems(
 	courseIds: string[],
@@ -17,22 +18,51 @@ export function getCourseMenuItems(
 	isSystemAdministrator: boolean
 ): React.ReactElement[] {
 	courseIds = courseIds.filter(item => courseById[item] !== undefined);
-	const visibleCourseIds = courseIds.slice(0, VISIBLE_COURSES_COUNT);
-	const items = visibleCourseIds.filter(courseId => Object.prototype.hasOwnProperty.call(courseById, courseId)).map(
-		courseId =>
+	const coursesInfo = courseIds
+		.filter(courseId => courseById[courseId])
+		.map(courseId => courseById[courseId]);
+
+	const lastVisitedCourses = [...coursesInfo].sort(sortCoursesByTimestamp)
+		.slice(0, COURSES_TO_BE_SORTED_BY_LAST_VISIT_COUNT);
+	const lastVisitedCoursesIds = new Set(lastVisitedCourses.map(c => c.id));
+
+	const items = [
+		...lastVisitedCourses,
+		...coursesInfo.filter(c => !lastVisitedCoursesIds.has(c.id))
+			.sort(sortCoursesByTitle)
+			.slice(0, VISIBLE_COURSES_COUNT - COURSES_TO_BE_SORTED_BY_LAST_VISIT_COUNT)
+	].map(
+		courseInfo =>
 			<MenuItem
-				href={ `/${ coursePath }/${ courseId }` }
-				key={ courseId }
-				component={ LinkComponent }>{ courseById[courseId].title }
+				href={ `/${ coursePath }/${ courseInfo.id }` }
+				key={ courseInfo.id }
+				component={ LinkComponent }>{ courseInfo.title }
 			</MenuItem>
 	);
-	if(courseIds.length > visibleCourseIds.length || isSystemAdministrator) {
+	if(courseIds.length > coursesInfo.length || isSystemAdministrator) {
 		items.push(
-			<MenuItem href={ adminCoursePath } key="-course-list" component={ LinkComponent }>
+			<MenuItem href={ coursesPath } key="-course-list" component={ LinkComponent }>
 				<strong>Все курсы</strong>
 			</MenuItem>);
 	}
 	return items;
+}
+
+function sortCoursesByTimestamp(courseInfo: CourseInfo, otherCourseInfo: CourseInfo) {
+	if(!otherCourseInfo.timestamp && !courseInfo.timestamp) {
+		return 0;
+	}
+	if(!courseInfo.timestamp) {
+		return 1;
+	}
+	if(!otherCourseInfo.timestamp) {
+		return -1;
+	}
+	return new Date(otherCourseInfo.timestamp).getTime() - new Date(courseInfo.timestamp).getTime();
+}
+
+function sortCoursesByTitle(courseInfo: CourseInfo, otherCourseInfo: CourseInfo) {
+	return courseInfo.title.localeCompare(otherCourseInfo.title);
 }
 
 export function menuItems(courseId: string, role: CourseRoleType, accesses: CourseAccessType[],
@@ -54,7 +84,7 @@ export function menuItems(courseId: string, role: CourseRoleType, accesses: Cour
 			Ведомость курса
 		</MenuItem>,
 
-		<MenuItem href={ "/Analytics/UnitStatistics?courseId=" + courseId } key="UnitStatistics"
+		<MenuItem href={ "/Analytics/UnitSheet?courseId=" + courseId } key="UnitStatistics"
 				  component={ LinkComponent }>
 			Ведомость модуля
 		</MenuItem>,

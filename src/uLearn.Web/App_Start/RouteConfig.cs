@@ -9,6 +9,11 @@ namespace uLearn.Web
 		{
 			routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 			routes.MapRoute(
+				name: "Course.Courses",
+				url: "Course/Courses",
+				defaults: new { controller = "Course", action = "Courses" }
+			);
+			routes.MapRoute(
 				name: "Course.Flashcards",
 				url: "Course/{courseId}/flashcards",
 				defaults: new { controller = "Spa", action = "IndexHtml" }
@@ -40,6 +45,11 @@ namespace uLearn.Web
 				url: "Exercise/{courseId}/{slideId}/StudentZip/{*fileName}",
 				defaults: new { controller = "Exercise", action = "StudentZip" },
 				constraints: new { slideId = @"(.*_)?[{|\(]?[0-9A-F]{8}[-]?([0-9A-F]{4}[-]?){3}[0-9A-F]{12}[\)|}]?" }
+			);
+			routes.MapRoute(
+				name: "Exercise.StepikStudentZip",
+				url: "Exercise/StudentZip",
+				defaults: new { controller = "Exercise", action = "StudentZip" }
 			);
 			routes.MapRoute(
 				name: "Certificates",

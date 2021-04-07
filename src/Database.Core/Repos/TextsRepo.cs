@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Database.Extensions;
 using Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Ulearn.Common.Extensions;
@@ -31,6 +32,9 @@ namespace Database.Repos
 
 			if (text.Length > MaxTextSize)
 				text = text.Substring(0, MaxTextSize);
+
+			if (text.Contains('\0'))
+				text = text.Replace("\0", ""); // postgres не поддерживает \0 в строках
 
 			var hash = GetHash(text);
 			var blob = await db.Texts.FindAsync(hash);

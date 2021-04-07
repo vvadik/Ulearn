@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
-using System.Data.Entity.Core.Objects;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Database.Models;
-using EntityFramework.Functions;
 using JetBrains.Annotations;
 using Microsoft.AspNet.Identity;
+using Npgsql;
 using Ulearn.Common;
 using Ulearn.Core;
 
@@ -38,9 +37,8 @@ namespace Database.DataContexts
 		{
 			var usersIdsByNamePrefix = string.IsNullOrEmpty(query.NamePrefix)
 				? null
-				: GetUsersByNamePrefix(query.NamePrefix).Select(u => u.Id);
-			return FilterUsers(query, usersIdsByNamePrefix, limit);
-
+				: GetUsersByNamePrefix(query.NamePrefix);
+			return FilterUsers(query, null, usersIdsByNamePrefix, limit);
 		}
 
 		[ItemCanBeNull]
@@ -50,30 +48,32 @@ namespace Database.DataContexts
 				return null;
 			var email = query.NamePrefix;
 			var usersIdsByEmail = db.Users.Where(u => u.Email == email).Select(u => u.Id);
-			return FilterUsers(query, usersIdsByEmail, limit);
+			return FilterUsers(query, usersIdsByEmail, null, limit);
 		}
-		
-		private List<UserRolesInfo> FilterUsers(UserSearchQueryModel query, [CanBeNull]IQueryable<string> userIds, int limit)
+
+		private List<UserRolesInfo> FilterUsers(UserSearchQueryModel query, [CanBeNull]IQueryable<string> userIdsQuery, [CanBeNull]List<string> userIds, int limit)
 		{
 			var roles = db.Roles.ToList();
 			var role = string.IsNullOrEmpty(query.Role) ? null : roles.FirstOrDefault(r => r.Name == query.Role);
 			var users = db.Users.Include(u => u.Roles).Where(u => !u.IsDeleted);
-			if (userIds != null)
-				users = users.Where(u => userIds.Contains(u.Id));
+			if (userIdsQuery != null)
+				users = users.Where(u => userIdsQuery.Contains(u.Id));
 
 			return users
 				.FilterByRole(role)
 				.FilterByUserIds(
 					userRolesRepo.GetListOfUsersWithCourseRole(query.CourseRole, query.CourseId, query.IncludeHighCourseRoles),
-					userRolesRepo.GetListOfUsersByPrivilege(query.OnlyPrivileged, query.CourseId)
+					userRolesRepo.GetListOfUsersByPrivilege(query.OnlyPrivileged, query.CourseId),
+					userIds
 				)
 				.GetUserRolesInfo(limit, roles);
 		}
 
 		public List<string> FilterUsersByNamePrefix(string namePrefix)
 		{
-			var deletedUserIds = db.Users.Where(u => u.IsDeleted).Select(u => u.Id).ToList();
-			return GetUsersByNamePrefix(namePrefix).Where(u => !deletedUserIds.Contains(u.Id)).Select(u => u.Id).ToList();
+			if (string.IsNullOrEmpty(namePrefix))
+				return db.Users.Where(u => !u.IsDeleted).Select(u => u.Id).ToList();
+			return GetUsersByNamePrefix(namePrefix).ToList();
 		}
 
 		/* Pass limit=0 to disable limiting */
@@ -123,20 +123,21 @@ namespace Database.DataContexts
 			return db.SaveChangesAsync();
 		}
 
-		private const string nameSpace = nameof(UsersRepo);
-		private const string dbo = nameof(dbo);
-
-		[TableValuedFunction(nameof(GetUsersByNamePrefix), nameSpace, Schema = dbo)]
-		// ReSharper disable once MemberCanBePrivate.Global
-		public IQueryable<UserIdWrapper> GetUsersByNamePrefix(string name)
+		private static Regex nonWordChars = new Regex(@"[^\w\s\-\.@_]*", RegexOptions.Compiled);
+		private List<string> GetUsersByNamePrefix(string name, int limit = 100)
 		{
-			if (string.IsNullOrEmpty(name))
-				return db.Users.Where(u => !u.IsDeleted).Select(u => new UserIdWrapper(u.Id));
-
-			var splittedName = name.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-			var nameQuery = string.Join(" & ", splittedName.Select(s => "\"" + s.Trim().Replace("\"", "\\\"") + "*\""));
-			var nameParameter = new ObjectParameter("name", nameQuery);
-			return db.ObjectContext().CreateQuery<UserIdWrapper>($"[{nameof(GetUsersByNamePrefix)}](@name)", nameParameter);
+			name = name.ToLower();
+			var escapedName = nonWordChars.Replace(name, "").Replace(".", "\\.").Trim();
+			var sql = 
+$@"SELECT ""Id""
+FROM ""AspNetUsers""
+WHERE ""IsDeleted"" = False and ""Names"" ~ @query
+LIMIT {limit};"; // ~ - регвыр c учетом размера букв. Есть ~* без учета. Но мы все равно поле ловеркейзим, чтобы по нему можно было искать в том числе like. 
+			var userIds = db.Database.SqlQuery<string>(
+				sql,
+				new NpgsqlParameter<string>("@query", $@"(^|\s){escapedName}")
+			).ToList();
+			return userIds;
 		}
 
 		public async Task UpdateLastConfirmationEmailTime(ApplicationUser user)
@@ -220,15 +221,4 @@ namespace Database.DataContexts
 	}
 
 	/* System.String is not available for table-valued functions so we need to create ComplexTyped wrapper */
-
-	[ComplexType]
-	public class UserIdWrapper
-	{
-		public UserIdWrapper(string userId)
-		{
-			Id = userId;
-		}
-
-		public string Id { get; set; }
-	}
 }

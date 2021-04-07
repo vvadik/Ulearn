@@ -44,7 +44,7 @@ namespace Database.Core.Tests.Repos.Users
 		{
 			var user = await CreateUserAsync("test").ConfigureAwait(false);
 
-			var result = await SearchAsAdminAsync(user.Id.Substring(0, 5)).ConfigureAwait(false);
+			var result = await SearchAsAdminAsync(user.Id).ConfigureAwait(false);
 
 			Assert.AreEqual(1, result.Count);
 		}
@@ -53,12 +53,9 @@ namespace Database.Core.Tests.Repos.Users
 		public async Task SearchByUserIdNotFoundUnnecessary()
 		{
 			var user1 = await CreateUserAsync("test1").ConfigureAwait(false);
-			var user2 = await CreateUserAsync("test2").ConfigureAwait(false);
+			await CreateUserAsync("test2").ConfigureAwait(false);
 
-			if (user1.Id.Substring(0, 5) == user2.Id.Substring(0, 5))
-				return;
-
-			var result = await SearchAsAdminAsync(user1.Id.Substring(0, 5)).ConfigureAwait(false);
+			var result = await SearchAsAdminAsync(user1.Id).ConfigureAwait(false);
 
 			Assert.AreEqual(1, result.Count);
 		}

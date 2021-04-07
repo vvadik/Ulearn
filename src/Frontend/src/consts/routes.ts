@@ -1,7 +1,7 @@
 import { buildQuery } from "src/utils";
 
 export const coursePath = "course";
-export const adminCoursePath = "/admin/courses";
+export const coursesPath = "/course/courses";
 export const flashcards = "flashcards";
 export const flashcardsPreview = "preview";
 export const commentsPath = "comments";
@@ -47,7 +47,7 @@ export function constructPathToStudentSubmissions(courseId: string, slideId: str
 	return `/${ exerciseStudentSubmissions }?courseId=${ courseId }&slideId=${ slideId }`;
 }
 
-export function constructPathToFlashcardsPreview(courseId: string, openUnitId?: string): string {
+export function constructPathToFlashcardsPreview(courseId: string, openUnitId?: string | null): string {
 	const unitIdQuery = buildQuery({ unitId: openUnitId });
 	const url = `/${ coursePath }/${ courseId }/${ flashcards }/${ flashcardsPreview }`;
 

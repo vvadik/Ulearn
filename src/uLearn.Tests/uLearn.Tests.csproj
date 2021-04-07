@@ -16,35 +16,34 @@
     <Optimize>false</Optimize>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="ApprovalTests" Version="4.5.2" />
-    <PackageReference Include="ApprovalUtilities" Version="4.5.2" />
-    <PackageReference Include="DotNetZip" Version="1.13.4" />
-    <PackageReference Include="FluentAssertions" Version="5.9.0" />
-    <PackageReference Include="JetBrains.dotMemoryUnit" Version="3.0.20171219.105559" />
+    <PackageReference Include="ApprovalTests" Version="5.4.5" />
+    <PackageReference Include="ApprovalUtilities" Version="5.4.5" />
+    <PackageReference Include="DotNetZip" Version="1.15.0" />
+    <PackageReference Include="FluentAssertions" Version="5.10.3" />
+    <PackageReference Include="JetBrains.dotMemoryUnit" Version="3.1.20200127.214830" />
     <PackageReference Include="MarkdownDeep.NET.Core" Version="1.5.0.4" />
-    <PackageReference Include="Microsoft.Build" Version="16.8.0" />
-    <PackageReference Include="Microsoft.Build.Framework" Version="16.8.0" />
-    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.8.0" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.8.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="3.1.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.2" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="3.1.2" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="3.1.2" />
-    <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="3.1.2" />
-    <PackageReference Include="Microsoft.Extensions.Primitives" Version="3.1.2" />
-    <PackageReference Include="Microsoft.Net.Compilers" Version="3.8.0">
+    <PackageReference Include="Microsoft.Build" Version="16.9.0" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="16.9.0" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="16.9.0" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.9.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Primitives" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Net.Compilers" Version="3.9.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Net.Http" Version="2.2.29" />
-    <PackageReference Include="Microsoft.NETCore.Platforms" Version="3.0.0" />
+    <PackageReference Include="Microsoft.NETCore.Platforms" Version="5.0.1" />
     <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="1.16.30">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Win32.Primitives" Version="4.3.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="NHunspell" Version="1.2.5554.16953" />
     <PackageReference Include="NUnit" Version="3.10.0" />
     <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />

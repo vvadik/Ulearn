@@ -79,7 +79,7 @@ namespace Ulearn.Web.Api
 
 		protected override IApplicationBuilder ConfigureWebApplication(IApplicationBuilder app)
 		{
-			// MigrateAndCreateInitialData(app); // NOTE: Миграции в Api отключены пока выполняются в Web
+			MigrateAndCreateInitialData(app);
 			ConfigureWebsockets(app);
 			return app;
 		}
@@ -119,10 +119,10 @@ namespace Ulearn.Web.Api
 			base.ConfigureServices(services, hostingEnvironment);
 
 			/* TODO (andgein): use UlearnDbFactory here */
-			services.AddDbContextPool<UlearnDb>(
+			services.AddDbContext<UlearnDb>( // AddDbContextPool: DbContext Pooling does not dispose LazyLoader https://github.com/dotnet/efcore/issues/11308
 				options => options
 					.UseLazyLoadingProxies()
-					.UseSqlServer(configuration.Database)
+					.UseNpgsql(configuration.Database, o => o.SetPostgresVersion(13, 2))
 			);
 
 			services.Configure<WebApiConfiguration>(options =>
@@ -206,6 +206,7 @@ namespace Ulearn.Web.Api
 			services.AddScoped<SandboxErrorsResultObserver>();
 			services.AddScoped<AntiPlagiarismResultObserver>();
 			services.AddScoped<StyleErrorsResultObserver>();
+			services.AddScoped<LtiResultObserver>();
 
 			services.AddDatabaseServices();
 		}

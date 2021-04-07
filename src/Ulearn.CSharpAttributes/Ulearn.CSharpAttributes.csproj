@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<RootNamespace>Ulearn</RootNamespace>
-		<TargetFrameworks>net472;netcoreapp3.1</TargetFrameworks>
+		<TargetFrameworks>net472;net5.0</TargetFrameworks>
 		<LangVersion>default</LangVersion>
 	</PropertyGroup>
 	<ItemGroup>

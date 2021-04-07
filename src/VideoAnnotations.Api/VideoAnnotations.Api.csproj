@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<RootNamespace>Ulearn.VideoAnnotations.Api</RootNamespace>
-		<TargetFrameworks>net472;netcoreapp3.1</TargetFrameworks>
+		<TargetFrameworks>net472;net5.0</TargetFrameworks>
 	</PropertyGroup>
 
 	<ItemGroup>

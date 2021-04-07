@@ -49,7 +49,7 @@ namespace Database.Models
 		[DatabaseGenerated(DatabaseGeneratedOption.Computed)]
 		public string Names
 		{
-			get { return UserName + " " + FirstName + " " + LastName; }
+			get { return UserName + " " + FirstName + " " + LastName + " " + FirstName; }
 			private set
 			{
 				/* Empty for EF */

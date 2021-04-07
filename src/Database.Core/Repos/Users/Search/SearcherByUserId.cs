@@ -7,13 +7,6 @@ namespace Database.Repos.Users.Search
 {
 	public class SearcherByUserId : ISearcher
 	{
-		private readonly UlearnDb db;
-
-		public SearcherByUserId(UlearnDb db)
-		{
-			this.db = db;
-		}
-
 		public SearchField GetSearchField()
 		{
 			return SearchField.UserId;
@@ -35,10 +28,8 @@ namespace Database.Repos.Users.Search
 			if (term.Length < 5)
 				return Task.FromResult(Enumerable.Empty<ApplicationUser>().AsQueryable());
 
-			if (strict)
-				return Task.FromResult(users.Where(u => u.Id == term));
-
-			return Task.FromResult(users.Where(u => u.Id.StartsWith(term)).OrderBy(u => u.Id).Take(limit));
+			/* This searcher works identically in strict and non-strict mode */
+			return Task.FromResult(users.Where(u => u.Id == term));
 		}
 	}
 }

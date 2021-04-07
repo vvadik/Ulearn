@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Transactions;
+using AntiPlagiarism.Web.Database.Extensions;
 using AntiPlagiarism.Web.Database.Models;
 using Ulearn.Common;
-using Ulearn.Common.Extensions;
+using Microsoft.EntityFrameworkCore;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
 
 namespace AntiPlagiarism.Web.Database.Repos
 {
@@ -24,12 +26,16 @@ namespace AntiPlagiarism.Web.Database.Repos
 
 		public async Task SetManualSuspicionLevelsAsync(ManualSuspicionLevels manualSuspicionLevels)
 		{
-			using (var ts = new TransactionScope(TransactionScopeOption.Required, TimeSpan.FromSeconds(30), TransactionScopeAsyncFlowOption.Enabled))
+			var executionStrategy = new NpgsqlRetryingExecutionStrategy(db, 3);
+			await executionStrategy.ExecuteAsync(async () =>
 			{
-				db.AddOrUpdate(manualSuspicionLevels, p => p.TaskId == manualSuspicionLevels.TaskId && p.Language == manualSuspicionLevels.Language);
-				await db.SaveChangesAsync().ConfigureAwait(false);
-				ts.Complete();
-			}
+				using (var ts = new TransactionScope(TransactionScopeOption.Required, TimeSpan.FromSeconds(30), TransactionScopeAsyncFlowOption.Enabled))
+				{
+					db.AddOrUpdate(manualSuspicionLevels, p => p.TaskId == manualSuspicionLevels.TaskId && p.Language == manualSuspicionLevels.Language);
+					await db.SaveChangesAsync().ConfigureAwait(false);
+					ts.Complete();
+				}
+			});
 		}
 
 		public async Task<ManualSuspicionLevels> GetManualSuspicionLevelsAsync(Guid taskId, Language language)

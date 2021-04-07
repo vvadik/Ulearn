@@ -35,7 +35,7 @@ namespace uLearn.Web.Controllers
 		private static ILog log => LogProvider.Get().ForContext(typeof(CourseController));
 
 		private readonly ULearnDb db = new ULearnDb();
-		private readonly CourseManager courseManager = WebCourseManager.Instance;
+		private readonly WebCourseManager courseManager = WebCourseManager.Instance;
 
 		private readonly SlideRateRepo slideRateRepo;
 		private readonly UserSolutionsRepo solutionsRepo;
@@ -46,6 +46,8 @@ namespace uLearn.Web.Controllers
 		private readonly GroupsRepo groupsRepo;
 		private readonly UserQuizzesRepo userQuizzesRepo;
 		private readonly CoursesRepo coursesRepo;
+		private readonly TempCoursesRepo tempCoursesRepo;
+		private readonly UserRolesRepo userRolesRepo;
 
 		public CourseController()
 		{
@@ -58,6 +60,8 @@ namespace uLearn.Web.Controllers
 			groupsRepo = new GroupsRepo(db, courseManager);
 			userQuizzesRepo = new UserQuizzesRepo(db);
 			coursesRepo = new CoursesRepo(db);
+			tempCoursesRepo = new TempCoursesRepo(db);
+			userRolesRepo = new UserRolesRepo(db);
 		}
 
 		[AllowAnonymous]
@@ -193,18 +197,7 @@ namespace uLearn.Web.Controllers
 				ErrorLog.GetDefault(System.Web.HttpContext.Current).Log(new Error(e));
 			}
 
-			var exerciseSlide = slide as ExerciseSlide;
-			if (exerciseSlide != null)
-			{
-				var model = new CodeModel
-				{
-					CourseId = courseId,
-					SlideId = exerciseSlide.Id,
-					ExerciseBlock = exerciseSlide.Exercise,
-					Context = CreateRenderContext(course, exerciseSlide, isLti: true)
-				};
-				return View("LtiExerciseSlide", model);
-			}
+			// Exercise обрабатывается реактом
 
 			var quizSlide = slide as QuizSlide;
 			if (quizSlide != null)
@@ -514,6 +507,50 @@ namespace uLearn.Web.Controllers
 			await db.SaveChangesAsync();
 
 			return RedirectToAction("SlideById", new { courseId, slideId = slide.Id });
+		}
+
+		public async Task<ActionResult> Courses(string courseId = null, string courseTitle = null)
+		{
+			var isSystemAdministrator = User.IsSystemAdministrator();
+			var userId = User.Identity.GetUserId();
+			var courses = courseManager.GetCourses();
+
+			// Неопубликованные курсы не покажем тем, кто не имеет роли в них.
+			if (!isSystemAdministrator)
+			{
+				var visibleCourses = unitsRepo.GetVisibleCourses();
+				var coursesInWhichUserHasAnyRole = userRolesRepo.GetCoursesWhereUserIsInRole(userId, CourseRole.Tester);
+				var coursesWhereIAmStudent = groupsRepo.GetUserGroups(userId)
+					.Select(g => g.CourseId)
+					.Distinct(StringComparer.OrdinalIgnoreCase)
+					.Where(c => visibleCourses.Contains(c)).ToList();
+				courses = courses.Where(c => coursesInWhichUserHasAnyRole.Contains(c.Id, StringComparer.OrdinalIgnoreCase)
+					|| coursesWhereIAmStudent.Contains(c.Id, StringComparer.OrdinalIgnoreCase));
+			}
+
+			var incorrectChars = new string(CourseManager.GetInvalidCharacters().OrderBy(c => c).Where(c => 32 <= c).ToArray());
+			if (isSystemAdministrator)
+				courses = courses.OrderBy(course => course.Id, StringComparer.InvariantCultureIgnoreCase);
+			else
+				courses = courses.OrderBy(course => course.Title, StringComparer.InvariantCultureIgnoreCase);
+
+			var tempCourses = tempCoursesRepo.GetTempCourses().Select(c => c.CourseId).ToHashSet();
+			var model = new CourseListViewModel
+			{
+				Courses = courses
+					.Select(course => new CourseViewModel
+					{
+						Id = course.Id,
+						Title = course.Title,
+						LastWriteTime = courseManager.GetLastWriteTime(course.Id),
+						IsTemp = tempCourses.Contains(course.Id)
+					})
+					.ToList(),
+				LastTryCourseId = courseId,
+				LastTryCourseTitle = courseTitle,
+				InvalidCharacters = incorrectChars
+			};
+			return View(model);
 		}
 	}
 }

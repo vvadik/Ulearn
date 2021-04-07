@@ -15,6 +15,8 @@ namespace uLearn.Web.Models
 
 		public string ReturnUrl { get; set; }
 
+		public bool RememberMe { get; set; }
+
 		public ExternalLoginListType Type { get; set; }
 
 		public List<IdentityUserLogin> UserLogins { get; set; }

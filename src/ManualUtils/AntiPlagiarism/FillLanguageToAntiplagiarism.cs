@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AntiPlagiarism.Web.Database;
+using Microsoft.EntityFrameworkCore;
 using Ulearn.Common;
 
 namespace ManualUtils.AntiPlagiarism
@@ -68,6 +69,7 @@ namespace ManualUtils.AntiPlagiarism
 
 			var snippets = adb
 				.SnippetsStatistics
+				.AsNoTracking()
 				.Where(p => p.Language == 0);
 
 			var count = snippets.Count();

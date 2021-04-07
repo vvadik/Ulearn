@@ -47,7 +47,7 @@ namespace uLearn.Web.Controllers
 		{
 		}
 
-		public AnalyticsController(ULearnDb db, CourseManager courseManager)
+		public AnalyticsController(ULearnDb db, WebCourseManager courseManager)
 		{
 			this.db = db;
 			this.courseManager = courseManager;
@@ -61,7 +61,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		public ActionResult UnitStatistics(UnitStatisticsParams param)
+		public ActionResult UnitSheet(UnitSheetParams param)
 		{
 			const int usersLimit = 200;
 
@@ -80,7 +80,7 @@ namespace uLearn.Web.Controllers
 			var visibleUnitsIds = unitsRepo.GetVisibleUnitIds(course, User);
 			var visibleUnits = course.GetUnits(visibleUnitsIds);
 			if (!unitId.HasValue)
-				return View("UnitStatisticsList", new UnitStatisticPageModel
+				return View("UnitSheetList", new UnitSheetPageModel
 				{
 					CourseId = courseId,
 					CourseTitle = course.Title,
@@ -90,8 +90,7 @@ namespace uLearn.Web.Controllers
 			if (selectedUnit == null)
 				return HttpNotFound();
 
-			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
-			var slides = selectedUnit.GetSlides(isInstructor);
+			var slides = selectedUnit.GetSlides(false);
 			var slidesIds = slides.Select(s => s.Id).ToList();
 
 			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
@@ -101,25 +100,6 @@ namespace uLearn.Web.Controllers
 			filterOptions.PeriodFinish = realPeriodFinish;
 
 			var slidesVisits = visitsRepo.GetVisitsInPeriodForEachSlide(filterOptions);
-
-			UnitStatSectionModel statSectionModel = null;
-			if (param.ShowStat || User.HasAccessFor(courseId, CourseRole.CourseAdmin))
-			{
-				statSectionModel = new UnitStatSectionModel();
-				statSectionModel.UsersVisitedAllSlidesInPeriodCount = visitsRepo.GetUsersVisitedAllSlides(filterOptions).Count();
-
-				var quizzes = slides.OfType<QuizSlide>();
-				statSectionModel.QuizzesAverageScore = quizzes.ToDictionary(q => q.Id,
-					q => (int)slidesVisits.GetOrDefault(q.Id, new List<Visit>())
-						.Where(v => v.IsPassed)
-						.Select(v => 100 * Math.Min(v.Score, q.MaxScore) / (q.MaxScore != 0 ? q.MaxScore : 1))
-						.DefaultIfEmpty(-1)
-						.Average()
-				);
-
-				statSectionModel.ExercisesSolutionsCount = GetExercisesSolutionsCount(courseId, slidesIds, periodStart, realPeriodFinish);
-				statSectionModel.ExercisesAcceptedSolutionsCount = GetExercisesAcceptedSolutionsCount(courseId, slidesIds, periodStart, realPeriodFinish);
-			}
 
 			List<string> usersIds;
 			/* If we filtered out users from one or several groups show them all */
@@ -147,7 +127,78 @@ namespace uLearn.Web.Controllers
 			var usersGroupsIds = groupsRepo.GetUsersGroupsIds(courseId, visitedUsersIds);
 			var enabledAdditionalScoringGroupsForGroups = GetEnabledAdditionalScoringGroupsForGroups(courseId);
 
-			var model = new UnitStatisticPageModel
+			var model = new UnitSheetPageModel
+			{
+				CourseId = courseId,
+				CourseTitle = course.Title,
+				Units = visibleUnits,
+				Unit = selectedUnit,
+				SelectedGroupsIds = groupsIds,
+				Groups = groups,
+				ShowStatisticsLink = User.HasAccessFor(courseId, CourseRole.CourseAdmin),
+
+				PeriodStart = periodStart,
+				PeriodFinish = periodFinish,
+
+				Slides = slides,
+				SlidesVisits = slidesVisits,
+
+				VisitedUsers = visitedUsers,
+				VisitedUsersIsMore = isMore,
+				VisitedSlidesCountByUser = visitedSlidesCountByUser,
+				VisitedSlidesCountByUserAllTime = visitedSlidesCountByUserAllTime,
+
+				AdditionalScores = additionalScores,
+				UsersGroupsIds = usersGroupsIds,
+				EnabledAdditionalScoringGroupsForGroups = enabledAdditionalScoringGroupsForGroups,
+			};
+			return View(model);
+		}
+
+		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
+		public ActionResult UnitStatistics(UnitSheetParams param)
+		{
+			if (param.CourseId == null)
+				return HttpNotFound();
+
+			var courseId = param.CourseId;
+			var unitId = param.UnitId;
+			var periodStart = param.PeriodStartDate;
+			var periodFinish = param.PeriodFinishDate;
+			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
+
+			var realPeriodFinish = periodFinish.Add(TimeSpan.FromDays(1));
+
+			var course = courseManager.GetCourse(courseId);
+			var visibleUnitsIds = unitsRepo.GetVisibleUnitIds(course, User);
+			var visibleUnits = course.GetUnits(visibleUnitsIds);
+			if (!unitId.HasValue)
+				return View("UnitSheetList", new UnitSheetPageModel
+				{
+					CourseId = courseId,
+					CourseTitle = course.Title,
+					Units = visibleUnits
+				});
+
+			var selectedUnit = visibleUnits.FirstOrDefault(x => x.Id == unitId);
+			if (selectedUnit == null)
+				return HttpNotFound();
+
+			var slides = selectedUnit.GetSlides(false);
+			var slidesIds = slides.Select(s => s.Id).ToList();
+
+			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
+			var filterOptions = ControllerUtils.GetFilterOptionsByGroup<VisitsFilterOptions>(groupsRepo, User, courseId, groupsIds);
+			filterOptions.SlidesIds = slidesIds;
+			filterOptions.PeriodStart = periodStart;
+			filterOptions.PeriodFinish = realPeriodFinish;
+
+			var slidesVisits = visitsRepo.GetVisitsInPeriodForEachSlide(filterOptions);
+
+			var visitedSlidesCountByUser = GetVisitedSlidesCountByUser(filterOptions);
+			var visitedSlidesCountByUserAllTime = GetVisitedSlidesCountByUserAllTime(filterOptions);
+
+			var model = new UnitStatModel
 			{
 				CourseId = courseId,
 				CourseTitle = course.Title,
@@ -162,17 +213,24 @@ namespace uLearn.Web.Controllers
 				Slides = slides,
 				SlidesVisits = slidesVisits,
 
-				UnitStatSectionModel = statSectionModel,
-
-				VisitedUsers = visitedUsers,
-				VisitedUsersIsMore = isMore,
 				VisitedSlidesCountByUser = visitedSlidesCountByUser,
 				VisitedSlidesCountByUserAllTime = visitedSlidesCountByUserAllTime,
-
-				AdditionalScores = additionalScores,
-				UsersGroupsIds = usersGroupsIds,
-				EnabledAdditionalScoringGroupsForGroups = enabledAdditionalScoringGroupsForGroups,
 			};
+
+			model.UsersVisitedAllSlidesInPeriodCount = visitsRepo.GetUsersVisitedAllSlides(filterOptions).Count();
+
+			var quizzes = slides.OfType<QuizSlide>();
+			model.QuizzesAverageScore = quizzes.ToDictionary(q => q.Id,
+				q => (int)slidesVisits.GetOrDefault(q.Id, new List<Visit>())
+					.Where(v => v.IsPassed)
+					.Select(v => 100 * Math.Min(v.Score, q.MaxScore) / (q.MaxScore != 0 ? q.MaxScore : 1))
+					.DefaultIfEmpty(-1)
+					.Average()
+			);
+
+			model.ExercisesSolutionsCount = GetExercisesSolutionsCount(courseId, slidesIds, periodStart, realPeriodFinish);
+			model.ExercisesAcceptedSolutionsCount = GetExercisesAcceptedSolutionsCount(courseId, slidesIds, periodStart, realPeriodFinish);
+
 			return View(model);
 		}
 
@@ -1022,10 +1080,9 @@ namespace uLearn.Web.Controllers
 		public new DateTime PeriodFinishDate => DateTime.MaxValue.Subtract(TimeSpan.FromDays(2));
 	}
 
-	public class UnitStatisticsParams : StatisticsParams
+	public class UnitSheetParams : StatisticsParams
 	{
 		public Guid? UnitId { get; set; }
-		public bool ShowStat { get; set; }
 	}
 
 	public class UserUnitStatisticsPageModel

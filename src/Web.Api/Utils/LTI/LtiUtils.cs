@@ -14,13 +14,9 @@ namespace Ulearn.Web.Api.Utils.LTI
 	{
 		private static ILog log => LogProvider.Get().ForContext(typeof(LtiUtils));
 
-		public static async Task SubmitScore(string courseId, Slide slide, string userId, int score,
-			ILtiRequestsRepo ltiRequestsRepo,
-			ILtiConsumersRepo consumersRepo)
+		public static async Task SubmitScore(Slide slide, string userId, int score,
+			string ltiRequestJson, ILtiConsumersRepo consumersRepo)
 		{
-			var ltiRequestJson = await ltiRequestsRepo.Find(courseId, userId, slide.Id);
-			if (ltiRequestJson == null)
-				throw new Exception("LtiRequest for user '" + userId + "' not found");
 			var ltiRequest = JsonConvert.DeserializeObject<LtiRequest>(ltiRequestJson);
 
 			var consumerSecret = (await consumersRepo.Find(ltiRequest.ConsumerKey)).Secret;

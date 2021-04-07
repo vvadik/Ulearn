@@ -229,8 +229,10 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 				plagiarisms.Add(BuildPlagiarismInfo(plagiarismSubmission, weight, matchedSnippets[plagiarismSubmission.Id]));
 			}
 
-			if(mostSimilarSubmission != null)
-				await mostSimilarSubmissionsRepo.SaveMostSimilarSubmissionAsync(mostSimilarSubmission).ConfigureAwait(false);
+			if (mostSimilarSubmission != null)
+			{
+				await mostSimilarSubmissionsRepo.TrySaveMostSimilarSubmissionAsync(mostSimilarSubmission).ConfigureAwait(false);
+			}
 
 			return plagiarisms;
 		}
