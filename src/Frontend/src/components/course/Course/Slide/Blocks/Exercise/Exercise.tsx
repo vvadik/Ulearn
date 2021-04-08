@@ -1139,7 +1139,6 @@ class Exercise extends React.Component<Props, State> {
 
 		const code = loadExerciseCodeFromCache(slideId);
 		this.resetCode();
-
 		if(submissions.length > 0 && code) {
 			let newValue = code.value;
 
@@ -1154,7 +1153,7 @@ class Exercise extends React.Component<Props, State> {
 
 			this.setState({
 				value: newValue,
-				language: code.language ? code.language : language,
+				language: this.getSupportedLanguage(code.language ? code.language : language),
 			});
 			return;
 		}
@@ -1164,7 +1163,7 @@ class Exercise extends React.Component<Props, State> {
 			this.saveCodeDraftToCache(slideId, lastSubmission.code);
 			this.setState({
 				value: lastSubmission.code,
-				language: lastSubmission.language,
+				language: this.getSupportedLanguage(lastSubmission.language),
 			});
 			return;
 		}
@@ -1172,9 +1171,17 @@ class Exercise extends React.Component<Props, State> {
 		if(code) {
 			this.setState({
 				value: code.value,
-				language: code.language ? code.language : language,
+				language: this.getSupportedLanguage(code.language ? code.language : language),
 			});
 		}
+	};
+
+	getSupportedLanguage = (languageToCheck: Language): Language => {
+		const { languages, defaultLanguage, } = this.props;
+
+		return languages.some(l => l === languageToCheck)
+			? languageToCheck
+			: defaultLanguage || languages[0];
 	};
 }
 
