@@ -137,7 +137,7 @@ namespace AntiPlagiarism.Web.CodeAnalyzing
 
 		private string GetPygmentizeResult(string code, Language language)
 		{
-			var lexer = language.GetAttribute<LexerAttribute>().lexer;
+			var lexer = language.GetAttribute<LexerAttribute>().Lexer;
 			var arguments = lexer == null ? "-g" : $"-l {lexer}";
 			arguments += " -f tokens -O encoding=utf-8";
 
