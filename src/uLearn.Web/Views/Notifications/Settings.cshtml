@@ -174,11 +174,11 @@ else
 </div>
 
 <script>
-	window.notificationTypesByCourse = @Html.Raw(
+	window.legacy.notificationTypesByCourse = @Html.Raw(
 		                                   Model.NotificationTypesByCourse.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Select(t => (int)t)).JsonSerialize()
 		                                   );
 
-	window.notificationTransportsSettings = @Html.Raw(Model.NotificationTransportsSettings.Select(
+	window.legacy.notificationTransportsSettings = @Html.Raw(Model.NotificationTransportsSettings.Select(
 		                                        kvp => new
 		                                        {
 			                                        courseId = kvp.Key.Item1,

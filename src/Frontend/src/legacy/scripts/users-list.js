@@ -1,6 +1,6 @@
 ﻿export function toggleRoleOrCourseAccess(comment) {
-	const target = window.toggleRoles.target;
-	const toggleClass = window.toggleRoles.toggleClass;
+	const target = window.legacy.toggleRoles.target;
+	const toggleClass = window.legacy.toggleRoles.toggleClass;
 	const $object = $(target);
 	const url = $object.data("toggleUrl");
 	const token = $('#AntiForgeryTokenContainer input[name="__RequestVerificationToken"]').val();
@@ -89,7 +89,7 @@ export function openPopup(target, toggleClass) {
 		isGrant = false;
 	}
 
-	window.toggleRoles = {
+	window.legacy.toggleRoles = {
 		target: target,
 		toggleClass: toggleClass,
 		userName: userName,

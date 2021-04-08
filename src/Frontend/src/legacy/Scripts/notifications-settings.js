@@ -5,11 +5,11 @@
 	const disableTransportUrlTemplate = $('.notifications__disable-transport__button').attr('href');
 
 	function getNotificationSettings(courseId, transportId, notificationType) {
-		for (let idx in window.notificationTransportsSettings) {
-			if(!window.notificationTransportsSettings.hasOwnProperty(idx))
+		for (let idx in window.legacy.notificationTransportsSettings) {
+			if(!window.legacy.notificationTransportsSettings.hasOwnProperty(idx))
 				continue;
 
-			const setting = window.notificationTransportsSettings[idx];
+			const setting = window.legacy.notificationTransportsSettings[idx];
 			if(setting.courseId === courseId &&
 				setting.transportId === transportId &&
 				setting.notificationType === notificationType)
@@ -56,7 +56,7 @@
 		// Clear all statuses
 		$panel.find('.status').text('');
 
-		const notificationTypesForCourse = window.notificationTypesByCourse[courseId];
+		const notificationTypesForCourse = window.legacy.notificationTypesByCourse[courseId];
 		const $checkboxes = $panel.find('input[type="checkbox"]');
 		$checkboxes.each(function () {
 			const $checkbox = $(this);

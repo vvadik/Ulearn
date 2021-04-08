@@ -56,15 +56,15 @@ export default function () {
 
 var editorLastRange, currentReviewTextMarker, reviewsTextMarkers, exerciseCodeDoc, $exerciseCodeBlock;
 
-window.showTooltipAboutCopyingFromCodemirror = function showTooltipAboutCopyingFromCodemirror(range) {
+function showTooltipAboutCopyingFromCodemirror(range) {
 	if(navigator.clipboard) {
 		const minLine = Math.min(range.anchor.line, range.head.line);
 		/* Don't show tooltip on first 4 lines, it is overlapped */
 		if(minLine >= 4) {
-			if(window.codeMirrorSelectionHint)
-				clearTimeout(window.codeMirrorSelectionHint);
+			if(window.legacy.codeMirrorSelectionHint)
+				clearTimeout(window.legacy.codeMirrorSelectionHint);
 
-			window.codeMirrorSelectionHint = setTimeout(function () {
+			window.legacy.codeMirrorSelectionHint = setTimeout(function () {
 				let $codeMirrorSelectedText = $('.CodeMirror-selected:first-child').first();
 				if($codeMirrorSelectedText.length === 0)
 					$codeMirrorSelectedText = $('.CodeMirror-selected').first();
@@ -86,7 +86,7 @@ window.showTooltipAboutCopyingFromCodemirror = function showTooltipAboutCopyingF
 	}
 }
 
-window.placeAddReviewPopup = function placeAddReviewPopup($addReviewPopup, internalCoords, $addReviewPopupInput) {
+function placeAddReviewPopup($addReviewPopup, internalCoords, $addReviewPopupInput) {
 	$addReviewPopup.show();
 	$addReviewPopup.offset({ top: internalCoords.top, left: internalCoords.left });
 
