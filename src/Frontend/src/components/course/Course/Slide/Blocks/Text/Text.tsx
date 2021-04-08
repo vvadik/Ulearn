@@ -1,4 +1,4 @@
-import React, { createRef, RefObject } from "react";
+import React, { createRef, RefObject, useEffect, useRef } from "react";
 
 import classNames from "classnames";
 import translateCode from "src/codeTranslator/translateCode";
@@ -7,21 +7,36 @@ import scrollToView from "src/utils/scrollToView";
 import styles from "./Text.less";
 
 interface Props {
-	className?: string,
-	content?: string,
+	className?: string;
+	content?: string;
+	disableAnchorsScrollHandlers?: boolean;
+	disableTranslatingTex?: boolean;
+	children?: React.ReactElement;
 }
 
-class Text extends React.Component<Props> {
-	private textContainer: RefObject<HTMLDivElement> = createRef();
+function Text(props: Props): React.ReactElement {
+	const textContainer: RefObject<HTMLDivElement> = createRef();
+	const prevProps = usePreviousProps(props);
 
-	componentDidMount(): void {
-		this.translateTex();
+	useEffect(() => {
+		const { disableTranslatingTex = true, disableAnchorsScrollHandlers = true, content, children, } = props;
+		if(!prevProps || prevProps.content !== content || prevProps.children?.key !== children?.key) {
+			if(disableTranslatingTex) {
+				translateTex();
+			}
 
-		if(!this.textContainer.current) {
+			if(disableAnchorsScrollHandlers) {
+				addScrollHandlersToAnchors();
+			}
+		}
+	});
+
+	function addScrollHandlersToAnchors(): void {
+		if(!textContainer.current) {
 			return;
 		}
 
-		const anchors = Array.from(this.textContainer.current.getElementsByTagName('a'));
+		const anchors = Array.from(textContainer.current.getElementsByTagName('a'));
 		//if href equal to origin + pathname + hash => <a href="#hash"> that means its navigation on slide via headers, we need to handle this via our modificated scrolling
 		const hashAnchorsLinks = anchors.filter(
 			a => window.location.origin + window.location.pathname + a.hash === a.href);
@@ -30,60 +45,67 @@ class Text extends React.Component<Props> {
 		if(hashInUrl) {
 			const hashToScroll = hashInUrl.replace('#', '');
 			if(anchors.some(a => a.name === hashToScroll)) {
-				this.scrollToHashAnchor(hashInUrl);
+				scrollToHashAnchor(hashInUrl);
 			}
 		}
 
 		for (const hashAnchor of hashAnchorsLinks) {
+			console.log(hashAnchor);
 			const { hash } = hashAnchor;
 			hashAnchor.addEventListener('click', (e) => {
 				e.stopPropagation();
 				e.preventDefault();
-				this.scrollToHashAnchor(hash);
+				scrollToHashAnchor(hash);
 			});
 		}
 	}
 
-	scrollToHashAnchor = (hash: string): void => {
+	function scrollToHashAnchor(hash: string): void {
 		window.history.pushState(null, '', hash);
 
 		const anchors = document.querySelectorAll(`a[name=${ hash.replace('#', '') }]`);
 		if(anchors.length > 0) {
-			scrollToView({ current: anchors[0] });
-		}
-	};
-
-	componentDidUpdate(prevProps: Props): void {
-		if(prevProps.content !== this.props.content) {
-			this.translateTex();
+			scrollToView({ current: anchors[0] }, {
+				animationDuration: 500,
+				allowScrollToTop: false,
+				behavior: 'smooth',
+				additionalTopOffset: 50,
+			});
 		}
 	}
 
-	translateTex = (): void => {
-		if(this.textContainer.current) {
-			translateCode(this.textContainer.current);
+	function translateTex(): void {
+		if(textContainer.current) {
+			translateCode(textContainer.current);
 		}
-	};
+	}
 
-	render(): React.ReactNode {
-		const { content, className, children, } = this.props;
-		if(content) {
-			return (
-				<div
-					ref={ this.textContainer }
-					className={ classNames(styles.text, className) }
-					dangerouslySetInnerHTML={ { __html: content } }
-				/>
-			);
-		}
+	function usePreviousProps(props: Props) {
+		const ref = useRef<Props>();
+		useEffect(() => {
+			ref.current = props;
+		});
+
+		return ref.current;
+	}
+
+	const { content, className, children, } = props;
+	if(content) {
 		return (
 			<div
-				ref={ this.textContainer }
-				className={ classNames(styles.text, className) }>
-				{ children }
-			</div>
+				ref={ textContainer }
+				className={ classNames(styles.text, className) }
+				dangerouslySetInnerHTML={ { __html: content } }
+			/>
 		);
 	}
+	return (
+		<div
+			ref={ textContainer }
+			className={ classNames(styles.text, className) }>
+			{ children }
+		</div>
+	);
 }
 
 

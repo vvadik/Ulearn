@@ -75,7 +75,7 @@ class Spoiler extends React.Component<Props, State> {
 					hide={ hide }
 					className={ titleClassName }
 				>
-					<Text>
+					<Text disableAnchorsScrollHandlers disableTranslatingTex>
 						<span onClick={ this.toggleContent } className={ styles.title }>
 							{ text }
 							<span className={ styles.arrow }>
