@@ -12,7 +12,6 @@ using Database.Models;
 using Database.Repos;
 using ManualUtils.AntiPlagiarism;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Newtonsoft.Json;
 using Ulearn.Core;
 using Ulearn.Core.Configuration;
@@ -37,7 +36,7 @@ namespace ManualUtils
 				.UseNpgsql(configuration.Database, o => o.SetPostgresVersion(13, 2));
 			var adb = new AntiPlagiarismDb(aOptionsBuilder.Options);
 
-			FillLanguageToAntiplagiarism.FillLanguage(adb);
+			//FillLanguageToAntiplagiarism.FillLanguage(adb);
 
 			//GenerateUpdateSequences();
 			//CompareColumns();

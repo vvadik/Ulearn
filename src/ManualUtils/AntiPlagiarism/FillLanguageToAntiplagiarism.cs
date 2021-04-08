@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using AntiPlagiarism.Web.Database;
 using Microsoft.EntityFrameworkCore;
 using Ulearn.Common;
+using Z.EntityFramework.Plus;
 
 namespace ManualUtils.AntiPlagiarism
 {
@@ -35,38 +37,22 @@ namespace ManualUtils.AntiPlagiarism
 
 			var count = parameterses.Count;
 
-			Console.WriteLine($"Count {parameterses.Count}");
+			Console.WriteLine($"Count {count}");
 
-			adb.DisableAutoDetectChanges();
-			var completed = 0;
 			foreach (var parameters in parameterses)
 			{
-				completed++;
-				try
-				{
-					var newLanguage = GetLanguageByTaskId(parameters.TaskId, adb);
-					if (newLanguage == null)
-						continue;
-					parameters.Language = newLanguage.Value;
-					adb.TasksStatisticsParameters.Update(parameters);
-				}
-				catch (Exception ex)
-				{
-					Console.WriteLine($"Error on id {parameters.TaskId}: {ex}");
-				}
-
-				if (count % 1000 == 0)
-				{
-					Console.WriteLine($"FillLanguageTasksStatisticsParameters - Completed {completed} / {count}");
-					adb.SaveChanges();
-				}
+				var newLanguage = GetLanguageByTaskId(parameters.TaskId, adb);
+				if (newLanguage == null)
+					continue;
+				adb.TasksStatisticsParameters.Remove(parameters);
+				adb.SaveChanges();
+				parameters.Language = newLanguage.Value;
+				adb.TasksStatisticsParameters.Add(parameters);
+				adb.SaveChanges();
 			}
-
-			adb.SaveChanges();
-			adb.EnableAutoDetectChanges();
 		}
 
-		private static void FillLanguageSnippetsStatistics(AntiPlagiarismDb adb)
+		private static void FillLanguageSnippetsStatistics(AntiPlagiarismDb adb, bool @do)
 		{
 			Console.WriteLine("FillLanguageSnippetsStatistics");
 
@@ -87,54 +73,68 @@ namespace ManualUtils.AntiPlagiarism
 
 			var snippets = adb
 				.SnippetsStatistics
+				.Select(c => new {c.Id, c.TaskId, c.Language})
 				.AsNoTracking();
 
 			var count = snippets.Count();
 
 			Console.WriteLine($"Count snippets {count}");
 
+			var changesCount = 0;
 			var changes = new List<(int Id, Language Language)>();
-			var getChangesCompleted = 0;
-			foreach (var snippet in snippets)
+			using (var changesFile = new StreamWriter("changes.txt"))
 			{
-				getChangesCompleted++;
-				if (getChangesCompleted % 10000 == 0)
-					Console.WriteLine($"getChangesCompleted {getChangesCompleted} / {count}");
-				var newLanguage = taskIdToLanguage[snippet.TaskId];
-				if (newLanguage == null)
-					newLanguage = 0;
-				if (newLanguage == snippet.Language)
-					continue;
-				changes.Add((snippet.Id, newLanguage.Value));
+				var getChangesCompleted = 0;
+				foreach (var snippet in snippets)
+				{
+					getChangesCompleted++;
+					if (getChangesCompleted % 10000 == 0)
+						Console.WriteLine($"getChangesCompleted {getChangesCompleted} / {count}");
+					var newLanguage = taskIdToLanguage[snippet.TaskId];
+					if (newLanguage == null)
+						newLanguage = 0;
+					if (newLanguage == snippet.Language)
+						continue;
+					changesFile.WriteLine($"{snippet.Id} {newLanguage.Value}");
+					changes.Add((snippet.Id, newLanguage.Value));
+					changesCount++;
+				}
 			}
 
-			Console.WriteLine($"Found changes {changes.Count}");
+			Console.WriteLine($"Found changes {changesCount}");
 
-			adb.DisableAutoDetectChanges();
-			var completed = 0;
-			foreach (var change in changes)
+			var batchSize = 300;
+			var currentBatch = 0;
+
+			var batches = new List<List<(int Id, Language Language)>>();
+			while (currentBatch * batchSize < changes.Count)
 			{
-				completed++;
-				try
-				{
-					var snippetsStatistics = adb.SnippetsStatistics.Find(change.Id);
-					snippetsStatistics.Language = change.Language;
-					adb.SnippetsStatistics.Update(snippetsStatistics);
-				}
-				catch (Exception ex)
-				{
-					Console.WriteLine($"Error on id {change.Id}: {ex}");
-				}
+				var nextBatch = changes.Skip(currentBatch * batchSize)
+					.Take(batchSize).ToList();
+				batches.Add(nextBatch);
+				currentBatch++;
+			}
 
-				if (count % 1000 == 0)
+			if (@do)
+			{
+				adb.DisableAutoDetectChanges();
+				var completed = 0;
+				foreach (var batch in batches)
 				{
-					Console.WriteLine($"FillLanguageSnippetsStatistics - Completed {completed} / {count}");
+					var batchIds = batch.Select(s => s.Id).ToList();
+					var batchDict = batch.ToDictionary(s => s.Id, s => s.Language);
+					var batchData = adb.SnippetsStatistics.Where(s => batchIds.Contains(s.Id)).ToList();
+					foreach (var data in batchData)
+					{
+						data.Language = batchDict[data.Id];
+						adb.SnippetsStatistics.Update(data);
+					}
+					completed += batch.Count;
+					Console.WriteLine($"FillLanguageSnippetsStatistics - Completed {completed} / {changesCount}");
 					adb.SaveChanges();
 				}
+				adb.EnableAutoDetectChanges();
 			}
-
-			adb.SaveChanges();
-			adb.EnableAutoDetectChanges();
 		}
 
 		private static void FillLanguageManualSuspicionLevels(AntiPlagiarismDb adb)
@@ -150,40 +150,24 @@ namespace ManualUtils.AntiPlagiarism
 
 			Console.WriteLine($"Count {count}");
 
-			adb.DisableAutoDetectChanges();
-			var completed = 0;
 			foreach (var level in suspicionLevels)
 			{
-				completed++;
-				try
-				{
-					var newLanguage = GetLanguageByTaskId(level.TaskId, adb);
-					if (newLanguage == null)
-						continue;
-					level.Language = newLanguage.Value;
-					adb.ManualSuspicionLevels.Update(level);
-				}
-				catch (Exception ex)
-				{
-					Console.WriteLine($"Error on id {level.TaskId}: {ex}");
-				}
-
-				if (count % 1000 == 0)
-				{
-					Console.WriteLine($"FillLanguageManualSuspicionLevels - Completed {completed} / {count}");
-					adb.SaveChanges();
-				}
+				var newLanguage = GetLanguageByTaskId(level.TaskId, adb);
+				if (newLanguage == null)
+					continue;
+				adb.ManualSuspicionLevels.Remove(level);
+				adb.SaveChanges();
+				level.Language = newLanguage.Value;
+				adb.ManualSuspicionLevels.Add(level);
+				adb.SaveChanges();
 			}
-
-			adb.SaveChanges();
-			adb.EnableAutoDetectChanges();
 		}
 
 		public static void FillLanguage(AntiPlagiarismDb adb)
 		{
 			FillLanguageManualSuspicionLevels(adb);
 			FillLanguageTasksStatisticsParameters(adb);
-			FillLanguageSnippetsStatistics(adb);
+			FillLanguageSnippetsStatistics(adb, true);
 		}
 	}
 }
