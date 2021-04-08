@@ -15,8 +15,9 @@
 		</div>
 		<div class="form-group">
 			<div class="checkbox checkbox-default">
-				@Html.CheckBoxFor(m => m.RememberMe)
-				@Html.LabelFor(m => m.RememberMe)
+				<input @((Model?.RememberMe ?? false) ? "checked=\"checked\"" : "") id="MainRememberMe" name="@nameof(Model.RememberMe)" type="checkbox" value="true"
+																					onchange="if(document.getElementById('ExternalLoginRememberMeCheckbox')) document.getElementById('ExternalLoginRememberMeCheckbox').checked = document.getElementById('MainRememberMe').checked;"/>
+				<label for="MainRememberMe">Запомнить меня</label>
 			</div>
 		</div>
 		<div class="form-group">

@@ -5,6 +5,9 @@ using System.Transactions;
 using AntiPlagiarism.Web.Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
+using Ulearn.Common;
+using Vostok.Logging.Abstractions;
 using static AntiPlagiarism.Web.Database.Models.WorkQueueItem;
 using IsolationLevel = System.Transactions.IsolationLevel;
 
@@ -20,6 +23,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 	public class WorkQueueRepo : IWorkQueueRepo
 	{
 		private readonly AntiPlagiarismDb db;
+		private static ILog log => LogProvider.Get().ForContext(typeof(WorkQueueRepo));
 
 		public WorkQueueRepo(AntiPlagiarismDb db)
 		{
@@ -61,16 +65,27 @@ set ""{TakeAfterTimeColumnName}"" = @timeLimit
 from next_task
 where {AntiPlagiarismDb.DefaultSchema}.""{nameof(db.WorkQueueItems)}"".""{IdColumnName}"" = next_task.""{IdColumnName}""
 returning next_task.""{IdColumnName}"", ""{QueueIdColumnName}"", ""{ItemIdColumnName}"", ""{TakeAfterTimeColumnName}"";"; // Если написать *, Id возвращается дважды
-			using (var scope = new TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions { IsolationLevel = IsolationLevel.Serializable }, TransactionScopeAsyncFlowOption.Enabled))
+			try
 			{
-				var taken = (await db.WorkQueueItems.FromSqlRaw(
-					sql,
-					new NpgsqlParameter<int>("@queueId", (int)queueId),
-					new NpgsqlParameter<DateTime>("@now", DateTime.UtcNow),
-					new NpgsqlParameter<DateTime>("@timeLimit", (DateTime.UtcNow + timeLimit).Value)
-				).AsNoTracking().ToListAsync()).FirstOrDefault();
-				scope.Complete();
-				return taken;
+				var executionStrategy = new NpgsqlRetryingExecutionStrategy(db, 3);
+				return await executionStrategy.ExecuteAsync(async () =>
+				{
+					using (var scope = new TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions { IsolationLevel = IsolationLevel.RepeatableRead }, TransactionScopeAsyncFlowOption.Enabled))
+					{
+						var taken = (await db.WorkQueueItems.FromSqlRaw(
+							sql,
+							new NpgsqlParameter<int>("@queueId", (int)queueId),
+							new NpgsqlParameter<DateTime>("@now", DateTime.UtcNow),
+							new NpgsqlParameter<DateTime>("@timeLimit", (DateTime.UtcNow + timeLimit).Value)
+						).AsNoTracking().ToListAsync()).FirstOrDefault();
+						scope.Complete();
+						return taken;
+					}
+				});
+			} catch (InvalidOperationException ex)
+			{
+				log.Warn(ex);
+				return null;
 			}
 		}
 	}

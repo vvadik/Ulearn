@@ -1,9 +1,9 @@
 ﻿public class Code
 {
-    //region Main
+    //region main
     public static void Main(int argc, string[] argv)
     {
         System.out.println(argc);
     }
-    //endregion Main
+    //endregion main
 }

@@ -10,11 +10,23 @@ using Database.Models.Quizzes;
 using Database.Models.Comments;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Npgsql.Logging;
+using Ulearn.Core.Configuration;
 
 namespace Database
 {
 	public class UlearnDb : IdentityDbContext<ApplicationUser>
 	{
+		static UlearnDb()
+		{
+			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
+			if (configuration.HostLog != null)
+			{
+				NpgsqlLogManager.Provider = new UlearnDbLoggingProvider();
+				NpgsqlLogManager.IsParameterLoggingEnabled = true;
+			}
+		}
+
 		public UlearnDb(DbContextOptions<UlearnDb> options)
 			: base(options)
 		{
@@ -43,7 +55,7 @@ namespace Database
 				.UseCollation("default");
 			modelBuilder.Entity<ApplicationUser>()
 				.Property(u => u.Names)
-				.HasComputedColumnSql(@"immutable_concat_ws(' ', nullif(""UserName"", ''), nullif(""FirstName"",''), nullif(""LastName"",''), nullif(""FirstName"",''))", stored: true);
+				.HasComputedColumnSql(@"lower(immutable_concat_ws(' ', nullif(""UserName"", ''), nullif(""FirstName"",''), nullif(""LastName"",''), nullif(""FirstName"",'')))", stored: true);
 			// Индекс с триграммами. Ускоряет поиск в том числе по регулярному выражению, если в нем есть кусочки простого текста хотя бы на 3 символа.
 			modelBuilder.Entity<ApplicationUser>()
 				.HasIndex(p => p.Names)
@@ -173,7 +185,7 @@ namespace Database
 			SetDeleteBehavior<CreatedGroupNotification, Group>(modelBuilder, c => c.Group, c => c.GroupId);
 			SetDeleteBehavior<PassedManualExerciseCheckingNotification, ManualExerciseChecking>(modelBuilder, c => c.Checking, c => c.CheckingId);
 			SetDeleteBehavior<PassedManualQuizCheckingNotification, ManualQuizChecking>(modelBuilder, c => c.Checking, c => c.CheckingId);
-			SetDeleteBehavior<ReceivedAdditionalScoreNotification, AdditionalScore>(modelBuilder, c => c.Score, c => c.ScoreId);
+			SetDeleteBehavior<ReceivedAdditionalScoreNotification, AdditionalScore>(modelBuilder, c => c.Score, c => c.ScoreId, DeleteBehavior.Cascade);
 
 			SetDeleteBehavior<NewCommentNotification, Comment>(modelBuilder, c => c.Comment, c => c.CommentId);
 			SetDeleteBehavior<NewCommentFromYourGroupStudentNotification, Comment>(modelBuilder, c => c.Comment, c => c.CommentId);
@@ -302,6 +314,8 @@ namespace Database
 			AddIndex<AutomaticExerciseChecking>(modelBuilder, c => new { c.CourseId, c.SlideId, c.UserId });
 			AddIndex<AutomaticExerciseChecking>(modelBuilder, c => new { c.CourseId, c.SlideId, c.Timestamp });
 			AddIndex<AutomaticExerciseChecking>(modelBuilder, c => new { c.CourseId, c.UserId });
+			AddIndex<AutomaticExerciseChecking>(modelBuilder, c => c.IsRightAnswer);
+			AddIndex<AutomaticExerciseChecking>(modelBuilder, c => new { c.CourseId, c.SlideId, c.IsRightAnswer });
 			AddIndex<ManualQuizChecking>(modelBuilder, c => new { c.CourseId, c.SlideId });
 			AddIndex<ManualQuizChecking>(modelBuilder, c => new { c.CourseId, c.SlideId, c.UserId });
 			AddIndex<ManualQuizChecking>(modelBuilder, c => new { c.CourseId, c.SlideId, c.Timestamp });
@@ -310,8 +324,6 @@ namespace Database
 			AddIndex<AutomaticQuizChecking>(modelBuilder, c => new { c.CourseId, c.SlideId, c.UserId });
 			AddIndex<AutomaticQuizChecking>(modelBuilder, c => new { c.CourseId, c.SlideId, c.Timestamp });
 			AddIndex<AutomaticQuizChecking>(modelBuilder, c => new { c.CourseId, c.UserId });
-
-			AddIndex<AutomaticExerciseChecking>(modelBuilder, c => c.IsRightAnswer);
 
 			AddIndex<ExerciseCodeReviewComment>(modelBuilder, c => new { c.ReviewId, c.IsDeleted });
 			AddIndex<ExerciseCodeReviewComment>(modelBuilder, c => c.AddingTime);

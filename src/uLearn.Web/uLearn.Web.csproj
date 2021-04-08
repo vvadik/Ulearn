@@ -666,8 +666,8 @@
       <HintPath>..\packages\Vostok.ClusterClient.Context.0.1.4\lib\netstandard2.0\Vostok.ClusterClient.Context.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vostok.ClusterClient.Core, Version=0.1.24.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Vostok.ClusterClient.Core.0.1.24\lib\netstandard2.0\Vostok.ClusterClient.Core.dll</HintPath>
+    <Reference Include="Vostok.ClusterClient.Core, Version=0.1.26.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.ClusterClient.Core.0.1.26\lib\netstandard2.0\Vostok.ClusterClient.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Vostok.ClusterClient.Datacenters, Version=0.1.2.0, Culture=neutral, PublicKeyToken=null">
@@ -686,8 +686,8 @@
       <HintPath>..\packages\Vostok.ClusterClient.Transport.0.1.17\lib\netstandard2.0\Vostok.ClusterClient.Transport.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vostok.ClusterConfig.Client, Version=0.1.9.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Vostok.ClusterConfig.Client.0.1.9\lib\netstandard2.0\Vostok.ClusterConfig.Client.dll</HintPath>
+    <Reference Include="Vostok.ClusterConfig.Client, Version=0.1.10.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.ClusterConfig.Client.0.1.10\lib\netstandard2.0\Vostok.ClusterConfig.Client.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Vostok.ClusterConfig.Client.Abstractions, Version=0.1.0.0, Culture=neutral, PublicKeyToken=null">
@@ -726,24 +726,24 @@
       <HintPath>..\packages\Vostok.Datacenters.Kontur.1.0.36\lib\netstandard2.0\Vostok.Datacenters.Kontur.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vostok.Hercules.Client, Version=0.1.12.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Vostok.Hercules.Client.0.1.12\lib\netstandard2.0\Vostok.Hercules.Client.dll</HintPath>
+    <Reference Include="Vostok.Hercules.Client, Version=0.1.13.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Hercules.Client.0.1.13\lib\netstandard2.0\Vostok.Hercules.Client.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Vostok.Hercules.Client.Abstractions, Version=0.1.7.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\packages\Vostok.Hercules.Client.Abstractions.0.1.7\lib\netstandard2.0\Vostok.Hercules.Client.Abstractions.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vostok.Logging.Abstractions, Version=1.0.19.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Vostok.Logging.Abstractions.1.0.19\lib\netstandard2.0\Vostok.Logging.Abstractions.dll</HintPath>
+    <Reference Include="Vostok.Logging.Abstractions, Version=1.0.20.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Logging.Abstractions.1.0.20\lib\netstandard2.0\Vostok.Logging.Abstractions.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Vostok.Logging.Formatting, Version=1.0.5.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\packages\Vostok.Logging.Formatting.1.0.5\lib\netstandard2.0\Vostok.Logging.Formatting.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vostok.Logging.Hercules, Version=0.1.6.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Vostok.Logging.Hercules.0.1.6\lib\netstandard2.0\Vostok.Logging.Hercules.dll</HintPath>
+    <Reference Include="Vostok.Logging.Hercules, Version=0.1.7.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Logging.Hercules.0.1.7\lib\netstandard2.0\Vostok.Logging.Hercules.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Vostok.Logging.Serilog, Version=1.0.2.0, Culture=neutral, PublicKeyToken=null">
@@ -754,8 +754,8 @@
       <HintPath>..\packages\Vostok.Logging.Tracing.0.1.5\lib\netstandard2.0\Vostok.Logging.Tracing.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Vostok.Metrics, Version=0.2.16.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Vostok.Metrics.0.2.16\lib\netstandard2.0\Vostok.Metrics.dll</HintPath>
+    <Reference Include="Vostok.Metrics, Version=0.2.19.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Metrics.0.2.19\lib\netstandard2.0\Vostok.Metrics.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Vostok.Metrics.Hercules, Version=0.1.2.0, Culture=neutral, PublicKeyToken=null">
@@ -988,6 +988,7 @@
     <Content Include="Views\Account\ToggleRolesHistory.cshtml" />
     <Content Include="Views\Admin\StyleValidations.cshtml" />
     <Content Include="Views\Analytics\RatingByPoints.cshtml" />
+    <Content Include="Views\Analytics\UnitStatistics.cshtml" />
     <Content Include="Views\AntiPlagiarism\Details.cshtml" />
     <Content Include="Views\Certificates\ListPartial.cshtml" />
     <Content Include="Views\Course\Courses.cshtml" />
@@ -1029,7 +1030,7 @@
     <Content Include="Views\Hint\UseHint.cshtml" />
     <Content Include="Views\Account\List.cshtml" />
     <Content Include="Views\Admin\Units.cshtml" />
-    <Content Include="Views\Analytics\UnitStatistics.cshtml" />
+    <Content Include="Views\Analytics\UnitSheet.cshtml" />
     <Content Include="Views\Course\InstructorNote.cshtml" />
     <Content Include="Views\Questions\Items.cshtml" />
     <Content Include="Views\Analytics\DailyStatistics.cshtml" />
@@ -1086,7 +1087,7 @@
     <Content Include="Views\Exercise\Submission.cshtml" />
     <Content Include="Views\Exercise\_ExerciseScoreForm.cshtml" />
     <Content Include="Views\Analytics\UserUnitStatistics.cshtml" />
-    <Content Include="Views\Analytics\UnitStatisticsList.cshtml" />
+    <Content Include="Views\Analytics\UnitSheetList.cshtml" />
     <Content Include="Views\Home\Terms.cshtml" />
     <Content Include="Web.Kontur.config">
       <DependentUpon>Web.config</DependentUpon>

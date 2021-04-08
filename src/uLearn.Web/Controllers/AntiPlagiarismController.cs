@@ -113,9 +113,9 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 
 			var antiPlagiarismsResult = await GetAuthorPlagiarismsAsync(submission);
-			var mostSimilarSubmissionsHistogramData = await GetMostSimilarSubmissionsHistogramData(submission.SlideId, 100);
+			var mostSimilarSubmissionsHistogramData = await GetMostSimilarSubmissionsHistogramData(submission.SlideId, submission.Language, 100);
 			//var mostSimilarSubmissionsHistogramData = GetMostSimilarSubmissionsHistogramDataMock(100);
-			var suspicionLevelsResponse = await antiPlagiarismClient.GetSuspicionLevelsAsync(new GetSuspicionLevelsParameters { TaskId = submission.SlideId });
+			var suspicionLevelsResponse = await antiPlagiarismClient.GetSuspicionLevelsAsync(new GetSuspicionLevelsParameters { TaskId = submission.SlideId, Language = submission.Language });
 
 			var antiPlagiarismSubmissionInfos = antiPlagiarismsResult.ResearchedSubmissions.Select(s => s.SubmissionInfo);
 			var plagiarismsSubmissionInfos = antiPlagiarismsResult.ResearchedSubmissions
@@ -144,6 +144,7 @@ namespace uLearn.Web.Controllers
 				Course = course,
 				Slide = slide,
 				SubmissionId = submissionId,
+				Language = submission.Language,
 				Submissions = submissions,
 				UsersGroups = usersGroups,
 				UsersArchivedGroups = usersArchivedGroups,
@@ -207,17 +208,19 @@ namespace uLearn.Web.Controllers
 			var value = await antiPlagiarismClient.GetAuthorPlagiarismsAsync(new GetAuthorPlagiarismsParameters
 			{
 				AuthorId = userId,
-				TaskId = taskId
+				TaskId = taskId,
+				Language = submission.Language
 			}).ConfigureAwait(false);
 			plagiarismsCache.AddOrUpdate(cacheKey, key => Tuple.Create(DateTime.Now, value), (key, old) => Tuple.Create(DateTime.Now, value));
 			return value;
 		}
 
-		private static async Task<MostSimilarSubmissionsHistogramData> GetMostSimilarSubmissionsHistogramData(Guid taskId, int binsCount)
+		private static async Task<MostSimilarSubmissionsHistogramData> GetMostSimilarSubmissionsHistogramData(Guid taskId, Language language, int binsCount)
 		{
 			var mostSimilarSubmissions = await antiPlagiarismClient.GetMostSimilarSubmissionsAsync(new GetMostSimilarSubmissionsParameters
 			{
-				TaskId = taskId
+				TaskId = taskId,
+				Language = language
 			});
 			var bins = new List<MostSimilarSubmissionsBin>();
 			var step = 1.0 / binsCount;
@@ -304,6 +307,8 @@ namespace uLearn.Web.Controllers
 	public class AntiPlagiarismDetailsModel
 	{
 		public int SubmissionId { get; set; }
+
+		public Language Language { get; set; }
 
 		public Course Course { get; set; }
 

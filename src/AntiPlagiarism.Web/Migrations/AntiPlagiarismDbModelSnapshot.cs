@@ -68,6 +68,9 @@ namespace AntiPlagiarism.Web.Migrations
                     b.Property<Guid>("TaskId")
                         .HasColumnType("uuid");
 
+                    b.Property<short>("Language")
+                        .HasColumnType("smallint");
+
                     b.Property<double?>("FaintSuspicion")
                         .HasColumnType("double precision");
 
@@ -77,7 +80,7 @@ namespace AntiPlagiarism.Web.Migrations
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("timestamp without time zone");
 
-                    b.HasKey("TaskId");
+                    b.HasKey("TaskId", "Language");
 
                     b.ToTable("ManualSuspicionLevels");
                 });
@@ -184,6 +187,9 @@ namespace AntiPlagiarism.Web.Migrations
                     b.Property<int>("ClientId")
                         .HasColumnType("integer");
 
+                    b.Property<short>("Language")
+                        .HasColumnType("smallint");
+
                     b.Property<int>("SnippetId")
                         .HasColumnType("integer");
 
@@ -194,7 +200,7 @@ namespace AntiPlagiarism.Web.Migrations
 
                     b.HasIndex("ClientId");
 
-                    b.HasIndex("SnippetId", "TaskId", "ClientId")
+                    b.HasIndex("SnippetId", "TaskId", "Language", "ClientId")
                         .IsUnique();
 
                     b.ToTable("SnippetsStatistics");
@@ -244,11 +250,7 @@ namespace AntiPlagiarism.Web.Migrations
 
                     b.HasIndex("ClientId", "ClientSubmissionId");
 
-                    b.HasIndex("ClientId", "TaskId");
-
-                    b.HasIndex("ClientId", "TaskId", "AuthorId");
-
-                    b.HasIndex("ClientId", "TaskId", "AddingTime", "AuthorId");
+                    b.HasIndex("ClientId", "TaskId", "Language");
 
                     b.HasIndex("ClientId", "TaskId", "Language", "AuthorId");
 
@@ -260,8 +262,10 @@ namespace AntiPlagiarism.Web.Migrations
             modelBuilder.Entity("AntiPlagiarism.Web.Database.Models.TaskStatisticsParameters", b =>
                 {
                     b.Property<Guid>("TaskId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<short>("Language")
+                        .HasColumnType("smallint");
 
                     b.Property<double>("Deviation")
                         .HasColumnType("double precision");
@@ -275,7 +279,7 @@ namespace AntiPlagiarism.Web.Migrations
                     b.Property<DateTime?>("Timestamp")
                         .HasColumnType("timestamp without time zone");
 
-                    b.HasKey("TaskId");
+                    b.HasKey("TaskId", "Language");
 
                     b.ToTable("TasksStatisticsParameters");
                 });

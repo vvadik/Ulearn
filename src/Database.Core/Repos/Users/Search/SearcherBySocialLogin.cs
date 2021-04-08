@@ -7,13 +7,11 @@ namespace Database.Repos.Users.Search
 	public class SearcherBySocialLogin : ISearcher
 	{
 		private readonly IUsersRepo usersRepo;
-		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IAccessRestrictor accessRestrictor;
 
-		public SearcherBySocialLogin(IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, IAccessRestrictor accessRestrictor)
+		public SearcherBySocialLogin(IUsersRepo usersRepo, IAccessRestrictor accessRestrictor)
 		{
 			this.usersRepo = usersRepo;
-			this.courseRolesRepo = courseRolesRepo;
 			this.accessRestrictor = accessRestrictor;
 		}
 

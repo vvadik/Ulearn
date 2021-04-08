@@ -123,15 +123,16 @@ namespace Database.DataContexts
 			return db.SaveChangesAsync();
 		}
 
-		private static Regex nonWordChars = new Regex(@"[^\w\s\-]*", RegexOptions.Compiled);
+		private static Regex nonWordChars = new Regex(@"[^\w\s\-\.@_]*", RegexOptions.Compiled);
 		private List<string> GetUsersByNamePrefix(string name, int limit = 100)
 		{
-			var escapedName = nonWordChars.Replace(name, "").Trim();
+			name = name.ToLower();
+			var escapedName = nonWordChars.Replace(name, "").Replace(".", "\\.").Trim();
 			var sql = 
 $@"SELECT ""Id""
 FROM ""AspNetUsers""
-WHERE ""IsDeleted"" = False and ""Names"" ~* @query
-LIMIT {limit};"; // ~* - регвыр ignoreCase
+WHERE ""IsDeleted"" = False and ""Names"" ~ @query
+LIMIT {limit};"; // ~ - регвыр c учетом размера букв. Есть ~* без учета. Но мы все равно поле ловеркейзим, чтобы по нему можно было искать в том числе like. 
 			var userIds = db.Database.SqlQuery<string>(
 				sql,
 				new NpgsqlParameter<string>("@query", $@"(^|\s){escapedName}")

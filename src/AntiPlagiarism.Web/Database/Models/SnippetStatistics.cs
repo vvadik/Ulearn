@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Ulearn.Common;
 
 namespace AntiPlagiarism.Web.Database.Models
 {
@@ -14,6 +15,8 @@ namespace AntiPlagiarism.Web.Database.Models
 		public virtual Snippet Snippet { get; set; }
 
 		public Guid TaskId { get; set; }
+		
+		public Language Language { get; set; }
 
 		public int ClientId { get; set; }
 		public virtual Client Client { get; set; }

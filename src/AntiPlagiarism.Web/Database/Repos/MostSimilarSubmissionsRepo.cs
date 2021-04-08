@@ -7,41 +7,56 @@ using AntiPlagiarism.Api.Models.Results;
 using AntiPlagiarism.Web.Database.Extensions;
 using AntiPlagiarism.Web.Database.Models;
 using Microsoft.EntityFrameworkCore;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
+using Ulearn.Common;
 using Ulearn.Core.Extensions;
+using Vostok.Logging.Abstractions;
 
 namespace AntiPlagiarism.Web.Database.Repos
 {
 	public interface IMostSimilarSubmissionsRepo
 	{
-		Task SaveMostSimilarSubmissionAsync(MostSimilarSubmission mostSimilarSubmission);
-		Task<List<MostSimilarSubmissions>> GetMostSimilarSubmissionsByTaskAsync(int clientId, Guid taskId);
+		Task TrySaveMostSimilarSubmissionAsync(MostSimilarSubmission mostSimilarSubmission);
+		Task<List<MostSimilarSubmissions>> GetMostSimilarSubmissionsByTaskAsync(int clientId, Guid taskId, Language language);
 	}
 
 	public class MostSimilarSubmissionsRepo : IMostSimilarSubmissionsRepo
 	{
 		private readonly AntiPlagiarismDb db;
+		private static ILog log => LogProvider.Get().ForContext(typeof(MostSimilarSubmissionsRepo));
 
 		public MostSimilarSubmissionsRepo(AntiPlagiarismDb db)
 		{
 			this.db = db;
 		}
 		
-		public async Task SaveMostSimilarSubmissionAsync(MostSimilarSubmission mostSimilarSubmission)
+		public async Task TrySaveMostSimilarSubmissionAsync(MostSimilarSubmission mostSimilarSubmission)
 		{
-			using (var ts = new TransactionScope(TransactionScopeOption.Required, TimeSpan.FromSeconds(30), TransactionScopeAsyncFlowOption.Enabled))
+			try
 			{
-				db.AddOrUpdate(mostSimilarSubmission, p => p.SubmissionId == mostSimilarSubmission.SubmissionId);
-				await db.SaveChangesAsync().ConfigureAwait(false);
-				ts.Complete();
+				var executionStrategy = new NpgsqlRetryingExecutionStrategy(db, 3);
+				await executionStrategy.ExecuteAsync(async () =>
+				{
+					using (var ts = new TransactionScope(TransactionScopeOption.Required, TimeSpan.FromSeconds(30), TransactionScopeAsyncFlowOption.Enabled))
+					{
+						db.AddOrUpdate(mostSimilarSubmission, p => p.SubmissionId == mostSimilarSubmission.SubmissionId);
+						await db.SaveChangesAsync().ConfigureAwait(false);
+						ts.Complete();
+						return 0;
+					}
+				});
+			} catch (InvalidOperationException ex)
+			{
+				log.Warn(ex);
 			}
 		}
 
-		public async Task<List<MostSimilarSubmissions>> GetMostSimilarSubmissionsByTaskAsync(int clientId, Guid taskId)
+		public async Task<List<MostSimilarSubmissions>> GetMostSimilarSubmissionsByTaskAsync(int clientId, Guid taskId, Language language)
 		{
 			using (var scope = new TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions { IsolationLevel = IsolationLevel.ReadUncommitted }, TransactionScopeAsyncFlowOption.Enabled))
 			{
 				var resultsWithRepeatingAuthors = await db.MostSimilarSubmissions
-					.Where(s => s.Submission.ClientId == clientId && s.Submission.TaskId == taskId)
+					.Where(s => s.Submission.ClientId == clientId && s.Submission.TaskId == taskId && s.Submission.Language == language)
 					.Select(s => new
 					{
 						SubmissionId = s.Submission.ClientSubmissionId,

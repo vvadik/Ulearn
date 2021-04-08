@@ -162,7 +162,7 @@ namespace Database
 				{
 					TryReloadCourse(courseId);
 					var tempCoursesRepo = new TempCoursesRepo();
-					tempCoursesRepo.UpdateTempCourseLastUpdateTimeAsync(courseId).Wait();
+					tempCoursesRepo.UpdateTempCourseLastUpdateTime(courseId);
 					courseVersionFetchTime[courseId] = DateTime.Now;
 				} else if (tempCourse.LastUpdateTime > tempCourse.LoadingTime)
 					courseVersionFetchTime[courseId] = DateTime.Now;
@@ -200,7 +200,7 @@ namespace Database
 					{
 						TryReloadCourse(courseId);
 						var tempCoursesRepo = new TempCoursesRepo();
-						tempCoursesRepo.UpdateTempCourseLastUpdateTimeAsync(courseId).Wait();
+						tempCoursesRepo.UpdateTempCourseLastUpdateTime(courseId);
 						courseVersionFetchTime[courseId] = DateTime.Now;
 					} else if (tempCourse.LastUpdateTime > tempCourse.LoadingTime)
 						courseVersionFetchTime[courseId] = DateTime.Now;

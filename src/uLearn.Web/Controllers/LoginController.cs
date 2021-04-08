@@ -81,13 +81,13 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		[HandleHttpAntiForgeryException]
-		public ActionResult ExternalLogin(string provider, string returnUrl)
+		public ActionResult ExternalLogin(string provider, string returnUrl, bool? rememberMe)
 		{
 			// Request a redirect to the external login provider
-			return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", new { ReturnUrl = returnUrl }));
+			return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", new { ReturnUrl = returnUrl, RememberMe = rememberMe }));
 		}
 
-		public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
+		public async Task<ActionResult> ExternalLoginCallback(string returnUrl, bool? rememberMe)
 		{
 			var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync(HttpContext);
 			if (loginInfo == null)
@@ -101,7 +101,7 @@ namespace uLearn.Web.Controllers
 			{
 				await UpdateUserFieldsFromExternalLoginInfo(user.Id, loginInfo);
 
-				await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: false);
+				await AuthenticationManager.LoginAsync(HttpContext, user, isPersistent: rememberMe ?? false);
 				await SendConfirmationEmailAfterLogin(user);
 				return Redirect(this.FixRedirectUrl(returnUrl));
 			}

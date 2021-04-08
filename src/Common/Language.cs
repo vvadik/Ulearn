@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 using Newtonsoft.Json;
@@ -21,22 +22,27 @@ namespace Ulearn.Common
 	{
 		[XmlEnum("csharp")]
 		[Lexer("csharp")]
+		[CommentSymbols("//")]
 		CSharp = 1,
 
 		[XmlEnum("python2")]
 		[Lexer("py2")]
+		[CommentSymbols("#")]
 		Python2 = 2,
 
 		[XmlEnum("python3")]
 		[Lexer("py3")]
+		[CommentSymbols("#")]
 		Python3 = 3,
 
 		[XmlEnum("java")]
 		[Lexer("java")]
+		[CommentSymbols("//")]
 		Java = 4,
 
 		[XmlEnum("javascript")]
 		[Lexer("js")]
+		[CommentSymbols("//")]
 		JavaScript = 5,
 
 		[XmlEnum("html")]
@@ -45,6 +51,7 @@ namespace Ulearn.Common
 
 		[XmlEnum("typescript")]
 		[Lexer("ts")]
+		[CommentSymbols("//")]
 		TypeScript = 7,
 
 		[XmlEnum("css")]
@@ -53,35 +60,50 @@ namespace Ulearn.Common
 
 		[XmlEnum("haskell")]
 		[Lexer("haskell")]
+		[CommentSymbols("--")]
 		Haskell = 9,
 		
 		[XmlEnum("cpp")]
 		[Lexer("cpp")]
+		[CommentSymbols("//")]
 		Cpp = 10,
 
 		[XmlEnum("c")]
 		[Lexer("c")]
+		[CommentSymbols("//")]
 		C = 11,
 
 		[XmlEnum("pgsql")]
 		[Lexer("postgresql")]
+		[CommentSymbols("--")]
 		PgSql = 12,
 
 		[XmlEnum("mikrokosmos")]
 		[Lexer("py3")]
+		[CommentSymbols("#")]
 		Mikrokosmos = 13, // https://mroman42.github.io/mikrokosmos/userguide.html
 
 		[XmlEnum("text")]
 		[Lexer("text")]
+		[CommentSymbols("//")]
 		Text = 100,
 	}
 
 	public class LexerAttribute : Attribute
 	{
-		public readonly string lexer;
+		public readonly string Lexer;
 		public LexerAttribute(string lexer)  
 		{  
-			this.lexer = lexer;
+			Lexer = lexer;
+		}  
+	}
+	
+	public class CommentSymbolsAttribute : Attribute
+	{
+		public readonly string CommentSymbols;
+		public CommentSymbolsAttribute(string commentSymbols)  
+		{  
+			CommentSymbols = commentSymbols;
 		}  
 	}
 

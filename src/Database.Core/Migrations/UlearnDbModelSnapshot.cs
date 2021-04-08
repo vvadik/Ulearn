@@ -21,38 +21,6 @@ namespace Database.Migrations
                 .HasAnnotation("ProductVersion", "5.0.3")
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-            modelBuilder.Entity("Database.LastVisit", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<string>("CourseId")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
-
-                    b.Property<Guid>("SlideId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("CourseId", "UserId");
-
-                    b.ToTable("LastVisits");
-                });
-
             modelBuilder.Entity("Database.Models.AdditionalScore", b =>
                 {
                     b.Property<int>("Id")
@@ -159,7 +127,7 @@ namespace Database.Migrations
                     b.Property<string>("Names")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("text")
-                        .HasComputedColumnSql("immutable_concat_ws(' ', nullif(\"UserName\", ''), nullif(\"FirstName\",''), nullif(\"LastName\",''), nullif(\"FirstName\",''))", true)
+                        .HasComputedColumnSql("lower(immutable_concat_ws(' ', nullif(\"UserName\", ''), nullif(\"FirstName\",''), nullif(\"LastName\",''), nullif(\"FirstName\",'')))", true)
                         .UseCollation("default");
 
                     b.Property<string>("NormalizedEmail")
@@ -298,6 +266,8 @@ namespace Database.Migrations
                     b.HasIndex("CourseId", "SlideId");
 
                     b.HasIndex("CourseId", "UserId");
+
+                    b.HasIndex("CourseId", "SlideId", "IsRightAnswer");
 
                     b.HasIndex("CourseId", "SlideId", "Timestamp");
 
@@ -1122,6 +1092,38 @@ namespace Database.Migrations
                         .IsUnique();
 
                     b.ToTable("LabelOnGroups");
+                });
+
+            modelBuilder.Entity("Database.Models.LastVisit", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<string>("CourseId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<Guid>("SlideId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("CourseId", "UserId");
+
+                    b.ToTable("LastVisits");
                 });
 
             modelBuilder.Entity("Database.Models.Like", b =>
@@ -2725,17 +2727,6 @@ namespace Database.Migrations
                     b.HasDiscriminator().HasValue("RepliedToYourCommentNotification");
                 });
 
-            modelBuilder.Entity("Database.LastVisit", b =>
-                {
-                    b.HasOne("Database.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Database.Models.AdditionalScore", b =>
                 {
                     b.HasOne("Database.Models.ApplicationUser", "Instructor")
@@ -3093,6 +3084,17 @@ namespace Database.Migrations
                     b.Navigation("Group");
 
                     b.Navigation("Label");
+                });
+
+            modelBuilder.Entity("Database.Models.LastVisit", b =>
+                {
+                    b.HasOne("Database.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Database.Models.Like", b =>
@@ -3627,7 +3629,7 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.AdditionalScore", "Score")
                         .WithMany()
                         .HasForeignKey("ScoreId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Score");
                 });

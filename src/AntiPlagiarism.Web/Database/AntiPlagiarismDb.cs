@@ -1,11 +1,24 @@
 ﻿using AntiPlagiarism.Web.Database.Models;
 using Microsoft.EntityFrameworkCore;
+using Npgsql.Logging;
+using Ulearn.Core.Configuration;
 
 namespace AntiPlagiarism.Web.Database
 {
 	public class AntiPlagiarismDb : DbContext
 	{
 		public static readonly string DefaultSchema = "antiplagiarism";
+
+		static AntiPlagiarismDb()
+		{
+			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
+			if (configuration.HostLog != null)
+			{
+				NpgsqlLogManager.Provider = new AntiPlagiarismDbLoggingProvider();
+				NpgsqlLogManager.IsParameterLoggingEnabled = true;
+			}
+		}
+
 		public AntiPlagiarismDb(DbContextOptions<AntiPlagiarismDb> options)
 			: base(options)
 		{
@@ -45,13 +58,11 @@ namespace AntiPlagiarism.Web.Database
 				.IsUnique();
 
 			modelBuilder.Entity<SnippetStatistics>()
-				.HasIndex(c => new { c.SnippetId, c.TaskId, c.ClientId })
+				.HasIndex(c => new { c.SnippetId, c.TaskId, c.Language, c.ClientId })
 				.IsUnique();
 
 			var submissionEntityBuilder = modelBuilder.Entity<Submission>();
-			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId });
-			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId, c.AuthorId });
-			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId, c.AddingTime, c.AuthorId });
+			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId, c.Language });
 			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId, c.Language, c.AuthorId });
 			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId, c.AddingTime, c.Language, c.AuthorId });
 			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.ClientSubmissionId });
@@ -64,6 +75,12 @@ namespace AntiPlagiarism.Web.Database
 			modelBuilder.Entity<MostSimilarSubmission>()
 				.HasIndex(c => new { c.Timestamp })
 				.IsUnique(false);
+
+			modelBuilder.Entity<TaskStatisticsParameters>()
+				.HasKey(p => new { p.TaskId, p.Language });
+			
+			modelBuilder.Entity<ManualSuspicionLevels>()
+				.HasKey(p => new { p.TaskId, p.Language });
 		}
 
 		public void MigrateToLatestVersion()

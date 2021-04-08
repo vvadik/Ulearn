@@ -50,6 +50,10 @@
 						}
 					}
 				</p>
+				@if (Model.Type == ExternalLoginListType.Login)
+				{
+					<input type="checkbox" id="ExternalLoginRememberMeCheckbox" name="RememberMe" class="hide" value="true">
+				}
 			</div>
 		}
 	}

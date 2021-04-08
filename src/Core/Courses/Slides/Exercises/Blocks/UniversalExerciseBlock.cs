@@ -149,9 +149,10 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			ExpectedOutput = ExpectedOutput ?? "";
 			SolutionRegionContent = new Lazy<string>(() => GetRegionContent(CorrectSolutionFile));
 			InitialRegionContent = new Lazy<string>(() => GetRegionContent(InitialUserCodeFile));
+			var commentSymbols = Language.GetAttribute<CommentSymbolsAttribute>()?.CommentSymbols ?? "//";
 			ExerciseInitialCode = NoStudentZip
 				? GetNoStudentZipInitialCode()
-				: ExerciseInitialCode ?? "// Вставьте сюда финальное содержимое файла " + UserCodeFilePath;
+				: ExerciseInitialCode ?? $"{commentSymbols} Вставьте сюда финальное содержимое файла {UserCodeFilePath}";
 			yield return this;
 
 			var correctSolution = GetCorrectSolution();
