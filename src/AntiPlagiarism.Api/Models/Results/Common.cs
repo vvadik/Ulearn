@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using Ulearn.Common;
 
 namespace AntiPlagiarism.Api.Models.Results
 {
@@ -35,6 +36,9 @@ namespace AntiPlagiarism.Api.Models.Results
 
 		[DataMember(Name = "task_id")]
 		public Guid TaskId { get; set; }
+		
+		[DataMember(Name = "language")]
+		public Language Language { get; set; }
 
 		[DataMember(Name = "author_id")]
 		public Guid AuthorId { get; set; }

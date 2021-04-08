@@ -37,6 +37,8 @@ namespace ManualUtils
 				.UseNpgsql(configuration.Database, o => o.SetPostgresVersion(13, 2));
 			var adb = new AntiPlagiarismDb(aOptionsBuilder.Options);
 
+			FillLanguageToAntiplagiarism.FillLanguage(adb);
+
 			//GenerateUpdateSequences();
 			//CompareColumns();
 			//await ResendLti(db);

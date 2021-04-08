@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
@@ -16,7 +15,7 @@ namespace AntiPlagiarism.Web.Database.Repos
 	public interface ITasksRepo
 	{
 		Task<List<Guid>> GetTaskIds();
-		Task<TaskStatisticsParameters> FindTaskStatisticsParametersAsync(Guid taskId);
+		Task<TaskStatisticsParameters> FindTaskStatisticsParametersAsync(Guid taskId, Language language);
 		Task SaveTaskStatisticsParametersAsync(TaskStatisticsParameters parameters, List<TaskStatisticsSourceData> sourceData);
 	}
 
@@ -34,9 +33,9 @@ namespace AntiPlagiarism.Web.Database.Repos
 			return db.TasksStatisticsParameters.Select(p => p.TaskId).ToListAsync();
 		}
 
-		public async Task<TaskStatisticsParameters> FindTaskStatisticsParametersAsync(Guid taskId)
+		public async Task<TaskStatisticsParameters> FindTaskStatisticsParametersAsync(Guid taskId, Language language)
 		{
-			return await db.TasksStatisticsParameters.FindAsync(taskId);
+			return await db.TasksStatisticsParameters.FindAsync(taskId, language);
 		}
 
 		/* It's very important that SaveTaskStatisticsParametersAsync() works with disabled EF's Change Tracker */
@@ -48,9 +47,9 @@ namespace AntiPlagiarism.Web.Database.Repos
 				using (var ts = new TransactionScope(TransactionScopeOption.Required, TimeSpan.FromSeconds(30), TransactionScopeAsyncFlowOption.Enabled))
 				{
 					await db.TaskStatisticsSourceData
-						.Where(d => d.Submission1.TaskId == parameters.TaskId)
+						.Where(d => d.Submission1.TaskId == parameters.TaskId && d.Submission1.Language == parameters.Language)
 						.DeleteAsync();
-					db.AddOrUpdate(parameters, p => p.TaskId == parameters.TaskId);
+					db.AddOrUpdate(parameters, p => p.TaskId == parameters.TaskId && p.Language == parameters.Language);
 					db.TaskStatisticsSourceData.AddRange(sourceData);
 					await db.SaveChangesAsync().ConfigureAwait(false);
 					ts.Complete();

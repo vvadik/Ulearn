@@ -58,13 +58,11 @@ namespace AntiPlagiarism.Web.Database
 				.IsUnique();
 
 			modelBuilder.Entity<SnippetStatistics>()
-				.HasIndex(c => new { c.SnippetId, c.TaskId, c.ClientId })
+				.HasIndex(c => new { c.SnippetId, c.TaskId, c.Language, c.ClientId })
 				.IsUnique();
 
 			var submissionEntityBuilder = modelBuilder.Entity<Submission>();
-			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId });
-			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId, c.AuthorId });
-			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId, c.AddingTime, c.AuthorId });
+			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId, c.Language });
 			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId, c.Language, c.AuthorId });
 			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.TaskId, c.AddingTime, c.Language, c.AuthorId });
 			submissionEntityBuilder.HasIndex(c => new { c.ClientId, c.ClientSubmissionId });
@@ -77,6 +75,12 @@ namespace AntiPlagiarism.Web.Database
 			modelBuilder.Entity<MostSimilarSubmission>()
 				.HasIndex(c => new { c.Timestamp })
 				.IsUnique(false);
+
+			modelBuilder.Entity<TaskStatisticsParameters>()
+				.HasKey(p => new { p.TaskId, p.Language });
+			
+			modelBuilder.Entity<ManualSuspicionLevels>()
+				.HasKey(p => new { p.TaskId, p.Language });
 		}
 
 		public void MigrateToLatestVersion()

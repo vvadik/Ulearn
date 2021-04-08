@@ -114,14 +114,15 @@ namespace AntiPlagiarism.Web.Controllers
 				return BadRequest(ModelState);
 
 			await snippetsRepo.RemoveSnippetsOccurrencesForTaskAsync(parameters.TaskId).ConfigureAwait(false);
-			var submissions = await submissionsRepo.GetSubmissionsByTaskAsync(client.Id, parameters.TaskId).ConfigureAwait(false);
+			var submissions = await submissionsRepo.GetSubmissionsByTaskAsync(client.Id, parameters.TaskId, parameters.Language)
+				.ConfigureAwait(false);
 			foreach (var submission in submissions)
 			{
 				await submissionsRepo.UpdateSubmissionTokensCountAsync(submission, GetTokensCount(submission.ProgramText, submission.Language));
 				await newSubmissionHandler.ExtractSnippetsFromSubmissionAsync(submission).ConfigureAwait(false);
 			}
 
-			await newSubmissionHandler.CalculateTaskStatisticsParametersAsync(client.Id, parameters.TaskId).ConfigureAwait(false);
+			await newSubmissionHandler.CalculateTaskStatisticsParametersAsync(client.Id, parameters.TaskId, parameters.Language).ConfigureAwait(false);
 
 			return Json(new RebuildSnippetsForTaskResponse
 			{
@@ -147,7 +148,7 @@ namespace AntiPlagiarism.Web.Controllers
 			var weights = new Dictionary<Guid, List<double>>();
 			foreach (var (index, taskId) in taskIds.Enumerate(start: 1))
 			{
-				weights[taskId] = await newSubmissionHandler.CalculateTaskStatisticsParametersAsync(client.Id, taskId).ConfigureAwait(false);
+				weights[taskId] = await newSubmissionHandler.CalculateTaskStatisticsParametersAsync(client.Id, taskId, parameters.Language).ConfigureAwait(false);
 				weights[taskId].Sort();
 
 				log.Info($"RecalculateTaskStatistics: обработано {index.PluralizeInRussian(RussianPluralizationOptions.Tasks)} из {taskIds.Count}");
@@ -159,6 +160,7 @@ namespace AntiPlagiarism.Web.Controllers
 			{
 				TaskIds = taskIds,
 				Weights = weights,
+				Language = parameters.Language
 			});
 		}
 
@@ -172,7 +174,7 @@ namespace AntiPlagiarism.Web.Controllers
 			if (submission == null || submission.ClientId != client.Id)
 				return NotFound(new ErrorResponse("Invalid submission id"));
 
-			var suspicionLevels = await GetSuspicionLevelsAsync(submission.TaskId).ConfigureAwait(false);
+			var suspicionLevels = await GetSuspicionLevelsAsync(submission.TaskId, submission.Language).ConfigureAwait(false);
 
 			var result = new GetSubmissionPlagiarismsResponse
 			{
@@ -196,9 +198,9 @@ namespace AntiPlagiarism.Web.Controllers
 			if (parameters.LastSubmissionsCount <= 0 || parameters.LastSubmissionsCount > maxLastSubmissionsCount)
 				return BadRequest(new ErrorResponse($"Invalid last_submissions_count. This value should be at least 1 and at most {maxLastSubmissionsCount}"));
 
-			var suspicionLevels = await GetSuspicionLevelsAsync(parameters.TaskId).ConfigureAwait(false);
+			var suspicionLevels = await GetSuspicionLevelsAsync(parameters.TaskId, parameters.Language).ConfigureAwait(false);
 
-			var submissions = await submissionsRepo.GetSubmissionsByAuthorAndTaskAsync(client.Id, parameters.AuthorId, parameters.TaskId, parameters.LastSubmissionsCount).ConfigureAwait(false);
+			var submissions = await submissionsRepo.GetSubmissionsByAuthorAndTaskAsync(client.Id, parameters.AuthorId, parameters.TaskId, parameters.Language, parameters.LastSubmissionsCount).ConfigureAwait(false);
 			var result = new GetAuthorPlagiarismsResponse
 			{
 				SuspicionLevels = suspicionLevels,
@@ -237,10 +239,10 @@ namespace AntiPlagiarism.Web.Controllers
 		}
 
 		[ItemNotNull]
-		private async Task<SuspicionLevels> GetSuspicionLevelsAsync(Guid taskId)
+		private async Task<SuspicionLevels> GetSuspicionLevelsAsync(Guid taskId, Language language)
 		{
-			var taskStatisticsParameters = await tasksRepo.FindTaskStatisticsParametersAsync(taskId).ConfigureAwait(false);
-			var manualSuspicionLevels = await manualSuspicionLevelsRepo.GetManualSuspicionLevelsAsync(taskId);
+			var taskStatisticsParameters = await tasksRepo.FindTaskStatisticsParametersAsync(taskId, language).ConfigureAwait(false);
+			var manualSuspicionLevels = await manualSuspicionLevelsRepo.GetManualSuspicionLevelsAsync(taskId, language);
 
 			var automaticFaintSuspicion = configuration.AntiPlagiarism.StatisticsAnalyzing.MaxFaintSuspicionLevel;
 			var automaticStrongSuspicion = configuration.AntiPlagiarism.StatisticsAnalyzing.MaxStrongSuspicionLevel;
@@ -292,7 +294,7 @@ namespace AntiPlagiarism.Web.Controllers
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);
 
-			var mostSimilarSubmissions = await mostSimilarSubmissionsRepo.GetMostSimilarSubmissionsByTaskAsync(client.Id, parameters.TaskId).ConfigureAwait(false);
+			var mostSimilarSubmissions = await mostSimilarSubmissionsRepo.GetMostSimilarSubmissionsByTaskAsync(client.Id, parameters.TaskId, parameters.Language).ConfigureAwait(false);
 			var result = new GetMostSimilarSubmissionsResponse
 			{
 				MostSimilarSubmissions = mostSimilarSubmissions,
@@ -306,7 +308,7 @@ namespace AntiPlagiarism.Web.Controllers
 			if (!ModelState.IsValid)
 				return BadRequest(ModelState);
 
-			var suspicionLevels = await GetSuspicionLevelsAsync(parameters.TaskId).ConfigureAwait(false);
+			var suspicionLevels = await GetSuspicionLevelsAsync(parameters.TaskId, parameters.Language).ConfigureAwait(false);
 
 			var result = new GetSuspicionLevelsResponse { SuspicionLevels = suspicionLevels };
 			return Json(result);
@@ -321,12 +323,13 @@ namespace AntiPlagiarism.Web.Controllers
 			await manualSuspicionLevelsRepo.SetManualSuspicionLevelsAsync(new ManualSuspicionLevels
 			{
 				TaskId = parameters.TaskId,
+				Language = parameters.Language,
 				FaintSuspicion = parameters.FaintSuspicion,
 				StrongSuspicion = parameters.StrongSuspicion,
 				Timestamp = DateTime.Now
 			});
 
-			var suspicionLevels = await GetSuspicionLevelsAsync(parameters.TaskId);
+			var suspicionLevels = await GetSuspicionLevelsAsync(parameters.TaskId, parameters.Language);
 
 			var result = new GetSuspicionLevelsResponse { SuspicionLevels = suspicionLevels };
 			return Json(result);
