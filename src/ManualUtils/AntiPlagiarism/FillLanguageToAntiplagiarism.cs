@@ -67,6 +67,21 @@ namespace ManualUtils.AntiPlagiarism
 		{
 			Console.WriteLine("FillLanguageSnippetsStatistics");
 
+			var taskIds = adb
+				.SnippetsStatistics
+				.Select(s => s.TaskId)
+				.Distinct()
+				.ToList();
+			
+			Console.WriteLine($"Count taskIds {taskIds.Count}");
+
+			var taskIdToLanguage = new Dictionary<Guid, Language>();
+			foreach (var taskId in taskIds)
+			{
+				if (!taskIdToLanguage.ContainsKey(taskId))
+					taskIdToLanguage[taskId] = GetLanguageByTaskId(taskId, adb);
+			}
+
 			var snippets = adb
 				.SnippetsStatistics
 				.AsNoTracking()
@@ -76,30 +91,20 @@ namespace ManualUtils.AntiPlagiarism
 
 			Console.WriteLine($"Count snippets {count}");
 
-			adb.DisableAutoDetectChanges();
-			var completed = 0;
+			var changes = new List<(int, Language)>();
+			var getChangesCompleted = 0;
 			foreach (var snippet in snippets)
 			{
-				completed++;
-				try
-				{
-					snippet.Language = GetLanguageByTaskId(snippet.TaskId, adb);
-					adb.SnippetsStatistics.Update(snippet);
-				}
-				catch (Exception ex)
-				{
-					Console.WriteLine($"Error on id {snippet.TaskId}: {ex}");
-				}
-
-				if (count % 1000 == 0)
-				{
-					Console.WriteLine($"FillLanguageSnippetsStatistics - Completed {completed} / {count}");
-					adb.SaveChanges();
-				}
+				getChangesCompleted++;
+				if (count % 10000 == 0)
+					Console.WriteLine($"getChangesCompleted {getChangesCompleted} / {count}");
+				var newLanguage = taskIdToLanguage[snippet.TaskId];
+				if (newLanguage != snippet.Language)
+					continue;
+				changes.Add((snippet.Id, newLanguage));
 			}
 
-			adb.SaveChanges();
-			adb.EnableAutoDetectChanges();
+			Console.WriteLine($"Found changes {changes.Count}");
 		}
 
 		private static void FillLanguageManualSuspicionLevels(AntiPlagiarismDb adb)
@@ -143,9 +148,9 @@ namespace ManualUtils.AntiPlagiarism
 
 		public static void FillLanguage(AntiPlagiarismDb adb)
 		{
-			FillLanguageSnippetsStatistics(adb);
 			FillLanguageManualSuspicionLevels(adb);
 			FillLanguageTasksStatisticsParameters(adb);
+			FillLanguageSnippetsStatistics(adb);
 		}
 	}
 }
