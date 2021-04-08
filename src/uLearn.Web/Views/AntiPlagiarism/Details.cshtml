@@ -67,6 +67,7 @@
 		@Html.AntiForgeryToken()
 		<input type="hidden" name="slideId" value="@Model.Slide.Id"/>
 		<input type="hidden" name="courseId" value="@Model.Course.Id"/>
+		<input type="hidden" name="language" value="@Model.Language"/>
 		<p>
 			<b>Желтая плашка</b> с
 			@if (Model.CanEditSuspicionLevels)

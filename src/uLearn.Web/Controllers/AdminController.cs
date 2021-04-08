@@ -19,6 +19,7 @@ using Database.Extensions;
 using Database.Models;
 using GitCourseUpdater;
 using Microsoft.VisualBasic.FileIO;
+using Ulearn.Common;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
@@ -1498,7 +1499,7 @@ namespace uLearn.Web.Controllers
 		[HandleHttpAntiForgeryException]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		[HttpPost]
-		public async Task<ActionResult> SetSuspicionLevels(string courseId, Guid slideId, string faintSuspicion = null, string strongSuspicion = null)
+		public async Task<ActionResult> SetSuspicionLevels(string courseId, Guid slideId, Language language, string faintSuspicion = null, string strongSuspicion = null)
 		{
 			var course = courseManager.GetCourse(courseId);
 			if (course.GetSlides(true).All(s => s.Id != slideId))
@@ -1516,6 +1517,7 @@ namespace uLearn.Web.Controllers
 			await antiPlagiarismClient.SetSuspicionLevelsAsync(new SetSuspicionLevelsParameters
 			{
 				TaskId = slideId,
+				Language = language,
 				FaintSuspicion = faintSuspicionParsed / 100d,
 				StrongSuspicion = strongSuspicionParsed / 100d,
 			});
