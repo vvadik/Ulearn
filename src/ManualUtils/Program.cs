@@ -18,6 +18,7 @@ using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Logging;
 using Ulearn.Web.Api.Utils.LTI;
+using Vostok.Logging.File;
 
 namespace ManualUtils
 {
@@ -27,17 +28,27 @@ namespace ManualUtils
 		{
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 			LoggerSetup.Setup(configuration.HostLog, configuration.GraphiteServiceName);
-			var optionsBuilder = new DbContextOptionsBuilder<UlearnDb>()
-				.UseLazyLoadingProxies()
-				.UseNpgsql(configuration.Database, o => o.SetPostgresVersion(13, 2));
-			var db = new UlearnDb(optionsBuilder.Options);
-			var aOptionsBuilder = new DbContextOptionsBuilder<AntiPlagiarismDb>()
-				.UseLazyLoadingProxies()
-				.UseNpgsql(configuration.Database, o => o.SetPostgresVersion(13, 2));
-			var adb = new AntiPlagiarismDb(aOptionsBuilder.Options);
+			try
+			{
+				var optionsBuilder = new DbContextOptionsBuilder<UlearnDb>()
+					.UseLazyLoadingProxies()
+					.UseNpgsql(configuration.Database, o => o.SetPostgresVersion(13, 2));
+				var db = new UlearnDb(optionsBuilder.Options);
+				var aOptionsBuilder = new DbContextOptionsBuilder<AntiPlagiarismDb>()
+					.UseLazyLoadingProxies()
+					.UseNpgsql(configuration.Database, o => o.SetPostgresVersion(13, 2));
+				var adb = new AntiPlagiarismDb(aOptionsBuilder.Options);
+				await Run(adb, db);
+			}
+			finally
+			{
+				await FileLog.FlushAllAsync();
+			}
+		}
 
+		private static async Task Run(AntiPlagiarismDb adb, UlearnDb db)
+		{
 			//FillLanguageToAntiplagiarism.FillLanguage(adb);
-
 			//GenerateUpdateSequences();
 			//CompareColumns();
 			//await ResendLti(db);

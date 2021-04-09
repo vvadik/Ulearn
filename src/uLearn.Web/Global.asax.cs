@@ -4,8 +4,8 @@ using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
-using Database.DataContexts;
 using uLearn.Web.SameSite;
+using Vostok.Logging.File;
 
 namespace uLearn.Web
 {
@@ -34,6 +34,11 @@ namespace uLearn.Web
 		protected void Application_BeginRequest(object sender, EventArgs e)
 		{
 			SameSiteCookieRewriter.FilterSameSiteNoneForIncompatibleUserAgents(sender);
+		}
+
+		protected void Application_End()
+		{
+			FileLog.FlushAll();
 		}
 	}
 }

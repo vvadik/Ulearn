@@ -27,7 +27,6 @@ namespace CourseToolHotReloader
 		private static IConfig config;
 		private static IUlearnApiClient ulearnApiClient;
 		private static ILog log => LogProvider.Get();
-		private static Action flushLog;
 
 		private static void Main()
 		{
@@ -101,7 +100,7 @@ namespace CourseToolHotReloader
 
 		private static void BeforeProgramEnd()
 		{
-			flushLog?.Invoke();
+			FileLog.FlushAll();
 		}
 
 		private static void InitLogger()
@@ -119,10 +118,8 @@ namespace CourseToolHotReloader
 				},
 				OutputTemplate = OutputTemplate.Parse("{Timestamp:HH:mm:ss.fff} {Level:u5} {sourceContext:w}{Message}{NewLine}{Exception}")
 			};
-			var fileLog = new FileLog(fileLogSettings);
-			flushLog = () => fileLog.Flush();
-			var fileLogWithMinimumLevel = fileLog.WithMinimumLevel(LogLevel.Info);
-			LogProvider.Configure(fileLogWithMinimumLevel);
+			var fileLog = new FileLog(fileLogSettings).WithMinimumLevel(LogLevel.Info);
+			LogProvider.Configure(fileLog);
 		}
 
 		private static async Task Startup()

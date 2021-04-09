@@ -11,6 +11,7 @@ using Vostok.Logging.Abstractions;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Logging;
 using Ulearn.Core.Metrics;
+using Vostok.Logging.File;
 
 namespace Notifications
 {
@@ -45,21 +46,28 @@ namespace Notifications
 		{
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 			LoggerSetup.Setup(configuration.HostLog, configuration.GraphiteServiceName);
-			/* Pass first argument 'send' to send emails to addresses from `emails.txt` with content from `content.txt` (notifications daemon is not started in this case)*/
-			if (args.Length > 0 && args[0] == "send")
+			try
 			{
-				var sender = new OneTimeEmailSender();
-				sender.SendEmailsAsync().Wait();
-				return;
-			}
+				/* Pass first argument 'send' to send emails to addresses from `emails.txt` with content from `content.txt` (notifications daemon is not started in this case)*/
+				if (args.Length > 0 && args[0] == "send")
+				{
+					var sender = new OneTimeEmailSender();
+					sender.SendEmailsAsync().Wait();
+					return;
+				}
 
-			if (configuration.Notifications != null && configuration.Notifications.Enabled == false)
+				if (configuration.Notifications != null && configuration.Notifications.Enabled == false)
+				{
+					Thread.Sleep(Timeout.Infinite);
+					return;
+				}
+
+				new Program().MainLoop().Wait();
+			}
+			finally
 			{
-				Thread.Sleep(Timeout.Infinite);
-				return;
+				FileLog.FlushAll();
 			}
-
-			new Program().MainLoop().Wait();
 		}
 
 		public async Task MainLoop()

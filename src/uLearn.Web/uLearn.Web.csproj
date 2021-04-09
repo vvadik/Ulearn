@@ -738,6 +738,10 @@
       <HintPath>..\packages\Vostok.Logging.Abstractions.1.0.20\lib\netstandard2.0\Vostok.Logging.Abstractions.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Vostok.Logging.File, Version=1.0.12.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Logging.File.1.0.12\lib\netstandard2.0\Vostok.Logging.File.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Vostok.Logging.Formatting, Version=1.0.5.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\packages\Vostok.Logging.Formatting.1.0.5\lib\netstandard2.0\Vostok.Logging.Formatting.dll</HintPath>
       <Private>True</Private>
