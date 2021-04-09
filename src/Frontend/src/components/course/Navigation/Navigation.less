@@ -3,19 +3,6 @@
 @rootZIndex: @asideZIndex;
 @contentHeight: calc(100vh - @headerHeight);
 
-:global {
-  .open :local {
-    .contentWrapper {
-      transform: translateX(0);
-    }
-
-    .overlay {
-      visibility: visible;
-      opacity: 1;
-    }
-  }
-}
-
 .overflow {
   overflow: hidden;
 }
@@ -23,9 +10,9 @@
 .overlay {
   position: fixed;
   width: 100%;
-  height: calc(100vh - @headerHeight);
+  height: 100vh;
 
-  top: @headerHeight;
+  top: 0;
   left: 0;
   z-index: @rootZIndex;
 
