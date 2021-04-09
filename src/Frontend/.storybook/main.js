@@ -1,5 +1,6 @@
 ﻿const path = require("path");
 const base = require('../config/webpack.config.base');
+const webpack = require('webpack');
 const { merge } = require('webpack-merge');
 
 module.exports = {
@@ -82,6 +83,20 @@ module.exports = {
 				],
 			},
 		);
+
+		config.plugins.push(
+			new webpack.ProvidePlugin({
+				process: 'process/browser',
+				$: 'jquery',
+				jQuery: 'jquery',
+				"window.$": 'jquery',
+				"window.jQuery": 'jquery',
+			}),
+			new webpack.IgnorePlugin({
+				resourceRegExp: /^\.\/locale$/,
+				contextRegExp: /moment$/,
+			}),
+		)
 
 		return config;
 	},
