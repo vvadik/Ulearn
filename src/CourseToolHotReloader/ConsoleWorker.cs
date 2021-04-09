@@ -32,7 +32,7 @@ namespace CourseToolHotReloader
 			var text = errorMessage;
 			Console.WriteLine(text);
 			Console.ResetColor();
-			log.Info(text);
+			log.Error(text);
 		}
 
 		public static void WriteErrorWithTime(string errorMessage)
@@ -40,7 +40,7 @@ namespace CourseToolHotReloader
 			Console.ForegroundColor = ConsoleColor.Red;
 			Console.WriteLine($"{DateTime.Now:HH:mm:ss} {errorMessage}");
 			Console.ResetColor();
-			log.Info(errorMessage);
+			log.Error(errorMessage);
 		}
 
 		public static void WriteAlert(string alertMessage)
@@ -49,7 +49,7 @@ namespace CourseToolHotReloader
 			var text = alertMessage;
 			Console.WriteLine(text);
 			Console.ResetColor();
-			log.Info(text);
+			log.Warn(text);
 		}
 
 		public static void Debug(string text)

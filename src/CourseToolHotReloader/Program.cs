@@ -27,6 +27,7 @@ namespace CourseToolHotReloader
 		private static IConfig config;
 		private static IUlearnApiClient ulearnApiClient;
 		private static ILog log => LogProvider.Get();
+		private static Action flushLog;
 
 		private static void Main()
 		{
@@ -84,6 +85,10 @@ namespace CourseToolHotReloader
 				log.Error(e, "Root error");
 				ConsoleWorker.WriteError("Ошибка. Подробнее в логах");
 			}
+			finally
+			{
+				BeforeProgramEnd();
+			}
 		}
 
 		private static void Init()
@@ -92,6 +97,11 @@ namespace CourseToolHotReloader
 			container = ConfigureAutofac.Build();
 			config = container.Resolve<IConfig>();
 			ulearnApiClient = container.Resolve<IUlearnApiClient>();
+		}
+
+		private static void BeforeProgramEnd()
+		{
+			flushLog?.Invoke();
 		}
 
 		private static void InitLogger()
@@ -109,8 +119,10 @@ namespace CourseToolHotReloader
 				},
 				OutputTemplate = OutputTemplate.Parse("{Timestamp:HH:mm:ss.fff} {Level:u5} {sourceContext:w}{Message}{NewLine}{Exception}")
 			};
-			var fileLog = new FileLog(fileLogSettings).WithMinimumLevel(LogLevel.Info);
-			LogProvider.Configure(fileLog);
+			var fileLog = new FileLog(fileLogSettings);
+			flushLog = () => fileLog.Flush();
+			var fileLogWithMinimumLevel = fileLog.WithMinimumLevel(LogLevel.Info);
+			LogProvider.Configure(fileLogWithMinimumLevel);
 		}
 
 		private static async Task Startup()
