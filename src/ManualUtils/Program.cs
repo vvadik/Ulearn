@@ -13,6 +13,7 @@ using Database.Repos;
 using ManualUtils.AntiPlagiarism;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses.Slides.Exercises;
@@ -68,6 +69,7 @@ namespace ManualUtils
 			//FillAntiplagFields.FillClientSubmissionId(adb);
 			//await XQueueRunAutomaticChecking(db);
 			//TextBlobsWithZeroByte(db);
+			//UpdateCertificateArchives(db);
 		}
 
 		private static void GenerateUpdateSequences()
@@ -280,6 +282,34 @@ namespace ManualUtils
 				Console.WriteLine("s" + i);
 				i++;
 				db.SaveChanges(); 
+			}
+		}
+
+		private static void UpdateCertificateArchives(UlearnDb db)
+		{
+			var directory = new DirectoryInfo("Templates");
+			foreach (var file in directory.EnumerateFiles())
+			{
+				var guid = file.Name.Split(".")[0];
+				var content = file.ReadAllContent();
+				var a = db.CertificateTemplateArchives.Find(guid);
+				if (a != null)
+				{
+					a.Content = content;
+					db.SaveChanges();
+				}
+				else
+				{
+					var id = db.CertificateTemplates.FirstOrDefault(t => t.ArchiveName == guid).Id;
+					db.CertificateTemplateArchives.Add(new CertificateTemplateArchive
+					{
+						ArchiveName = guid,
+						Content = content,
+						CertificateTemplateId = id
+					});
+					db.SaveChanges();
+				}
+				Console.WriteLine(guid);
 			}
 		}
 	}
