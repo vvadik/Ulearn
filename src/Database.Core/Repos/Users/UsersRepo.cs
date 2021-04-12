@@ -154,6 +154,11 @@ namespace Database.Repos.Users
 		{
 			return (await GetSysAdminsIdsAsync()).Contains(userId);
 		}
+
+		public async Task<List<ApplicationUser>> FindUsersByConfirmedEmails(IEnumerable<string> emails)
+		{
+			return await db.Users.Where(u => emails.Contains(u.Email) && u.EmailConfirmed).ToListAsync();
+		}
 	}
 
 	/* System.String is not available for table-valued functions so we need to create ComplexTyped wrapper */

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Database.Models;
+using Microsoft.Extensions.Options;
 using Vostok.Logging.Abstractions;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
@@ -11,6 +13,11 @@ using Ulearn.Core.Metrics;
 
 namespace Notifications
 {
+	public interface ITelegramSender
+	{
+		Task SendMessageAsync(long chatId, string html, TelegramButton button = null);
+	}
+
 	public class TelegramSender : ITelegramSender
 	{
 		private static ILog log => LogProvider.Get().ForContext(typeof(TelegramSender));
@@ -19,10 +26,11 @@ namespace Notifications
 
 		private readonly TelegramBotClient bot;
 
-		public TelegramSender()
+		public TelegramSender(MetricSender metricSender, IOptions<NotificationsConfiguration> options)
 		{
-			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
-			var botToken = configuration.Telegram.BotToken;
+			this.metricSender = metricSender;
+
+			var botToken = options.Value.Telegram.BotToken;
 			try
 			{
 				bot = new TelegramBotClient(botToken);
@@ -34,8 +42,6 @@ namespace Notifications
 			}
 
 			log.Info($"Initialized telegram bot with token \"{botToken.MaskAsSecret()}\"");
-
-			metricSender = new MetricSender(configuration.GraphiteServiceName);
 		}
 
 		public async Task SendMessageAsync(long chatId, string html, TelegramButton button = null)
@@ -85,6 +91,29 @@ namespace Notifications
 			html = html.Replace("&apos;", "'");
 
 			return html;
+		}
+	}
+
+	public class TelegramButton
+	{
+		public TelegramButton(NotificationButton notificationButton)
+		{
+			Link = notificationButton.Link;
+
+			/* Telegram doesn't support links to localhost so replace domain */
+			Link = Link.Replace("localhost", "replace.to.localhost");
+
+			Link = Link.AddQueryParameter("utm_source", "telegram");
+
+			Text = notificationButton.Text;
+		}
+
+		public string Link { get; private set; }
+		public string Text { get; private set; }
+
+		public override string ToString()
+		{
+			return $"TelegramButton{{{Text}: <{Link}>}}";
 		}
 	}
 }

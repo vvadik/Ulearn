@@ -24,5 +24,6 @@ namespace Database.Repos.Users
 		Task<bool> IsSystemAdministrator(string userId);
 		Task<List<string>> GetUserIdsWithLmsRoleAsync(LmsRoleType lmsRole);
 		Task<List<string>> FindUsersBySocialProviderKeyAsync(string providerKey);
+		Task<List<ApplicationUser>> FindUsersByConfirmedEmails(IEnumerable<string> emails);
 	}
 }
