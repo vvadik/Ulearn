@@ -494,5 +494,7 @@ namespace Database
 		public DbSet<StyleErrorSettings> StyleErrorSettings { get; set; }
 
 		public DbSet<WorkQueueItem> WorkQueueItems { get; set; }
+
+		public DbSet<CourseDbRecord> CourseDbRecords { get; set; }
 	}
 }

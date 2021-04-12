@@ -256,5 +256,7 @@ namespace Database.DataContexts
 		public DbSet<TempCourseError> TempCourseErrors { get; set; }
 
 		public DbSet<WorkQueueItem> WorkQueueItems { get; set; }
+
+		public DbSet<CourseDbRecord> CourseDbRecords { get; set; }
 	}
 }
