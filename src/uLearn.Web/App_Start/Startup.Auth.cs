@@ -47,7 +47,7 @@ namespace uLearn.Web
 				Provider = new CookieAuthenticationProvider
 				{
 					OnValidateIdentity = SecurityStampValidator.OnValidateIdentity<ULearnUserManager, ApplicationUser, string>(
-						validateInterval: TimeSpan.FromSeconds(5),
+						validateInterval: TimeSpan.FromSeconds(30),
 						regenerateIdentityCallback: (manager, user) => user.GenerateUserIdentityAsync(manager),
 						getUserIdCallback: identity => identity.GetUserId()
 					)
