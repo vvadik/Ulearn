@@ -1,6 +1,4 @@
 import React, { Component, CSSProperties } from "react";
-import { connect } from "react-redux";
-import { Dispatch } from "redux";
 
 import NavigationContent from './Unit/NavigationContent';
 import NextUnit from "./Unit/NextUnit";
@@ -11,13 +9,12 @@ import Flashcards from "./Course/Flashcards/Flashcards";
 
 import { flashcards } from "src/consts/routes";
 
+import { clamp } from "src/utils/mathExtensions";
 import throttle from "src/utils/throttle";
-import { toggleNavigationAction } from "src/actions/navigation";
 
 import { CourseMenuItem, FlashcardsStatistics, MenuItem, Progress, UnitProgress } from "./types";
 
 import { GroupAsStudentInfo } from "src/models/groups";
-import { RootState } from "src/redux/reducers";
 import { UnitInfo } from "src/models/course";
 import { SlideType } from "src/models/slide";
 import { DeviceType } from "src/consts/deviceType";
@@ -72,11 +69,11 @@ interface State {
 }
 
 class Navigation extends Component<Props, State> {
-	touchDistanceTolerance = 50;
-	touchStartMaxX = 24 * 2;//is similar to left padding on slide * 2
-	wrapper: React.RefObject<HTMLDivElement> = React.createRef();
-	currentActiveItem: React.RefObject<HTMLLIElement> = React.createRef();
-	header: React.RefObject<HTMLDivElement> = React.createRef();
+	private touchDistanceTolerance = 50;
+	private touchStartMaxX = 24 * 2;//is similar to left padding on slide * 2
+	private wrapper: React.RefObject<HTMLDivElement> = React.createRef();
+	private currentActiveItem: React.RefObject<HTMLLIElement> = React.createRef();
+	private header: React.RefObject<HTMLDivElement> = React.createRef();
 	private body: HTMLBodyElement | null = document.querySelector('body');
 
 	constructor(props: Props) {
@@ -89,11 +86,9 @@ class Navigation extends Component<Props, State> {
 			currentScrollState: 'top',
 			moveStarted: false,
 		};
-
-		this.handleTouchMove = throttle(this.handleTouchMove, 10);
 	}
 
-	componentDidMount() {
+	componentDidMount(): void {
 		this.tryAddTouchListener();
 		this.tryScrollToActiveItem();
 
@@ -117,7 +112,7 @@ class Navigation extends Component<Props, State> {
 		}
 	}
 
-	tryScrollToActiveItem = () => {
+	tryScrollToActiveItem = (): void => {
 		if(this.currentActiveItem.current && this.wrapper.current && this.header.current) {
 			const active = this.currentActiveItem.current;
 			const wrapper = this.wrapper.current;
@@ -145,12 +140,12 @@ class Navigation extends Component<Props, State> {
 		}
 	};
 
-	isMobileNavigationEnabled = () => {
+	isMobileNavigationEnabled = (): boolean => {
 		const { deviceType } = this.props;
 		return deviceType === DeviceType.mobile || deviceType === DeviceType.tablet;
 	};
 
-	tryAddTouchListener = () => {
+	tryAddTouchListener = (): void => {
 		if(this.isMobileNavigationEnabled() && !this.state.touchListenerAdded) {
 			document.addEventListener('touchstart', this.handleTouchStart, { passive: true });
 			this.setState({
@@ -159,7 +154,7 @@ class Navigation extends Component<Props, State> {
 		}
 	};
 
-	removeTouchListener = () => {
+	removeTouchListener = (): void => {
 		if(this.state.touchListenerAdded) {
 			document.removeEventListener('touchstart', this.handleTouchStart);
 			this.removeMoveAndEndListeners();
@@ -169,11 +164,11 @@ class Navigation extends Component<Props, State> {
 		}
 	};
 
-	getTouches = (evt: TouchEvent) => {
+	getTouches = (evt: TouchEvent): TouchList => {
 		return evt.touches || evt.changedTouches;
 	};
 
-	handleTouchStart = (evt: TouchEvent) => {
+	handleTouchStart = (evt: TouchEvent): void => {
 		const { clientX, clientY, } = this.getTouches(evt)[0];
 		const { navigationOpened, } = this.props;
 		const { xDown, yDown, } = this.state;
@@ -196,11 +191,7 @@ class Navigation extends Component<Props, State> {
 		}
 	};
 
-	clamp(number: number, min: number, max: number,): number {
-		return Math.min(Math.max(number, min), max);
-	}
-
-	handleTouchMove = (evt: TouchEvent) => {
+	handleTouchMove = (evt: TouchEvent): void => {
 		const { xDown, yDown, moveStarted, } = this.state;
 		const { navigationOpened, } = this.props;
 
@@ -224,8 +215,8 @@ class Navigation extends Component<Props, State> {
 				ratio = 1 - Math.abs(Math.min(diff, 0) / menuWidth);
 			}
 
-			diff = this.clamp(diff, -menuWidth, 0,);
-			ratio = this.clamp(ratio, 0, 1);
+			diff = clamp(diff, -menuWidth, 0,);
+			ratio = clamp(ratio, 0, 1);
 
 			this.setState({
 				overlayStyle: {
@@ -249,7 +240,7 @@ class Navigation extends Component<Props, State> {
 		}
 	};
 
-	handleTouchEnd = (evt: TouchEvent) => {
+	handleTouchEnd = (evt: TouchEvent): void => {
 		const { clientX, } = evt.changedTouches[0];
 		const { toggleNavigation, navigationOpened, } = this.props;
 		const { xDown, yDown, moveStarted, } = this.state;
@@ -273,16 +264,16 @@ class Navigation extends Component<Props, State> {
 		this.removeMoveAndEndListeners();
 	};
 
-	removeMoveAndEndListeners = () => {
+	removeMoveAndEndListeners = (): void => {
 		document.removeEventListener('touchmove', this.handleTouchMove);
 		document.removeEventListener('touchend', this.handleTouchEnd);
 	};
 
-	componentWillUnmount() {
+	componentWillUnmount(): void {
 		this.removeTouchListener();
 	}
 
-	componentDidUpdate(prevProps: Props) {
+	componentDidUpdate(prevProps: Props): void {
 		const { navigationOpened, unitTitle, deviceType, } = this.props;
 		const { moveStarted, } = this.state;
 		this.lockBodyScroll(moveStarted || navigationOpened);
@@ -318,7 +309,7 @@ class Navigation extends Component<Props, State> {
 		}
 	}
 
-	lockBodyScroll = (lock: boolean) => {
+	lockBodyScroll = (lock: boolean): void => {
 		const classList = this.body?.classList;
 		if(!classList) {
 			return;
@@ -328,7 +319,7 @@ class Navigation extends Component<Props, State> {
 		}
 	};
 
-	hideNavigationMenu = () => {
+	hideNavigationMenu = (): void => {
 		const { navigationOpened, toggleNavigation, } = this.props;
 
 		this.setState({
@@ -342,7 +333,7 @@ class Navigation extends Component<Props, State> {
 		}
 	};
 
-	render() {
+	render(): React.ReactElement {
 		const { overlayStyle, sideMenuStyle, currentScrollState, } = this.state;
 		const {
 			courseTitle,
@@ -382,7 +373,7 @@ class Navigation extends Component<Props, State> {
 		);
 	}
 
-	renderUnitNavigation() {
+	renderUnitNavigation(): React.ReactNode {
 		const {
 			toggleNavigation,
 			unitTitle,
@@ -406,7 +397,7 @@ class Navigation extends Component<Props, State> {
 		);
 	}
 
-	renderCourseNavigation() {
+	renderCourseNavigation(): React.ReactElement {
 		const {
 			courseItems,
 			containsFlashcards,
@@ -435,23 +426,4 @@ class Navigation extends Component<Props, State> {
 	}
 }
 
-const mapStateToProps = (state: RootState) => {
-	const { currentCourseId, } = state.courses;
-	const { deviceType, } = state.device;
-	const courseId = currentCourseId
-		? currentCourseId.toLowerCase()
-		: null;
-	const groupsAsStudent = state.account.groupsAsStudent;
-	const courseGroupsAsStudent = groupsAsStudent
-		? groupsAsStudent.filter(group => group.courseId.toLowerCase() === courseId && !group.isArchived)
-		: [];
-
-	return { groupsAsStudent: courseGroupsAsStudent, deviceType };
-};
-
-const mapDispatchToProps = (dispatch: Dispatch) => ({
-	toggleNavigation: () => dispatch(toggleNavigationAction()),
-});
-
-const connected = connect(mapStateToProps, mapDispatchToProps)(Navigation);
-export default connected;
+export default Navigation;
