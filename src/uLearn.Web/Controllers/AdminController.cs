@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -142,9 +143,19 @@ namespace uLearn.Web.Controllers
 		public ActionResult DownloadPackage(string courseId)
 		{
 			var packageName = courseManager.GetPackageName(courseId);
-			var path = courseManager.GetStagingCoursePath(courseId);
-			var content = System.IO.File.ReadAllBytes(path);
-			return File(content, "application/zip", packageName);
+			var isTempCourse = tempCoursesRepo.Find(courseId) != null;
+			Stream stream;
+			if (!isTempCourse)
+			{
+				var path = courseManager.GetStagingCoursePath(courseId);
+				stream = System.IO.File.OpenRead(path);
+			}
+			else
+			{
+				var path = courseManager.GetExtractedCourseDirectory(courseId);
+				stream = ZipUtils.CreateZipFromDirectory(new List<string> { path.FullName }, null, null, Encoding.UTF8);
+			}
+			return File(stream, "application/zip", packageName);
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
