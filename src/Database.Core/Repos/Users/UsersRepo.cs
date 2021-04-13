@@ -54,7 +54,7 @@ namespace Database.Repos.Users
 			return GetUserIdsWithLmsRoleAsync(LmsRoleType.SysAdmin);
 		}
 
-		public async Task ChangeTelegram(string userId, long chatId, string chatTitle)
+		public async Task ChangeTelegram(string userId, long? chatId, string chatTitle)
 		{
 			var user = await FindUserByIdAsync(userId).ConfigureAwait(false);
 			if (user == null)

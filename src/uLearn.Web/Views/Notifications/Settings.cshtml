@@ -107,7 +107,8 @@
 @if (Model.User.TelegramChatId.HasValue)
 {
 	<div class="form-group profile__form-group-info">
-		<b>Телеграм:</b> @Model.User.TelegramChatTitle
+		<b>Телеграм:</b> @Model.User.TelegramChatTitle <a class="glyphicon glyphicon-remove glyphicon-sm text-danger"
+			href="@Url.Action("RemoveTelegram", "Account")"></a>
 		@ShowNotificationsTransportSettings(Model.TelegramTransport, "в телеграм")
 	</div>
 }

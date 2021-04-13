@@ -10,7 +10,7 @@ namespace Database.Repos.Users
 		[ItemCanBeNull]
 		Task<ApplicationUser> FindUserByIdAsync(string userId);
 		Task<List<string>> GetSysAdminsIdsAsync();
-		Task ChangeTelegram(string userId, long chatId, string chatTitle);
+		Task ChangeTelegram(string userId, long? chatId, string chatTitle);
 		Task ConfirmEmail(string userId, bool isConfirmed = true);
 		Task UpdateLastConfirmationEmailTime(ApplicationUser user);
 		Task ChangeEmail(ApplicationUser user, string email);

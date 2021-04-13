@@ -102,7 +102,7 @@ namespace Database.DataContexts
 			return db.Users.Where(u => !u.IsDeleted).FilterByRole(role).Select(u => u.Id).ToList();
 		}
 
-		public Task ChangeTelegram(string userId, long chatId, string chatTitle)
+		public Task ChangeTelegram(string userId, long? chatId, string chatTitle)
 		{
 			var user = FindUserById(userId);
 			if (user == null)

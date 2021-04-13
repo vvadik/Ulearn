@@ -577,8 +577,11 @@ namespace uLearn.Web.Controllers
 			[Display(Name = "Адрес электронной почты подтверждён")]
 			EmailConfirmed,
 
-			[Display(Name = "Аккаунт телеграма добавлен в ваш профиль")]
+			[Display(Name = "Аккаунт telegram добавлен в ваш профиль")]
 			TelegramAdded,
+
+			[Display(Name = "Аккаунт telegram удален из вашего профиля")]
+			TelegramRemoved,
 
 			[Display(Name = "У вас не указан адрес эл. почты")]
 			[IsError(true)]
@@ -692,6 +695,16 @@ namespace uLearn.Web.Controllers
 			return RedirectToAction("Manage");
 		}
 
+		public async Task<ActionResult> RemoveTelegram()
+		{
+			var userId = User.Identity.GetUserId();
+			await usersRepo.ChangeTelegram(userId, null, null).ConfigureAwait(false);
+			var telegramTransport = notificationsRepo.FindUsersNotificationTransport<TelegramNotificationTransport>(userId);
+			if (telegramTransport != null)
+				await notificationsRepo.EnableNotificationTransport(telegramTransport.Id, false).ConfigureAwait(false);
+			return RedirectToAction("Manage", new { Message = ManageMessageId.TelegramRemoved });
+		}
+
 		[HttpPost]
 		[ULearnAuthorize(ShouldBeSysAdmin = true)]
 		[ValidateAntiForgeryToken]
@@ -730,12 +743,17 @@ namespace uLearn.Web.Controllers
 			var userId = User.Identity.GetUserId();
 			await usersRepo.ChangeTelegram(userId, chatId, chatTitle).ConfigureAwait(false);
 			metricSender.SendCount("connect_telegram.success");
-			await notificationsRepo.AddNotificationTransport(new TelegramNotificationTransport
+			var telegramTransport = notificationsRepo.FindUsersNotificationTransport<TelegramNotificationTransport>(userId);
+			if (telegramTransport != null)
+				await notificationsRepo.EnableNotificationTransport(telegramTransport.Id).ConfigureAwait(false);
+			else
 			{
-				UserId = userId,
-				IsEnabled = true,
-			}).ConfigureAwait(false);
-
+				await notificationsRepo.AddNotificationTransport(new TelegramNotificationTransport
+				{
+					UserId = userId,
+					IsEnabled = true,
+				}).ConfigureAwait(false);
+			}
 			return RedirectToAction("Manage", new { Message = ManageMessageId.TelegramAdded });
 		}
 
