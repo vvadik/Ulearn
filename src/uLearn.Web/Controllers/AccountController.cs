@@ -97,7 +97,7 @@ namespace uLearn.Web.Controllers
 			var userIds = users.Select(u => u.UserId).ToList();
 			var tempCoursesIds = tempCoursesRepo.GetTempCourses()
 				.Select(t => t.CourseId)
-				.ToHashSet();
+				.ToHashSet(StringComparer.OrdinalIgnoreCase);
 			var model = new UserListModel
 			{
 				CanToggleRoles = User.HasAccess(CourseRole.CourseAdmin),
@@ -323,7 +323,7 @@ namespace uLearn.Web.Controllers
 			var tempCourseIds = tempCoursesRepo.GetTempCourses()
 				.Select(c => c.CourseId)
 				.Where(c => allCourses.ContainsKey(c))
-				.ToHashSet();
+				.ToHashSet(StringComparer.OrdinalIgnoreCase);
 			var certificates = certificatesRepo.GetUserCertificates(user.Id).OrderBy(c => allCourses.GetOrDefault(c.Template.CourseId)?.Title ?? "<курс удалён>").ToList();
 
 			var courseGroups = userCourses.ToDictionary(c => c.Id, c => groupsRepo.GetUserGroupsNamesAsString(c.Id, userId, User, actual: true, archived: false, maxCount: 10));
