@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Ionic.Zip;
 using JetBrains.Annotations;
-using Microsoft.IO;
 
 namespace Ulearn.Common
 {
@@ -92,6 +92,25 @@ namespace Ulearn.Common
 				regexpSb.Append(isDirectory ? '/' : '$');
 				var regex = new Regex(regexpSb.ToString(), RegexOptions.Compiled);
 				yield return regex;
+			}
+		}
+
+		public static void UnpackZip(byte[] data, string pathToExtractDir)
+		{
+			using (var ms = new MemoryStream(data))
+			{
+				using (var zip = ZipFile.Read(ms))
+				{
+					foreach (var file in zip)
+						try
+						{
+							file.Extract(pathToExtractDir, ExtractExistingFileAction.OverwriteSilently);
+						}
+						catch (Exception e)
+						{
+							throw new IOException("File " + file.FileName, e);
+						}
+				}
 			}
 		}
 	}
