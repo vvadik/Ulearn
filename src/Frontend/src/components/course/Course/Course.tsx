@@ -12,7 +12,7 @@ import CourseFlashcardsPage from 'src/pages/course/CourseFlashcardsPage.js';
 import PreviewUnitPageFromAllCourse from "src/components/flashcards/UnitPage/PreviewUnitPageFromAllCourse";
 import SlideHeader from "./Slide/SlideHeader/SlideHeader";
 import { BlocksWrapper } from "src/components/course/Course/Slide/Blocks";
-import CommentsView from "src/components/comments/CommentsView/CommentsView";
+import CommentsView from "src/components/comments/CommentsView";
 import Slide from './Slide/Slide';
 
 import { UrlError } from "src/components/common/Error/NotFoundErrorBoundary";
@@ -345,7 +345,7 @@ class Course extends Component<Props, State> {
 			return <Error404/>;
 		}
 		if(!courseInfo || !flashcardsStatisticsByUnits) {
-			return <CourseLoader/>;
+			return <CourseLoader isSlideLoader={ false }/>;
 		}
 
 		return (
@@ -434,7 +434,7 @@ class Course extends Component<Props, State> {
 
 	renderGitEditLink = (slideInfo: ShortSlideInfo): React.ReactElement => {
 		return (
-			<a className={ styles.gitEditLink } rel='noopener noreferrer' target='_blank'
+			<a className={ styles.gitEditLink } rel="noopener noreferrer" target="_blank"
 			   href={ slideInfo.gitEditLink }>
 				<Edit/>
 			</a>

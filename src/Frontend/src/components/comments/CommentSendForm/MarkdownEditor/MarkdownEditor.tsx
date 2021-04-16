@@ -50,7 +50,6 @@ interface Props {
 		inEditForm?: boolean;
 		inReplyForm?: boolean;
 	};
-	isForInstructors?: boolean;
 
 	handleChange: (text: string, callback?: () => void) => void;
 	handleSubmit: (event: React.KeyboardEvent) => void;
@@ -95,7 +94,7 @@ class MarkdownEditor extends Component<Props> {
 	}
 
 	render(): React.ReactElement {
-		const { hasError, text, children, isForInstructors } = this.props;
+		const { hasError, text, children, } = this.props;
 
 		return (
 			<>
@@ -111,7 +110,7 @@ class MarkdownEditor extends Component<Props> {
 					onValueChange={ this.handleChange }
 					onKeyDown={ this.handleKeyDown }
 					autoResize
-					placeholder={ isForInstructors ? "Комментарий для преподавателей" : "Комментарий" }/>
+					placeholder={ "Комментарий" }/>
 				<div className={ styles.formFooter }>
 					{ children }
 					<MarkdownButtons

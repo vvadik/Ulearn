@@ -21,7 +21,7 @@ interface Props {
 
 	actions: ActionsType;
 	canModerateComments: (user: UserInfo, access: CourseAccessType) => boolean;
-	handleCommentBackGround: (commentId: string, isApproved: boolean) => void;
+	handleCommentBackGround: (commentId: number, isApproved: boolean) => void;
 }
 
 export default function KebabActions(props: Props): React.ReactElement {
@@ -79,8 +79,8 @@ export default function KebabActions(props: Props): React.ReactElement {
 	);
 
 	function handleApprovedMarkClick(): void {
-		actions.handleApprovedMark(comment.id, comment.isApproved);
-		handleCommentBackGround(comment.id, comment.isApproved);
+		actions.handleApprovedMark(comment.id, !comment.isApproved);
+		handleCommentBackGround(comment.id, !comment.isApproved);
 	}
 
 	function handleDeleteCommentClick() {
@@ -88,7 +88,7 @@ export default function KebabActions(props: Props): React.ReactElement {
 	}
 
 	function handlePinnedToTopMarkClick() {
-		actions.handlePinnedToTopMark(comment.id, comment.isPinnedToTop);
+		actions.handlePinnedToTopMark(comment.id, !comment.isPinnedToTop);
 	}
 
 	function handleShowEditFormClick() {
@@ -96,6 +96,6 @@ export default function KebabActions(props: Props): React.ReactElement {
 	}
 
 	function handleCorrectAnswerMarkClick() {
-		actions.handleCorrectAnswerMark(comment.id, comment.isCorrectAnswer);
+		actions.handleCorrectAnswerMark(comment.id, !comment.isCorrectAnswer);
 	}
 }

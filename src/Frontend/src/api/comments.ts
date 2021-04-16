@@ -1,27 +1,40 @@
 import api from "./index";
-import { commentPoliciesPath, commentsPath, constructPathToComment } from "src/consts/routes";
+
 import { buildQuery } from "src/utils";
 import { convertCamelCaseToSnakeCase } from "src/utils/caseConverter";
-import { SlideComments, Comment, CommentPolicy, } from "src/models/comments";
+
+import { commentPoliciesPath, commentsPath, constructPathToComment } from "src/consts/routes";
+import { Comment, CommentPolicyResponse, SlideCommentsResponse, } from "src/models/comments";
+import { Dispatch } from "redux";
+import {
+	commentAddedAction,
+	commentDeletedAction, commentLikeUpdatedAction,
+	commentsAction,
+	commentsPolicyAction,
+	commentUpdatedAction,
+} from "src/actions/comments";
+import {
+	CommentAddedAction, CommentDeletedAction, CommentLikeUpdatedAction,
+	CommentsAction,
+	CommentsPolicyAction,
+	CommentUpdatedAction
+} from "src/actions/comments.types";
 
 export function getComments(courseId: string, slideId: string, forInstructors: boolean, offset?: number,
 	count?: number
-): Promise<SlideComments> {
+): (dispatch: Dispatch) => Promise<CommentsAction> {
 	const query = buildQuery({ courseId, slideId, forInstructors, count, offset }, convertCamelCaseToSnakeCase);
 	const url = commentsPath + query;
 
-	return api.get(url);
+	return (dispatch: Dispatch): Promise<CommentsAction> => {
+		return api.get<SlideCommentsResponse>(url)
+			.then(comments => dispatch(commentsAction(slideId, courseId, comments.topLevelComments, forInstructors)));
+	};
 }
 
-export function getComment(commentId: string): Promise<Comment> {
-	const url = constructPathToComment(commentId);
-
-	return api.get(url);
-}
-
-export function addComment(courseId: string, slideId: string, text: string, parentCommentId: string | null,
-	forInstructors: boolean
-): Promise<Comment> {
+export function addComment(courseId: string, slideId: string, text: string, parentCommentId?: number,
+	forInstructors?: boolean
+): (dispatch: Dispatch) => Promise<CommentAddedAction> {
 	const query = buildQuery({ courseId }, convertCamelCaseToSnakeCase);
 	const url = commentsPath + query;
 	const params = api.createRequestParams({
@@ -31,37 +44,69 @@ export function addComment(courseId: string, slideId: string, text: string, pare
 		forInstructors,
 	});
 
-	return api.post(url, params);
+
+	return (dispatch: Dispatch): Promise<CommentAddedAction> => {
+		return api
+			.post<Comment>(url, params)
+			.then(c => dispatch(commentAddedAction(courseId, slideId, c, forInstructors, parentCommentId,)));
+	};
 }
 
-export function deleteComment(commentId: string): Promise<string> {
+export function deleteComment(courseId: string, slideId: string, comment: Comment, forInstructor: boolean,)
+	: (dispatch: Dispatch) => Promise<CommentDeletedAction> {
+	const url = constructPathToComment(comment.id);
+
+	return (dispatch: Dispatch): Promise<CommentDeletedAction> => {
+		return api
+			.delete(url)
+			.then(() => dispatch(commentDeletedAction(courseId, slideId, comment, forInstructor)));
+	};
+}
+
+export function updateComment(commentId: number,
+	updatedFields?: Pick<Partial<Comment>, 'text' | 'isApproved' | 'isCorrectAnswer' | 'isPinnedToTop'>
+)
+	: (dispatch: Dispatch) => Promise<CommentUpdatedAction> {
 	const url = constructPathToComment(commentId);
+	const params = api.createRequestParams(updatedFields || {});
 
-	return api.delete(url);
+	return (dispatch: Dispatch): Promise<CommentUpdatedAction> => {
+		return api
+			.patch<Comment>(url, params)
+			.then(c => dispatch(commentUpdatedAction(c)));
+	};
 }
 
-export function updateComment(commentId: string, commentSettings = {}): Promise<Comment> {
-	const url = constructPathToComment(commentId);
-	const params = api.createRequestParams(commentSettings);
-
-	return api.patch(url, params);
-}
-
-export function likeComment(commentId: string): Promise<string> {
+export function likeComment(commentId: number)
+	: (dispatch: Dispatch) => Promise<CommentLikeUpdatedAction> {
 	const url = constructPathToComment(commentId, true);
 
-	return api.post(url);
+	return (dispatch: Dispatch): Promise<CommentLikeUpdatedAction> => {
+		return api.post(url)
+			.then(() => dispatch(
+				commentLikeUpdatedAction(commentId, true)));
+	};
 }
 
-export function dislikeComment(commentId: string): Promise<string> {
+export function dislikeComment(commentId: number)
+	: (dispatch: Dispatch) => Promise<CommentLikeUpdatedAction> {
 	const url = constructPathToComment(commentId, true);
 
-	return api.delete(url);
+	return (dispatch: Dispatch): Promise<CommentLikeUpdatedAction> => {
+		return api
+			.delete(url)
+			.then(() => dispatch(
+				commentLikeUpdatedAction(commentId, false)));
+	};
 }
 
-export function getCommentPolicy(courseId: string): Promise<CommentPolicy> {
-	const query = buildQuery({ courseId }, convertCamelCaseToSnakeCase);
-	const url = commentPoliciesPath + query;
-	return api.get(url);
+export function getCommentPolicy(courseId: string) {
+	return (dispatch: Dispatch): Promise<CommentsPolicyAction> => {
+		const query = buildQuery({ courseId }, convertCamelCaseToSnakeCase);
+		const url = commentPoliciesPath + query;
+
+		return api.get<CommentPolicyResponse>(url)
+			.then(p => dispatch(commentsPolicyAction(courseId, p)));
+	};
 }
 

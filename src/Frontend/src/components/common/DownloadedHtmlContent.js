@@ -269,7 +269,7 @@ class DownloadedHtmlContent extends Component {
 			return this.props.injectInWrapperAfterContentReady(this.getContent());
 		} else if(this.state.loading) {
 			return (
-				<CourseLoader/>
+				<CourseLoader isSlideLoader={ false }/>
 			)
 		}
 

@@ -35,7 +35,7 @@ export function constructPathToAcceptedSolutions(courseId: string, slideId: stri
 	return `/${ coursePath }/${ courseId }/${ acceptedSolutions }?slideId=${ slideId }`;
 }
 
-export function constructPathToComment(commentId: string, isLike?: boolean): string {
+export function constructPathToComment(commentId: number, isLike?: boolean): string {
 	const url = `${ commentsPath }/${ commentId }`;
 
 	if(isLike) {
@@ -58,4 +58,8 @@ export function constructPathToFlashcardsPreview(courseId: string, openUnitId?: 
 
 export function constructLinkWithReturnUrl(link: string, returnUrl?: string): string {
 	return `/${ link }${ buildQuery({ returnUrl: returnUrl || window.location.pathname }) }`;
+}
+
+export function getUserSolutionsUrl(courseId: string, slideId: string, userId: string): string {
+	return userSolutions + buildQuery({ courseId, slideId, userId });
 }

@@ -15,13 +15,11 @@ import styles from "./CommentSendForm.less";
 interface Props {
 	text?: string;
 	author?: UserInfo;
-	commentId: string;
 	sendStatus?: string;
 	submitTitle?: string;
 	cancelTitle?: string;
 	className?: string;
 
-	isForInstructors?: boolean;
 	isShowFocus: {
 		inSendForm?: boolean;
 		inEditForm?: boolean;
@@ -30,13 +28,12 @@ interface Props {
 	sending?: boolean;
 
 	handleCancel?: () => void;
-	handleSubmit: (commentId: string, text: string) => void;
+	handleSubmit: (text: string) => void;
 }
 
 interface State {
 	text: string;
 	error: null | string;
-	commentId: string;
 	status?: string;
 }
 
@@ -47,35 +44,23 @@ class CommentSendForm extends Component<Props, State> {
 		this.state = {
 			text: props.text || "",
 			error: null,
-			commentId: props.commentId,
 			status: props.sendStatus,
 		};
 	}
 
-	static getDerivedStateFromProps(props: Props, state: State): Partial<State> | null {
-		if(props.commentId !== state.commentId) {
-			return {
-				text: props.text || "",
-				commentId: props.commentId,
-			};
-		}
-
-		return null;
-	}
-
 	render(): React.ReactElement {
-		const { author, isForInstructors, isShowFocus, className } = this.props;
+		const { author, isShowFocus, className } = this.props;
 		const { error, text } = this.state;
 
 		const classes = classNames(className, styles.formContainer);
 
 		return (
 			<div className={ classes }>
-				{ author && !isMobile() && (<Avatar className={ styles.avatar } user={ author as ShortUserInfo } size="big"/>) }
+				{ author && !isMobile() && (
+					<Avatar className={ styles.avatar } user={ author as ShortUserInfo } size="big"/>) }
 				<form className={ styles.form } onSubmit={ this.handleSubmit }>
 					<MarkdownEditor
 						isShowFocus={ isShowFocus }
-						isForInstructors={ isForInstructors }
 						hasError={ error !== null }
 						text={ text }
 						handleChange={ this.handleChange }
@@ -132,11 +117,15 @@ class CommentSendForm extends Component<Props, State> {
 				error: "Заполните поле комментария",
 			});
 			return;
+		} else {
+			this.setState({
+				text: '',
+			});
 		}
 
-		const { commentId, handleSubmit } = this.props;
+		const { handleSubmit, } = this.props;
 
-		handleSubmit(commentId, text);
+		handleSubmit(text);
 	};
 
 	handleChange = (text: string, callback?: () => void): void => {

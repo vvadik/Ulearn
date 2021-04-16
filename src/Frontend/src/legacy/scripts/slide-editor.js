@@ -1,6 +1,6 @@
 import CodeMirror from "codemirror";
 import { autoEnlargeTextarea } from "src/legacy/scripts/slide-comments";
-import { Exercise } from "src/components/course/Course/Slide/Blocks";
+import { loadLanguageStyles } from "src/components/course/Course/Slide/Blocks/Exercise/ExerciseUtils";
 
 export default function () {
 	initCodeEditor();
@@ -127,7 +127,7 @@ export function initCodeEditor($parent) {
 
 	function getLangInfo(langId) {
 		/* See http://codemirror.net/mode/ for details */
-		Exercise.loadLanguageStyles(langId);//we're reusing this method to load styles
+		loadLanguageStyles(langId);//we're reusing this method to load styles
 
 		if(!langId)
 			return { mode: "text/plain", hint: null };

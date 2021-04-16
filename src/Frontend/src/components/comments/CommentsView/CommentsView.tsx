@@ -1,17 +1,14 @@
 import React, { Component } from "react";
-import { connect } from "react-redux";
-
-import api from "src/api";
 
 import { Tabs } from "ui";
 import CommentsList from "../CommentsList/CommentsList";
+import CourseLoader from "src/components/course/Course/CourseLoader/CourseLoader";
 
 import { isInstructor, UserInfo, } from "src/utils/courseRoles";
 
-import { RootState } from "src/redux/reducers";
 import { TabsType } from "src/consts/tabsType";
 import { SlideType } from "src/models/slide";
-import { Comment, CommentPolicy } from "src/models/comments";
+import { Comment, CommentPolicy, } from "src/models/comments";
 import { DeviceType } from "src/consts/deviceType";
 
 import styles from "./CommentsView.less";
@@ -24,20 +21,36 @@ interface Props {
 
 	user: UserInfo;
 
-	commentsApi: typeof api.comments;
-
 	openInstructorsComments?: boolean;
 	isSlideReady: boolean;
 
 	deviceType: DeviceType;
+
+	commentPolicy?: CommentPolicy;
+	comments?: Comment[];
+	instructorComments?: Comment[];
+
+	api: {
+		getCommentPolicy: (courseId: string) => Promise<unknown>;
+		getComments: (courseId: string, slideId: string, forInstructor: boolean) => Promise<unknown>;
+
+		addComment: (courseId: string, slideId: string, text: string, forInstructor: boolean,
+			parentCommentId?: number
+		) => Promise<Comment>;
+		deleteComment: (courseId: string, slideId: string, comment: Comment, forInstructor: boolean,
+		) => Promise<unknown>;
+
+		likeComment: (commentId: number) => Promise<unknown>;
+		dislikeComment: (commentId: number) => Promise<unknown>;
+
+		updateComment: (commentId: number,
+			updatedFields?: Pick<Partial<Comment>, 'text' | 'isApproved' | 'isCorrectAnswer' | 'isPinnedToTop'>
+		) => Promise<Comment>;
+	}
 }
 
 interface State {
-	commentPolicy: CommentPolicy | null;
 	activeTab: TabsType;
-	instructorsCommentCount: number;
-	instructorsComments: Comment[];
-
 	openModal: boolean;
 	tabHasAutomaticallyChanged: boolean;
 }
@@ -49,94 +62,103 @@ class CommentsView extends Component<Props, State> {
 		super(props);
 
 		this.state = {
-			instructorsComments: [],
-			commentPolicy: null,
 			activeTab: this.props.openInstructorsComments ? TabsType.instructorsComments : TabsType.allComments,
 			openModal: false,
-			instructorsCommentCount: 0,
 			tabHasAutomaticallyChanged: false,
 		};
 	}
 
-	static defaultProps = {
-		commentsApi: api.comments,
-	};
-
 	componentDidMount(): void {
-		const { courseId, slideId, user, } = this.props;
+		this.loadData();
+	}
 
-		this.loadCommentPolicy(courseId);
+	componentDidUpdate(prevProps: Props, prevState: State,): void {
+		const { slideId, } = this.props;
+		const { activeTab, } = this.state;
+
+		if(slideId !== prevProps.slideId && prevProps.slideId || activeTab !== prevState.activeTab) {
+			this.loadData();
+		}
+	}
+
+	loadData = (): void => {
+		const { courseId, slideId, user, commentPolicy, api, } = this.props;
+		if(!commentPolicy) {
+			api.getCommentPolicy(courseId);
+		}
+
+		api.getComments(courseId, slideId, false);
 
 		if(isInstructor(user)) {
-			this.loadComments(courseId, slideId);
+			api.getComments(courseId, slideId, true);
 		}
-	}
-
-	componentDidUpdate(prevProps: Props): void {
-		const { slideId, courseId, user, } = this.props;
-
-		if(slideId !== prevProps.slideId) {
-			if(isInstructor(user)) {
-				this.loadComments(courseId, slideId);
-			}
-		}
-	}
-
-	loadCommentPolicy = (courseId: string): void => {
-		const { commentsApi, } = this.props;
-
-		commentsApi.getCommentPolicy(courseId)
-			.then(commentPolicy => {
-				this.setState({
-					commentPolicy: commentPolicy,
-				});
-			})
-			.catch(console.error);
-	};
-
-	loadComments = (courseId: string, slideId: string): void => {
-		const { commentsApi, } = this.props;
-
-		commentsApi.getComments(courseId, slideId, true)
-			.then(json => {
-				const comments = json.topLevelComments;
-				this.setState({
-					instructorsComments: comments,
-					instructorsCommentCount: comments.length,
-				});
-			})
-			.catch(console.error);
 	};
 
 	render(): React.ReactElement {
-		const { user, courseId, slideId, slideType, commentsApi, isSlideReady, } = this.props;
-		const { activeTab, commentPolicy, } = this.state;
+		const {
+			user,
+			courseId,
+			slideId,
+			slideType,
+			isSlideReady,
+			comments,
+			instructorComments,
+			commentPolicy,
+			api,
+		} = this.props;
+		const { activeTab, } = this.state;
+
+		const commentsInList = activeTab === TabsType.allComments ? comments : instructorComments;
+		const commentsLoaded = isInstructor(user)
+			? commentPolicy && comments && instructorComments
+			: commentPolicy && comments;
 
 		return (
 			<div className={ styles.wrapper }>
 				{ this.renderHeader() }
 				<div key={ activeTab }>
-					<CommentsList
-						slideType={ slideType }
-						handleInstructorsCommentCount={ this.handleInstructorsCommentCount }
-						handleTabChange={ this.handleTabChange }
-						headerRef={ this.headerRef }
-						forInstructors={ activeTab === TabsType.instructorsComments }
-						commentsApi={ commentsApi }
-						commentPolicy={ commentPolicy }
-						user={ user }
-						slideId={ slideId }
-						courseId={ courseId }
-						isSlideReady={ isSlideReady }>
-					</CommentsList>
+					{ commentsLoaded
+						? <CommentsList
+							slideType={ slideType }
+							handleTabChange={ this.handleTabChange }
+							isSlideContainsComment={ this.isSlideContainsComment }
+							headerRef={ this.headerRef }
+							commentPolicy={ commentPolicy! }
+							user={ user }
+							slideId={ slideId }
+							courseId={ courseId }
+							isSlideReady={ isSlideReady }
+							comments={ commentsInList! }
+							api={ {
+								addComment: this.handleAddComment,
+								deleteComment: this.handleDeleteComment,
+
+								likeComment: api.likeComment,
+								dislikeComment: api.dislikeComment,
+
+								updateComment: api.updateComment,
+							} }
+						/>
+						: <CourseLoader isSlideLoader={ false }/>
+					}
 				</div>
 			</div>
 		);
 	}
 
+	isSlideContainsComment = (commentId: number): boolean => {
+		const {
+			comments,
+			instructorComments,
+		} = this.props;
+
+		return !!(comments?.some(c => c.id === commentId || c.replies.some(r => r.id === commentId))
+			|| instructorComments?.some(c => c.id === commentId || c.replies.some(r => r.id === commentId)));
+	};
+
 	renderHeader(): React.ReactElement {
-		const { user, deviceType, } = this.props;
-		const { activeTab, instructorsCommentCount, } = this.state;
+		const { user, deviceType, instructorComments } = this.props;
+		const { activeTab, } = this.state;
 
 		return (
 			<header className={ styles.header } ref={ this.headerRef }>
@@ -146,8 +168,8 @@ class CommentsView extends Component<Props, State> {
 						<Tabs.Tab id={ TabsType.allComments }>К слайду</Tabs.Tab>
 						<Tabs.Tab id={ TabsType.instructorsComments }>
 							Для преподавателей
-							{ instructorsCommentCount > 0 &&
-							<span className={ styles.commentsCount }>{ instructorsCommentCount }</span> }
+							{ instructorComments && instructorComments.length > 0 &&
+							<span className={ styles.commentsCount }>{ instructorComments.length }</span> }
 						</Tabs.Tab>
 						{ activeTab === TabsType.instructorsComments && deviceType !== DeviceType.mobile &&
 						<span className={ styles.textForInstructors }>
@@ -159,45 +181,42 @@ class CommentsView extends Component<Props, State> {
 		);
 	}
 
-	handleTabChangeByUser = (id: string): void =>
-		this.handleTabChange(id as TabsType, true);
+	handleTabChangeByUser = (): void =>
+		this.handleTabChange(true);
 
-	handleTabChange = (id: TabsType, isUserAction: boolean): void => {
+	handleTabChange = (isUserAction?: boolean): void => {
 		const { user, } = this.props;
 		const { activeTab, tabHasAutomaticallyChanged, } = this.state;
 
-		if(isInstructor(user)) {
-			if(!isUserAction && tabHasAutomaticallyChanged) {
-				return;
-			}
-
-			if(id !== activeTab) {
-				this.setState({
-					activeTab: id,
-				});
-			}
-
-			if(!isUserAction) {
-				this.setState({
-					tabHasAutomaticallyChanged: true
-				});
-			}
+		if(!isUserAction && tabHasAutomaticallyChanged) {
+			return;
 		}
+
+		if(isInstructor(user)) {
+			this.setState({
+				activeTab: activeTab === TabsType.allComments ? TabsType.instructorsComments : TabsType.allComments,
+			});
+		}
+
+		this.setState({
+			tabHasAutomaticallyChanged: true,
+		});
 	};
 
-	handleInstructorsCommentCount = (action: 'add' | string): void => {
-		const { instructorsCommentCount, } = this.state;
+	handleAddComment = async (text: string, parentCommentId?: number): Promise<Comment> => {
+		const { activeTab, } = this.state;
+		const { slideId, courseId, api, } = this.props;
 
-		if(action === "add") {
-			this.setState({
-				instructorsCommentCount: instructorsCommentCount + 1,
-			});
-		} else {
-			this.setState({
-				instructorsCommentCount: instructorsCommentCount - 1,
-			});
-		}
+		return await api.addComment(courseId, slideId, text, activeTab === TabsType.instructorsComments,
+			parentCommentId);
+	};
+
+	handleDeleteComment = async (comment: Comment): Promise<void> => {
+		const { slideId, courseId, api, } = this.props;
+		const { activeTab, } = this.state;
+
+		await api.deleteComment(courseId, slideId, comment, activeTab === TabsType.instructorsComments);
 	};
 }
 
-export default connect((state: RootState) => ({ deviceType: state.device.deviceType }))(CommentsView);
+export default CommentsView;

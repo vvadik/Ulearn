@@ -63,12 +63,10 @@ function animate(
 	scrollingElement?: HTMLElement,
 	increment = 20,
 ) {
-	const getChange = () => getToPosition() - getScrollTop(scrollingElement);
 	let currentTime = 0;
-
 	const animateScroll = function () {
 		currentTime += increment;
-		const scrollPosition = easeInOutQuad(currentTime, getScrollTop(scrollingElement), getChange(), duration);
+		const scrollPosition = easeInOutQuad(currentTime, getScrollTop(scrollingElement), getToPosition() - getScrollTop(scrollingElement), duration);
 		(scrollingElement || window).scrollTo({
 			left: 0,
 			top: scrollPosition,

@@ -3,7 +3,7 @@ import api from "src/api";
 import { AccountInfo, LogoutInfo, RolesInfo } from "src/models/account";
 import { accountInfoUpdateAction, rolesUpdateAction } from "src/actions/account";
 import { account, logoutPath, rolesPath } from "src/consts/routes";
-import { clearCache, exerciseSolutions, removeFromCache, setBlockCache, } from "src/utils/localStorageManager";
+import { exerciseSolutions, removeFromCache, setBlockCache, } from "src/utils/localStorageManager";
 
 export function getCurrentUser() {
 	return (dispatch: Dispatch): Promise<void> => {

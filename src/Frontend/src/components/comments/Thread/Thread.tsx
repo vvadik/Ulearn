@@ -14,6 +14,7 @@ import styles from "./Thread.less";
 
 interface Props {
 	courseId: string;
+	slideId: string;
 	slideType: SlideType;
 
 	user: UserInfo;
@@ -26,13 +27,12 @@ interface Props {
 	animation: boolean;
 	isSlideReady: boolean;
 
-	getUserSolutionsUrl: (userId: string) => string;
 	actions: ActionsType;
 }
 
 function Thread({
 	comment, user, reply, commentEditing, actions, slideType,
-	getUserSolutionsUrl, commentPolicy, courseId, isSlideReady, animation,
+	commentPolicy, courseId, isSlideReady, animation, slideId,
 }: Props): React.ReactElement {
 	const replies = comment.replies || [];
 	return renderComment(comment, replies.length === 0);
@@ -50,9 +50,9 @@ function Thread({
 				commentEditing={ commentEditing }
 				commentPolicy={ commentPolicy }
 				actions={ actions }
-				getUserSolutionsUrl={ getUserSolutionsUrl }
 				slideType={ slideType }
 				courseId={ courseId }
+				slideId={ slideId }
 				user={ user }
 				isSlideReady={ isSlideReady }>
 				{ comment.replies.length > 0 && renderReplies(comment) }
@@ -60,14 +60,17 @@ function Thread({
 				<CommentSendForm
 					className={ styles.replyForm }
 					isShowFocus={ focusedReplyForm }
-					commentId={ comment.id }
 					sending={ reply.sending }
 					author={ user }
 					submitTitle="Отправить"
 					handleCancel={ handleShowReplyFormClick }
-					handleSubmit={ actions.handleAddReplyComment }/> }
+					handleSubmit={ handleAddReply }/> }
 			</Comment>
 		);
+	}
+
+	function handleAddReply(text: string) {
+		actions.handleAddReplyComment(comment.id, text);
 	}
 
 	function handleShowReplyFormClick() {

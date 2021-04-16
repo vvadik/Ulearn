@@ -1,7 +1,7 @@
 import React from "react";
 
 export interface CommentStatus {
-	commentId?: string | null;
+	commentId?: number | null;
 	sending?: boolean;
 }
 

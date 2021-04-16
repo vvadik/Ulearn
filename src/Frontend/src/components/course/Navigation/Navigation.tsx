@@ -311,6 +311,9 @@ class Navigation extends Component<Props, State> {
 
 	lockBodyScroll = (lock: boolean): void => {
 		const classList = this.body?.classList;
+		if(!this.isMobileNavigationEnabled()) {
+			return;
+		}
 		if(!classList) {
 			return;
 		}

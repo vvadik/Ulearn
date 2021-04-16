@@ -7,6 +7,7 @@ import accountReducer from "./account";
 import notificationsReducer from "./notifications";
 import instructorReducer from "./instructor";
 import deviceReducer from "./device";
+import commentsReducer from "./comments";
 import { ACCOUNT__USER_INFO_UPDATED } from "src/actions/account.types";
 
 const rootReducer = combineReducers({
@@ -18,6 +19,7 @@ const rootReducer = combineReducers({
 	slides: slidesReducer,
 	instructor: instructorReducer,
 	device: deviceReducer,
+	comments: commentsReducer,
 });
 
 type RootState = ReturnType<typeof rootReducer>

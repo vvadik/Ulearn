@@ -13,6 +13,7 @@ import CommentActions from "./CommentActions/CommentActions";
 import { UserInfo, } from "src/utils/courseRoles";
 import scrollToView from "src/utils/scrollToView";
 import { convertDefaultTimezoneToLocal } from "src/utils/momentUtils";
+import { getUserSolutionsUrl } from "src/consts/routes";
 
 import { CommentStatus } from "src/consts/comments";
 import { CourseAccessType, CourseRoleType, SystemAccessType } from "src/consts/accessType";
@@ -25,6 +26,7 @@ import styles from "./Comment.less";
 
 interface Props {
 	courseId: string;
+	slideId: string;
 	slideType: SlideType;
 
 	user: UserInfo;
@@ -37,7 +39,6 @@ interface Props {
 	isSlideReady: boolean;
 
 	actions: ActionsType;
-	getUserSolutionsUrl: (userId: string) => string;
 
 	children: React.ReactNode;
 }
@@ -57,14 +58,12 @@ class Comment extends Component<Props, State> {
 		};
 	}
 
-
 	componentDidMount(): void {
 		this.scrollToComment();
 	}
 
 	componentDidUpdate(prevProps: Props): void {
 		const { isSlideReady, } = this.props;
-
 		if(isSlideReady && !prevProps.isSlideReady) {
 			this.scrollToComment();
 		}
@@ -72,8 +71,7 @@ class Comment extends Component<Props, State> {
 
 	scrollToComment = (): void => {
 		const { isSlideReady, } = this.props;
-
-		if(isSlideReady && window.location.hash === `#comment-${ this.props.comment.id }`) {
+		if(isSlideReady && window.location.hash.includes(`comment-${ this.props.comment.id }`)) {
 			scrollToView(this.ref);
 		}
 	};
@@ -108,7 +106,7 @@ class Comment extends Component<Props, State> {
 	}
 
 	renderHeader(profileUrl: string, canViewProfiles: boolean): React.ReactElement {
-		const { actions, comment, user, slideType, getUserSolutionsUrl, courseId } = this.props;
+		const { actions, comment, user, slideType, courseId, slideId, } = this.props;
 		const canSeeKebabActions = user.id && (user.id === comment.author.id ||
 			this.canModerateComments(user, CourseAccessType.editPinAndRemoveComments) ||
 			this.canModerateComments(user, CourseAccessType.viewAllStudentsSubmissions));
@@ -130,7 +128,7 @@ class Comment extends Component<Props, State> {
 				{ canSeeKebabActions &&
 				<KebabActions
 					user={ user }
-					url={ getUserSolutionsUrl(comment.author.id) }
+					url={ getUserSolutionsUrl(courseId, slideId, comment.author.id) }
 					canModerateComments={ this.canModerateComments }
 					slideType={ slideType }
 					comment={ comment }
@@ -149,7 +147,8 @@ class Comment extends Component<Props, State> {
 	renderComment(): React.ReactNode {
 		const {
 			comment, user, hasReplyAction, actions, slideType,
-			getUserSolutionsUrl
+			courseId,
+			slideId,
 		} = this.props;
 
 		return (
@@ -164,7 +163,7 @@ class Comment extends Component<Props, State> {
 					comment={ comment }
 					canReply={ this.canReply(user) }
 					user={ user }
-					url={ getUserSolutionsUrl(comment.author.id) }
+					url={ getUserSolutionsUrl(courseId, slideId, comment.author.id) }
 					hasReplyAction={ hasReplyAction }
 					actions={ actions }
 					canModerateComments={ this.canModerateComments }/> }
@@ -173,20 +172,25 @@ class Comment extends Component<Props, State> {
 	}
 
 	renderEditCommentForm(): React.ReactElement {
-		const { comment, actions, commentEditing } = this.props;
+		const { comment, commentEditing } = this.props;
 		const focusedEditForm = { inEditForm: comment.id === commentEditing.commentId, };
 
 		return (
 			<CommentSendForm
 				isShowFocus={ focusedEditForm }
-				commentId={ comment.id }
-				handleSubmit={ actions.handleEditComment }
+				handleSubmit={ this.handleEditSubmit }
 				text={ comment.text }
 				submitTitle={ "Сохранить" }
 				sending={ commentEditing.sending }
 				handleCancel={ this.handleShowEditFormCancelClick }/>
 		);
 	}
+
+	handleEditSubmit = (text: string): void => {
+		const { actions, comment, } = this.props;
+
+		actions.handleEditComment(comment.id, text);
+	};
 
 	handleShowEditFormCancelClick = (): void => {
 		this.props.actions.handleShowEditForm(null);
@@ -215,7 +219,7 @@ class Comment extends Component<Props, State> {
 			user.isSystemAdministrator;
 	};
 
-	handleCommentBackground = (commentId: string, isApproved: boolean): void => {
+	handleCommentBackground = (commentId: number, isApproved: boolean): void => {
 		this.setState({
 			isApproved,
 		});
