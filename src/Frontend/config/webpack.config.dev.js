@@ -19,7 +19,7 @@ const { merge } = require('webpack-merge');
 
 module.exports = merge([base, {
 	mode: 'development',
-	devtool: 'eval-cheap-source-map',
+	devtool: 'eval-source-map',
 	entry: {
 		oldBrowser: paths.oldBrowserJs,
 		hmr: 'react-dev-utils/webpackHotDevClient',
