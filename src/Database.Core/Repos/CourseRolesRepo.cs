@@ -80,7 +80,7 @@ namespace Database.Repos
 
 		public async Task<bool> HasUserAccessToCourse(string userId, string courseId, CourseRoleType minCourseRoleType)
 		{
-			var user = await usersRepo.FindUserByIdAsync(userId).ConfigureAwait(false);
+			var user = await usersRepo.FindUserById(userId).ConfigureAwait(false);
 			if (usersRepo.IsSystemAdministrator(user))
 				return true;
 
@@ -89,7 +89,7 @@ namespace Database.Repos
 
 		public async Task<bool> HasUserAccessTo_Any_Course(string userId, CourseRoleType minCourseRoleType)
 		{
-			var user = await usersRepo.FindUserByIdAsync(userId).ConfigureAwait(false);
+			var user = await usersRepo.FindUserById(userId).ConfigureAwait(false);
 			if (usersRepo.IsSystemAdministrator(user))
 				return true;
 

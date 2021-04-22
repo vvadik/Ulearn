@@ -18,7 +18,7 @@ namespace Database.Repos.Users.Search
 			if (request.LmsRole == null)
 				return users;
 
-			var userIds = await usersRepo.GetUserIdsWithLmsRoleAsync(request.LmsRole.Value).ConfigureAwait(false);
+			var userIds = await usersRepo.GetUserIdsWithLmsRole(request.LmsRole.Value).ConfigureAwait(false);
 			return users.Where(u => userIds.Contains(u.Id));
 		}
 	}

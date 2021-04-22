@@ -159,7 +159,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 				return StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse("You can't change the owner of this group. Only current owner and course admin can change the owner."));
 
 			/* New owner should exist and be a course instructor */
-			var user = await usersRepo.FindUserByIdAsync(parameters.OwnerId).ConfigureAwait(false);
+			var user = await usersRepo.FindUserById(parameters.OwnerId).ConfigureAwait(false);
 			if (user == null)
 				return NotFound(new ErrorResponse($"Can't find user with id {parameters.OwnerId}"));
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(parameters.OwnerId, group.CourseId, CourseRoleType.Instructor).ConfigureAwait(false);
@@ -328,7 +328,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			if (!await IsSystemAdministratorAsync().ConfigureAwait(false))
 				return StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse("Only system administrator can add students to group directly"));
 
-			var user = await usersRepo.FindUserByIdAsync(studentId).ConfigureAwait(false);
+			var user = await usersRepo.FindUserById(studentId).ConfigureAwait(false);
 			if (user == null)
 				return NotFound(new ErrorResponse($"Can't find user with id {studentId}"));
 
@@ -357,7 +357,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
 
-			var user = await usersRepo.FindUserByIdAsync(studentId).ConfigureAwait(false);
+			var user = await usersRepo.FindUserById(studentId).ConfigureAwait(false);
 			if (user == null)
 				return NotFound(new ErrorResponse($"Can't find user with id {studentId}"));
 
@@ -493,7 +493,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
 
-			var user = await usersRepo.FindUserByIdAsync(userId).ConfigureAwait(false);
+			var user = await usersRepo.FindUserById(userId).ConfigureAwait(false);
 			if (user == null)
 				return NotFound(new ErrorResponse($"User {userId} not found"));
 

@@ -1277,7 +1277,7 @@ namespace Database.Models
 		{
 			GroupId = groupId;
 			UserIds = string.Join(",", userIds);
-			var users = usersRepo.GetUsersByIdsAsync(userIds).GetAwaiter().GetResult();
+			var users = usersRepo.GetUsersByIds(userIds).GetAwaiter().GetResult();
 			var userNames = users.Select(u => u.VisibleName).ToList();
 			UserDescriptions = GetUserDescriptions(userNames);
 		}

@@ -42,7 +42,7 @@ namespace Database.Repos.Users.Search
 				return Enumerable.Empty<ApplicationUser>().AsQueryable();
 
 			/* This searcher works identically in strict and non-strict mode */
-			var userIds = await usersRepo.FindUsersBySocialProviderKeyAsync(term).ConfigureAwait(false);
+			var userIds = await usersRepo.FindUsersBySocialProviderKey(term).ConfigureAwait(false);
 			return users.Where(u => userIds.Contains(u.Id));
 		}
 	}

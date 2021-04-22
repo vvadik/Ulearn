@@ -53,7 +53,7 @@ namespace Ulearn.Web.Api.Controllers.Websockets
 				else
 				{
 					var instructors = await courseRolesRepo.GetListOfUsersWithCourseRole(CourseRoleType.Instructor, courseId, true);
-					var sysAdmins = await usersRepo.GetSysAdminsIdsAsync();
+					var sysAdmins = await usersRepo.GetSysAdminsIds();
 					clientProxy = hubContext.Clients.Users(instructors.Concat(sysAdmins).Distinct().ToList());
 				}
 

@@ -412,7 +412,7 @@ namespace Database.Repos
 					if (!visibleUnits.Any())
 					{
 						var userIdsWithInstructorRoles = await courseRolesRepo.GetListOfUsersWithCourseRole(CourseRoleType.Tester, notification.CourseId, true);
-						var sysAdminsIds = await usersRepo.GetSysAdminsIdsAsync();
+						var sysAdminsIds = await usersRepo.GetSysAdminsIds();
 						recipientsIds.IntersectWith(userIdsWithInstructorRoles.Concat(sysAdminsIds));
 					}
 				}

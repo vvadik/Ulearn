@@ -38,7 +38,7 @@ namespace Ulearn.Web.Api.Controllers.Users
 			if (words.Count > 10)
 				return BadRequest(new ErrorResponse("Too many words in query"));
 
-			var currentUser = await usersRepo.FindUserByIdAsync(UserId).ConfigureAwait(false);
+			var currentUser = await usersRepo.FindUserById(UserId).ConfigureAwait(false);
 			var isSystemAdministrator = usersRepo.IsSystemAdministrator(currentUser);
 
 			if (!string.IsNullOrEmpty(parameters.CourseId))

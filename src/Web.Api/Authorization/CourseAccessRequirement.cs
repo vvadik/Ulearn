@@ -57,7 +57,7 @@ namespace Ulearn.Web.Api.Authorization
 			}
 
 			var userId = context.User.GetUserId();
-			var user = await usersRepo.FindUserByIdAsync(userId).ConfigureAwait(false);
+			var user = await usersRepo.FindUserById(userId).ConfigureAwait(false);
 			if (user == null)
 			{
 				context.Fail();

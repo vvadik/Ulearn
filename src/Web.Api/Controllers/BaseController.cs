@@ -68,7 +68,7 @@ namespace Ulearn.Web.Api.Controllers
 
 		protected async Task<bool> IsSystemAdministratorAsync()
 		{
-			var user = await usersRepo.FindUserByIdAsync(UserId).ConfigureAwait(false);
+			var user = await usersRepo.FindUserById(UserId).ConfigureAwait(false);
 			return usersRepo.IsSystemAdministrator(user);
 		}
 
