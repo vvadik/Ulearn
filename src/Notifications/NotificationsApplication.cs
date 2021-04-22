@@ -39,12 +39,12 @@ namespace Notifications
 			if (isOneTimeSend)
 			{
 				var sender = serviceProvider.GetService<OneTimeEmailSender>();
-				await sender.SendEmails();
+				await sender!.SendEmails();
 				return;
 			}
 
 			var notificationsConfiguration = serviceProvider.GetService<IOptions<NotificationsConfiguration>>();
-			if (!notificationsConfiguration.Value.Enabled)
+			if (!notificationsConfiguration!.Value.Enabled)
 			{
 				Thread.Sleep(Timeout.Infinite);
 				return;
@@ -71,25 +71,27 @@ namespace Notifications
 		{
 			base.ConfigureDi(services);
 			services.AddSingleton<OneTimeEmailSender>();
-			services.AddSingleton<IEmailSender, KonturSpamEmailSender>();
-			services.AddSingleton<INotificationSender, NotificationSender>();
-			services.AddSingleton<ITelegramSender, TelegramSender>();
-			services.AddSingleton<ProcessDeliveries>();
-			services.AddSingleton(sp => new MetricSender(
-				((IOptions<NotificationsConfiguration>)sp.GetService(typeof(IOptions<NotificationsConfiguration>))).Value.GraphiteServiceName));
+			services.AddScoped<IEmailSender, KonturSpamEmailSender>();
+			services.AddScoped<INotificationSender, NotificationSender>();
+			services.AddScoped<ITelegramSender, TelegramSender>();
+			services.AddScoped<DeliveriesProcessor>();
+			services.AddScoped(sp => new MetricSender(
+				((IOptions<NotificationsConfiguration>)sp.GetService(typeof(IOptions<NotificationsConfiguration>)))!.Value.GraphiteServiceName));
 			services.AddDatabaseServices();
 		}
 
 		public async Task MainLoop()
 		{
-			var sender = serviceProvider.GetService<ProcessDeliveries>();
-
 			while (true)
 			{
 				try
 				{
-					await sender.CreateDeliveries().ConfigureAwait(false);
-					await sender.SendDeliveries().ConfigureAwait(false);
+					using (var scope = serviceProvider.CreateScope())
+					{
+						var sender = scope.ServiceProvider.GetService<DeliveriesProcessor>();
+						await sender!.CreateDeliveries().ConfigureAwait(false);
+						await sender.SendDeliveries().ConfigureAwait(false);
+					}
 				}
 				catch (Exception e)
 				{

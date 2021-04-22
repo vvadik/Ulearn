@@ -9,7 +9,7 @@ using Vostok.Logging.Abstractions;
 
 namespace Notifications
 {
-	public class ProcessDeliveries
+	public class DeliveriesProcessor
 	{
 		private readonly INotificationsRepo notificationsRepo;
 		private readonly INotificationSender notificationSender;
@@ -17,7 +17,7 @@ namespace Notifications
 
 		private ILog log => LogProvider.Get().ForContext(typeof(NotificationsApplication));
 
-		public ProcessDeliveries(INotificationsRepo notificationsRepo, INotificationSender notificationSender, IWebCourseManager courseManager)
+		public DeliveriesProcessor(INotificationsRepo notificationsRepo, INotificationSender notificationSender, IWebCourseManager courseManager)
 		{
 			this.notificationsRepo = notificationsRepo;
 			this.notificationSender = notificationSender;
