@@ -35,20 +35,24 @@ function ShowHintButton({
 
 	return (
 		<span className={ styles.exerciseControls } onClick={ showTooltip }>
-			<span className={ styles.exerciseControlsIcon }>
-				<Tooltip
-					onCloseRequest={ closeTooltip }
-					allowedPositions={ [hintPosition] }
-					pos={ hintPosition }
-					trigger={ mainTooltipTrigger || (isTooltipOpened ? "opened" : "closed") }
-					render={ renderHints }
-				>
-					<Lightbulb/>
-				</Tooltip>
-			</span>
-			<ShowControlsTextContext.Consumer>
+				<ShowControlsTextContext.Consumer>
 				{
-					(showControlsTextContext) => (showControlsTextContext || showControlsText) && texts.controls.hints.text
+					(showControlsTextContext) =>
+						<>
+						<span className={ styles.exerciseControlsIcon }>
+							<Tooltip
+								disableAnimations={ !showControlsTextContext && !showControlsText }
+								onCloseRequest={ closeTooltip }
+								allowedPositions={ [hintPosition] }
+								pos={ hintPosition }
+								trigger={ mainTooltipTrigger || (isTooltipOpened ? "opened" : "closed") }
+								render={ renderHints }
+							>
+								<Lightbulb/>
+							</Tooltip>
+						</span>
+							{ (showControlsTextContext || showControlsText) && texts.controls.hints.text }
+						</>
 				}
 			</ShowControlsTextContext.Consumer>
 		</span>
