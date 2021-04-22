@@ -50,7 +50,6 @@ function Text(props: Props): React.ReactElement {
 		}
 
 		for (const hashAnchor of hashAnchorsLinks) {
-			console.log(hashAnchor);
 			const { hash } = hashAnchor;
 			hashAnchor.addEventListener('click', (e) => {
 				e.stopPropagation();
@@ -67,7 +66,6 @@ function Text(props: Props): React.ReactElement {
 		if(anchors.length > 0) {
 			scrollToView({ current: anchors[0] }, {
 				animationDuration: 500,
-				allowScrollToTop: false,
 				behavior: 'smooth',
 				additionalTopOffset: 50,
 			});
