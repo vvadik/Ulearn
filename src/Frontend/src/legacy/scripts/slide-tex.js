@@ -1,14 +1,11 @@
-﻿import * as katex from "katex";
-
-const katexTransformed = 'katex';
+﻿import translateTextToKatex from "src/codeTranslator/katex";
+import translateTextToMathKatex from "src/codeTranslator/math-katex";
 
 export default function () {
 	$(".tex").each(function (index, element) {
-		const latex = $(element).text();
-		if(latex && element.dataset.transformation !== katexTransformed) {
-			element.title = latex;
-			element.dataset.transformation = katexTransformed;
-			katex.render(latex, element);
-		}
+		translateTextToKatex(element, {});
+	});
+	$(".math-tex").each(function (index, element) {
+		translateTextToMathKatex(element, {});
 	});
 }
