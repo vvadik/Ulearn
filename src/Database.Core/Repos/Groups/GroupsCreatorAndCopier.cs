@@ -8,7 +8,6 @@ using Ulearn.Common.Extensions;
 
 namespace Database.Repos.Groups
 {
-	/* This class is fully migrated to .NET Core and EF Core */
 	public class GroupsCreatorAndCopier : IGroupsCreatorAndCopier
 	{
 		private readonly UlearnDb db;

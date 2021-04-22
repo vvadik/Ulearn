@@ -10,7 +10,6 @@ using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
 
 namespace Database.Repos
 {
-	/* This repo is fully migrated to .NET Core and EF Core */
 	/* TODO (andgein): BE CAREFUL. This repo is not tested absolutely, it was just copied from legacy Database/UserQuizzesRepo and refactored. */
 	public class UserQuizzesRepo : IUserQuizzesRepo
 	{

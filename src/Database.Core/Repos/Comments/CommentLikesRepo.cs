@@ -11,7 +11,6 @@ using Z.EntityFramework.Plus;
 
 namespace Database.Repos.Comments
 {
-	/* This class is fully migrated to .NET Core and EF Core */
 	public class CommentLikesRepo : ICommentLikesRepo
 	{
 		private readonly UlearnDb db;

@@ -9,7 +9,6 @@ using Ulearn.Core.Courses;
 
 namespace Database.Repos.Groups
 {
-	/* This repo is fully migrated to .NET Core and EF Core */
 	public class GroupsRepo : IGroupsRepo
 	{
 		private readonly UlearnDb db;
