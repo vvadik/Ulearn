@@ -37,7 +37,7 @@ interface Props {
 		addComment: (courseId: string, slideId: string, text: string, forInstructor: boolean,
 			parentCommentId?: number
 		) => Promise<Comment>;
-		deleteComment: (courseId: string, slideId: string, comment: Comment, forInstructor: boolean,
+		deleteComment: (courseId: string, slideId: string, commentId: number, forInstructor: boolean,
 		) => Promise<unknown>;
 
 		likeComment: (commentId: number) => Promise<unknown>;
@@ -211,11 +211,11 @@ class CommentsView extends Component<Props, State> {
 			parentCommentId);
 	};
 
-	handleDeleteComment = async (comment: Comment): Promise<void> => {
+	handleDeleteComment = async (commentId: number): Promise<void> => {
 		const { slideId, courseId, api, } = this.props;
 		const { activeTab, } = this.state;
 
-		await api.deleteComment(courseId, slideId, comment, activeTab === TabsType.instructorsComments);
+		await api.deleteComment(courseId, slideId, commentId, activeTab === TabsType.instructorsComments);
 	};
 }
 

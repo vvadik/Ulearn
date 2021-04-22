@@ -47,7 +47,7 @@ export interface CommentDeletedAction {
 	type: typeof COMMENT_DELETED;
 	slideId: string;
 	courseId: string;
-	comment: Comment;
+	commentId: number;
 	forInstructor: boolean;
 }
 

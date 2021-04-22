@@ -16,6 +16,7 @@ import { sortComments } from "../utils";
 import { RootState } from "src/redux/reducers";
 import { Dispatch } from "redux";
 import { Comment } from "src/models/comments";
+import { CommentRedux } from "src/redux/comments";
 
 
 const mapStateToProps = (state: RootState, { courseId, slideId }: { courseId: string, slideId: string, }) => {
@@ -24,14 +25,16 @@ const mapStateToProps = (state: RootState, { courseId, slideId }: { courseId: st
 	let comments = undefined;
 	let instructorComments = undefined;
 
+	const convertReduxCommentToComment = ({ repliesIds, ...rest }:CommentRedux) => ({ ...rest, replies: repliesIds?.map(id => byIds[id]) || [] } as Comment);
+
 	const filterDeletedAndSort = (commentsIds: number[],) => {
 		const comments = [];
 
 		for (const commentId of commentsIds) {
 			const comment = { ...byIds[commentId] };
 			if(!comment.isDeleted) {
-				comment.replies = comment.replies.filter(c => !c.isDeleted);
-				comments.push(comment);
+				comment.repliesIds = comment.repliesIds?.filter(replyId => !byIds[replyId].isDeleted);
+				comments.push(convertReduxCommentToComment(comment));
 			}
 		}
 
@@ -68,8 +71,8 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
 			parentCommentId?: number
 		) =>
 			addComment(courseId, slideId, text, parentCommentId, forInstructor)(dispatch).then(c => c.comment),
-		deleteComment: (courseId: string, slideId: string, comment: Comment, forInstructor: boolean,) =>
-			deleteComment(courseId, slideId, comment, forInstructor)(dispatch),
+		deleteComment: (courseId: string, slideId: string, commentId: number, forInstructor: boolean,) =>
+			deleteComment(courseId, slideId, commentId, forInstructor)(dispatch),
 
 		likeComment: (commentId: number) => likeComment(commentId)(dispatch),
 		dislikeComment: (commentId: number) => dislikeComment(commentId)(dispatch),

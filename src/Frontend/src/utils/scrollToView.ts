@@ -3,42 +3,43 @@ import { RefObject } from "react";
 export default function scrollToView(
 	element: RefObject<Element> | Element,
 	options: {
-		animationDuration: number,
+		animationDuration?: number,
 		scrollingElement?: HTMLElement,
-		allowScrollToTop: boolean,
-		behavior: ScrollBehavior,
-		additionalTopOffset: number,
+		behavior?: ScrollBehavior,
+		additionalTopOffset?: number,
 	} = {
 		animationDuration: 500,
-		allowScrollToTop: false,
 		behavior: 'smooth',
 		additionalTopOffset: 0,
 	}
-): void {
-	const { animationDuration, scrollingElement, allowScrollToTop, behavior, additionalTopOffset, } = options;
+): Promise<void> {
+	const {
+		animationDuration = 500,
+		scrollingElement,
+		behavior = 'smooth',
+		additionalTopOffset = 0,
+	} = options;
 	const curElem = (element as RefObject<Element>).current ?? (element as Element);
 	const elemPos = curElem?.getBoundingClientRect();
 
 	if(curElem) {
 		const getToPosition = () =>
-			offsetTop(curElem,
-				scrollingElement) - (curElem.parentElement?.getBoundingClientRect().height || 0) - additionalTopOffset;
+			offsetTop(curElem, scrollingElement)
+			- (curElem.parentElement?.getBoundingClientRect().height || 0)
+			- additionalTopOffset;
 		if(elemPos.top > 0) {
-			animate(
+			return new Promise(r => animate(
 				getToPosition,
 				animationDuration,
 				behavior,
 				scrollingElement,
-			);
-		} else if(allowScrollToTop && elemPos.top < 0) {
-			animate(
-				getToPosition,
-				animationDuration,
-				behavior,
-				scrollingElement,
-			);
+				20,
+				r,
+			));
 		}
 	}
+
+	return Promise.reject(`Elements wasn't found`);
 }
 
 function getScrollTop(scrollingElement?: HTMLElement) {
@@ -62,11 +63,13 @@ function animate(
 	behavior: ScrollBehavior,
 	scrollingElement?: HTMLElement,
 	increment = 20,
+	callback?: () => void,
 ) {
 	let currentTime = 0;
 	const animateScroll = function () {
 		currentTime += increment;
-		const scrollPosition = easeInOutQuad(currentTime, getScrollTop(scrollingElement), getToPosition() - getScrollTop(scrollingElement), duration);
+		const scrollPosition = easeInOutQuad(currentTime, getScrollTop(scrollingElement),
+			getToPosition() - getScrollTop(scrollingElement), duration);
 		(scrollingElement || window).scrollTo({
 			left: 0,
 			top: scrollPosition,
@@ -74,6 +77,8 @@ function animate(
 		});
 		if(currentTime < duration) {
 			setTimeout(animateScroll, increment);
+		} else if(callback) {
+			callback?.();
 		}
 	};
 	animateScroll();

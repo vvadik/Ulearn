@@ -87,11 +87,21 @@ class MarkdownEditor extends Component<Props> {
 
 	componentDidMount(): void {
 		const { inSendForm, inEditForm, inReplyForm } = this.props.isShowFocus;
-
 		if(inSendForm || inEditForm || inReplyForm) {
 			this.textarea.current?.focus();
 		}
 	}
+
+	componentDidUpdate(prevProps: Readonly<Props>): void {
+		const { inSendForm, inEditForm, inReplyForm } = this.props.isShowFocus;
+		const { isShowFocus, } = prevProps;
+		const shouldFocus = (inSendForm || inEditForm || inReplyForm)
+			&& !(isShowFocus.inSendForm || isShowFocus.inEditForm || isShowFocus.inReplyForm);
+		if(shouldFocus) {
+			this.textarea.current?.focus();
+		}
+	}
+
 
 	render(): React.ReactElement {
 		const { hasError, text, children, } = this.props;

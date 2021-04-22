@@ -11,9 +11,9 @@ import {
 } from 'src/actions/comments.types';
 import { Comment, CommentPolicy, } from "src/models/comments";
 
-interface CommentRedux extends Comment {
+export interface CommentRedux extends Omit<Comment, 'replies'> {
 	isDeleted?: boolean;
-	replies: CommentRedux[],
+	repliesIds?: number[],
 }
 
 export interface CommentsState {
@@ -44,9 +44,15 @@ export default function comments(state = initialCommentsState, action: CommentsA
 			const { slideId, courseId, comments, forInstructor, } = action as CommentsLoadedAction;
 			const newComments = { ...state.byIds };
 			const newCommentsIds = [];
-			for (const comment of comments) {
-				newComments[comment.id] = comment;
-				newCommentsIds.push(comment.id);
+			for (const { id, replies, ...rest } of comments) {
+				const repliesIds = [];
+				for (const reply of replies) {
+					repliesIds.push(reply.id);
+					newComments[reply.id] = reply;
+				}
+
+				newComments[id] = { id, repliesIds, ...rest, };
+				newCommentsIds.push(id);
 			}
 
 			if(forInstructor) {
@@ -101,27 +107,11 @@ export default function comments(state = initialCommentsState, action: CommentsA
 		case COMMENT_UPDATED: {
 			const { comment } = action as CommentUpdatedAction;
 
-			if(comment.parentCommentId) {
-				const parentComment = { ...state.byIds[comment.parentCommentId] };
-				const commentIndex = parentComment.replies.findIndex(r => r.id === comment.id);
-
-				parentComment.replies = [...parentComment.replies];
-				parentComment.replies[commentIndex] = comment;
-
-				return {
-					...state,
-					byIds: {
-						...state.byIds,
-						[comment.parentCommentId]: parentComment,
-					}
-				};
-			}
-
 			return {
 				...state,
 				byIds: {
 					...state.byIds,
-					[comment.id]: { ...comment, replies: [...state.byIds[comment.id].replies] },
+					[comment.id]: { ...comment, },
 				}
 			};
 		}
@@ -142,22 +132,10 @@ export default function comments(state = initialCommentsState, action: CommentsA
 			};
 		}
 		case COMMENT_DELETED: {
-			const { comment, } = action as CommentDeletedAction;
-			if(comment.parentCommentId) {
-				const newByIds = { ...state.byIds };
-				const reply = newByIds[comment.parentCommentId].replies.find(r => r.id === comment.id);
-				if(reply) {
-					reply.isDeleted = true;
-				}
-
-				return {
-					...state,
-					byIds: newByIds,
-				};
-			}
+			const { commentId, } = action as CommentDeletedAction;
 
 			const newByIds = { ...state.byIds };
-			newByIds[comment.id].isDeleted = true;
+			newByIds[commentId].isDeleted = true;
 
 			return {
 				...state,
@@ -168,14 +146,16 @@ export default function comments(state = initialCommentsState, action: CommentsA
 			const { comment, courseId, slideId, forInstructor, parentCommentId, } = action as CommentAddedAction;
 
 			if(parentCommentId) {
+				const parentReplies = state.byIds[parentCommentId].repliesIds || [];
 				return {
 					...state,
 					byIds: {
 						...state.byIds,
 						[parentCommentId]: {
 							...state.byIds[parentCommentId],
-							replies: [...state.byIds[parentCommentId].replies, comment],
-						}
+							repliesIds: [...parentReplies, comment.id],
+						},
+						[comment.id]: comment,
 					}
 				};
 			}

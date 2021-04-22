@@ -1,6 +1,9 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { EyeClosed, Ok, Pin, People } from "icons";
 import { TooltipMenu, MenuItem } from "ui";
+
+import { constructPathToGroup } from "src/consts/routes";
 
 import { Comment, ShortGroupInfo } from "src/models/comments";
 
@@ -14,13 +17,12 @@ interface MarksProps {
 }
 
 export default function Marks({ courseId, comment, authorGroups }: MarksProps): React.ReactElement {
-	const windowUrl = `${ window.location.origin }/${ courseId }`;
 	return (
 		<>
 			{ !comment.isApproved && <HiddenMark/> }
 			{ comment.isCorrectAnswer && <CorrectAnswerMark/> }
 			{ comment.isPinnedToTop && <PinnedToTopMark/> }
-			{ authorGroups && <GroupMark url={ windowUrl } groups={ authorGroups }/> }
+			{ authorGroups && <GroupMark courseId={ courseId } groups={ authorGroups }/> }
 		</>
 	);
 }
@@ -53,11 +55,11 @@ const PinnedToTopMark = () => (
 );
 
 interface GroupProps {
-	url: string;
+	courseId: string;
 	groups: ShortGroupInfo[];
 }
 
-export function GroupMark({ url, groups }: GroupProps): React.ReactElement {
+export function GroupMark({ courseId, groups, }: GroupProps): React.ReactElement {
 	const groupsNumber = groups.length;
 
 	return (
@@ -69,22 +71,22 @@ export function GroupMark({ url, groups }: GroupProps): React.ReactElement {
 							<div key={ group.id }
 								 className={ `${ styles.mark } ${ styles.group } ${ group.isArchived && styles.archiveGroup }` }>
 								<People size={ 15 }/>
-								<a href={ group.apiUrl && `${ url }${ group.apiUrl }` }
-								   className={ `${ styles.text } ${ styles.groupName }` }>
+								<Link to={ constructPathToGroup(courseId, group.id) }
+									  className={ `${ styles.text } ${ styles.groupName }` }>
 									{ group.name }
-								</a>
+								</Link>
 							</div>) :
-						<GroupsMenu url={ url } groups={ groups }/> }
+						<GroupsMenu courseId={ courseId } groups={ groups }/> }
 				</div>
 			</div>
 			<div className={ styles.visibleOnPhone }>
-				<GroupsMenu url={ url } groups={ groups }/>
+				<GroupsMenu courseId={ courseId } groups={ groups }/>
 			</div>
 		</>
 	);
 }
 
-const GroupsMenu = ({ url, groups }: GroupProps) => (
+const GroupsMenu = ({ courseId, groups, }: GroupProps) => (
 	<TooltipMenu
 		menuWidth="150px"
 		positions={ ["bottom right"] }
@@ -98,15 +100,17 @@ const GroupsMenu = ({ url, groups }: GroupProps) => (
 		<>
 			{ groups.map(group => !group.isArchived &&
 				<MenuItem
-					key={ group.id }
-					href={ group.apiUrl && `${ url }${ group.apiUrl }` }>
-					{ group.name }
+					key={ group.id }>
+					<Link to={ constructPathToGroup(courseId, group.id) }>
+						{ group.name }
+					</Link>
 				</MenuItem>) }
 			{ groups.map(group => group.isArchived &&
 				<MenuItem
-					key={ group.id }
-					href={ group.apiUrl && `${ url }${ group.apiUrl }` }>
-					{ group.name }
+					key={ group.id }>
+					<Link to={ constructPathToGroup(courseId, group.id) }>
+						{ group.name }
+					</Link>
 				</MenuItem>) }
 		</>
 	</TooltipMenu>

@@ -1,6 +1,6 @@
 import { Comment } from "src/models/comments";
 
-const compareComments = (a: Comment, b: Comment, timeByAscending?: boolean): number => {
+export const compareComments = (a: Comment, b: Comment, timeByAscending?: boolean): number => {
 	if(a.isPinnedToTop && !b.isPinnedToTop) {
 		return -1;
 	}
@@ -13,9 +13,55 @@ const compareComments = (a: Comment, b: Comment, timeByAscending?: boolean): num
 	return timeByAscending ? bTime - aTime : aTime - bTime;
 };
 
-const sortComments = (comments: Comment[]): void => {
+export const sortComments = (comments: Comment[]): void => {
 	comments.sort((a, b) => compareComments(a, b, true));
 	comments.forEach(c => c.replies = c.replies.sort(compareComments));
 };
 
-export { compareComments, sortComments, };
+export const countAllComments = (comments: Comment[]): number =>
+	(comments.length + comments.reduce((pV, c) => pV + c.replies.length, 0));
+
+export const getAllCommentsInRow = <T>(
+	comments: Comment[],
+	mapper: (comment: Comment) => T
+): T[] => (comments.reduce((pV: T[], c) => pV.concat([mapper(c), ...c.replies.map(mapper)]), []));
+
+export const getCommentsIdsInRow = (comments: Comment[]): number[] =>
+	(getAllCommentsInRow(comments, (c) => c.id));
+
+export const findIndexOfComment = (commentId: number, comments: Comment[]): number =>
+	(getCommentsIdsInRow(comments).indexOf(commentId));
+
+export const getCommentsByCount = (count: number, comments: Comment[]): Comment[] => {
+	const resultComments = [];
+	let topLevelCommentIndex = 0;
+
+	while (count > 0) {
+		if(topLevelCommentIndex >= comments.length) {
+			break;
+		}
+
+		const comment = { ...comments[topLevelCommentIndex] };
+
+		resultComments.push(comment);
+		topLevelCommentIndex++;
+		count--;
+
+		if(comment.replies.length > count) {
+			comment.replies = comment.replies.slice(0, count);
+			break;
+		}
+		count -= comment.replies.length;
+	}
+
+	return resultComments;
+};
+
+export const parseCommentIdFromHash = (hash: string, commentHash = 'comment'): number => {
+	if(!hash.includes(commentHash)) {
+		return -1;
+	}
+
+	const startIndex = hash.indexOf('-') + 1;
+	return Number.parseInt(hash.slice(startIndex));
+};

@@ -69,11 +69,11 @@ export const commentAddedAction = (
 export const commentDeletedAction = (
 	courseId: string,
 	slideId: string,
-	comment: Comment,
+	commentId: number,
 	forInstructor: boolean,
 ): CommentDeletedAction => ({
 	type: COMMENT_DELETED,
-	comment,
+	commentId,
 	courseId,
 	slideId,
 	forInstructor,

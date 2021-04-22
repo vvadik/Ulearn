@@ -22,10 +22,12 @@ export const accountPath = '/' + account + '/manage';
 export const register = account + '/register';
 export const logoutPath = account + '/logout';
 export const rolesPath = account + '/roles';
+export const accountProfile = '/' + account + '/profile';
 export const externalLoginConfirmation = login + '/externalLoginConfirmation';
 export const externalLoginCallback = login + '/externalLoginCallback';
 export const feed = 'feed';
 export const notificationsFeed = feed + '/notificationsPartial';
+export const groups = 'groups';
 
 export function constructPathToSlide(courseId: string, slideId: string): string {
 	return `/${ coursePath }/${ courseId }/${ slideId }`;
@@ -62,4 +64,12 @@ export function constructLinkWithReturnUrl(link: string, returnUrl?: string): st
 
 export function getUserSolutionsUrl(courseId: string, slideId: string, userId: string): string {
 	return userSolutions + buildQuery({ courseId, slideId, userId });
+}
+
+export function constructPathToAccount(userId: string): string {
+	return accountProfile + buildQuery({ userId });
+}
+
+export function constructPathToGroup(courseId: string, groupId: string): string {
+	return `/${ courseId }/${ groups }/${ groupId }`;
 }

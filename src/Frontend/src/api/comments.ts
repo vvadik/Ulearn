@@ -52,14 +52,14 @@ export function addComment(courseId: string, slideId: string, text: string, pare
 	};
 }
 
-export function deleteComment(courseId: string, slideId: string, comment: Comment, forInstructor: boolean,)
+export function deleteComment(courseId: string, slideId: string, commentId: number, forInstructor: boolean,)
 	: (dispatch: Dispatch) => Promise<CommentDeletedAction> {
-	const url = constructPathToComment(comment.id);
+	const url = constructPathToComment(commentId);
 
 	return (dispatch: Dispatch): Promise<CommentDeletedAction> => {
 		return api
 			.delete(url)
-			.then(() => dispatch(commentDeletedAction(courseId, slideId, comment, forInstructor)));
+			.then(() => dispatch(commentDeletedAction(courseId, slideId, commentId, forInstructor)));
 	};
 }
 

@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import moment from "moment";
 
-import { Link, Hint } from "ui";
+import { Hint, } from "ui";
+import { Link } from "react-router-dom";
 import Avatar from "../../common/Avatar/Avatar";
 import CommentSendForm from "../CommentSendForm/CommentSendForm";
 import Like from "./Like/Like";
@@ -13,7 +14,8 @@ import CommentActions from "./CommentActions/CommentActions";
 import { UserInfo, } from "src/utils/courseRoles";
 import scrollToView from "src/utils/scrollToView";
 import { convertDefaultTimezoneToLocal } from "src/utils/momentUtils";
-import { getUserSolutionsUrl } from "src/consts/routes";
+import { constructPathToAccount, getUserSolutionsUrl } from "src/consts/routes";
+import { parseCommentIdFromHash } from "../utils";
 
 import { CommentStatus } from "src/consts/comments";
 import { CourseAccessType, CourseRoleType, SystemAccessType } from "src/consts/accessType";
@@ -49,6 +51,7 @@ interface State {
 
 class Comment extends Component<Props, State> {
 	private ref: React.RefObject<HTMLDivElement> = React.createRef();
+	private onScrollColorChangeDelay = 500;
 
 	constructor(props: Props) {
 		super(props);
@@ -69,10 +72,11 @@ class Comment extends Component<Props, State> {
 		}
 	}
 
-	scrollToComment = (): void => {
-		const { isSlideReady, } = this.props;
-		if(isSlideReady && window.location.hash.includes(`comment-${ this.props.comment.id }`)) {
-			scrollToView(this.ref);
+	scrollToComment = async (): Promise<void> => {
+		const { isSlideReady, comment, } = this.props;
+		if(isSlideReady && parseCommentIdFromHash(window.location.hash) === comment.id) {
+			await scrollToView(this.ref);
+			setTimeout(() => this.ref.current?.classList.add(styles.isScrollTarget), this.onScrollColorChangeDelay);
 		}
 	};
 
@@ -80,16 +84,16 @@ class Comment extends Component<Props, State> {
 		const { children, commentEditing, comment, user, } = this.props;
 		const canViewProfiles = (user.systemAccesses.includes(SystemAccessType.viewAllProfiles)) ||
 			user.isSystemAdministrator;
-		const profileUrl = `${ window.location.origin }/Account/Profile?userId=${ comment.author.id }`;
 
 		return (
 			<div className={ `${ styles.comment } ${ !this.state.isApproved ? styles.isNotApproved : "" }` }
 				 ref={ this.ref }>
 				<span className={ styles.commentAnchor } id={ `comment-${ this.props.comment.id }` }/>
-				{ canViewProfiles ? <Link href={ profileUrl }><Avatar user={ comment.author } size="big"/></Link> :
+				{ canViewProfiles ?
+					<Link to={ constructPathToAccount(comment.author.id) }><Avatar user={ comment.author } size="big"/></Link> :
 					<Avatar user={ comment.author } size="big"/> }
 				<div className={ styles.content }>
-					{ this.renderHeader(profileUrl, canViewProfiles) }
+					{ this.renderHeader(canViewProfiles) }
 					<div className={ styles.timeSinceAdded }>
 						<Hint
 							pos="right middle"
@@ -105,7 +109,7 @@ class Comment extends Component<Props, State> {
 		);
 	}
 
-	renderHeader(profileUrl: string, canViewProfiles: boolean): React.ReactElement {
+	renderHeader(canViewProfiles: boolean): React.ReactElement {
 		const { actions, comment, user, slideType, courseId, slideId, } = this.props;
 		const canSeeKebabActions = user.id && (user.id === comment.author.id ||
 			this.canModerateComments(user, CourseAccessType.editPinAndRemoveComments) ||
@@ -113,7 +117,7 @@ class Comment extends Component<Props, State> {
 
 		return (
 			<Header
-				profileUrl={ profileUrl }
+				profileUrl={ constructPathToAccount(comment.author.id) }
 				canViewProfiles={ canViewProfiles }
 				name={ comment.author.visibleName }>
 				<Like

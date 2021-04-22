@@ -9,7 +9,6 @@ import CommentSendForm from "../CommentSendForm/CommentSendForm";
 import Stub from "../Stub/Stub";
 import Error404 from "../../common/Error/Error404";
 
-import scrollToView from "src/utils/scrollToView";
 import throttle from "src/utils/throttle";
 import { UserInfo, } from "src/utils/courseRoles";
 
@@ -18,6 +17,11 @@ import { SlideType } from "src/models/slide";
 import { CommentStatus } from "src/consts/comments";
 
 import styles from "./CommentsList.less";
+import {
+	countAllComments,
+	findIndexOfComment,
+	getCommentsByCount, parseCommentIdFromHash,
+} from "../utils";
 
 const defaultPaginationOptions = {
 	commentsPerPack: 15,
@@ -43,7 +47,7 @@ interface Props {
 
 	api: {
 		addComment: (text: string, parentCommentId?: number) => Promise<Comment>;
-		deleteComment: (comment: Comment,) => Promise<void>;
+		deleteComment: (commentId: number,) => Promise<void>;
 
 		likeComment: (commentId: number) => Promise<unknown>;
 		dislikeComment: (commentId: number) => Promise<unknown>;
@@ -64,7 +68,7 @@ interface State {
 	sending: boolean;
 	animation: boolean;
 
-	renderedCount: number;
+	commentsToRender: number;
 }
 
 export interface ActionsType {
@@ -74,7 +78,7 @@ export interface ActionsType {
 	handlePinnedToTopMark: (commentId: number, isPinnedToTop: boolean) => void;
 	handleEditComment: (commentId: number, text: string) => void;
 	handleAddReplyComment: (parentCommentId: number, text: string) => void;
-	handleDeleteComment: (comment: Comment) => void;
+	handleDeleteComment: (commentId: number) => void;
 	handleShowEditForm: (commentId: number | null) => void;
 	handleShowReplyForm: (commentId: number | null) => void;
 }
@@ -84,6 +88,8 @@ class CommentsList extends Component<Props, State> {
 	private commentsListRef: React.RefObject<HTMLDivElement> = React.createRef();
 	private commentsPaginationOptions: typeof defaultPaginationOptions = { ...defaultPaginationOptions };
 	private throttleScroll: (() => void) | null = null;
+	private additionalCommentsCountOnScroll = 5;
+
 	private readonly debouncedSendData: null |
 		((method: (commentId: number) => Promise<unknown>,
 			commentId: number,
@@ -92,7 +98,6 @@ class CommentsList extends Component<Props, State> {
 
 	constructor(props: Props) {
 		super(props);
-
 		this.state = {
 			saveCommentLikeStatus: null,
 			commentEditing: {
@@ -107,7 +112,7 @@ class CommentsList extends Component<Props, State> {
 			sending: false,
 			status: "",
 			animation: false,
-			renderedCount: Math.min(this.commentsPaginationOptions.commentsPerPack, props.comments.length),
+			commentsToRender: this.commentsPaginationOptions.commentsPerPack,
 		};
 
 		this.debouncedSendData = debounce(this.sendData, 300);
@@ -121,17 +126,6 @@ class CommentsList extends Component<Props, State> {
 		this.handleScrollToCommentByHashFormUrl();
 	}
 
-	static getDerivedStateFromProps(props: Readonly<Props>, state: Readonly<State>): State | null {
-		if(props.comments.length - 1 === state.renderedCount) {
-			return {
-				...state,
-				renderedCount: props.comments.length,
-			};
-		}
-
-		return null;
-	}
-
 	componentWillUnmount(): void {
 		if(this.throttleScroll) {
 			window.removeEventListener("scroll", this.throttleScroll);
@@ -140,11 +134,10 @@ class CommentsList extends Component<Props, State> {
 	}
 
 	renderPackOfComments(packSize: number): void {
-		const { renderedCount, } = this.state;
-		const { comments, } = this.props;
+		const { commentsToRender, } = this.state;
 
 		this.setState({
-			renderedCount: Math.min(renderedCount + packSize, comments.length),
+			commentsToRender: commentsToRender + packSize,
 		});
 	}
 
@@ -155,51 +148,38 @@ class CommentsList extends Component<Props, State> {
 	}
 
 	handleScrollToBottom = (): void => {
-		const { renderedCount, } = this.state;
+		const { commentsToRender, } = this.state;
 		const { comments, } = this.props;
 		const { scrollDistance, commentsPerPack, } = this.commentsPaginationOptions;
 
 		const element = document.documentElement;
 		const windowRelativeBottom = element.getBoundingClientRect().bottom;
-		if(windowRelativeBottom < (element.clientHeight + scrollDistance) && renderedCount < comments.length) {
+		if(windowRelativeBottom < (element.clientHeight + scrollDistance)
+			&& commentsToRender < countAllComments(comments)) {
 			this.renderPackOfComments(commentsPerPack);
 		}
 	};
 
 	handleScrollToCommentByHashFormUrl = (): void => {
 		const { comments, handleTabChange, isSlideContainsComment, } = this.props;
-		const { renderedCount, } = this.state;
+		const { commentsToRender, } = this.state;
 
-		const hashId = this.parseCommentIdFromHash(window.location.hash);
-		const indexOfComment = this.findIndexOfComment(hashId, comments);
+		const hashId = parseCommentIdFromHash(window.location.hash);
+		const indexOfComment = findIndexOfComment(hashId, comments);
 
 		if(hashId >= 0) {
-			if(indexOfComment >= renderedCount) {
-				this.renderPackOfComments(indexOfComment - renderedCount + 1);
+			if(indexOfComment >= commentsToRender) {
+				const indexAsCount = indexOfComment + 1;
+				this.renderPackOfComments(indexAsCount - commentsToRender + this.additionalCommentsCountOnScroll);
 			} else if(indexOfComment < 0 && isSlideContainsComment(hashId)) {
 				handleTabChange();
 			}
 		}
 	};
 
-	parseCommentIdFromHash = (hash: string): number => {
-		if(!hash.includes("comment")) {
-			return -1;
-		}
-
-		const startIndex = hash.indexOf('-') + 1;
-		return Number.parseInt(hash.slice(startIndex));
-	};
-
-	findIndexOfComment = (commentId: number, comments: Comment[]): number => {
-		const commentsIds = comments.reduce((pV: number[], c) => pV.concat([c.id, ...c.replies.map(c => c.id)]), []);
-		return commentsIds.indexOf(commentId);
-	};
-
 	render(): React.ReactNode {
-		const { status, } = this.state;
-		const { user, commentPolicy, key, courseId, slideId, comments, } = this.props;
-		const replies = comments.reduce((sum, current) => sum + current.replies.length, 0);
+		const { status, commentsToRender, } = this.state;
+		const { user, commentPolicy, key, courseId, slideId, } = this.props;
 
 		if(status === "error") {
 			return <Error404/>;
@@ -208,11 +188,11 @@ class CommentsList extends Component<Props, State> {
 		return (
 			<div key={ key } ref={ this.commentsListRef }>
 				{ !user.id &&
-				<Stub hasThreads={ comments.length > 0 } courseId={ courseId } slideId={ slideId }/> }
+				<Stub hasThreads={ commentsToRender > 0 } courseId={ courseId } slideId={ slideId }/> }
 				{ (user.id && commentPolicy && !commentPolicy.areCommentsEnabled) && this.renderMessageIfCommentsDisabled() }
 				{ this.renderSendForm() }
 				{ this.renderThreads() }
-				{ (commentPolicy.areCommentsEnabled && user.id && (comments.length + replies) > 7) &&
+				{ (commentPolicy.areCommentsEnabled && user.id && commentsToRender > 7) &&
 				<button className={ styles.sendButton } onClick={ this.handleShowSendForm }>
 					<CommentLite color="#3072C4"/>
 					Оставить комментарий
@@ -246,8 +226,8 @@ class CommentsList extends Component<Props, State> {
 	}
 
 	renderThreads(): React.ReactElement {
-		const { commentEditing, reply, animation, renderedCount, } = this.state;
-		const { user, slideType, courseId, commentPolicy, isSlideReady, comments, slideId, } = this.props;
+		const { commentEditing, reply, animation, commentsToRender, } = this.state;
+		const { user, slideType, courseId, commentPolicy, isSlideReady, slideId, comments, } = this.props;
 
 		const transitionStyles = {
 			enter: styles.enter,
@@ -275,34 +255,38 @@ class CommentsList extends Component<Props, State> {
 
 		return (
 			<TransitionGroup enter={ animation }>
-				{ comments
-					.slice(0, renderedCount)
-					.map((comment) =>
-						<CSSTransition
-							key={ comment.id }
-							appear
-							in={ animation }
-							mountOnEnter
-							unmountOnExit
-							classNames={ transitionStyles }
-							timeout={ duration }>
-							<section className={ styles.thread } key={ comment.id } ref={ this.lastThreadRef }>
-								<Thread
-									user={ user }
-									slideType={ slideType }
-									courseId={ courseId }
-									slideId={ slideId }
-									animation={ animation }
-									comment={ comment }
-									commentPolicy={ commentPolicy }
-									commentEditing={ commentEditing }
-									reply={ reply }
-									actions={ actions }
-									isSlideReady={ isSlideReady }/>
-							</section>
-						</CSSTransition>) }
+				{ getCommentsByCount(commentsToRender, comments)
+					.map((comment, index, array) => {
+						const ref = index === array.length - 1 ? this.lastThreadRef : null;
+
+						return (
+							<CSSTransition
+								key={ comment.id }
+								appear
+								in={ animation }
+								mountOnEnter
+								unmountOnExit
+								classNames={ transitionStyles }
+								timeout={ duration }>
+								<section className={ styles.thread } key={ comment.id } ref={ ref }>
+									<Thread
+										user={ user }
+										slideType={ slideType }
+										courseId={ courseId }
+										slideId={ slideId }
+										animation={ animation }
+										comment={ comment }
+										commentPolicy={ commentPolicy }
+										commentEditing={ commentEditing }
+										reply={ reply }
+										actions={ actions }
+										isSlideReady={ isSlideReady }/>
+								</section>
+							</CSSTransition>);
+					}) }
 			</TransitionGroup>
 		);
+
 	}
 
 	updateComment = async (id: number, updatedFields: Partial<Comment>): Promise<void> => {
@@ -315,6 +299,7 @@ class CommentsList extends Component<Props, State> {
 
 	handleAddComment = async (text: string): Promise<void> => {
 		const { api, } = this.props;
+		const { commentsToRender, } = this.state;
 
 		this.setState({
 			sending: true,
@@ -323,7 +308,9 @@ class CommentsList extends Component<Props, State> {
 
 		try {
 			await api.addComment(text);
-			this.handleScroll(this.lastThreadRef);
+			this.setState({
+				commentsToRender: commentsToRender + 1,
+			});
 		} catch (e) {
 			Toast.push("Не удалось добавить комментарий. Попробуйте снова.");
 			console.error(e);
@@ -371,6 +358,7 @@ class CommentsList extends Component<Props, State> {
 				...this.state.commentEditing,
 				commentId: commentId,
 			},
+			showFocus: false,
 		});
 	};
 
@@ -380,6 +368,7 @@ class CommentsList extends Component<Props, State> {
 				...this.state.reply,
 				commentId: commentId,
 			},
+			showFocus: false,
 		});
 	};
 
@@ -391,6 +380,7 @@ class CommentsList extends Component<Props, State> {
 				commentId: commentId,
 				sending: true,
 			},
+			showFocus: false,
 		});
 
 		try {
@@ -449,7 +439,7 @@ class CommentsList extends Component<Props, State> {
 		}
 	};
 
-	handleDeleteComment = async (comment: Comment): Promise<void> => {
+	handleDeleteComment = async (commentId: number): Promise<void> => {
 		const { api, } = this.props;
 
 		this.setState({
@@ -457,12 +447,12 @@ class CommentsList extends Component<Props, State> {
 		});
 
 		try {
-			await api.deleteComment(comment);
+			await api.deleteComment(commentId);
 
 			Toast.push("Комментарий удалён", {
 				label: "Восстановить",
 				handler: () => {
-					api.updateComment(comment.id);
+					api.updateComment(commentId);
 					Toast.push("Комментарий восстановлен");
 				}
 			});
@@ -474,7 +464,12 @@ class CommentsList extends Component<Props, State> {
 
 	handleScroll = (ref: React.RefObject<HTMLDivElement>): void => {
 		if(ref.current) {
-			scrollToView(ref);
+			const rect = ref.current.getBoundingClientRect();
+			window.scrollTo({
+				left: 0,
+				top: window.pageYOffset + rect.top,
+				behavior: "auto"
+			});
 		}
 	};
 

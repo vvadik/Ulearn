@@ -1,5 +1,6 @@
 import React from "react";
-import { Link, Button } from "ui";
+import { Button, } from "ui";
+import { Link } from 'react-router-dom';
 import { ArrowCorner1, Edit, DocumentLite } from "icons";
 
 import { CourseAccessType, } from "src/consts/accessType";
@@ -35,8 +36,8 @@ interface ActionLinkProps {
 
 const ActionLink = ({ url, icon, children }: ActionLinkProps) => (
 	<div className={ styles.action }>
-		<Link href={ url } icon={ icon }>
-			{ children }
+		<Link to={ url }>
+			{ icon }{ children }
 		</Link>
 	</div>
 );

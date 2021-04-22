@@ -84,7 +84,7 @@ export default function KebabActions(props: Props): React.ReactElement {
 	}
 
 	function handleDeleteCommentClick() {
-		actions.handleDeleteComment(comment);
+		actions.handleDeleteComment(comment.id);
 	}
 
 	function handlePinnedToTopMarkClick() {

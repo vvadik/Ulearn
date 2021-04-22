@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "ui";
+import { Link } from "react-router-dom";
 
 import styles from "./Header.less";
 
@@ -24,7 +24,7 @@ export default function Header(props: Props): React.ReactElement {
 	const { name, children, canViewProfiles, profileUrl } = props;
 	return (
 		<div className={ styles.header }>
-			{ canViewProfiles ? <Link href={ profileUrl }><Author name={ name }/></Link> :
+			{ canViewProfiles ? <Link to={ profileUrl }><Author name={ name }/></Link> :
 				<Author name={ name }/> }
 			{ children }
 		</div>
