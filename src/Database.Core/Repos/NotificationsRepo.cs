@@ -283,12 +283,29 @@ namespace Database.Repos
 			if (recipientsIds.Count == 0)
 				return;
 
-			var transportsSettings = db.NotificationTransportSettings
-				.Include(s => s.NotificationTransport)
-				.Where(s => s.CourseId == notification.CourseId &&
-							s.NotificationType == notificationType &&
-							!s.NotificationTransport.IsDeleted &&
-							recipientsIds.Contains(s.NotificationTransport.UserId)).ToList();
+			List<NotificationTransportSettings> transportsSettings;
+			if (recipientsIds.Count > 1000)
+			{
+				log.Warn($"Recipients list for notification is too big {notification.Id}: {recipientsIds.Count} user(s)");
+				transportsSettings = (await db.NotificationTransportSettings
+					.Include(s => s.NotificationTransport)
+					.Where(s => s.CourseId == notification.CourseId &&
+								s.NotificationType == notificationType &&
+								!s.NotificationTransport.IsDeleted)
+					.ToListAsync())
+					.Where(s => recipientsIds.Contains(s.NotificationTransport.UserId))
+					.ToList();
+			}
+			else
+			{
+				transportsSettings = await db.NotificationTransportSettings
+					.Include(s => s.NotificationTransport)
+					.Where(s => s.CourseId == notification.CourseId &&
+								s.NotificationType == notificationType &&
+								!s.NotificationTransport.IsDeleted &&
+								recipientsIds.Contains(s.NotificationTransport.UserId))
+					.ToListAsync();
+			}
 
 			var commonTransports = db.NotificationTransports.Where(t => t.UserId == null && t.IsEnabled).ToList();
 
