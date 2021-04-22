@@ -276,7 +276,7 @@ class Navigation extends Component<Props, State> {
 	}
 
 	componentDidUpdate(prevProps: Props): void {
-		const { navigationOpened, unitTitle, deviceType, slideId, returnInUnit, } = this.props;
+		const { navigationOpened, unitTitle, deviceType, returnInUnit, } = this.props;
 		const { moveStarted, } = this.state;
 		this.lockBodyScroll(moveStarted || navigationOpened);
 
