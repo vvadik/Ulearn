@@ -71,7 +71,7 @@ namespace Ulearn.Web.Api.Authorization
 			}
 
 			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourse(userId, courseId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
-			if (isCourseAdmin || await coursesRepo.HasCourseAccessAsync(userId, courseId, requirement.CourseAccessType).ConfigureAwait(false))
+			if (isCourseAdmin || await coursesRepo.HasCourseAccess(userId, courseId, requirement.CourseAccessType).ConfigureAwait(false))
 				context.Succeed(requirement);
 			else
 				context.Fail();

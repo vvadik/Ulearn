@@ -190,7 +190,7 @@ namespace Ulearn.Web.Api.Controllers
 
 			var rolesByCourse = (await courseRolesRepo.GetRoles(userId).ConfigureAwait(false))
 				.Where(kvp => kvp.Value != CourseRoleType.Student).ToList();
-			var courseAccesses = await coursesRepo.GetUserAccessesAsync(userId).ConfigureAwait(false);
+			var courseAccesses = await coursesRepo.GetUserAccesses(userId).ConfigureAwait(false);
 			var courseAccessesByCourseId = courseAccesses.GroupBy(a => a.CourseId).Select(
 				g => new CourseAccessResponse
 				{

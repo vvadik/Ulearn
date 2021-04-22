@@ -241,7 +241,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 
 		private async Task<bool> CanModerateCommentsInCourseAsync(string courseId, string userId)
 		{
-			var hasCourseAccessForCommentEditing = await coursesRepo.HasCourseAccessAsync(userId, courseId, CourseAccessType.EditPinAndRemoveComments).ConfigureAwait(false);
+			var hasCourseAccessForCommentEditing = await coursesRepo.HasCourseAccess(userId, courseId, CourseAccessType.EditPinAndRemoveComments).ConfigureAwait(false);
 			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourse(userId, courseId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
 			return hasCourseAccessForCommentEditing || isCourseAdmin;
 		}

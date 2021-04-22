@@ -248,7 +248,7 @@ namespace Database.Repos.Groups
 		private async Task<List<string>> GetCoursesWhereUserCanSeeAllGroupsAsync(string userId)
 		{
 			if (await usersRepo.IsSystemAdministrator(userId) || await systemAccessesRepo.HasSystemAccessAsync(userId, SystemAccessType.ViewAllGroupMembers).ConfigureAwait(false))
-				return await coursesRepo.GetPublishedCourseIdsAsync().ConfigureAwait(false);
+				return await coursesRepo.GetPublishedCourseIds().ConfigureAwait(false);
 
 			var coursesAsCourseAdmin = await courseRolesRepo.GetCoursesWhereUserIsInRole(userId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
 			var coursesWithCourseAccess = await coursesRepo.GetCoursesUserHasAccessTo(userId, CourseAccessType.ViewAllGroupMembers).ConfigureAwait(false);
@@ -259,7 +259,7 @@ namespace Database.Repos.Groups
 		private async Task<List<string>> GetCoursesWhereUserCanEditAllGroupsAsync(string userId)
 		{
 			if (await usersRepo.IsSystemAdministrator(userId))
-				return await coursesRepo.GetPublishedCourseIdsAsync().ConfigureAwait(false);
+				return await coursesRepo.GetPublishedCourseIds().ConfigureAwait(false);
 
 			var coursesAsCourseAdmin = await courseRolesRepo.GetCoursesWhereUserIsInRole(userId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
 
@@ -271,7 +271,7 @@ namespace Database.Repos.Groups
 			if (isSystemAdministrator == true || isSystemAdministrator == null && await usersRepo.IsSystemAdministrator(userId))
 				return true;
 			var canViewAllGroupMembersGlobal = await systemAccessesRepo.HasSystemAccessAsync(userId, SystemAccessType.ViewAllGroupMembers).ConfigureAwait(false);
-			var canViewAllGroupMembersInCourse = await coursesRepo.HasCourseAccessAsync(userId, courseId, CourseAccessType.ViewAllGroupMembers).ConfigureAwait(false);
+			var canViewAllGroupMembersInCourse = await coursesRepo.HasCourseAccess(userId, courseId, CourseAccessType.ViewAllGroupMembers).ConfigureAwait(false);
 			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourse(userId, courseId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
 			return isCourseAdmin || canViewAllGroupMembersGlobal || canViewAllGroupMembersInCourse;
 		}
