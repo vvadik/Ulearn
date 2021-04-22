@@ -10,7 +10,6 @@ import Flashcards from "./Course/Flashcards/Flashcards";
 import { flashcards } from "src/consts/routes";
 
 import { clamp } from "src/utils/mathExtensions";
-import throttle from "src/utils/throttle";
 
 import { CourseMenuItem, FlashcardsStatistics, MenuItem, Progress, UnitProgress } from "./types";
 
@@ -20,6 +19,7 @@ import { SlideType } from "src/models/slide";
 import { DeviceType } from "src/consts/deviceType";
 
 import styles from './Navigation.less';
+import { findUnitIdBySlideId } from "../Course/CourseUtils";
 
 export type Props = PropsFromRedux & DefaultNavigationProps & CourseNavigationProps & UnitNavigationProps;
 
@@ -43,6 +43,8 @@ export interface CourseNavigationProps {
 
 	courseProgress: Progress;
 	courseItems: CourseMenuItem[];
+
+	returnInUnit: () => void;
 }
 
 export interface UnitNavigationProps {
@@ -274,7 +276,7 @@ class Navigation extends Component<Props, State> {
 	}
 
 	componentDidUpdate(prevProps: Props): void {
-		const { navigationOpened, unitTitle, deviceType, } = this.props;
+		const { navigationOpened, unitTitle, deviceType, slideId, returnInUnit, } = this.props;
 		const { moveStarted, } = this.state;
 		this.lockBodyScroll(moveStarted || navigationOpened);
 
@@ -294,6 +296,9 @@ class Navigation extends Component<Props, State> {
 					}
 					: undefined,
 			});
+			if(!navigationOpened) {
+				returnInUnit();
+			}
 		}
 
 		if(deviceType !== prevProps.deviceType) {

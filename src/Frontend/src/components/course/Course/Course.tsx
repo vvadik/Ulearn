@@ -579,6 +579,7 @@ class Course extends Component<Props, State> {
 				publicationDate: item.publicationDate,
 			})),
 			containsFlashcards: courseInfo.containsFlashcards,
+			returnInUnit: this.returnInUnit,
 		};
 	}
 
@@ -658,6 +659,25 @@ class Course extends Component<Props, State> {
 	returnInUnitsMenu = (): void => {
 		this.setState({
 			openedUnit: undefined,
+		});
+	};
+
+	returnInUnit = (): void => {
+		const { slideId, courseInfo, units, } = this.props;
+		if(!units) {
+			return;
+		}
+
+		const currentUnitId = findUnitIdBySlideId(slideId, courseInfo);
+
+		if(!currentUnitId) {
+			return;
+		}
+
+		const openedUnit = units[currentUnitId];
+
+		this.setState({
+			openedUnit,
 		});
 	};
 }
