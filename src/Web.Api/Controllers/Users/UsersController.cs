@@ -49,7 +49,7 @@ namespace Ulearn.Web.Api.Controllers.Users
 					return BadRequest(new ErrorResponse("You can not search students by this method: there are too many students"));
 
 				/* Only instructors can search by course role */
-				var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, parameters.CourseId, CourseRoleType.Instructor).ConfigureAwait(false);
+				var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, parameters.CourseId, CourseRoleType.Instructor).ConfigureAwait(false);
 				if (!isInstructor)
 					return StatusCode((int)HttpStatusCode.Unauthorized, new ErrorResponse("Only instructors can search by course role"));
 			}
@@ -115,7 +115,7 @@ namespace Ulearn.Web.Api.Controllers.Users
 				}
 			}
 
-			var instructors = await courseRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, null, true).ConfigureAwait(false);
+			var instructors = await courseRolesRepo.GetListOfUsersWithCourseRole(CourseRoleType.Instructor, null, true).ConfigureAwait(false);
 			var currentUserIsInstructor = instructors.Contains(User.GetUserId());
 			return new UsersSearchResponse
 			{

@@ -164,7 +164,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				.Include(s => s.ManualCheckings).ThenInclude(c => c.Reviews).ThenInclude(r => r.Author)
 				.ToListAsync();
 			var codeReviewComments = await slideCheckingsRepo.GetExerciseCodeReviewComments(context.CourseId, context.Slide.Id, context.UserId);
-			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourseAsync(context.UserId, context.CourseId, CourseRoleType.CourseAdmin);
+			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourse(context.UserId, context.CourseId, CourseRoleType.CourseAdmin);
 			
 			ExerciseAttemptsStatistics exerciseAttemptsStatistics = null;
 			if (b.HasAutomaticChecking())

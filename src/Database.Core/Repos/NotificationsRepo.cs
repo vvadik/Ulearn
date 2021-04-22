@@ -411,7 +411,7 @@ namespace Database.Repos
 					var visibleUnits = await unitsRepo.GetPublishedUnitIdsAsync(course);
 					if (!visibleUnits.Any())
 					{
-						var userIdsWithInstructorRoles = await courseRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Tester, notification.CourseId, true);
+						var userIdsWithInstructorRoles = await courseRolesRepo.GetListOfUsersWithCourseRole(CourseRoleType.Tester, notification.CourseId, true);
 						var sysAdminsIds = await usersRepo.GetSysAdminsIdsAsync();
 						recipientsIds.IntersectWith(userIdsWithInstructorRoles.Concat(sysAdminsIds));
 					}
@@ -457,7 +457,7 @@ namespace Database.Repos
 		{
 			var notificationTypes = GetAllNotificationTypes();
 
-			var courseRole = await courseRolesRepo.GetRoleAsync(userId, courseId);
+			var courseRole = await courseRolesRepo.GetRole(userId, courseId);
 			notificationTypes = notificationTypes
 				.Where(t => t.GetMinCourseRole() <= courseRole)
 				.OrderByDescending(t => t.GetMinCourseRole())

@@ -61,7 +61,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 
 			if (comment.IsForInstructorsOnly)
 			{
-				var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, comment.CourseId, CourseRoleType.Instructor).ConfigureAwait(false);
+				var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, comment.CourseId, CourseRoleType.Instructor).ConfigureAwait(false);
 				if (!isInstructor)
 				{
 					context.Result = StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse("You have no access to this comment"));
@@ -87,7 +87,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 
 			DefaultDictionary<int, int> likesCount;
 			var likedByUserCommentsIds = (await commentLikesRepo.GetCommentsLikedByUserAsync(comment.CourseId, comment.SlideId, UserId).ConfigureAwait(false)).ToHashSet();
-			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(User.GetUserId(), comment.CourseId, CourseRoleType.Instructor).ConfigureAwait(false);
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(User.GetUserId(), comment.CourseId, CourseRoleType.Instructor).ConfigureAwait(false);
 			var canViewAllGroupMembers = false;
 			HashSet<int> userAvailableGroupsIds = null;
 			if (isInstructor)
@@ -242,7 +242,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		private async Task<bool> CanModerateCommentsInCourseAsync(string courseId, string userId)
 		{
 			var hasCourseAccessForCommentEditing = await coursesRepo.HasCourseAccessAsync(userId, courseId, CourseAccessType.EditPinAndRemoveComments).ConfigureAwait(false);
-			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
+			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourse(userId, courseId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
 			return hasCourseAccessForCommentEditing || isCourseAdmin;
 		}
 

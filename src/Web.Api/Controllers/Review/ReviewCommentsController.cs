@@ -47,7 +47,7 @@ namespace Ulearn.Web.Api.Controllers.Review
 
 			var submissionUserId = review.ExerciseCheckingId.HasValue ? review.ExerciseChecking.UserId : review.Submission.UserId;
 			var submissionCourseId = review.ExerciseCheckingId.HasValue ? review.ExerciseChecking.CourseId : review.Submission.CourseId;
-			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, submissionCourseId, CourseRoleType.Instructor);
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, submissionCourseId, CourseRoleType.Instructor);
 			if (submissionUserId != UserId && !isInstructor)
 				return StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse("You can't comment this review"));
 
@@ -82,7 +82,7 @@ namespace Ulearn.Web.Api.Controllers.Review
 				return NotFound(new ErrorResponse($"Comment {commentId} not found"));
 
 			var courseId = comment.Review.ExerciseCheckingId.HasValue ? comment.Review.ExerciseChecking.CourseId : comment.Review.Submission.CourseId;
-			if (comment.AuthorId != UserId && !await courseRolesRepo.HasUserAccessToCourseAsync(UserId, courseId, CourseRoleType.CourseAdmin))
+			if (comment.AuthorId != UserId && !await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.CourseAdmin))
 				return StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse("You can't delete this comment"));
 
 			await slideCheckingsRepo.DeleteExerciseCodeReviewComment(comment).ConfigureAwait(false);

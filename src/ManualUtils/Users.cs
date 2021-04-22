@@ -11,7 +11,7 @@ namespace ManualUtils
 		public static void PrintCourseAdmins(UlearnDb db)
 		{
 			var courseRolesRepo = new CourseRolesRepo(db, null);
-			var adminIds = courseRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRoleType.CourseAdmin, null, false).Result;
+			var adminIds = courseRolesRepo.GetListOfUsersWithCourseRole(CourseRoleType.CourseAdmin, null, false).Result;
 			var users = adminIds.Select(
 				adminId =>
 				{

@@ -10,7 +10,6 @@ using Ulearn.Common.Extensions;
 
 namespace Database.Repos
 {
-	/* This repo is fully migrated to .NET Core and EF Core */
 	public class CourseRolesRepo : ICourseRolesRepo
 	{
 		private readonly UlearnDb db;
@@ -40,20 +39,20 @@ namespace Database.Repos
 				.ToList();
 		}
 
-		public async Task<Dictionary<string, CourseRoleType>> GetRolesAsync(string userId)
+		public async Task<Dictionary<string, CourseRoleType>> GetRoles(string userId)
 		{
 			return (await Internal_GetActualUserRoles(userId))
 				.GroupBy(role => role.CourseId, StringComparer.OrdinalIgnoreCase)
 				.ToDictionary(g => g.Key, g => g.Select(role => role.Role).Min());
 		}
 		
-		public async Task<CourseRoleType> GetRoleAsync(string userId, string courseId)
+		public async Task<CourseRoleType> GetRole(string userId, string courseId)
 		{
 			var roles = (await Internal_GetActualUserRoles(userId, courseId)).Select(role => role.Role).ToList();
 			return roles.Any() ? roles.Min() : CourseRoleType.Student;
 		}
 
-		public async Task<bool> ToggleRoleAsync(string courseId, string userId, CourseRoleType roleType, string grantedById, string comment)
+		public async Task<bool> ToggleRole(string courseId, string userId, CourseRoleType roleType, string grantedById, string comment)
 		{
 			var userRoles = await db.CourseRoles.ToListAsync();
 
@@ -70,7 +69,7 @@ namespace Database.Repos
 				Role = roleType,
 				IsEnabled = isEnabled,
 				GrantedById = grantedById,
-				GrantTime = DateTime.Now,
+				GrantTime = DateTime.Now.ToUniversalTime(),
 				Comment = comment
 			});
 
@@ -79,7 +78,7 @@ namespace Database.Repos
 			return isEnabled;
 		}
 
-		public async Task<bool> HasUserAccessToCourseAsync(string userId, string courseId, CourseRoleType minCourseRoleType)
+		public async Task<bool> HasUserAccessToCourse(string userId, string courseId, CourseRoleType minCourseRoleType)
 		{
 			var user = await usersRepo.FindUserByIdAsync(userId).ConfigureAwait(false);
 			if (usersRepo.IsSystemAdministrator(user))
@@ -88,7 +87,7 @@ namespace Database.Repos
 			return (await Internal_GetActualUserRoles(userId)).Any(r => string.Equals(r.CourseId, courseId, StringComparison.OrdinalIgnoreCase) && r.Role <= minCourseRoleType);
 		}
 
-		public async Task<bool> HasUserAccessTo_Any_CourseAsync(string userId, CourseRoleType minCourseRoleType)
+		public async Task<bool> HasUserAccessTo_Any_Course(string userId, CourseRoleType minCourseRoleType)
 		{
 			var user = await usersRepo.FindUserByIdAsync(userId).ConfigureAwait(false);
 			if (usersRepo.IsSystemAdministrator(user))
@@ -97,19 +96,19 @@ namespace Database.Repos
 			return (await Internal_GetActualUserRoles(userId)).Any(r => r.Role <= minCourseRoleType);
 		}
 
-		public async Task<List<string>> GetCoursesWhereUserIsInRoleAsync(string userId, CourseRoleType minCourseRoleType)
+		public async Task<List<string>> GetCoursesWhereUserIsInRole(string userId, CourseRoleType minCourseRoleType)
 		{
 			var roles = (await Internal_GetActualUserRoles(userId)).Where(r => r.Role <= minCourseRoleType).ToList();
 			return roles.Select(r => r.CourseId).ToList();
 		}
 
-		public async Task<List<string>> GetCoursesWhereUserIsInStrictRoleAsync(string userId, CourseRoleType courseRoleType)
+		public async Task<List<string>> GetCoursesWhereUserIsInStrictRole(string userId, CourseRoleType courseRoleType)
 		{
 			var roles = (await Internal_GetActualUserRoles(userId)).Where(r => r.Role == courseRoleType).ToList();
 			return roles.Select(r => r.CourseId).ToList();
 		}
 
-		public async Task<List<string>> GetListOfUsersWithCourseRoleAsync(CourseRoleType courseRoleType, string courseId, bool includeHighRoles)
+		public async Task<List<string>> GetListOfUsersWithCourseRole(CourseRoleType courseRoleType, string courseId, bool includeHighRoles)
 		{
 			IEnumerable<CourseRole> usersRoles = await Internal_GetActualUserRoles(null, courseId.NullIfEmptyOrWhitespace(), false);
 			usersRoles = includeHighRoles

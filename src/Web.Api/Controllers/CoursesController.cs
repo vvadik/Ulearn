@@ -76,7 +76,7 @@ namespace Ulearn.Web.Api.Controllers
 			// Фильтрация по роли. У администратора высшая роль.
 			if (role.HasValue && !isSystemAdministrator)
 			{
-				var courseIdsAsRole = await courseRolesRepo.GetCoursesWhereUserIsInRoleAsync(UserId, role.Value).ConfigureAwait(false);
+				var courseIdsAsRole = await courseRolesRepo.GetCoursesWhereUserIsInRole(UserId, role.Value).ConfigureAwait(false);
 				courses = courses.Where(c => courseIdsAsRole.Contains(c.Id, StringComparer.InvariantCultureIgnoreCase));
 			}
 
@@ -84,14 +84,14 @@ namespace Ulearn.Web.Api.Controllers
 			if (!isSystemAdministrator)
 			{
 				var visibleCourses = unitsRepo.GetVisibleCourses();
-				var coursesInWhichUserHasAnyRole = await courseRolesRepo.GetCoursesWhereUserIsInRoleAsync(UserId, CourseRoleType.Tester).ConfigureAwait(false);
+				var coursesInWhichUserHasAnyRole = await courseRolesRepo.GetCoursesWhereUserIsInRole(UserId, CourseRoleType.Tester).ConfigureAwait(false);
 				courses = courses.Where(c => visibleCourses.Contains(c.Id) || coursesInWhichUserHasAnyRole.Contains(c.Id, StringComparer.OrdinalIgnoreCase));
 			}
 
 			// Администратор видит все курсы. Покажем сверху те, в которых он преподаватель.
 			if (isSystemAdministrator)
 			{
-				var instructorCourseIds = await courseRolesRepo.GetCoursesWhereUserIsInStrictRoleAsync(UserId, CourseRoleType.Instructor).ConfigureAwait(false);
+				var instructorCourseIds = await courseRolesRepo.GetCoursesWhereUserIsInStrictRole(UserId, CourseRoleType.Instructor).ConfigureAwait(false);
 				courses = courses.OrderBy(c => !instructorCourseIds.Contains(c.Id, StringComparer.InvariantCultureIgnoreCase)).ThenBy(c => c.Title);
 			}
 			else
@@ -134,7 +134,7 @@ namespace Ulearn.Web.Api.Controllers
 			var visibleUnits = course.GetUnits(visibleUnitsIds);
 			if (groupId == null)
 			{
-				var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, course.Id, CourseRoleType.Instructor).ConfigureAwait(false);
+				var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, course.Id, CourseRoleType.Instructor).ConfigureAwait(false);
 				if (!isInstructor && visibleUnits.Count == 0)
 					return NotFound(new ErrorResponse("Course not found"));
 

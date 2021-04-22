@@ -153,7 +153,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		{
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
 
-			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, group.CourseId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
+			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourse(UserId, group.CourseId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
 			var canChangeOwner = group.OwnerId == UserId || isCourseAdmin;
 			if (!canChangeOwner)
 				return StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse("You can't change the owner of this group. Only current owner and course admin can change the owner."));
@@ -162,7 +162,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			var user = await usersRepo.FindUserByIdAsync(parameters.OwnerId).ConfigureAwait(false);
 			if (user == null)
 				return NotFound(new ErrorResponse($"Can't find user with id {parameters.OwnerId}"));
-			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(parameters.OwnerId, group.CourseId, CourseRoleType.Instructor).ConfigureAwait(false);
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(parameters.OwnerId, group.CourseId, CourseRoleType.Instructor).ConfigureAwait(false);
 			if (!isInstructor)
 				return NotFound(new ErrorResponse($"User {parameters.OwnerId} is not an instructor of course {group.CourseId}"));
 
@@ -208,7 +208,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 
 		private async Task<bool> CanCreateGroupInCourseAsync(string userId, string courseId)
 		{
-			return await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.Instructor).ConfigureAwait(false) ||
+			return await courseRolesRepo.HasUserAccessToCourse(userId, courseId, CourseRoleType.Instructor).ConfigureAwait(false) ||
 					await IsSystemAdministratorAsync().ConfigureAwait(false);
 		}
 

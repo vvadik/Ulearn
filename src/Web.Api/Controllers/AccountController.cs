@@ -88,7 +88,7 @@ namespace Ulearn.Web.Api.Controllers
 					"emailNotConfirmed"
 				));
 
-			var isInstructor = await courseRolesRepo.HasUserAccessTo_Any_CourseAsync(user.Id, CourseRoleType.Instructor).ConfigureAwait(false);
+			var isInstructor = await courseRolesRepo.HasUserAccessTo_Any_Course(user.Id, CourseRoleType.Instructor).ConfigureAwait(false);
 			if (isInstructor && (string.IsNullOrEmpty(user.FirstName) || string.IsNullOrEmpty(user.LastName)))
 				problems.Add(new AccountProblem(
 					"Не указаны имя или фамилия",
@@ -118,7 +118,7 @@ namespace Ulearn.Web.Api.Controllers
 		[Authorize]
 		public async Task<ActionResult<TokenResponse>> ApiToken([FromQuery] int days)
 		{
-			var isInstructor = await courseRolesRepo.HasUserAccessTo_Any_CourseAsync(User.GetUserId(), CourseRoleType.Instructor).ConfigureAwait(false);
+			var isInstructor = await courseRolesRepo.HasUserAccessTo_Any_Course(User.GetUserId(), CourseRoleType.Instructor).ConfigureAwait(false);
 			if (!isInstructor)
 				return StatusCode((int)HttpStatusCode.Forbidden, "You should be at least instructor");
 
@@ -188,7 +188,7 @@ namespace Ulearn.Web.Api.Controllers
 			var isSystemAdministrator = User.IsSystemAdministrator();
 			var visibleCourses = unitsRepo.GetVisibleCourses();
 
-			var rolesByCourse = (await courseRolesRepo.GetRolesAsync(userId).ConfigureAwait(false))
+			var rolesByCourse = (await courseRolesRepo.GetRoles(userId).ConfigureAwait(false))
 				.Where(kvp => kvp.Value != CourseRoleType.Student).ToList();
 			var courseAccesses = await coursesRepo.GetUserAccessesAsync(userId).ConfigureAwait(false);
 			var courseAccessesByCourseId = courseAccesses.GroupBy(a => a.CourseId).Select(

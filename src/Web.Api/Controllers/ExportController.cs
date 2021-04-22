@@ -52,7 +52,7 @@ namespace Ulearn.Web.Api.Controllers
 				return StatusCode((int)HttpStatusCode.NotFound, "Group not found");
 
 			var isSystemAdministrator = await IsSystemAdministratorAsync().ConfigureAwait(false);
-			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, group.CourseId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
+			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourse(UserId, group.CourseId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
 
 			if (!(isSystemAdministrator || isCourseAdmin))
 				return StatusCode((int)HttpStatusCode.Forbidden, "You should be course or system admin");

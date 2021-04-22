@@ -537,7 +537,7 @@ namespace Database.Models
 			if (slide.Hide)
 			{
 				var courseRoleUsersFilter = serviceProvider.GetService<ICourseRolesRepo>();
-				return await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, CourseId, includeHighRoles: true);
+				return await courseRoleUsersFilter.GetListOfUsersWithCourseRole(CourseRoleType.Instructor, CourseId, includeHighRoles: true);
 			}
 			var visitsRepo = serviceProvider.GetService<IVisitsRepo>();
 			return await visitsRepo.GetCourseUsers(CourseId);
@@ -596,7 +596,7 @@ namespace Database.Models
 			if (!slide.Hide)
 				return new List<string> { ParentComment.AuthorId };
 			var courseRolesRepo = serviceProvider.GetService<ICourseRolesRepo>();
-			if (await courseRolesRepo.HasUserAccessToCourseAsync(ParentComment.AuthorId, course.Id, CourseRoleType.Instructor))
+			if (await courseRolesRepo.HasUserAccessToCourse(ParentComment.AuthorId, course.Id, CourseRoleType.Instructor))
 				return new List<string> { ParentComment.AuthorId };
 			return new List<string>();
 		}
@@ -678,7 +678,7 @@ namespace Database.Models
 			if (!slide.Hide)
 				return new List<string> { Comment.AuthorId };
 			var courseRolesRepo = serviceProvider.GetService<ICourseRolesRepo>();
-			if (await courseRolesRepo.HasUserAccessToCourseAsync(Comment.AuthorId, course.Id, CourseRoleType.Instructor))
+			if (await courseRolesRepo.HasUserAccessToCourse(Comment.AuthorId, course.Id, CourseRoleType.Instructor))
 				return new List<string> { Comment.AuthorId };
 			return new List<string>();
 		}
@@ -825,7 +825,7 @@ namespace Database.Models
 			if (!slide.Hide)
 				return new List<string> { Checking.UserId };
 			var courseRolesRepo = serviceProvider.GetService<ICourseRolesRepo>();
-			if (await courseRolesRepo.HasUserAccessToCourseAsync(Checking.UserId, course.Id, CourseRoleType.Instructor))
+			if (await courseRolesRepo.HasUserAccessToCourse(Checking.UserId, course.Id, CourseRoleType.Instructor))
 				return new List<string> { Checking.UserId };
 			return new List<string>();
 		}
@@ -879,7 +879,7 @@ namespace Database.Models
 			if (!slide.Hide)
 				return new List<string> { Checking.UserId };
 			var courseRolesRepo = serviceProvider.GetService<ICourseRolesRepo>();
-			if (await courseRolesRepo.HasUserAccessToCourseAsync(Checking.UserId, course.Id, CourseRoleType.Instructor))
+			if (await courseRolesRepo.HasUserAccessToCourse(Checking.UserId, course.Id, CourseRoleType.Instructor))
 				return new List<string> { Checking.UserId };
 			return new List<string>();
 		}
@@ -1074,7 +1074,7 @@ namespace Database.Models
 			var usersWithAccess = new List<string>();
 			foreach (var authorsId in authorsIds)
 			{
-				if (await courseRolesRepo.HasUserAccessToCourseAsync(authorsId, course.Id, CourseRoleType.Instructor))
+				if (await courseRolesRepo.HasUserAccessToCourse(authorsId, course.Id, CourseRoleType.Instructor))
 					usersWithAccess.Add(authorsId);
 			}
 			return usersWithAccess;
@@ -1402,7 +1402,7 @@ namespace Database.Models
 		public override async Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider, Course course)
 		{
 			var courseRoleUsersFilter = serviceProvider.GetService<ICourseRolesRepo>();
-			return await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, CourseId, includeHighRoles: true);
+			return await courseRoleUsersFilter.GetListOfUsersWithCourseRole(CourseRoleType.Instructor, CourseId, includeHighRoles: true);
 		}
 
 		public override async Task<List<Notification>> GetBlockerNotifications(IServiceProvider serviceProvider)
@@ -1439,7 +1439,7 @@ namespace Database.Models
 		public override async Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider, Course course)
 		{
 			var courseRoleUsersFilter = serviceProvider.GetService<ICourseRolesRepo>();
-			return await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.CourseAdmin, CourseId, false);
+			return await courseRoleUsersFilter.GetListOfUsersWithCourseRole(CourseRoleType.CourseAdmin, CourseId, false);
 		}
 
 		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
@@ -1479,7 +1479,7 @@ namespace Database.Models
 		public override async Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider, Course course)
 		{
 			var courseRoleUsersFilter = serviceProvider.GetService<ICourseRolesRepo>();
-			return await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.CourseAdmin, CourseId, false);
+			return await courseRoleUsersFilter.GetListOfUsersWithCourseRole(CourseRoleType.CourseAdmin, CourseId, false);
 		}
 
 		public override bool IsActual()
@@ -1522,7 +1522,7 @@ namespace Database.Models
 		public override async Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider, Course course)
 		{
 			var courseRoleUsersFilter = serviceProvider.GetService<ICourseRolesRepo>();
-			return await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.CourseAdmin, CourseId, false);
+			return await courseRoleUsersFilter.GetListOfUsersWithCourseRole(CourseRoleType.CourseAdmin, CourseId, false);
 		}
 
 		public override bool IsActual()
@@ -1555,7 +1555,7 @@ namespace Database.Models
 		public override async Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider, Course course)
 		{
 			var courseRoleUsersFilter = serviceProvider.GetService<ICourseRolesRepo>();
-			return await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.CourseAdmin, CourseId, false);
+			return await courseRoleUsersFilter.GetListOfUsersWithCourseRole(CourseRoleType.CourseAdmin, CourseId, false);
 		}
 
 		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
@@ -1592,7 +1592,7 @@ namespace Database.Models
 		public override async Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider, Course course)
 		{
 			var courseRoleUsersFilter = serviceProvider.GetService<ICourseRolesRepo>();
-			return await courseRoleUsersFilter.GetListOfUsersWithCourseRoleAsync(CourseRoleType.CourseAdmin, CourseId, false);
+			return await courseRoleUsersFilter.GetListOfUsersWithCourseRole(CourseRoleType.CourseAdmin, CourseId, false);
 		}
 
 		public override bool IsActual()

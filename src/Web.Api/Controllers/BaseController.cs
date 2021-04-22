@@ -130,7 +130,7 @@ namespace Ulearn.Web.Api.Controllers
 		public static async Task<Func<Slide, string>> BuildGetGitEditLinkFunc(string userId, Course course,
 			ICourseRolesRepo courseRolesRepo, ICoursesRepo coursesRepo)
 		{
-			var courseRole = await courseRolesRepo.GetRoleAsync(userId, course.Id);
+			var courseRole = await courseRolesRepo.GetRole(userId, course.Id);
 			var canEditGit = courseRole <= CourseRoleType.CourseAdmin;
 			if (!canEditGit)
 				return s => null;

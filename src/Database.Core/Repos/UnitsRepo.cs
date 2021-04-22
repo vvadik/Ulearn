@@ -24,7 +24,7 @@ namespace Database.Repos
 
 		public async Task<List<Guid>> GetVisibleUnitIdsAsync(Course course, string userId)
 		{
-			var canSeeEverything = await courseRolesRepo.HasUserAccessToCourseAsync(userId, course.Id, CourseRoleType.Tester);
+			var canSeeEverything = await courseRolesRepo.HasUserAccessToCourse(userId, course.Id, CourseRoleType.Tester);
 			if (canSeeEverything)
 				return course.GetUnitsNotSafe().Select(u => u.Id).ToList();
 

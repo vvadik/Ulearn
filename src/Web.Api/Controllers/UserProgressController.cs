@@ -72,7 +72,7 @@ namespace Ulearn.Web.Api.Controllers
 					return NotFound(new ErrorResponse($"Users {userIdsStr} not found"));
 				}
 			}
-			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
 			var visibleSlides = course.GetSlides(isInstructor).Select(s => s.Id).ToHashSet();
 
 			var scores = await visitsRepo.GetScoresForSlides(course.Id, userIds);
@@ -123,7 +123,7 @@ namespace Ulearn.Web.Api.Controllers
 				return null;
 			if (await groupAccessesRepo.CanUserSeeAllCourseGroupsAsync(UserId, courseId))
 				return null;
-			var userRole = await courseRolesRepo.GetRoleAsync(UserId, courseId).ConfigureAwait(false);
+			var userRole = await courseRolesRepo.GetRole(UserId, courseId).ConfigureAwait(false);
 			var groups = userRole == CourseRoleType.Instructor ? await groupAccessesRepo.GetAvailableForUserGroupsAsync(courseId, UserId, false, true, false) : new List<Group>();
 			groups = groups
 				.Concat((await groupMembersRepo.GetUserGroupsAsync(courseId, UserId, false)).Where(g=> g.CanUsersSeeGroupProgress))
@@ -160,7 +160,7 @@ namespace Ulearn.Web.Api.Controllers
 		[Authorize]
 		public async Task<ActionResult<UsersProgressResponse>> Visit([FromRoute] Course course, [FromRoute] Guid slideId)
 		{
-			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, course.Id, CourseRoleType.Instructor).ConfigureAwait(false);
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, course.Id, CourseRoleType.Instructor).ConfigureAwait(false);
 			var slide = course.FindSlideById(slideId, isInstructor);
 			if (slide == null)
 			{
