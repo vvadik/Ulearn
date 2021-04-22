@@ -71,9 +71,9 @@ namespace Notifications
 		{
 			base.ConfigureDi(services);
 			services.AddSingleton<OneTimeEmailSender>();
-			services.AddScoped<IEmailSender, KonturSpamEmailSender>();
+			services.AddSingleton<IEmailSender, KonturSpamEmailSender>();
 			services.AddScoped<INotificationSender, NotificationSender>();
-			services.AddScoped<ITelegramSender, TelegramSender>();
+			services.AddSingleton<ITelegramSender, TelegramSender>();
 			services.AddScoped<DeliveriesProcessor>();
 			services.AddScoped(sp => new MetricSender(
 				((IOptions<NotificationsConfiguration>)sp.GetService(typeof(IOptions<NotificationsConfiguration>)))!.Value.GraphiteServiceName));
