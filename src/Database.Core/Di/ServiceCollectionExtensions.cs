@@ -83,7 +83,6 @@ namespace Database.Di
 			services.AddScoped<ICertificatesRepo, CertificatesRepo>();
 			services.AddScoped<IGradersRepo, GradersRepo>();
 			services.AddScoped<IRestoreRequestRepo, RestoreRequestRepo>();
-			services.AddScoped<ISlideRateRepo, SlideRateRepo>();
 			services.AddScoped<IStepikRepo, StepikRepo>();
 
 			return services;
