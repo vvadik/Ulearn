@@ -8,12 +8,12 @@ namespace Database.Repos
 {
 	public interface IUnitsRepo
 	{
-		Task<List<Guid>> GetVisibleUnitIdsAsync(Course course, string userId);
-		Task<List<Guid>> GetPublishedUnitIdsAsync(Course course);
-		Task<List<UnitAppearance>> GetUnitAppearancesAsync(Course course);
+		Task<List<Guid>> GetVisibleUnitIds(Course course, string userId);
+		Task<List<Guid>> GetPublishedUnitIds(Course course);
+		Task<List<UnitAppearance>> GetUnitAppearances(Course course);
 		Task<bool> IsUnitVisibleForStudents(Course course, Guid unitId);
-		DateTime? GetNextUnitPublishTime(string courseId);
-		HashSet<string> GetVisibleCourses();
-		Task<bool> IsCourseVisibleForStudentsAsync(string courseId);
+		Task<DateTime?> GetNextUnitPublishTime(string courseId);
+		Task<HashSet<string>> GetVisibleCourses();
+		Task<bool> IsCourseVisibleForStudents(string courseId);
 	}
 }

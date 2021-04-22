@@ -48,7 +48,7 @@ namespace Ulearn.Web.Api.Controllers
 		{
 			var userFlashcardsVisitsByCourse = await usersFlashcardsVisitsRepo.GetUserFlashcardsVisitsAsync(UserId, course.Id);
 			var flashcardResponseByUnits = new FlashcardResponseByUnits();
-			var visibleUnits = await unitsRepo.GetVisibleUnitIdsAsync(course, UserId);
+			var visibleUnits = await unitsRepo.GetVisibleUnitIds(course, UserId);
 			foreach (var unit in course.GetUnits(visibleUnits))
 			{
 				var unitFlashcardsResponse = new UnitFlashcardsResponse();
@@ -173,7 +173,7 @@ namespace Ulearn.Web.Api.Controllers
 		[ProducesResponseType((int)HttpStatusCode.NoContent)]
 		public async Task<IActionResult> Status([FromRoute] Course course, [FromRoute] string flashcardId, [FromBody] Rate rate)
 		{
-			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIdsAsync(course, UserId);
+			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIds(course, UserId);
 			var unit = course.GetUnits(visibleUnitsIds).FirstOrDefault(x => x.GetFlashcardById(flashcardId) != null);
 			if (unit is null)
 				return BadRequest($"flashcard with id {flashcardId} does not exist");

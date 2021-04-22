@@ -185,8 +185,8 @@ namespace Ulearn.Web.Api.Controllers
 		public async Task<ActionResult<CourseRolesResponse>> CourseRoles()
 		{
 			var userId = User.GetUserId();
-			var isSystemAdministrator = User.IsSystemAdministrator();
-			var visibleCourses = unitsRepo.GetVisibleCourses();
+			var isSystemAdministrator = await usersRepo.IsSystemAdministrator(userId);
+			var visibleCourses = await unitsRepo.GetVisibleCourses();
 
 			var rolesByCourse = (await courseRolesRepo.GetRoles(userId).ConfigureAwait(false))
 				.Where(kvp => kvp.Value != CourseRoleType.Student).ToList();

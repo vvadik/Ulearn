@@ -83,7 +83,7 @@ namespace Ulearn.Web.Api.Controllers
 			// Неопубликованные курсы не покажем тем, кто не имеет роли в них.
 			if (!isSystemAdministrator)
 			{
-				var visibleCourses = unitsRepo.GetVisibleCourses();
+				var visibleCourses = await unitsRepo.GetVisibleCourses();
 				var coursesInWhichUserHasAnyRole = await courseRolesRepo.GetCoursesWhereUserIsInRole(UserId, CourseRoleType.Tester).ConfigureAwait(false);
 				courses = courses.Where(c => visibleCourses.Contains(c.Id) || coursesInWhichUserHasAnyRole.Contains(c.Id, StringComparer.OrdinalIgnoreCase));
 			}
@@ -130,7 +130,7 @@ namespace Ulearn.Web.Api.Controllers
 
 			var course = await courseManager.FindCourseAsync(courseId);
 			List<UnitInfo> units;
-			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIdsAsync(course, UserId);
+			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIds(course, UserId);
 			var visibleUnits = course.GetUnits(visibleUnitsIds);
 			if (groupId == null)
 			{
@@ -140,8 +140,8 @@ namespace Ulearn.Web.Api.Controllers
 
 				var unitAppearances = !isInstructor
 					? new Dictionary<Guid, UnitAppearance>()
-					: (await unitsRepo.GetUnitAppearancesAsync(course)).ToDictionary(a => a.UnitId, a => a);
-				var publishedUnitIds = new HashSet<Guid>(!isInstructor ? visibleUnitsIds : await unitsRepo.GetPublishedUnitIdsAsync(course));
+					: (await unitsRepo.GetUnitAppearances(course)).ToDictionary(a => a.UnitId, a => a);
+				var publishedUnitIds = new HashSet<Guid>(!isInstructor ? visibleUnitsIds : await unitsRepo.GetPublishedUnitIds(course));
 				var getSlideMaxScoreFunc = await BuildGetSlideMaxScoreFunc(solutionsRepo, userQuizzesRepo, visitsRepo, groupsRepo, course, UserId);
 				var getGitEditLinkFunc = await BuildGetGitEditLinkFunc(User.GetUserId(), course, courseRolesRepo, coursesRepo);
 				units = visibleUnits.Select(unit => BuildUnitInfo(course.Id, unit,
@@ -179,7 +179,7 @@ namespace Ulearn.Web.Api.Controllers
 				Title = isTempCourse ? "Временный - " + course.Title : course.Title,
 				Description = course.Settings.Description,
 				Scoring = scoringSettings,
-				NextUnitPublishTime = unitsRepo.GetNextUnitPublishTime(course.Id),
+				NextUnitPublishTime = await unitsRepo.GetNextUnitPublishTime(course.Id),
 				Units = units,
 				ContainsFlashcards = containsFlashcards,
 				IsTempCourse = isTempCourse,

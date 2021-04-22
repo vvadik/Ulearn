@@ -48,7 +48,7 @@ namespace Ulearn.Web.Api.Controllers.Websockets
 				var usersRepo = scope.ServiceProvider.GetService<IUsersRepo>();
 
 				IClientProxy clientProxy;
-				if (await unitsRepo.IsCourseVisibleForStudentsAsync(courseId))
+				if (await unitsRepo.IsCourseVisibleForStudents(courseId))
 					clientProxy = hubContext.Clients.All;
 				else
 				{

@@ -227,7 +227,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			}
 
 			var scoringGroups = course.Settings.Scoring.Groups.Values.ToList();
-			var visibleUnitIds = await unitsRepo.GetVisibleUnitIdsAsync(course, UserId);
+			var visibleUnitIds = await unitsRepo.GetVisibleUnitIds(course, UserId);
 			var scoringGroupsCanBeSetInSomeUnit = GetScoringGroupsCanBeSetInSomeUnit(course.GetUnits(visibleUnitIds));
 			var enabledScoringGroups = await groupsRepo.GetEnabledAdditionalScoringGroupsForGroupAsync(groupId).ConfigureAwait(false);
 			return new GroupScoringGroupsResponse
@@ -257,7 +257,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			}
 
 			var courseScoringGroupIds = course.Settings.Scoring.Groups.Values.Select(g => g.Id).ToList();
-			var visibleUnitIds = await unitsRepo.GetVisibleUnitIdsAsync(course, UserId);
+			var visibleUnitIds = await unitsRepo.GetVisibleUnitIds(course, UserId);
 			var scoringGroupsCanBeSetInSomeUnit = GetScoringGroupsCanBeSetInSomeUnit(course.GetUnits(visibleUnitIds)).Select(g => g.Id).ToList();
 			foreach (var scoringGroupId in parameters.Scores)
 			{
