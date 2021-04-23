@@ -1461,6 +1461,11 @@ namespace Database.Models
 
 		public virtual Group Group { get; set; }
 
+		public CreatedGroupNotification(int groupId)
+		{
+			GroupId = groupId;
+		}
+
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
 			return $"<b>{Group.Owner.VisibleName.EscapeHtml()}</b> создал{Group.Owner.Gender.ChooseEnding()} новую группу <b>«{Group.Name.EscapeHtml()}»</b> в курсе «{course.Title.EscapeHtml()}».";
