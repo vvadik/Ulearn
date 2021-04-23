@@ -1,70 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net472</TargetFramework>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFramework>net5.0</TargetFramework>
     <AssemblyTitle>Notifications</AssemblyTitle>
-    <Product>Notifications</Product>
-    <Description>Notifications service for ulearn mooc platform</Description>
-    <Copyright>Copyright 2014–2018 SKB Kontur</Copyright>
-    <Authors>SKB Kontur</Authors>
-    <PackageId>Kontur.Ulearn.Notifications</PackageId>
-    <PackageLicenseUrl>https://ulearn.me/Home/Terms</PackageLicenseUrl>
-    <PackageProjectUrl>https://ulearn.me</PackageProjectUrl>
-    <PackageTags>ulearn education mooc</PackageTags>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-    <LangVersion>default</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DotNetZip" Version="1.15.0" />
-    <PackageReference Include="EntityFramework" Version="6.4.4" />
-    <PackageReference Include="EntityFramework6.Npgsql" Version="6.4.1" />
-    <PackageReference Include="Graphite" Version="1.3.0.0" />
-    <PackageReference Include="MarkdownDeep.NET.Core" Version="1.5.0.4" />
-    <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.3" />
-    <PackageReference Include="Microsoft.AspNet.Identity.EntityFramework" Version="2.2.3" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
-    <PackageReference Include="Microsoft.Build.Framework" Version="16.9.0" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.9.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="5.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Primitives" Version="5.0.0" />
-    <PackageReference Include="Microsoft.NETCore.Platforms" Version="5.0.1" />
-    <PackageReference Include="Microsoft.VisualStudio.Setup.Configuration.Interop" Version="1.16.30">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Win32.Primitives" Version="4.3.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="NUnit" Version="3.10.0" />
-    <PackageReference Include="OctoPack" Version="3.6.5">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
-    <PackageReference Include="Telegram.Bot" Version="15.7.1" />
-    <PackageReference Include="UnidecodeSharpCore" Version="2.0.1" />
+    <PackageReference Include="Spam.Api.Client" Version="1.3.3.1" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Kontur.Spam.Client, Version=1.3.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\ThirdParty\Spam.Api.Client.1.3.2.1\lib\Kontur.Spam.Client.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-  <ItemGroup>
+    <ProjectReference Include="..\Common.Api.Application\Common.Api.Application.csproj" />
+    <ProjectReference Include="..\Common.Api\Common.Api.csproj" />
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\Core\Core.csproj" />
-    <ProjectReference Include="..\Database\Database.csproj" />
+    <ProjectReference Include="..\Database.Core\Database.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="appsettings.local.json">
@@ -88,5 +37,10 @@
     <Content Include="sender.xml.example">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  <Content Include="deploy\**">
+    <Link>deploy\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>None</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+  </Content>
   </ItemGroup>
 </Project>

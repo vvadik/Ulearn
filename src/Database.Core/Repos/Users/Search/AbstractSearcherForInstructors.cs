@@ -55,7 +55,7 @@ namespace Database.Repos.Users.Search
 			if (usersRepo.IsSystemAdministrator(currentUser))
 				return Task.FromResult(true);
 
-			return courseRolesRepo.HasUserAccessTo_Any_CourseAsync(currentUser.Id, CourseRoleType.Instructor);
+			return courseRolesRepo.HasUserAccessTo_Any_Course(currentUser.Id, CourseRoleType.Instructor);
 		}
 
 		public abstract Task<IQueryable<ApplicationUser>> SearchAsync(IQueryable<ApplicationUser> users, string term, bool strict = false, int limit = 1000);

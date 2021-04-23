@@ -8,7 +8,6 @@ using Newtonsoft.Json;
 
 namespace Database.Repos
 {
-	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
 	public class CertificatesRepo : ICertificatesRepo
 	{
 		private readonly UlearnDb db;
@@ -18,24 +17,24 @@ namespace Database.Repos
 			this.db = db;
 		}
 
-		public List<CertificateTemplate> GetTemplates(string courseId)
+		public async Task<List<CertificateTemplate>> GetTemplates(string courseId)
 		{
-			return db.CertificateTemplates.Where(t => t.CourseId == courseId && !t.IsDeleted).ToList();
+			return await db.CertificateTemplates.Where(t => t.CourseId == courseId && !t.IsDeleted).ToListAsync();
 		}
 
-		public CertificateTemplate FindTemplateById(Guid id)
+		public async Task<CertificateTemplate> FindTemplateById(Guid id)
 		{
-			return db.CertificateTemplates.FirstOrDefault(t => t.Id == id && !t.IsDeleted);
+			return await db.CertificateTemplates.FirstOrDefaultAsync(t => t.Id == id && !t.IsDeleted);
 		}
 
-		public Certificate FindCertificateById(Guid id)
+		public async Task<Certificate> FindCertificateById(Guid id)
 		{
-			return db.Certificates.FirstOrDefault(c => c.Id == id && !c.IsDeleted);
+			return await db.Certificates.FirstOrDefaultAsync(c => c.Id == id && !c.IsDeleted);
 		}
 
-		public List<Certificate> GetTemplateCertificates(Guid templateId)
+		public async Task<List<Certificate>> GetTemplateCertificates(Guid templateId)
 		{
-			return db.Certificates.Where(c => c.TemplateId == templateId && !c.IsDeleted).ToList();
+			return await db.Certificates.Where(c => c.TemplateId == templateId && !c.IsDeleted).ToListAsync();
 		}
 
 		public async Task<CertificateTemplate> AddTemplate(string courseId, string name, string archiveName)
@@ -72,7 +71,7 @@ namespace Database.Repos
 
 		public async Task ChangeTemplateArchiveName(Guid templateId, string newArchiveName)
 		{
-			var template = FindTemplateById(templateId);
+			var template = await FindTemplateById(templateId);
 			if (template == null)
 				throw new ArgumentException("Invalid templateId", nameof(templateId));
 
@@ -82,7 +81,7 @@ namespace Database.Repos
 
 		public async Task ChangeTemplateName(Guid templateId, string name)
 		{
-			var template = FindTemplateById(templateId);
+			var template = await FindTemplateById(templateId);
 			if (template == null)
 				throw new ArgumentException("Invalid templateId", nameof(templateId));
 
@@ -90,16 +89,16 @@ namespace Database.Repos
 			await db.SaveChangesAsync();
 		}
 
-		public Dictionary<Guid, List<Certificate>> GetCertificates(string courseId, bool includePreviews = false)
+		public async Task<Dictionary<Guid, List<Certificate>>> GetCertificates(string courseId, bool includePreviews = false)
 		{
 			var certificates = db.Certificates
 				.Where(c => c.Template.CourseId == courseId && !c.IsDeleted);
 			if (!includePreviews)
 				certificates = certificates.Where(c => !c.IsPreview);
-			return certificates
+			return (await certificates
 				.Include(c => c.User)
 				.Include(c => c.Instructor)
-				.AsEnumerable()
+				.ToListAsync())
 				.GroupBy(c => c.TemplateId)
 				.ToDictionary(g => g.Key, g => g.OrderBy(c => c.Timestamp).ToList());
 		}
@@ -110,17 +109,29 @@ namespace Database.Repos
 			await db.SaveChangesAsync();
 		}
 
-		public List<Certificate> GetUserCertificates(string userId, bool includePreviews = false)
+		public async Task<List<Certificate>> GetUserCertificates(string userId, bool includePreviews = false)
 		{
 			var certificates = db.Certificates.Where(c => c.UserId == userId && !c.IsDeleted);
 			if (!includePreviews)
 				certificates = certificates.Where(c => !c.IsPreview);
-			return certificates.ToList();
+			return await certificates.ToListAsync();
 		}
 
 		public async Task RemoveCertificate(Certificate certificate)
 		{
 			certificate.IsDeleted = true;
+			await db.SaveChangesAsync();
+		}
+
+		public async Task AddCertificateTemplateArchive(string archiveName, Guid certificateTemplateId, byte[] content)
+		{
+			var archive = new CertificateTemplateArchive
+			{
+				ArchiveName = archiveName,
+				CertificateTemplateId = certificateTemplateId,
+				Content = content
+			};
+			db.CertificateTemplateArchives.Add(archive);
 			await db.SaveChangesAsync();
 		}
 	}

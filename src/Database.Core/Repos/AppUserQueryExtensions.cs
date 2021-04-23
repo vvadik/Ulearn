@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Database.Repos
 {
@@ -32,14 +33,14 @@ namespace Database.Repos
 		}
 
 		/* Pass count=0 to disable limiting */
-		public static async Task<List<UserRolesInfo>> GetUserRolesInfoAsync(this IQueryable<ApplicationUser> applicationUsers, int count, UserManager<ApplicationUser> userManager)
+		public static async Task<List<UserRolesInfo>> GetUserRolesInfo(this IQueryable<ApplicationUser> applicationUsers, int count, UserManager<ApplicationUser> userManager)
 		{
 			IQueryable<ApplicationUser> users = applicationUsers.OrderBy(u => u.UserName);
 			if (count > 0)
 				users = users.Take(count);
 
 			var userRolesInfos = new List<UserRolesInfo>();
-			foreach (var user in users.ToList())
+			foreach (var user in await users.ToListAsync())
 			{
 				userRolesInfos.Append(new UserRolesInfo
 				{

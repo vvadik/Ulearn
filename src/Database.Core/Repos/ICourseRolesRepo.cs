@@ -7,13 +7,13 @@ namespace Database.Repos
 {
 	public interface ICourseRolesRepo
 	{
-		Task<Dictionary<string, CourseRoleType>> GetRolesAsync(string userId);
-		Task<CourseRoleType> GetRoleAsync(string userId, string courseId);
-		Task<bool> ToggleRoleAsync(string courseId, string userId, CourseRoleType roleType, string grantedById, string comment);
-		Task<bool> HasUserAccessToCourseAsync(string userId, string courseId, CourseRoleType minCourseRoleType);
-		Task<bool> HasUserAccessTo_Any_CourseAsync(string userId, CourseRoleType minCourseRoleType);
-		Task<List<string>> GetCoursesWhereUserIsInRoleAsync(string userId, CourseRoleType minCourseRoleType);
-		Task<List<string>> GetCoursesWhereUserIsInStrictRoleAsync(string userId, CourseRoleType courseRoleType);
-		Task<List<string>> GetListOfUsersWithCourseRoleAsync(CourseRoleType courseRoleType, [CanBeNull]string courseId, bool includeHighRoles);
+		Task<Dictionary<string, CourseRoleType>> GetRoles(string userId);
+		Task<CourseRoleType> GetRole(string userId, string courseId);
+		Task<bool> ToggleRole(string courseId, string userId, CourseRoleType roleType, string grantedById, string comment);
+		Task<bool> HasUserAccessToCourse(string userId, string courseId, CourseRoleType minCourseRoleType);
+		Task<bool> HasUserAccessTo_Any_Course(string userId, CourseRoleType minCourseRoleType);
+		Task<List<string>> GetCoursesWhereUserIsInRole(string userId, CourseRoleType minCourseRoleType);
+		Task<List<string>> GetCoursesWhereUserIsInStrictRole(string userId, CourseRoleType courseRoleType);
+		Task<List<string>> GetListOfUsersWithCourseRole(CourseRoleType courseRoleType, [CanBeNull]string courseId, bool includeHighRoles);
 	}
 }

@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Database;
+using Database.Models;
+using Database.Repos;
 using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
@@ -23,15 +26,17 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		private readonly IGroupsRepo groupsRepo;
 		private readonly IGroupAccessesRepo groupAccessesRepo;
 		private readonly IGroupMembersRepo groupMembersRepo;
+		private readonly INotificationsRepo notificationsRepo;
 
 		public GroupsController(IWebCourseManager courseManager, UlearnDb db,
 			IUsersRepo usersRepo,
-			IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo)
+			IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo, INotificationsRepo notificationsRepo)
 			: base(courseManager, db, usersRepo)
 		{
 			this.groupsRepo = groupsRepo;
 			this.groupAccessesRepo = groupAccessesRepo;
 			this.groupMembersRepo = groupMembersRepo;
+			this.notificationsRepo = notificationsRepo;
 		}
 
 		/// <summary>
@@ -90,6 +95,12 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		{
 			var ownerId = User.GetUserId();
 			var group = await groupsRepo.CreateGroupAsync(courseAuthorizationParameters.CourseId, parameters.Name, ownerId).ConfigureAwait(false);
+
+			await notificationsRepo.AddNotification(
+				group.CourseId,
+				new CreatedGroupNotification(group.Id),
+				UserId
+			).ConfigureAwait(false);
 
 			var url = Url.Action(new UrlActionContext { Action = nameof(GroupController.Group), Controller = "Group", Values = new { groupId = group.Id } });
 			return Created(url, new CreateGroupResponse

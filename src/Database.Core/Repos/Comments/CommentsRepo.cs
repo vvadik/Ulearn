@@ -10,7 +10,6 @@ using Ulearn.Common.Extensions;
 
 namespace Database.Repos.Comments
 {
-	/* This class is fully migrated to .NET Core and EF Core */
 	public class CommentsRepo : ICommentsRepo
 	{
 		private readonly UlearnDb db;
@@ -27,7 +26,7 @@ namespace Database.Repos.Comments
 		public async Task<Comment> AddCommentAsync(string authorId, string courseId, Guid slideId, int parentCommentId, bool isForInstructorsOnly, string commentText)
 		{
 			var commentsPolicy = await commentPoliciesRepo.GetCommentsPolicyAsync(courseId).ConfigureAwait(false);
-			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(authorId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(authorId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
 			var isApproved = commentsPolicy.ModerationPolicy == CommentModerationPolicy.Postmoderation || isInstructor;
 
 			/* Instructors' replies are automatically correct */

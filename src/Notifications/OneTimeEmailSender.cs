@@ -4,8 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
-using Database.DataContexts;
 using Database.Models;
+using Database.Repos;
+using Database.Repos.Users;
 using Vostok.Logging.Abstractions;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Extensions;
@@ -16,19 +17,20 @@ namespace Notifications
 	{
 		private const string configFilename = "sender.xml";
 
-		private static ILog log => LogProvider.Get().ForContext(typeof(OneTimeEmailSender));
-		private readonly KonturSpamEmailSender emailSender;
-		private readonly UsersRepo usersRepo;
-		private readonly NotificationsRepo notificationsRepo;
+		private readonly IEmailSender emailSender;
+		private readonly IUsersRepo usersRepo;
+		private readonly INotificationsRepo notificationsRepo;
 
-		public OneTimeEmailSender()
+		private static ILog log => LogProvider.Get().ForContext(typeof(OneTimeEmailSender));
+
+		public OneTimeEmailSender(IEmailSender emailSender, IUsersRepo usersRepo, INotificationsRepo notificationsRepo)
 		{
-			emailSender = new KonturSpamEmailSender();
-			usersRepo = new UsersRepo(new ULearnDb());
-			notificationsRepo = new NotificationsRepo(new ULearnDb());
+			this.emailSender = emailSender;
+			this.usersRepo = usersRepo;
+			this.notificationsRepo = notificationsRepo;
 		}
 
-		public async Task SendEmailsAsync()
+		public async Task SendEmails()
 		{
 			log.Info($"Loading config from {configFilename} (see example in {configFilename}.example)");
 			OneTimeEmailSenderConfig config;
@@ -44,7 +46,7 @@ namespace Notifications
 			config.Text = config.Text.RemoveCommonNesting().Trim();
 
 			var emails = config.Emails.ToImmutableHashSet();
-			var email2User = usersRepo.FindUsersByConfirmedEmails(emails).ToDictSafe(u => u.Email, u => u);
+			var email2User = (await usersRepo.FindUsersByConfirmedEmails(emails)).ToDictSafe(u => u.Email, u => u);
 
 			foreach (var email in emails)
 			{
@@ -54,14 +56,14 @@ namespace Notifications
 					continue;
 				}
 
-				var mailTransport = notificationsRepo.FindUsersNotificationTransport<MailNotificationTransport>(user.Id);
+				var mailTransport = await notificationsRepo.FindUsersNotificationTransport<MailNotificationTransport>(user.Id);
 				if (mailTransport == null)
 				{
 					log.Warn($"Mail transport not enabled for {email}");
 					continue;
 				}
 
-				var settings = notificationsRepo.GetNotificationTransportsSettings(config.CourseId, NotificationType.SystemMessage, new List<int> { mailTransport.Id });
+				var settings = await notificationsRepo.GetNotificationTransportsSettings(config.CourseId, NotificationType.SystemMessage, new List<int> { mailTransport.Id });
 				const bool isEnabledByDefault = true;
 				var mailSettings = settings[mailTransport.Id];
 				if (mailSettings == null && !isEnabledByDefault || mailSettings != null && !settings[mailTransport.Id].IsEnabled)

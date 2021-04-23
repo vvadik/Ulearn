@@ -22,7 +22,7 @@ namespace Database.Repos.Users.Search
 			if (request.MinCourseRoleType == CourseRoleType.Student)
 				throw new ArgumentException($"Can't search by students, sorry: there are too many students");
 
-			var userIds = await courseRolesRepo.GetListOfUsersWithCourseRoleAsync(request.MinCourseRoleType.Value, request.CourseId, true).ConfigureAwait(false);
+			var userIds = await courseRolesRepo.GetListOfUsersWithCourseRole(request.MinCourseRoleType.Value, request.CourseId, true).ConfigureAwait(false);
 			return users.Where(u => userIds.Contains(u.Id));
 		}
 	}

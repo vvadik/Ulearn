@@ -68,7 +68,7 @@ namespace Ulearn.Web.Api.Controllers
 
 		protected async Task<bool> IsSystemAdministratorAsync()
 		{
-			var user = await usersRepo.FindUserByIdAsync(UserId).ConfigureAwait(false);
+			var user = await usersRepo.FindUserById(UserId).ConfigureAwait(false);
 			return usersRepo.IsSystemAdministrator(user);
 		}
 
@@ -130,11 +130,11 @@ namespace Ulearn.Web.Api.Controllers
 		public static async Task<Func<Slide, string>> BuildGetGitEditLinkFunc(string userId, Course course,
 			ICourseRolesRepo courseRolesRepo, ICoursesRepo coursesRepo)
 		{
-			var courseRole = await courseRolesRepo.GetRoleAsync(userId, course.Id);
+			var courseRole = await courseRolesRepo.GetRole(userId, course.Id);
 			var canEditGit = courseRole <= CourseRoleType.CourseAdmin;
 			if (!canEditGit)
 				return s => null;
-			var publishedCourseVersion = await coursesRepo.GetPublishedCourseVersionAsync(course.Id);
+			var publishedCourseVersion = await coursesRepo.GetPublishedCourseVersion(course.Id);
 			if (publishedCourseVersion == null)
 				return s => null;
 			var repoUrl = publishedCourseVersion.RepoUrl;

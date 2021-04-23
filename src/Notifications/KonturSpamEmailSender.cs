@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Threading.Tasks;
+using Database.Models;
 using Kontur.Spam.Client;
+using Microsoft.Extensions.Options;
 using Vostok.Logging.Abstractions;
 using Ulearn.Common.Extensions;
-using Ulearn.Core.Configuration;
 using Ulearn.Core.Metrics;
 
 namespace Notifications
 {
+	public interface IEmailSender
+	{
+		Task SendEmailAsync(string to, string subject, string textContent = null, string htmlContent = null, EmailButton button = null, string textContentAfterButton = null, string htmlContentAfterButton = null);
+	}
+
 	public class KonturSpamEmailSender : IEmailSender
 	{
 		private static ILog log => LogProvider.Get().ForContext(typeof(KonturSpamEmailSender));
@@ -20,15 +25,16 @@ namespace Notifications
 		private readonly string channelId;
 		private readonly string templateId;
 
-		public KonturSpamEmailSender()
+		public KonturSpamEmailSender(MetricSender metricSender, IOptions<NotificationsConfiguration> options)
 		{
-			var spamEndpoint = ConfigurationManager.AppSettings["ulearn.spam.endpoint"] ?? "";
-			var spamLogin = ConfigurationManager.AppSettings["ulearn.spam.login"] ?? "ulearn";
-			var spamPassword = ConfigurationManager.AppSettings["ulearn.spam.password"] ?? "";
-			channelId = ConfigurationManager.AppSettings["ulearn.spam.channels.notifications"] ?? "";
-			templateId = ConfigurationManager.AppSettings["ulearn.spam.templates.withButton"];
+			this.metricSender = metricSender;
 
-			metricSender = new MetricSender(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName);
+			var config = options.Value;
+			var spamEndpoint = config.Spam.Endpoint ?? "";
+			var spamLogin = config.Spam.Login ?? "ulearn";
+			var spamPassword = config.Spam.Password ?? "";
+			channelId = config.Spam.Channels.Notifications ?? "";
+			templateId = config.Spam.Templates.WithButton;
 
 			try
 			{
@@ -93,5 +99,25 @@ namespace Notifications
 			metricSender.SendCount("send_email.success");
 			metricSender.SendCount($"send_email.success.to.{recipientEmailMetricName}");
 		}
+	}
+
+	public class EmailButton
+	{
+		public EmailButton(string link, string text)
+		{
+			Link = link;
+			Link = Link.AddQueryParameter("utm_source", "email");
+
+			Text = text;
+		}
+
+		public EmailButton(NotificationButton notificationButton)
+			: this(notificationButton.Link, notificationButton.Text)
+		{
+		}
+
+		public string Link { get; private set; }
+
+		public string Text { get; private set; }
 	}
 }

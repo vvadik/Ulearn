@@ -61,7 +61,7 @@ namespace Ulearn.Web.Api.Controllers
 
 			count = Math.Min(count, 10000);
 
-			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, course.Id, CourseRoleType.Instructor).ConfigureAwait(false);
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, course.Id, CourseRoleType.Instructor).ConfigureAwait(false);
 
 			var exerciseSlides = course.GetSlides(isInstructor).OfType<ExerciseSlide>().ToList();
 			/* TODO (andgein): I can't select all submissions because ApplicationUserId column doesn't exist in database (ApplicationUser_Id exists).

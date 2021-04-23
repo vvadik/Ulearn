@@ -8,7 +8,6 @@ using Ulearn.Core.Courses;
 
 namespace Database.Repos
 {
-	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
 	public class UnitsRepo : IUnitsRepo
 	{
 		private readonly UlearnDb db;
@@ -22,16 +21,16 @@ namespace Database.Repos
 			this.courseRolesRepo = courseRolesRepo;
 		}
 
-		public async Task<List<Guid>> GetVisibleUnitIdsAsync(Course course, string userId)
+		public async Task<List<Guid>> GetVisibleUnitIds(Course course, string userId)
 		{
-			var canSeeEverything = await courseRolesRepo.HasUserAccessToCourseAsync(userId, course.Id, CourseRoleType.Tester);
+			var canSeeEverything = await courseRolesRepo.HasUserAccessToCourse(userId, course.Id, CourseRoleType.Tester);
 			if (canSeeEverything)
 				return course.GetUnitsNotSafe().Select(u => u.Id).ToList();
 
-			return await GetPublishedUnitIdsAsync(course);
+			return await GetPublishedUnitIds(course);
 		}
 
-		public async Task<List<Guid>> GetPublishedUnitIdsAsync(Course course)
+		public async Task<List<Guid>> GetPublishedUnitIds(Course course)
 		{
 			var visibleUnitsIds = new HashSet<Guid>(await db.UnitAppearances
 				.Where(u => u.CourseId == course.Id && u.PublishTime <= DateTime.Now)
@@ -42,22 +41,22 @@ namespace Database.Repos
 
 		public async Task<bool> IsUnitVisibleForStudents(Course course, Guid unitId)
 		{
-			return (await GetPublishedUnitIdsAsync(course)).Contains(unitId);
+			return (await GetPublishedUnitIds(course)).Contains(unitId);
 		}
 
-		public async Task<List<UnitAppearance>> GetUnitAppearancesAsync(Course course)
+		public async Task<List<UnitAppearance>> GetUnitAppearances(Course course)
 		{
 			return await db.UnitAppearances
 				.Where(u => u.CourseId == course.Id)
 				.ToListAsync();
 		}
 
-		public HashSet<string> GetVisibleCourses()
+		public async Task<HashSet<string>> GetVisibleCourses()
 		{
-			var appearances = db.UnitAppearances
+			var appearances = (await db.UnitAppearances
 				.Where(u => u.PublishTime <= DateTime.Now)
 				.Select(u => new { u.CourseId, u.UnitId })
-				.AsEnumerable()
+				.ToListAsync())
 				.GroupBy(p => p.CourseId)
 				.Where(g => courseManager.FindCourse(g.Key) != null)
 				.Where(g =>
@@ -70,7 +69,7 @@ namespace Database.Repos
 			return new HashSet<string>(appearances, StringComparer.OrdinalIgnoreCase);
 		}
 
-		public async Task<bool> IsCourseVisibleForStudentsAsync(string courseId)
+		public async Task<bool> IsCourseVisibleForStudents(string courseId)
 		{
 			if (await courseManager.FindCourseAsync(courseId) == null)
 				return false;
@@ -84,13 +83,13 @@ namespace Database.Repos
 			return units.Any();
 		}
 
-		public DateTime? GetNextUnitPublishTime(string courseId)
+		public async Task<DateTime?> GetNextUnitPublishTime(string courseId)
 		{
-			return db.UnitAppearances
+			return await db.UnitAppearances
 				.Where(u => u.CourseId == courseId && u.PublishTime > DateTime.Now)
 				.Select(u => (DateTime?)u.PublishTime)
 				.OrderBy(t => t)
-				.FirstOrDefault();
+				.FirstOrDefaultAsync();
 		}
 	}
 }

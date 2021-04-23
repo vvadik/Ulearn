@@ -70,7 +70,7 @@ namespace Ulearn.Web.Api.Controllers
 
 			var visitsByUnits = userVisits.GroupBy(x => x.UnitId).ToDictionary(x => x.Key);
 
-			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIdsAsync(course, UserId);
+			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIds(course, UserId);
 			foreach (var unit in course.GetUnits(visibleUnitsIds))
 			{
 				var unitStat = new UnitUserStatistic { UnitId = unit.Id, UnitTitle = unit.Title, TotalFlashcardsCount = unit.Flashcards.Count };

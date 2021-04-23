@@ -11,27 +11,26 @@ namespace Database.Repos
 	public interface ICoursesRepo
 	{
 		[ItemCanBeNull]
-		Task<CourseVersion> GetPublishedCourseVersionAsync(string courseId);
-		Task<List<CourseVersion>> GetCourseVersionsAsync(string courseId);
+		Task<CourseVersion> GetPublishedCourseVersion(string courseId);
+		Task<List<CourseVersion>> GetCourseVersions(string courseId);
 
-		Task<CourseVersion> AddCourseVersionAsync(string courseId, Guid versionId, string authorId,
+		Task<CourseVersion> AddCourseVersion(string courseId, Guid versionId, string authorId,
 			string pathToCourseXml, string repoUrl, string commitHash, string description);
 
-		Task MarkCourseVersionAsPublishedAsync(Guid versionId);
-		Task DeleteCourseVersionAsync(string courseId, Guid versionId);
-		Task<List<CourseVersion>> GetPublishedCourseVersionsAsync();
-		Task<CourseAccess> GrantAccessAsync(string courseId, string userId, CourseAccessType accessType, string grantedById, string comment);
-		bool CanRevokeAccess(string courseId, string userId, IPrincipal revokedBy);
-		Task<List<CourseAccess>> RevokeAccessAsync(string courseId, string userId, CourseAccessType accessType, string grantedById, string comment);
-		Task<List<CourseAccess>> GetCourseAccessesAsync(string courseId);
-		Task<List<CourseAccess>> GetCourseAccessesAsync(string courseId, string userId);
-		Task<DefaultDictionary<string, List<CourseAccess>>> GetCoursesAccessesAsync(IEnumerable<string> coursesIds);
-		Task<bool> HasCourseAccessAsync(string userId, string courseId, CourseAccessType accessType);
-		Task<List<CourseAccess>> GetUserAccessesAsync(string userId);
-		Task<List<string>> GetPublishedCourseIdsAsync();
+		Task MarkCourseVersionAsPublished(Guid versionId);
+		Task DeleteCourseVersion(string courseId, Guid versionId);
+		Task<List<CourseVersion>> GetPublishedCourseVersions();
+		Task<CourseAccess> GrantAccess(string courseId, string userId, CourseAccessType accessType, string grantedById, string comment);
+		Task<List<CourseAccess>> RevokeAccess(string courseId, string userId, CourseAccessType accessType, string grantedById, string comment);
+		Task<List<CourseAccess>> GetCourseAccesses(string courseId);
+		Task<List<CourseAccess>> GetCourseAccesses(string courseId, string userId);
+		Task<DefaultDictionary<string, List<CourseAccess>>> GetCoursesAccesses(IEnumerable<string> coursesIds);
+		Task<bool> HasCourseAccess(string userId, string courseId, CourseAccessType accessType);
+		Task<List<CourseAccess>> GetUserAccesses(string userId);
+		Task<List<string>> GetPublishedCourseIds();
 		Task<List<string>> GetCoursesUserHasAccessTo(string userId, CourseAccessType accessType);
 		Task AddCourseFile(string courseId, Guid versionId, byte[] content);
-		Task<CourseFile> GetCourseFileAsync(string courseId);
-		Task<List<CourseFile>> GetCourseFilesAsync(IEnumerable<string> exceptCourseIds);
+		Task<CourseFile> GetCourseFile(string courseId);
+		Task<List<CourseFile>> GetCourseFiles(IEnumerable<string> exceptCourseIds);
 	}
 }

@@ -153,16 +153,16 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		{
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
 
-			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, group.CourseId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
+			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourse(UserId, group.CourseId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
 			var canChangeOwner = group.OwnerId == UserId || isCourseAdmin;
 			if (!canChangeOwner)
 				return StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse("You can't change the owner of this group. Only current owner and course admin can change the owner."));
 
 			/* New owner should exist and be a course instructor */
-			var user = await usersRepo.FindUserByIdAsync(parameters.OwnerId).ConfigureAwait(false);
+			var user = await usersRepo.FindUserById(parameters.OwnerId).ConfigureAwait(false);
 			if (user == null)
 				return NotFound(new ErrorResponse($"Can't find user with id {parameters.OwnerId}"));
-			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(parameters.OwnerId, group.CourseId, CourseRoleType.Instructor).ConfigureAwait(false);
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(parameters.OwnerId, group.CourseId, CourseRoleType.Instructor).ConfigureAwait(false);
 			if (!isInstructor)
 				return NotFound(new ErrorResponse($"User {parameters.OwnerId} is not an instructor of course {group.CourseId}"));
 
@@ -208,7 +208,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 
 		private async Task<bool> CanCreateGroupInCourseAsync(string userId, string courseId)
 		{
-			return await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.Instructor).ConfigureAwait(false) ||
+			return await courseRolesRepo.HasUserAccessToCourse(userId, courseId, CourseRoleType.Instructor).ConfigureAwait(false) ||
 					await IsSystemAdministratorAsync().ConfigureAwait(false);
 		}
 
@@ -227,7 +227,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			}
 
 			var scoringGroups = course.Settings.Scoring.Groups.Values.ToList();
-			var visibleUnitIds = await unitsRepo.GetVisibleUnitIdsAsync(course, UserId);
+			var visibleUnitIds = await unitsRepo.GetVisibleUnitIds(course, UserId);
 			var scoringGroupsCanBeSetInSomeUnit = GetScoringGroupsCanBeSetInSomeUnit(course.GetUnits(visibleUnitIds));
 			var enabledScoringGroups = await groupsRepo.GetEnabledAdditionalScoringGroupsForGroupAsync(groupId).ConfigureAwait(false);
 			return new GroupScoringGroupsResponse
@@ -257,7 +257,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			}
 
 			var courseScoringGroupIds = course.Settings.Scoring.Groups.Values.Select(g => g.Id).ToList();
-			var visibleUnitIds = await unitsRepo.GetVisibleUnitIdsAsync(course, UserId);
+			var visibleUnitIds = await unitsRepo.GetVisibleUnitIds(course, UserId);
 			var scoringGroupsCanBeSetInSomeUnit = GetScoringGroupsCanBeSetInSomeUnit(course.GetUnits(visibleUnitIds)).Select(g => g.Id).ToList();
 			foreach (var scoringGroupId in parameters.Scores)
 			{
@@ -328,7 +328,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			if (!await IsSystemAdministratorAsync().ConfigureAwait(false))
 				return StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse("Only system administrator can add students to group directly"));
 
-			var user = await usersRepo.FindUserByIdAsync(studentId).ConfigureAwait(false);
+			var user = await usersRepo.FindUserById(studentId).ConfigureAwait(false);
 			if (user == null)
 				return NotFound(new ErrorResponse($"Can't find user with id {studentId}"));
 
@@ -357,7 +357,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
 
-			var user = await usersRepo.FindUserByIdAsync(studentId).ConfigureAwait(false);
+			var user = await usersRepo.FindUserById(studentId).ConfigureAwait(false);
 			if (user == null)
 				return NotFound(new ErrorResponse($"Can't find user with id {studentId}"));
 
@@ -493,7 +493,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 
 			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
 
-			var user = await usersRepo.FindUserByIdAsync(userId).ConfigureAwait(false);
+			var user = await usersRepo.FindUserById(userId).ConfigureAwait(false);
 			if (user == null)
 				return NotFound(new ErrorResponse($"User {userId} not found"));
 

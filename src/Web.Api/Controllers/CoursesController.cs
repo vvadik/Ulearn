@@ -76,22 +76,22 @@ namespace Ulearn.Web.Api.Controllers
 			// Фильтрация по роли. У администратора высшая роль.
 			if (role.HasValue && !isSystemAdministrator)
 			{
-				var courseIdsAsRole = await courseRolesRepo.GetCoursesWhereUserIsInRoleAsync(UserId, role.Value).ConfigureAwait(false);
+				var courseIdsAsRole = await courseRolesRepo.GetCoursesWhereUserIsInRole(UserId, role.Value).ConfigureAwait(false);
 				courses = courses.Where(c => courseIdsAsRole.Contains(c.Id, StringComparer.InvariantCultureIgnoreCase));
 			}
 
 			// Неопубликованные курсы не покажем тем, кто не имеет роли в них.
 			if (!isSystemAdministrator)
 			{
-				var visibleCourses = unitsRepo.GetVisibleCourses();
-				var coursesInWhichUserHasAnyRole = await courseRolesRepo.GetCoursesWhereUserIsInRoleAsync(UserId, CourseRoleType.Tester).ConfigureAwait(false);
+				var visibleCourses = await unitsRepo.GetVisibleCourses();
+				var coursesInWhichUserHasAnyRole = await courseRolesRepo.GetCoursesWhereUserIsInRole(UserId, CourseRoleType.Tester).ConfigureAwait(false);
 				courses = courses.Where(c => visibleCourses.Contains(c.Id) || coursesInWhichUserHasAnyRole.Contains(c.Id, StringComparer.OrdinalIgnoreCase));
 			}
 
 			// Администратор видит все курсы. Покажем сверху те, в которых он преподаватель.
 			if (isSystemAdministrator)
 			{
-				var instructorCourseIds = await courseRolesRepo.GetCoursesWhereUserIsInStrictRoleAsync(UserId, CourseRoleType.Instructor).ConfigureAwait(false);
+				var instructorCourseIds = await courseRolesRepo.GetCoursesWhereUserIsInStrictRole(UserId, CourseRoleType.Instructor).ConfigureAwait(false);
 				courses = courses.OrderBy(c => !instructorCourseIds.Contains(c.Id, StringComparer.InvariantCultureIgnoreCase)).ThenBy(c => c.Title);
 			}
 			else
@@ -130,18 +130,18 @@ namespace Ulearn.Web.Api.Controllers
 
 			var course = await courseManager.FindCourseAsync(courseId);
 			List<UnitInfo> units;
-			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIdsAsync(course, UserId);
+			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIds(course, UserId);
 			var visibleUnits = course.GetUnits(visibleUnitsIds);
 			if (groupId == null)
 			{
-				var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, course.Id, CourseRoleType.Instructor).ConfigureAwait(false);
+				var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, course.Id, CourseRoleType.Instructor).ConfigureAwait(false);
 				if (!isInstructor && visibleUnits.Count == 0)
 					return NotFound(new ErrorResponse("Course not found"));
 
 				var unitAppearances = !isInstructor
 					? new Dictionary<Guid, UnitAppearance>()
-					: (await unitsRepo.GetUnitAppearancesAsync(course)).ToDictionary(a => a.UnitId, a => a);
-				var publishedUnitIds = new HashSet<Guid>(!isInstructor ? visibleUnitsIds : await unitsRepo.GetPublishedUnitIdsAsync(course));
+					: (await unitsRepo.GetUnitAppearances(course)).ToDictionary(a => a.UnitId, a => a);
+				var publishedUnitIds = new HashSet<Guid>(!isInstructor ? visibleUnitsIds : await unitsRepo.GetPublishedUnitIds(course));
 				var getSlideMaxScoreFunc = await BuildGetSlideMaxScoreFunc(solutionsRepo, userQuizzesRepo, visitsRepo, groupsRepo, course, UserId);
 				var getGitEditLinkFunc = await BuildGetGitEditLinkFunc(User.GetUserId(), course, courseRolesRepo, coursesRepo);
 				units = visibleUnits.Select(unit => BuildUnitInfo(course.Id, unit,
@@ -179,7 +179,7 @@ namespace Ulearn.Web.Api.Controllers
 				Title = isTempCourse ? "Временный - " + course.Title : course.Title,
 				Description = course.Settings.Description,
 				Scoring = scoringSettings,
-				NextUnitPublishTime = unitsRepo.GetNextUnitPublishTime(course.Id),
+				NextUnitPublishTime = await unitsRepo.GetNextUnitPublishTime(course.Id),
 				Units = units,
 				ContainsFlashcards = containsFlashcards,
 				IsTempCourse = isTempCourse,

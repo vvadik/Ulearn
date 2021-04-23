@@ -12,12 +12,11 @@ using Ulearn.Core;
 
 namespace Database.Repos.Users
 {
-	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
 	public class UsersRepo : IUsersRepo
 	{
 		private readonly UlearnDb db;
 		private readonly UlearnUserManager userManager;
-		private IdentityRole sysAdminRole = null;
+		private IdentityRole sysAdminRole;
 
 		public const string UlearnBotUsername = "ulearn-bot";
 
@@ -27,52 +26,49 @@ namespace Database.Repos.Users
 			this.userManager = userManager;
 		}
 
-		public async Task<ApplicationUser> FindUserByIdAsync(string userId)
+		public async Task<ApplicationUser> FindUserById(string userId)
 		{
-			var user = await db.Users.FindAsync(userId).ConfigureAwait(false);
-			if (user == null)
-				return null;
-
-			return user.IsDeleted ? null : user;
+			var user = await db.Users.FindAsync(userId);
+			return user == null || user.IsDeleted ? null : user;
 		}
 
-		public Task<List<string>> FindUsersBySocialProviderKeyAsync(string providerKey)
+		public Task<List<string>> FindUsersBySocialProviderKey(string providerKey)
 		{
 			return db.UserLogins.Where(login => login.ProviderKey == providerKey).Select(login => login.UserId).Distinct().ToListAsync();
 		}
 
-		public async Task<List<string>> GetUserIdsWithLmsRoleAsync(LmsRoleType lmsRole)
+		public async Task<List<string>> GetUserIdsWithLmsRole(LmsRoleType lmsRole)
 		{
-			var role = await db.Roles.FirstOrDefaultAsync(r => r.Name == lmsRole.ToString()).ConfigureAwait(false);
+			var role = await db.Roles.FirstOrDefaultAsync(r => r.Name == lmsRole.ToString());
 			if (role == null)
 				return new List<string>();
 			return db.Users.Where(u => !u.IsDeleted).FilterByRole(role, userManager).Select(u => u.Id).ToList();
 		}
 
-		public Task<List<string>> GetSysAdminsIdsAsync()
+		public Task<List<string>> GetSysAdminsIds()
 		{
-			return GetUserIdsWithLmsRoleAsync(LmsRoleType.SysAdmin);
+			return GetUserIdsWithLmsRole(LmsRoleType.SysAdmin);
 		}
 
 		public async Task ChangeTelegram(string userId, long? chatId, string chatTitle)
 		{
-			var user = await FindUserByIdAsync(userId).ConfigureAwait(false);
+			var user = await FindUserById(userId);
 			if (user == null)
 				return;
 
 			user.TelegramChatId = chatId;
 			user.TelegramChatTitle = chatTitle;
-			await db.SaveChangesAsync().ConfigureAwait(false);
+			await db.SaveChangesAsync();
 		}
 
 		public async Task ConfirmEmail(string userId, bool isConfirmed = true)
 		{
-			var user = await FindUserByIdAsync(userId).ConfigureAwait(false);
+			var user = await FindUserById(userId);
 			if (user == null)
 				return;
 
 			user.EmailConfirmed = isConfirmed;
-			await db.SaveChangesAsync().ConfigureAwait(false);
+			await db.SaveChangesAsync();
 		}
 
 		public Task UpdateLastConfirmationEmailTime(ApplicationUser user)
@@ -103,9 +99,9 @@ namespace Database.Repos.Users
 			return user.Id;
 		}
 
-		public async Task CreateUlearnBotUserIfNotExistsAsync()
+		public async Task CreateUlearnBotUserIfNotExists()
 		{
-			var ulearnBotFound = await db.Users.AnyAsync(u => u.UserName == UlearnBotUsername).ConfigureAwait(false);
+			var ulearnBotFound = await db.Users.AnyAsync(u => u.UserName == UlearnBotUsername);
 			if (!ulearnBotFound)
 			{
 				var user = new ApplicationUser
@@ -115,18 +111,18 @@ namespace Database.Repos.Users
 					LastName = "bot",
 					Email = "support@ulearn.me",
 				};
-				await userManager.CreateAsync(user, StringUtils.GenerateSecureAlphanumericString(10)).ConfigureAwait(false);
+				await userManager.CreateAsync(user, StringUtils.GenerateSecureAlphanumericString(10));
 
-				await db.SaveChangesAsync().ConfigureAwait(false);
+				await db.SaveChangesAsync();
 			}
 		}
 
-		public List<ApplicationUser> FindUsersByUsernameOrEmail(string usernameOrEmail)
+		public async Task<List<ApplicationUser>> FindUsersByUsernameOrEmail(string usernameOrEmail)
 		{
-			return db.Users.Where(u => (u.UserName == usernameOrEmail || u.Email == usernameOrEmail) && !u.IsDeleted).ToList();
+			return await db.Users.Where(u => (u.UserName == usernameOrEmail || u.Email == usernameOrEmail) && !u.IsDeleted).ToListAsync();
 		}
 
-		public Task<List<ApplicationUser>> GetUsersByIdsAsync(IEnumerable<string> usersIds)
+		public Task<List<ApplicationUser>> GetUsersByIds(IEnumerable<string> usersIds)
 		{
 			return db.Users.Where(u => usersIds.Contains(u.Id) && !u.IsDeleted).ToListAsync();
 		}
@@ -152,20 +148,12 @@ namespace Database.Repos.Users
 
 		public async Task<bool> IsSystemAdministrator(string userId)
 		{
-			return (await GetSysAdminsIdsAsync()).Contains(userId);
+			return (await GetSysAdminsIds()).Contains(userId);
 		}
-	}
 
-	/* System.String is not available for table-valued functions so we need to create ComplexTyped wrapper */
-
-	[ComplexType]
-	public class UserIdWrapper
-	{
-		public UserIdWrapper(string userId)
+		public async Task<List<ApplicationUser>> FindUsersByConfirmedEmails(IEnumerable<string> emails)
 		{
-			Id = userId;
+			return await db.Users.Where(u => emails.Contains(u.Email) && u.EmailConfirmed).ToListAsync();
 		}
-
-		public string Id { get; set; }
 	}
 }

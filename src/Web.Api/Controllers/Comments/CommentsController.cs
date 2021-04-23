@@ -46,7 +46,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			var courseId = parameters.CourseId;
 			var slideId = parameters.SlideId;
 
-			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
 			var slide = await GetSlide(courseId, slideId, isInstructor);
 			if (slide == null)
 				return StatusCode((int)HttpStatusCode.NotFound, $"No slide with id {slideId}");
@@ -90,7 +90,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 
 			var commentLikesCount = await commentLikesRepo.GetLikesCountsAsync(allComments.Select(c => c.Id)).ConfigureAwait(false);
 			var likedByUserCommentsIds = (await commentLikesRepo.GetCommentsLikedByUserAsync(courseId, parameters.SlideId, UserId).ConfigureAwait(false)).ToHashSet();
-			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(User.GetUserId(), courseId, CourseRoleType.Instructor).ConfigureAwait(false);
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(User.GetUserId(), courseId, CourseRoleType.Instructor).ConfigureAwait(false);
 			var canViewAllGroupMembers = isInstructor && await groupAccessesRepo.CanUserSeeAllCourseGroupsAsync(User.GetUserId(), courseId).ConfigureAwait(false);
 			var userAvailableGroupsIds = !isInstructor ? null : (await groupAccessesRepo.GetAvailableForUserGroupsAsync(User.GetUserId(), false, true, true).ConfigureAwait(false)).Select(g => g.Id).ToHashSet();
 			var authorsIds = allComments.Select(c => c.Author.Id).Distinct().ToList();
@@ -123,7 +123,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			var slideId = parameters.SlideId;
 			parameters.Text.TrimEnd();
 
-			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
 			var slide = await GetSlide(courseId, slideId, isInstructor);
 			if (slide == null)
 				return StatusCode((int)HttpStatusCode.NotFound, $"No slide with id {slideId}");
@@ -176,7 +176,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		private async Task<bool> CanCommentNowAsync(string userId, string courseId, CommentsPolicy commentsPolicy)
 		{
 			/* Instructors have unlimited comments */
-			if (await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.Instructor).ConfigureAwait(false))
+			if (await courseRolesRepo.HasUserAccessToCourse(userId, courseId, CourseRoleType.Instructor).ConfigureAwait(false))
 				return true;
 
 			var isUserAddedMaxCommentsInLastTime = await commentsRepo.IsUserAddedMaxCommentsInLastTimeAsync(
@@ -189,7 +189,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 
 		private async Task<bool> CanCommentHereAsync(string userId, string courseId, bool isReply, CommentsPolicy commentsPolicy)
 		{
-			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(userId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
 
 			if (!isInstructor && !commentsPolicy.IsCommentsEnabled)
 				return false;

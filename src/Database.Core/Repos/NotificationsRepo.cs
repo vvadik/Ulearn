@@ -283,12 +283,29 @@ namespace Database.Repos
 			if (recipientsIds.Count == 0)
 				return;
 
-			var transportsSettings = db.NotificationTransportSettings
-				.Include(s => s.NotificationTransport)
-				.Where(s => s.CourseId == notification.CourseId &&
-							s.NotificationType == notificationType &&
-							!s.NotificationTransport.IsDeleted &&
-							recipientsIds.Contains(s.NotificationTransport.UserId)).ToList();
+			List<NotificationTransportSettings> transportsSettings;
+			if (recipientsIds.Count > 1000)
+			{
+				log.Warn($"Recipients list for notification is too big {notification.Id}: {recipientsIds.Count} user(s)");
+				transportsSettings = (await db.NotificationTransportSettings
+					.Include(s => s.NotificationTransport)
+					.Where(s => s.CourseId == notification.CourseId &&
+								s.NotificationType == notificationType &&
+								!s.NotificationTransport.IsDeleted)
+					.ToListAsync())
+					.Where(s => recipientsIds.Contains(s.NotificationTransport.UserId))
+					.ToList();
+			}
+			else
+			{
+				transportsSettings = await db.NotificationTransportSettings
+					.Include(s => s.NotificationTransport)
+					.Where(s => s.CourseId == notification.CourseId &&
+								s.NotificationType == notificationType &&
+								!s.NotificationTransport.IsDeleted &&
+								recipientsIds.Contains(s.NotificationTransport.UserId))
+					.ToListAsync();
+			}
 
 			var commonTransports = db.NotificationTransports.Where(t => t.UserId == null && t.IsEnabled).ToList();
 
@@ -391,11 +408,11 @@ namespace Database.Repos
 				var course = await courseManager.FindCourseAsync(notification.CourseId);
 				if (course != null)
 				{
-					var visibleUnits = await unitsRepo.GetPublishedUnitIdsAsync(course);
+					var visibleUnits = await unitsRepo.GetPublishedUnitIds(course);
 					if (!visibleUnits.Any())
 					{
-						var userIdsWithInstructorRoles = await courseRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Tester, notification.CourseId, true);
-						var sysAdminsIds = await usersRepo.GetSysAdminsIdsAsync();
+						var userIdsWithInstructorRoles = await courseRolesRepo.GetListOfUsersWithCourseRole(CourseRoleType.Tester, notification.CourseId, true);
+						var sysAdminsIds = await usersRepo.GetSysAdminsIds();
 						recipientsIds.IntersectWith(userIdsWithInstructorRoles.Concat(sysAdminsIds));
 					}
 				}
@@ -440,7 +457,7 @@ namespace Database.Repos
 		{
 			var notificationTypes = GetAllNotificationTypes();
 
-			var courseRole = await courseRolesRepo.GetRoleAsync(userId, courseId);
+			var courseRole = await courseRolesRepo.GetRole(userId, courseId);
 			notificationTypes = notificationTypes
 				.Where(t => t.GetMinCourseRole() <= courseRole)
 				.OrderByDescending(t => t.GetMinCourseRole())

@@ -70,7 +70,7 @@ namespace Database
 
 		public async Task CreateUlearnBotUser()
 		{
-			await usersRepo.CreateUlearnBotUserIfNotExistsAsync().ConfigureAwait(false);
+			await usersRepo.CreateUlearnBotUserIfNotExists().ConfigureAwait(false);
 
 			await db.SaveChangesAsync().ConfigureAwait(false);
 		}

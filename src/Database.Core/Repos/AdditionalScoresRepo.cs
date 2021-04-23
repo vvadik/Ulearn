@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Database.Repos
 {
-	/* TODO (andgein): This repo is not fully migrated to .NET Core and EF Core */
 	public class AdditionalScoresRepo : IAdditionalScoresRepo
 	{
 		private readonly UlearnDb db;
@@ -17,11 +16,17 @@ namespace Database.Repos
 			this.db = db;
 		}
 
-		public async Task<AdditionalScore> SetAdditionalScore(string courseId, Guid unitId, string userId, string scoringGroupId, int score, string instructorId)
+		/// <summary>
+		/// Returns new AdditionalScore and old score (or null if not exists)
+		/// </summary>
+		public async Task<(AdditionalScore, int?)> SetAdditionalScore(string courseId, Guid unitId, string userId, string scoringGroupId, int score, string instructorId)
 		{
+			int? oldScore = null;
 			using (var transaction = db.Database.BeginTransaction())
 			{
-				var scores = db.AdditionalScores.Where(s => s.CourseId == courseId && s.UnitId == unitId && s.UserId == userId && s.ScoringGroupId == scoringGroupId);
+				var scores = await db.AdditionalScores.Where(s => s.CourseId == courseId && s.UnitId == unitId && s.UserId == userId && s.ScoringGroupId == scoringGroupId).ToListAsync();
+				if (scores.Any())
+					oldScore = scores.First().Score;
 				db.AdditionalScores.RemoveRange(scores);
 
 				var additionalScore = new AdditionalScore
@@ -35,15 +40,15 @@ namespace Database.Repos
 					Timestamp = DateTime.Now,
 				};
 				db.AdditionalScores.Add(additionalScore);
-				await db.SaveChangesAsync();
 
-				transaction.Commit();
-				return additionalScore;
+				await db.SaveChangesAsync();
+				await transaction.CommitAsync();
+
+				return (additionalScore, oldScore);
 			}
 		}
 
 		/* Dictionary<(unitId, scoringGroupId), additionalScore> */
-
 		public async Task<Dictionary<Tuple<Guid, string>, int>> GetAdditionalScoresForUser(string courseId, string userId)
 		{
 			return (await db.AdditionalScores
@@ -52,20 +57,20 @@ namespace Database.Repos
 				.ToDictSafe(s => Tuple.Create(s.UnitId, s.ScoringGroupId), s => s.Score);
 		}
 
-		public Dictionary<string, AdditionalScore> GetAdditionalScoresForUser(string courseId, Guid unitId, string userId)
+		public async Task<Dictionary<string, AdditionalScore>> GetAdditionalScoresForUser(string courseId, Guid unitId, string userId)
 		{
-			return db.AdditionalScores
+			return (await db.AdditionalScores
 				.Where(s => s.CourseId == courseId && s.UnitId == unitId && s.UserId == userId)
-				.ToList()
+				.ToListAsync())
 				.ToDictSafe(s => s.ScoringGroupId, s => s);
 		}
 
 		/* Dictionary<(userId, scoringGroupId), additionalScore> */
-		public Dictionary<Tuple<string, string>, AdditionalScore> GetAdditionalScoresForUsers(string courseId, Guid unitId, IEnumerable<string> usersIds)
+		public async Task<Dictionary<Tuple<string, string>, AdditionalScore>> GetAdditionalScoresForUsers(string courseId, Guid unitId, IEnumerable<string> usersIds)
 		{
-			return db.AdditionalScores
+			return (await db.AdditionalScores
 				.Where(s => s.CourseId == courseId && s.UnitId == unitId && usersIds.Contains(s.UserId))
-				.ToList()
+				.ToListAsync())
 				.ToDictSafe(s => Tuple.Create(s.UserId, s.ScoringGroupId), s => s);
 		}
 
@@ -74,7 +79,7 @@ namespace Database.Repos
 		{
 			return (await db.AdditionalScores
 				.Where(s => s.CourseId == courseId && usersIds.Contains(s.UserId))
-				.ToListAsync().ConfigureAwait(false))
+				.ToListAsync())
 				.ToDictSafe(s => Tuple.Create(s.UserId, s.UnitId, s.ScoringGroupId), s => s);
 		}
 
