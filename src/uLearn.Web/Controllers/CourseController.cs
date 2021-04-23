@@ -516,7 +516,7 @@ namespace uLearn.Web.Controllers
 			else
 				courses = courses.OrderBy(course => course.Title, StringComparer.InvariantCultureIgnoreCase);
 
-			var tempCourses = tempCoursesRepo.GetTempCourses().Select(c => c.CourseId).ToHashSet();
+			var tempCourses = tempCoursesRepo.GetTempCourses().Select(c => c.CourseId).ToHashSet(StringComparer.OrdinalIgnoreCase);
 			var model = new CourseListViewModel
 			{
 				Courses = courses

@@ -100,7 +100,7 @@ namespace Ulearn.Web.Api.Controllers
 			var tempCourseLabel =  "Временный - ";
 			var tempCoursesIds = (await tempCoursesRepo.GetTempCoursesAsync())
 				.Select(t => t.CourseId)
-				.ToHashSet();
+				.ToHashSet(StringComparer.OrdinalIgnoreCase);
 			var coursesList = courses.ToList();
 			var coursesLastVisits = await visitsRepo.GetLastVisitsForCourses(coursesList.Select(c => c.Id).ToHashSet(), UserId);
 			return new CoursesListResponse

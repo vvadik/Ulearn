@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -11,9 +10,9 @@ using LibGit2Sharp;
 using LibGit2Sharp.Handlers;
 using LibGit2Sharp.Ssh;
 using Newtonsoft.Json;
+using Ulearn.Common;
 using Vostok.Logging.Abstractions;
 using Ulearn.Common.Extensions;
-using Ulearn.Core;
 
 namespace GitCourseUpdater
 {
@@ -96,8 +95,7 @@ namespace GitCourseUpdater
 			log.Info($"Start load '{repoDirName}' to zip");
 			var dir = reposBaseDir.GetSubdirectory(repoDirName).FullName;
 			dir = courseSubdirectoryInRepo == null ? dir : Path.Combine(dir, courseSubdirectoryInRepo);
-			var zip = ZipHelper.CreateFromDirectory(dir, CompressionLevel.Optimal, false, Encoding.UTF8,
-				s => !s.StartsWith(".git"));
+			var zip = ZipUtils.CreateZipFromDirectory(new List<string> {dir}, new List<string> {".git/"},  null, Encoding.UTF8);
 			log.Info($"Successfully load '{repoDirName}' to zip");
 			return zip;
 		}

@@ -146,7 +146,7 @@ namespace Database
 					return;
 
 				var tempCourses = GetTempCoursesWithCache();
-				var tempCourse = tempCourses.FirstOrDefault(tc => tc.CourseId == courseId);
+				var tempCourse = tempCourses.FirstOrDefault(tc => string.Equals(tc.CourseId, courseId, StringComparison.OrdinalIgnoreCase));
 				if (tempCourse == null)
 					return;
 				Course course = null;

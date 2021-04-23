@@ -8,17 +8,24 @@ using System.Threading.Tasks;
 using AntiPlagiarism.Web.Database;
 using AntiPlagiarism.Web.Database.Models;
 using Database;
+using Database.Di;
 using Database.Models;
 using Database.Repos;
+using Database.Repos.Users;
 using ManualUtils.AntiPlagiarism;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Logging;
 using Ulearn.Web.Api.Utils.LTI;
+using Vostok.Logging.Abstractions;
 using Vostok.Logging.File;
+using Vostok.Logging.Microsoft;
 
 namespace ManualUtils
 {
@@ -38,7 +45,8 @@ namespace ManualUtils
 					.UseLazyLoadingProxies()
 					.UseNpgsql(configuration.Database, o => o.SetPostgresVersion(13, 2));
 				var adb = new AntiPlagiarismDb(aOptionsBuilder.Options);
-				await Run(adb, db);
+				var serviceProvider = ConfigureDI(adb, db);
+				await Run(adb, db, serviceProvider);
 			}
 			finally
 			{
@@ -46,8 +54,20 @@ namespace ManualUtils
 			}
 		}
 
-		private static async Task Run(AntiPlagiarismDb adb, UlearnDb db)
+		private static IServiceProvider ConfigureDI(AntiPlagiarismDb adb, UlearnDb db)
 		{
+			var services = new ServiceCollection();
+			services.AddLogging(builder => builder.AddVostok(LogProvider.Get()));
+			services.AddSingleton(db);
+			services.AddDatabaseServices();
+			services.AddSingleton(adb);
+			services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<UlearnDb>();
+			return services.BuildServiceProvider();
+		}
+
+		private static async Task Run(AntiPlagiarismDb adb, UlearnDb db, IServiceProvider serviceProvider)
+		{
+			//await new UsersRepo(db, serviceProvider.GetService<UlearnUserManager>()).CreateUlearnBotUserIfNotExistsAsync();
 			//FillLanguageToAntiplagiarism.FillLanguage(adb);
 			//GenerateUpdateSequences();
 			//CompareColumns();
@@ -68,6 +88,7 @@ namespace ManualUtils
 			//FillAntiplagFields.FillClientSubmissionId(adb);
 			//await XQueueRunAutomaticChecking(db);
 			//TextBlobsWithZeroByte(db);
+			//UpdateCertificateArchives(db);
 		}
 
 		private static void GenerateUpdateSequences()
@@ -280,6 +301,34 @@ namespace ManualUtils
 				Console.WriteLine("s" + i);
 				i++;
 				db.SaveChanges(); 
+			}
+		}
+
+		private static void UpdateCertificateArchives(UlearnDb db)
+		{
+			var directory = new DirectoryInfo("Templates");
+			foreach (var file in directory.EnumerateFiles())
+			{
+				var guid = file.Name.Split(".")[0];
+				var content = file.ReadAllContent();
+				var a = db.CertificateTemplateArchives.Find(guid);
+				if (a != null)
+				{
+					a.Content = content;
+					db.SaveChanges();
+				}
+				else
+				{
+					var id = db.CertificateTemplates.FirstOrDefault(t => t.ArchiveName == guid).Id;
+					db.CertificateTemplateArchives.Add(new CertificateTemplateArchive
+					{
+						ArchiveName = guid,
+						Content = content,
+						CertificateTemplateId = id
+					});
+					db.SaveChanges();
+				}
+				Console.WriteLine(guid);
 			}
 		}
 	}
