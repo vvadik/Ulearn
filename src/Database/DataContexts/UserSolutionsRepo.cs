@@ -1,104 +1,25 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Entity;
-using System.Data.Entity.Core.Objects;
-using System.Data.Entity.Migrations;
-using System.Data.Entity.Validation;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Database.Models;
-using EntityFramework.Functions;
-using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
-using Ulearn.Core.Courses.Slides.Exercises;
-using Ulearn.Core.Courses.Slides.Exercises.Blocks;
-using Ulearn.Core.RunCheckerJobApi;
 
 namespace Database.DataContexts
 {
 	public class UserSolutionsRepo
 	{
-		private static ILog log => LogProvider.Get().ForContext(typeof(UserSolutionsRepo));
 		private readonly ULearnDb db;
 		private readonly TextsRepo textsRepo;
-		private readonly WebCourseManager courseManager;
 
-		private static volatile ConcurrentDictionary<int, DateTime> unhandledSubmissions = new ConcurrentDictionary<int, DateTime>();
-		private static volatile ConcurrentDictionary<int, DateTime> handledSubmissions = new ConcurrentDictionary<int, DateTime>();
-		private static readonly TimeSpan handleTimeout = TimeSpan.FromMinutes(3);
-
-		public UserSolutionsRepo(ULearnDb db, WebCourseManager courseManager)
+		public UserSolutionsRepo(ULearnDb db)
 		{
 			this.db = db;
-			this.courseManager = courseManager;
 			textsRepo = new TextsRepo(db);
-		}
-
-		public async Task<UserExerciseSubmission> AddUserExerciseSubmission(
-			string courseId, Guid slideId,
-			string code, string compilationError, string output,
-			string userId, string executionServiceName, string displayName,
-			Language language,
-			string sandbox,
-			AutomaticExerciseCheckingStatus status = AutomaticExerciseCheckingStatus.Waiting)
-		{
-			if (string.IsNullOrWhiteSpace(code))
-				code = "// no code";
-			var hash = (await textsRepo.AddText(code)).Hash;
-			var compilationErrorHash = (await textsRepo.AddText(compilationError)).Hash;
-			var outputHash = (await textsRepo.AddText(output)).Hash;
-			var exerciseBlock = (courseManager.FindCourse(courseId)?.FindSlideById(slideId, true) as ExerciseSlide)?.Exercise;
-
-			AutomaticExerciseChecking automaticChecking;
-			if (exerciseBlock != null && exerciseBlock.HasAutomaticChecking())
-			{
-				automaticChecking = new AutomaticExerciseChecking
-				{
-					CourseId = courseId,
-					SlideId = slideId,
-					UserId = userId,
-					Timestamp = DateTime.Now,
-					CompilationErrorHash = compilationErrorHash,
-					IsCompilationError = !string.IsNullOrWhiteSpace(compilationError),
-					OutputHash = outputHash,
-					ExecutionServiceName = executionServiceName,
-					DisplayName = displayName,
-					Status = status,
-					IsRightAnswer = false,
-				};
-
-				db.AutomaticExerciseCheckings.Add(automaticChecking);
-			}
-			else
-			{
-				automaticChecking = null;
-			}
-
-			var submission = new UserExerciseSubmission
-			{
-				CourseId = courseId,
-				SlideId = slideId,
-				UserId = userId,
-				Timestamp = DateTime.Now,
-				SolutionCodeHash = hash,
-				CodeHash = code.Split('\n').Select(x => x.Trim()).Aggregate("", (x, y) => x + y).GetHashCode(),
-				Likes = new List<Like>(),
-				AutomaticChecking = automaticChecking,
-				AutomaticCheckingIsRightAnswer = automaticChecking?.IsRightAnswer ?? true,
-				Language = language,
-				Sandbox = sandbox
-			};
-
-			db.UserExerciseSubmissions.Add(submission);
-
-			await db.SaveChangesAsync();
-
-			return submission;
 		}
 
 		///<returns>(likesCount, isLikedByThisUsed)</returns>
@@ -321,149 +242,6 @@ namespace Database.DataContexts
 				.ForEach(s => s.AutomaticCheckingIsRightAnswer = checking.IsRightAnswer);
 		}
 
-		protected async Task SaveAll(IEnumerable<AutomaticExerciseChecking> checkings)
-		{
-			foreach (var checking in checkings)
-			{
-				log.Info($"Обновляю статус автоматической проверки #{checking.Id}: {checking.Status}");
-				db.AutomaticExerciseCheckings.AddOrUpdate(checking);
-				UpdateIsRightAnswerForSubmission(checking);
-			}
-
-			try
-			{
-				await db.ObjectContext().SaveChangesAsync(SaveOptions.DetectChangesBeforeSave).ConfigureAwait(false);
-			}
-			catch (DbEntityValidationException e)
-			{
-				throw new Exception(
-					string.Join("\r\n",
-						e.EntityValidationErrors.SelectMany(v => v.ValidationErrors).Select(err => err.PropertyName + " " + err.ErrorMessage)));
-			}
-		}
-
-		public async Task SaveResult(RunningResults result, Func<UserExerciseSubmission, Task> onSave)
-		{
-			using (var transaction = db.Database.BeginTransaction())
-			{
-				log.Info($"Сохраняю информацию о проверке решения {result.Id}");
-				var submission = FindSubmissionById(result.Id);
-				if (submission == null)
-				{
-					log.Warn($"Не нашёл в базе данных решение {result.Id}");
-					return;
-				}
-
-				var aec = await UpdateAutomaticExerciseChecking(submission.AutomaticChecking, result).ConfigureAwait(false);
-				await SaveAll(Enumerable.Repeat(aec, 1)).ConfigureAwait(false);
-
-				await onSave(submission).ConfigureAwait(false);
-
-				transaction.Commit();
-				db.ObjectContext().AcceptAllChanges();
-
-				if (!handledSubmissions.TryAdd(submission.Id, DateTime.Now))
-					log.Warn($"Не удалось запомнить, что проверка {submission.Id} проверена, а результат сохранен в базу");
-
-				log.Info($"Есть информация о следующих проверках, которые ещё не записаны в базу клиентом: [{string.Join(", ", handledSubmissions.Keys)}]");
-			}
-		}
-
-		private async Task<AutomaticExerciseChecking> UpdateAutomaticExerciseChecking(AutomaticExerciseChecking checking, RunningResults result)
-		{
-			var compilationErrorHash = (await textsRepo.AddText(result.CompilationOutput)).Hash;
-			var output = result.GetOutput().NormalizeEoln();
-			var outputHash = (await textsRepo.AddText(output)).Hash;
-
-			var isWebRunner = checking.CourseId == "web" && checking.SlideId == Guid.Empty;
-			var exerciseSlide = isWebRunner ? null : (ExerciseSlide)courseManager.GetCourse(checking.CourseId).GetSlideById(checking.SlideId, true);
-
-			var isRightAnswer = IsRightAnswer(result, output, exerciseSlide?.Exercise);
-
-			var elapsed = DateTime.Now - checking.Timestamp;
-			elapsed = elapsed < TimeSpan.FromDays(1) ? elapsed : new TimeSpan(0, 23, 59, 59); 
-			var newChecking = new AutomaticExerciseChecking
-			{
-				Id = checking.Id,
-				CourseId = checking.CourseId,
-				SlideId = checking.SlideId,
-				UserId = checking.UserId,
-				Timestamp = checking.Timestamp,
-				CompilationErrorHash = compilationErrorHash,
-				IsCompilationError = result.Verdict == Verdict.CompilationError,
-				OutputHash = outputHash,
-				ExecutionServiceName = checking.ExecutionServiceName,
-				Status = AutomaticExerciseCheckingStatus.Done,
-				DisplayName = checking.DisplayName,
-				Elapsed = elapsed,
-				IsRightAnswer = isRightAnswer,
-				CheckingAgentName = checking.CheckingAgentName,
-				Points = result.Points
-			};
-
-			return newChecking;
-		}
-
-		private bool IsRightAnswer(RunningResults result, string output, AbstractExerciseBlock exerciseBlock)
-		{
-			if (result.Verdict != Verdict.Ok)
-				return false;
-
-			/* For sandbox runner */
-			if (exerciseBlock == null)
-				return false;
-
-			if (exerciseBlock.ExerciseType == ExerciseType.CheckExitCode)
-				return true;
-
-			if (exerciseBlock.ExerciseType == ExerciseType.CheckOutput)
-			{
-				var expectedOutput = exerciseBlock.ExpectedOutput.NormalizeEoln();
-				return output.Equals(expectedOutput);
-			}
-			
-			if (exerciseBlock.ExerciseType == ExerciseType.CheckPoints)
-			{
-				if (!result.Points.HasValue)
-					return false;
-				const float eps = 0.00001f;
-				return exerciseBlock.SmallPointsIsBetter ? result.Points.Value < exerciseBlock.PassingPoints + eps : result.Points.Value > exerciseBlock.PassingPoints - eps;
-			}
-
-			throw new InvalidOperationException($"Unknown exercise type for checking: {exerciseBlock.ExerciseType}");
-		}
-
-		public async Task RunAutomaticChecking(UserExerciseSubmission submission, TimeSpan timeout, bool waitUntilChecked)
-		{
-			log.Info($"Запускаю автоматическую проверку решения. ID посылки: {submission.Id}");
-			unhandledSubmissions.TryAdd(submission.Id, DateTime.Now);
-
-			if (!waitUntilChecked)
-			{
-				log.Info($"Не буду ожидать результатов проверки посылки {submission.Id}");
-				return;
-			}
-
-			var sw = Stopwatch.StartNew();
-			while (sw.Elapsed < timeout)
-			{
-				await WaitUntilSubmissionHandled(TimeSpan.FromSeconds(5), submission.Id);
-				var updatedSubmission = FindNoTrackingSubmission(submission.Id);
-				if (updatedSubmission == null)
-					break;
-
-				if (updatedSubmission.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Done)
-				{
-					log.Info($"Посылка {submission.Id} проверена. Результат: {updatedSubmission.AutomaticChecking.GetVerdict()}");
-					return;
-				}
-			}
-
-			/* If something is wrong */
-			unhandledSubmissions.TryRemove(submission.Id, out DateTime value);
-			throw new SubmissionCheckingTimeout();
-		}
-
 		public Dictionary<int, string> GetSolutionsForSubmissions(IEnumerable<int> submissionsIds)
 		{
 			var solutionsHashes = db.UserExerciseSubmissions
@@ -472,59 +250,5 @@ namespace Database.DataContexts
 			var textsByHash = textsRepo.GetTextsByHashes(solutionsHashes.Select(s => s.Hash));
 			return solutionsHashes.ToDictSafe(s => s.SubmissionId, s => textsByHash.GetOrDefault(s.Hash, ""));
 		}
-
-		public async Task WaitAnyUnhandledSubmissions(TimeSpan timeout)
-		{
-			var sw = Stopwatch.StartNew();
-			while (sw.Elapsed < timeout)
-			{
-				if (unhandledSubmissions.Count > 0)
-				{
-					log.Info($"Список невзятых пока на проверку решений: [{string.Join(", ", unhandledSubmissions.Keys)}]");
-					ClearHandleDictionaries();
-					return;
-				}
-
-				await Task.Delay(TimeSpan.FromMilliseconds(100));
-			}
-		}
-
-		public async Task WaitUntilSubmissionHandled(TimeSpan timeout, int submissionId)
-		{
-			log.Info($"Вхожу в цикл ожидания результатов проверки решения {submissionId}. Жду {timeout.TotalSeconds} секунд");
-			var sw = Stopwatch.StartNew();
-			while (sw.Elapsed < timeout)
-			{
-				if (handledSubmissions.ContainsKey(submissionId))
-				{
-					DateTime value;
-					handledSubmissions.TryRemove(submissionId, out value);
-					return;
-				}
-
-				await Task.Delay(TimeSpan.FromMilliseconds(100));
-			}
-		}
-
-		private static void ClearHandleDictionaries()
-		{
-			var timeout = DateTime.Now.Subtract(handleTimeout);
-			ClearHandleDictionary(handledSubmissions, timeout);
-			ClearHandleDictionary(unhandledSubmissions, timeout);
-		}
-
-		private static void ClearHandleDictionary(ConcurrentDictionary<int, DateTime> dictionary, DateTime timeout)
-		{
-			foreach (var key in dictionary.Keys)
-			{
-				DateTime value;
-				if (dictionary.TryGetValue(key, out value) && value < timeout)
-					dictionary.TryRemove(key, out value);
-			}
-		}
-	}
-
-	public class SubmissionCheckingTimeout : Exception
-	{
 	}
 }

@@ -57,9 +57,9 @@ namespace uLearn.Web
 			this.visitsRepo = visitsRepo;
 		}
 
-		public CertificateGenerator(ULearnDb db, WebCourseManager courseManager)
+		public CertificateGenerator(ULearnDb db)
 			: this(new UserQuizzesRepo(db),
-				new UserSolutionsRepo(db, courseManager),
+				new UserSolutionsRepo(db),
 				new SlideCheckingsRepo(db),
 				new VisitsRepo(db))
 		{

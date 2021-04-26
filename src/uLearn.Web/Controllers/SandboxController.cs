@@ -1,17 +1,10 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using System.Web.Mvc;
 using Database;
 using Database.DataContexts;
 using Database.Models;
-using Microsoft.AspNet.Identity;
-using Ulearn.Common;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
-using Ulearn.Common.Extensions;
-using Ulearn.Core;
-using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 
 namespace uLearn.Web.Controllers
@@ -22,11 +15,9 @@ namespace uLearn.Web.Controllers
 		private readonly UserSolutionsRepo solutionsRepo;
 		private readonly WebCourseManager courseManager = WebCourseManager.Instance;
 
-		private static readonly TimeSpan timeout = TimeSpan.FromSeconds(30);
-
 		public SandboxController()
 		{
-			solutionsRepo = new UserSolutionsRepo(new ULearnDb(), courseManager);
+			solutionsRepo = new UserSolutionsRepo(new ULearnDb());
 		}
 
 		public ActionResult Index(int max = 200, int skip = 0)
@@ -35,43 +26,6 @@ namespace uLearn.Web.Controllers
 			return View(new SubmissionsListModel
 			{
 				Submissions = submissions
-			});
-		}
-
-		[HttpPost]
-		public async Task<ActionResult> Run()
-		{
-			var code = Request.InputStream.GetString();
-
-			var submission = await solutionsRepo.AddUserExerciseSubmission(
-				"web", Guid.Empty, code, null, null, User.Identity.GetUserId(), "null", User.Identity.Name + ": CsSandbox Web Executor", Language.CSharp, null
-			).ConfigureAwait(false);
-			try
-			{
-				await solutionsRepo.RunAutomaticChecking(submission, timeout, waitUntilChecked: true).ConfigureAwait(false);
-			}
-			catch (SubmissionCheckingTimeout)
-			{
-				return Json(new RunSolutionResult
-				{
-					ErrorMessage = "Что-то пошло не так :(",
-					IsCompileError = true,
-				});
-			}
-
-			/* Update the submission */
-			submission = solutionsRepo.FindNoTrackingSubmission(submission.Id);
-
-			var automaticChecking = submission.AutomaticChecking;
-
-			return Json(new RunSolutionResult
-			{
-				ActualOutput = automaticChecking.Output.Text,
-				ErrorMessage = automaticChecking.CompilationError.Text,
-				ExecutionServiceName = automaticChecking.ExecutionServiceName,
-				IsCompileError = automaticChecking.IsCompilationError,
-				IsRightAnswer = automaticChecking.IsRightAnswer,
-				SubmissionId = submission.Id,
 			});
 		}
 

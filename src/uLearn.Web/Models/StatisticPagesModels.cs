@@ -141,24 +141,6 @@ namespace uLearn.Web.Models
 		public string UserEmail { get; private set; }
 	}
 
-	public class DailyStatistics
-	{
-		public DateTime Day { get; set; }
-		public int SlidesVisited { get; set; }
-		public int TasksSolved { get; set; }
-		public int QuizesPassed { get; set; }
-		public int Score { get; set; }
-	}
-
-	public class SlideRateStats
-	{
-		public Guid SlideId { get; set; }
-		public string SlideTitle { get; set; }
-		public int NotUnderstand { get; set; }
-		public int Good { get; set; }
-		public int Trivial { get; set; }
-	}
-
 	public class UserInfo
 	{
 		public string UserId { get; set; }

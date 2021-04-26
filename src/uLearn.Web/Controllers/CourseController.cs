@@ -55,7 +55,7 @@ namespace uLearn.Web.Controllers
 			visitsRepo = new VisitsRepo(db);
 			unitsRepo = new UnitsRepo(db);
 			slideRateRepo = new SlideRateRepo(db);
-			solutionsRepo = new UserSolutionsRepo(db, courseManager);
+			solutionsRepo = new UserSolutionsRepo(db);
 			ltiRequestsRepo = new LtiRequestsRepo(db);
 			groupsRepo = new GroupsRepo(db, courseManager);
 			userQuizzesRepo = new UserQuizzesRepo(db);

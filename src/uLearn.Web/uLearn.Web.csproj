@@ -807,7 +807,6 @@
     <Compile Include="Clients\UlearnVideoAnnotationsClient.cs" />
     <Compile Include="Controllers\AntiPlagiarismController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
-    <Compile Include="Controllers\BaseExerciseController.cs" />
     <Compile Include="Controllers\CertificatesController.cs" />
     <Compile Include="Controllers\ErrorsController.cs" />
     <Compile Include="Controllers\FeedController.cs" />
@@ -982,7 +981,6 @@
     <Content Include="..\schema.xsd">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Views\Account\CourseRightsHistory.cshtml" />
     <Content Include="Views\Account\JoinedToGroup.cshtml" />
     <Content Include="Views\Account\ToggleRolesHistory.cshtml" />
     <Content Include="Views\Admin\StyleValidations.cshtml" />
@@ -1033,7 +1031,6 @@
     <Content Include="Views\Course\InstructorNote.cshtml" />
     <Content Include="Views\Questions\Items.cshtml" />
     <Content Include="Views\Analytics\UsersProgress.cshtml" />
-    <Content Include="Views\Analytics\SlideRatings.cshtml" />
     <Content Include="Views\Analytics\UserSolutions.cshtml" />
     <Content Include="Views\Account\ChangeDetailsPartial.cshtml" />
     <Content Include="Views\Shared\DisplayTemplates\TexBlock.cshtml" />
