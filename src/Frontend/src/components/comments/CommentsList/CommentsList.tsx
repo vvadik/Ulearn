@@ -112,7 +112,7 @@ class CommentsList extends Component<Props, State> {
 			sending: false,
 			status: "",
 			animation: false,
-			commentsToRender: 0,
+			commentsToRender: this.commentsPaginationOptions.commentsPerPack,
 		};
 
 		this.debouncedSendData = debounce(this.sendData, 300);
@@ -138,7 +138,7 @@ class CommentsList extends Component<Props, State> {
 		const { comments, } = this.props;
 
 		this.setState({
-			commentsToRender: Math.max(commentsToRender + packSize, countAllComments(comments)),
+			commentsToRender: Math.min(commentsToRender + packSize, countAllComments(comments)),
 		});
 	}
 

@@ -45,21 +45,9 @@ interface Props {
 	children: React.ReactNode;
 }
 
-interface State {
-	isApproved: boolean;
-}
-
-class Comment extends Component<Props, State> {
+class Comment extends Component<Props, unknown> {
 	private ref: React.RefObject<HTMLDivElement> = React.createRef();
 	private onScrollColorChangeDelay = 500;
-
-	constructor(props: Props) {
-		super(props);
-
-		this.state = {
-			isApproved: props.comment.isApproved
-		};
-	}
 
 	componentDidMount(): void {
 		this.scrollToComment();
@@ -81,12 +69,12 @@ class Comment extends Component<Props, State> {
 	};
 
 	render(): React.ReactNode {
-		const { children, commentEditing, comment, user, } = this.props;
+		const { children, commentEditing, comment, user,} = this.props;
 		const canViewProfiles = (user.systemAccesses.includes(SystemAccessType.viewAllProfiles)) ||
 			user.isSystemAdministrator;
 
 		return (
-			<div className={ `${ styles.comment } ${ !this.state.isApproved ? styles.isNotApproved : "" }` }
+			<div className={ `${ styles.comment } ${ !comment.isApproved ? styles.isNotApproved : "" }` }
 				 ref={ this.ref }>
 				<span className={ styles.commentAnchor } id={ `comment-${ this.props.comment.id }` }/>
 				{ canViewProfiles ?
@@ -136,8 +124,8 @@ class Comment extends Component<Props, State> {
 					canModerateComments={ this.canModerateComments }
 					slideType={ slideType }
 					comment={ comment }
-					actions={ actions }
-					handleCommentBackGround={ this.handleCommentBackground }/> }
+					actions={ actions }/>
+				}
 			</Header>
 		);
 	}
@@ -221,12 +209,6 @@ class Comment extends Component<Props, State> {
 
 		return (user.systemAccesses && user.systemAccesses.includes(SystemAccessType.viewAllGroupMembers)) ||
 			user.isSystemAdministrator;
-	};
-
-	handleCommentBackground = (commentId: number, isApproved: boolean): void => {
-		this.setState({
-			isApproved,
-		});
 	};
 }
 

@@ -12,6 +12,7 @@ import { Comment, CommentPolicy, } from "src/models/comments";
 import { DeviceType } from "src/consts/deviceType";
 
 import styles from "./CommentsView.less";
+import { parseCommentIdFromHash } from "../utils";
 
 
 interface Props {
@@ -181,8 +182,10 @@ class CommentsView extends Component<Props, State> {
 		);
 	}
 
-	handleTabChangeByUser = (): void =>
+	handleTabChangeByUser = (): void => {
 		this.handleTabChange(true);
+		this.removeCommentIdFromLocationHash();
+	};
 
 	handleTabChange = (isUserAction?: boolean): void => {
 		const { user, } = this.props;
@@ -201,6 +204,12 @@ class CommentsView extends Component<Props, State> {
 		this.setState({
 			tabHasAutomaticallyChanged: true,
 		});
+	};
+
+	removeCommentIdFromLocationHash = (): void => {
+		if(parseCommentIdFromHash(window.location.hash) > 0) {
+			history.pushState("", document.title, window.location.pathname + window.location.search);
+		}
 	};
 
 	handleAddComment = async (text: string, parentCommentId?: number): Promise<Comment> => {

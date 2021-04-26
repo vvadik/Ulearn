@@ -21,11 +21,10 @@ interface Props {
 
 	actions: ActionsType;
 	canModerateComments: (user: UserInfo, access: CourseAccessType) => boolean;
-	handleCommentBackGround: (commentId: number, isApproved: boolean) => void;
 }
 
 export default function KebabActions(props: Props): React.ReactElement {
-	const { user, comment, url, canModerateComments, actions, slideType, handleCommentBackGround } = props;
+	const { user, comment, url, canModerateComments, actions, slideType, } = props;
 	const canModerate = canModerateComments(user, CourseAccessType.editPinAndRemoveComments);
 	const canDeleteAndEdit = (user.id === comment.author.id || canModerate);
 	const canSeeSubmissions = (slideType === SlideType.Exercise &&
@@ -80,7 +79,6 @@ export default function KebabActions(props: Props): React.ReactElement {
 
 	function handleApprovedMarkClick(): void {
 		actions.handleApprovedMark(comment.id, !comment.isApproved);
-		handleCommentBackGround(comment.id, !comment.isApproved);
 	}
 
 	function handleDeleteCommentClick() {
