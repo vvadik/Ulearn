@@ -5,7 +5,6 @@ import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
 import '../config/polyfills.js';
 import { register } from './registerServiceWorker';
-import { Toast } from 'ui';
 
 Sentry.init({
 	dsn: "https://62e9c6b9ae6a47399a2b79600f1cacc5@sentry.skbkontur.ru/781",
@@ -23,12 +22,4 @@ if(root) {
 	), root);
 }
 
-const swUpdateHandler = () => window.location.reload();
-register({
-	onUpdate: () => {
-		Toast.push('Доступно обновление', {
-			label: 'Обновить',
-			handler: swUpdateHandler,
-		});
-	}
-});
+register();
