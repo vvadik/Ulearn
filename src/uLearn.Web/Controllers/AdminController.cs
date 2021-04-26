@@ -73,13 +73,13 @@ namespace uLearn.Web.Controllers
 			coursesRepo = new CoursesRepo(db);
 			groupsRepo = new GroupsRepo(db, courseManager);
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
-			userSolutionsRepo = new UserSolutionsRepo(db, courseManager);
+			userSolutionsRepo = new UserSolutionsRepo(db);
 			certificatesRepo = new CertificatesRepo(db);
 			additionalScoresRepo = new AdditionalScoresRepo(db);
 			notificationsRepo = new NotificationsRepo(db);
 			systemAccessesRepo = new SystemAccessesRepo(db);
 			styleErrorsRepo = new StyleErrorsRepo(db);
-			certificateGenerator = new CertificateGenerator(db, courseManager);
+			certificateGenerator = new CertificateGenerator(db);
 			tempCoursesRepo = new TempCoursesRepo(db);
 			reposDirectory = CourseManager.GetCoursesDirectory().GetSubdirectory("Repos");
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();

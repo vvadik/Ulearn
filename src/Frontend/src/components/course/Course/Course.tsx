@@ -12,7 +12,7 @@ import CourseFlashcardsPage from 'src/pages/course/CourseFlashcardsPage.js';
 import PreviewUnitPageFromAllCourse from "src/components/flashcards/UnitPage/PreviewUnitPageFromAllCourse";
 import SlideHeader from "./Slide/SlideHeader/SlideHeader";
 import { BlocksWrapper } from "src/components/course/Course/Slide/Blocks";
-import CommentsView from "src/components/comments/CommentsView/CommentsView.js";
+import CommentsView from "src/components/comments/CommentsView";
 import Slide from './Slide/Slide';
 
 import { UrlError } from "src/components/common/Error/NotFoundErrorBoundary";
@@ -30,6 +30,8 @@ import {
 	getSlideInfoById,
 } from "./CourseUtils";
 import { buildQuery } from "src/utils";
+import { UserInfo, UserRoles } from "src/utils/courseRoles";
+import documentReadyFunctions from "src/legacy/legacy";
 
 import { constructPathToSlide, flashcards, flashcardsPreview, signalrWS, } from 'src/consts/routes';
 import { ShortSlideInfo, SlideType, } from 'src/models/slide';
@@ -37,7 +39,8 @@ import Meta from "src/consts/Meta";
 import { CourseInfo, PageInfo, UnitInfo, UnitsInfo } from "src/models/course";
 import { SlideUserProgress, } from "src/models/userProgress";
 import { AccountState } from "src/redux/account";
-import { CourseAccessType, CourseRoleType } from "src/consts/accessType";
+import { CourseRoleType } from "src/consts/accessType";
+import { ShortUserInfo } from "src/models/users";
 import {
 	CourseStatistics,
 	FlashcardsStatistics,
@@ -154,7 +157,7 @@ class Course extends Component<Props, State> {
 		}
 
 		/* TODO: (rozentor) for now it copied from downloadedHtmlContetn, which run documentReadyFunctions scripts. In future, we will have no scripts in back, so it can be removed totally ( in other words, remove it when DownloadedHtmlContent will be removed)  */
-		(window.documentReadyFunctions || []).forEach(f => f());
+		documentReadyFunctions.forEach(f => f());
 	}
 
 	startSignalRConnection = (): void => {
@@ -294,7 +297,7 @@ class Course extends Component<Props, State> {
 			return AnyPage;
 		}
 
-		if(!slideType) {
+		if(slideType === SlideType.NotFound) {
 			throw new UrlError();
 		}
 
@@ -342,7 +345,7 @@ class Course extends Component<Props, State> {
 			return <Error404/>;
 		}
 		if(!courseInfo || !flashcardsStatisticsByUnits) {
-			return <CourseLoader/>;
+			return <CourseLoader isSlideLoader={ false }/>;
 		}
 
 		return (
@@ -381,10 +384,12 @@ class Course extends Component<Props, State> {
 			? currentSlideInfo.current
 			: null;
 
-		const { isSystemAdministrator, accessesByCourse, roleByCourse } = user;
-		const courseAccesses = accessesByCourse[courseId] ? accessesByCourse[courseId] : [];
+		const { isSystemAdministrator, roleByCourse } = user;
 		const courseRole = roleByCourse[courseId] ? roleByCourse[courseId] : CourseRoleType.student;
-		const userRoles = { isSystemAdministrator, courseRole, courseAccesses, };
+		const userRoles: UserRoles = {
+			isSystemAdministrator,
+			courseRole,
+		};
 		return (
 			<main className={ wrapperClassName }>
 				{ (isNavigationVisible || isReview) && title &&
@@ -419,8 +424,9 @@ class Course extends Component<Props, State> {
 					}
 				</div>
 				{ currentSlideInfo && isNavigationVisible && this.renderNavigationButtons(currentSlideInfo) }
-				{ currentSlideInfo && currentSlideInfo.current && slideInfo && slideInfo.id && isNavigationVisible && this.renderComments(
-					currentSlideInfo.current, userRoles) }
+				{ currentSlideInfo && currentSlideInfo.current
+				&& slideInfo && slideInfo.id && isNavigationVisible
+				&& this.renderComments(currentSlideInfo.current) }
 				{ isNavigationVisible && this.renderFooter() }
 			</main>
 		);
@@ -428,7 +434,7 @@ class Course extends Component<Props, State> {
 
 	renderGitEditLink = (slideInfo: ShortSlideInfo): React.ReactElement => {
 		return (
-			<a className={ styles.gitEditLink } rel='noopener noreferrer' target='_blank'
+			<a className={ styles.gitEditLink } rel="noopener noreferrer" target="_blank"
 			   href={ slideInfo.gitEditLink }>
 				<Edit/>
 			</a>
@@ -488,18 +494,27 @@ class Course extends Component<Props, State> {
 		return baseHref + buildQuery({ autoplay: true });
 	};
 
-	renderComments(currentSlide: ShortSlideInfo,
-		userRoles: { isSystemAdministrator: boolean, courseRole: CourseRoleType, courseAccesses: CourseAccessType[] },
-	): React.ReactElement {
+	renderComments(currentSlide: ShortSlideInfo,): React.ReactElement {
 		const { user, courseId, isSlideReady, } = this.props;
+		const { isSystemAdministrator, accessesByCourse, roleByCourse, systemAccesses, } = user;
+		const courseAccesses = accessesByCourse[courseId] ? accessesByCourse[courseId] : [];
+
+		const userInfo: UserInfo = {
+			...user as ShortUserInfo,
+
+			isAuthenticated: user.isAuthenticated,
+			isSystemAdministrator,
+			courseRole: roleByCourse[courseId],
+			courseAccesses,
+			systemAccesses
+		};
 
 		return (
 			<BlocksWrapper className={ styles.commentsWrapper }>
 				<CommentsView
-					user={ user }
+					user={ userInfo }
 					slideType={ currentSlide.type }
 					slideId={ currentSlide.id }
-					userRoles={ userRoles }
 					courseId={ courseId }
 					isSlideReady={ isSlideReady }
 				/>
@@ -564,6 +579,7 @@ class Course extends Component<Props, State> {
 				publicationDate: item.publicationDate,
 			})),
 			containsFlashcards: courseInfo.containsFlashcards,
+			returnInUnit: this.returnInUnit,
 		};
 	}
 
@@ -643,6 +659,25 @@ class Course extends Component<Props, State> {
 	returnInUnitsMenu = (): void => {
 		this.setState({
 			openedUnit: undefined,
+		});
+	};
+
+	returnInUnit = (): void => {
+		const { slideId, courseInfo, units, } = this.props;
+		if(!units) {
+			return;
+		}
+
+		const currentUnitId = findUnitIdBySlideId(slideId, courseInfo);
+
+		if(!currentUnitId) {
+			return;
+		}
+
+		const openedUnit = units[currentUnitId];
+
+		this.setState({
+			openedUnit,
 		});
 	};
 }

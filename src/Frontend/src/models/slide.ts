@@ -25,6 +25,7 @@ enum SlideType {
 	Flashcards = "flashcards",
 	CourseFlashcards = "courseFlashcards",
 	PreviewFlashcards = "previewFlashcards",
+	NotFound = 'notFound',
 }
 
 export enum BlockTypes {

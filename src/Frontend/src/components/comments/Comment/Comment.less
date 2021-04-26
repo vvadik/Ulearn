@@ -65,3 +65,19 @@
 .isNotApproved {
   opacity: 0.6;
 }
+
+.isScrollTarget {
+  animation: scrollTargetBlink 1000ms ease-out;
+}
+
+@keyframes scrollTargetBlink {
+  0% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: rgba(40, 153, 234, 0.3);
+  }
+  100% {
+    background-color: transparent;
+  }
+}

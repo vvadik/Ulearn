@@ -3,12 +3,17 @@ import { ShortUserInfo } from "src/models/users";
 export interface SlideComments {
 	topLevelComments: Comment[],
 	pagination: Pagination,
-	status: ResponseStatus,
 }
+
+export type SlideCommentsResponse = SlideComments & Response;
 
 export enum ResponseStatus {
 	ok,
 	error,
+}
+
+export interface Response {
+	status: ResponseStatus,
 }
 
 export interface Pagination {
@@ -26,9 +31,9 @@ export interface ShortGroupInfo {
 }
 
 export interface Comment {
-	id: string,
+	id: number,
 	author: ShortUserInfo,
-	AuthorGroups: ShortGroupInfo[],
+	authorGroups: ShortGroupInfo[],
 	text: string,
 	renderedText: string,
 	publishTime: string,
@@ -40,10 +45,16 @@ export interface Comment {
 	replies: Comment[],
 	courseId: string,
 	slideId: string,
-	parentCommentId: string,
+	parentCommentId?: number,
 }
 
 export interface CommentPolicy {
+	areCommentsEnabled: boolean,
+	moderationPolicy: string,
+	onlyInstructorsCanReply: boolean,
+}
+
+export interface CommentPolicyResponse {
 	areCommentsEnabled: boolean,
 	moderationPolicy: string,
 	onlyInstructorsCanReply: boolean,

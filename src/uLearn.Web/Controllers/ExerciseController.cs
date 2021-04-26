@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Mvc;
 using Database;
+using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using JetBrains.Annotations;
@@ -17,28 +18,55 @@ using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
+using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Helpers;
+using Ulearn.Core.Metrics;
+using Vostok.Logging.Abstractions;
 
 namespace uLearn.Web.Controllers
 {
 	[ULearnAuthorize]
-	public class ExerciseController : BaseExerciseController
+	public class ExerciseController : JsonDataContractController
 	{
+		protected readonly ULearnDb db;
+		protected readonly CourseManager courseManager;
+		protected readonly MetricSender metricSender;
 		private readonly ExerciseStudentZipsCache exerciseStudentZipsCache;
 
+		protected readonly UserSolutionsRepo userSolutionsRepo;
+		protected readonly SlideCheckingsRepo slideCheckingsRepo;
+		protected readonly GroupsRepo groupsRepo;
+		protected readonly VisitsRepo visitsRepo;
+		protected readonly NotificationsRepo notificationsRepo;
+		protected readonly UsersRepo usersRepo;
+		protected readonly UnitsRepo unitsRepo;
+
+		private static ILog log => LogProvider.Get().ForContext(typeof(ExerciseController));
+
 		public ExerciseController()
+			: this(new ULearnDb(), WebCourseManager.Instance, new MetricSender(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName))
 		{
-			exerciseStudentZipsCache = new ExerciseStudentZipsCache();
 		}
 
-		[System.Web.Mvc.HttpPost]
-		public async Task<ActionResult> RunSolution(string courseId, Guid slideId, bool isLti = false)
+		public ExerciseController(ULearnDb db, WebCourseManager courseManager, MetricSender metricSender)
 		{
-			return HttpNotFound();
+			exerciseStudentZipsCache = new ExerciseStudentZipsCache();
+			this.db = db;
+			this.courseManager = courseManager;
+			this.metricSender = metricSender;
+
+			userSolutionsRepo = new UserSolutionsRepo(db);
+			slideCheckingsRepo = new SlideCheckingsRepo(db);
+			groupsRepo = new GroupsRepo(db, courseManager);
+			visitsRepo = new VisitsRepo(db);
+			notificationsRepo = new NotificationsRepo(db);
+			usersRepo = new UsersRepo(db);
+			unitsRepo = new UnitsRepo(db);
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
@@ -370,6 +398,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[System.Web.Mvc.AllowAnonymous]
+		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult Submission(string courseId, Guid slideId, string userId = null, int? submissionId = null, int? manualCheckingId = null, bool isLti = false, bool showOutput = false, bool instructorView = false, bool onlyAccepted = true)
 		{
 			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
@@ -651,30 +680,6 @@ namespace uLearn.Web.Controllers
 		/* By default it's Url.RouteUrl("Course.SlideById", new { Model.CourseId, slideId = Model.Slide.Url }) */
 		[CanBeNull]
 		public string FormUrl { get; set; }
-	}
-
-	public class ExerciseControlsModel
-	{
-		public ExerciseControlsModel(string courseId, ExerciseSlide slide)
-		{
-			CourseId = courseId;
-			Slide = slide;
-		}
-
-		public string CourseId;
-		public ExerciseSlide Slide;
-		public AbstractExerciseBlock Block => Slide.Exercise;
-
-		public bool IsLti = false;
-		public bool IsCodeEditableAndSendable = true;
-		public bool DebugView = false;
-		public bool CanShowOutput = false;
-		public bool IsShowOutputButtonActive = false;
-		public string AcceptedSolutionsAction = "";
-		public string RunSolutionUrl = "";
-		public string UseHintUrl = "";
-
-		public bool HideShowSolutionsButton => Block.HideShowSolutionsButton;
 	}
 
 	public class ExerciseScoreFormModel

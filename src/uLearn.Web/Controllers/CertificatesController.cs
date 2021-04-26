@@ -32,7 +32,7 @@ namespace uLearn.Web.Controllers
 
 			certificatesRepo = new CertificatesRepo(db);
 			userManager = new ULearnUserManager(db);
-			certificateGenerator = new CertificateGenerator(db, courseManager);
+			certificateGenerator = new CertificateGenerator(db);
 		}
 
 		[AllowAnonymous]

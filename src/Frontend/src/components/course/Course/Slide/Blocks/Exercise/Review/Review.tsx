@@ -1,7 +1,7 @@
 import React from "react";
 import classNames from "classnames";
 
-import Avatar from "src/components/common/Avatar/Avatar.js";
+import Avatar from "src/components/common/Avatar/Avatar";
 import { Textarea, ThemeContext, } from "ui";
 import { Send3, Trash, Delete, } from "icons";
 
@@ -11,6 +11,7 @@ import { ReviewCommentResponse, ReviewInfo } from "src/models/exercise";
 
 import styles from "./Review.less";
 import texts from "./Review.texts";
+import { Editor } from "codemirror";
 
 
 interface CommentReplies {
@@ -30,13 +31,13 @@ interface ReviewState {
 }
 
 interface ReviewProps {
+	editor: Editor | null;
 	reviews: ReviewInfo[];
 	selectedReviewId: number;
 	userId?: string | null;
 	onSelectComment: (e: React.MouseEvent | React.FocusEvent, id: number,) => void;
 	addReviewComment: (reviewId: number, comment: string) => void;
 	deleteReviewComment: (reviewId: number, commentId: number) => void;
-	getReviewAnchorTop: (review: ReviewInfo) => number;
 }
 
 const botUser = { visibleName: 'Ulearn bot', id: 'bot', };
@@ -98,8 +99,13 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 				innerCommentsIds: r.comments.map(c => c.id),
 			}));
 
-			for (const [i, { id, innerCommentsIds }] of newReviews.entries()) {
-				const oldReview = oldReviews[i];
+			for (const { id, innerCommentsIds } of newReviews.values()) {
+				const oldReview = oldReviews.find(or => or.id === id);
+				if(!oldReview) {
+					sameReviews = false;
+					break;
+				}
+
 				if(oldReview.id !== id || innerCommentsIds.length !== oldReview.innerCommentsIds.length) {
 					sameReviews = false;
 					break;
@@ -129,7 +135,7 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 
 	addMarginsToComments = (): void => {
 		const { comments, } = this.state;
-		const { selectedReviewId, getReviewAnchorTop, } = this.props;
+		const { selectedReviewId, editor, } = this.props;
 
 		const commentsWithMargin = [...comments];
 		const selectedReviewIndex = commentsWithMargin.findIndex(c => c.review.id === selectedReviewId);
@@ -137,7 +143,7 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 
 		if(selectedReviewIndex >= 0) {
 			const selectedComment = commentsWithMargin[selectedReviewIndex];
-			const anchorTop = getReviewAnchorTop(selectedComment.review);
+			const anchorTop = this.getReviewAnchorTop(selectedComment.review, editor);
 			const height = selectedComment.ref.current?.offsetHeight || 0;
 			const offset = Math.max(5, anchorTop);
 
@@ -155,7 +161,7 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 
 				for (let i = 0; i <= selectedReviewIndex; i++) {
 					const comment = commentsWithMargin[i];
-					const anchorTop = getReviewAnchorTop(comment.review);
+					const anchorTop = this.getReviewAnchorTop(comment.review, editor);
 					const height = comment.ref.current?.offsetHeight || 0;
 					comment.margin = Math.min(anchorTop, spaceToSelectedReview - totalCommentsHeight);
 					if(i > 0) {
@@ -169,7 +175,7 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 
 		for (let i = selectedReviewIndex + 1; i < commentsWithMargin.length; i++) {
 			const comment = commentsWithMargin[i];
-			const anchorTop = getReviewAnchorTop(comment.review);
+			const anchorTop = this.getReviewAnchorTop(comment.review, editor);
 			const height = comment.ref.current?.offsetHeight || 0;
 			const offset = Math.max(5, anchorTop - lastReviewBottomHeight);
 
@@ -346,6 +352,17 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 		const { commentsReplies, } = this.state;
 
 		addReviewComment(selectedReviewId, commentsReplies[selectedReviewId]);
+	};
+
+	getReviewAnchorTop = (review: ReviewInfo, editor: Editor | null,): number => {
+		if(!editor) {
+			return - 1;
+		}
+
+		return editor.charCoords({
+			line: review.startLine,
+			ch: review.startPosition,
+		}, 'local').top;
 	};
 }
 

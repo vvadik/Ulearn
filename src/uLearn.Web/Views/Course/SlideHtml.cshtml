@@ -314,76 +314,14 @@
 	</div>
 }
 
-@helper CodeTextArea(string initialCode, string langId, string runSolutionUrl)
-{
-	<textarea class="code code-exercise" data-lang="@langId">@initialCode</textarea>
-	<div class="solution-control btn-group ctrl-group">
-		<button type="button" class="run-solution-button btn btn-primary no-rounds" data-url="@runSolutionUrl">
-			Run
-		</button>
-	</div>
-
-	@RunErrors()
-}
-
 @helper Block(AbstractExerciseBlock block, BlockRenderContext context, HtmlHelper Html)
 {
 	<div class="exercise">
-		@if (context.ManualChecking != null)
-        {
-	        @Html.Action("LastReviewComments", "Exercise", new { courseId = context.Course.Id, slideId = context.Slide.Id, userId = context.ManualChecking.UserId })
-        }
-		
 		@{
+			@Html.Action("LastReviewComments", "Exercise", new { courseId = context.Course.Id, slideId = context.Slide.Id, userId = context.ManualChecking.UserId })
 			ExerciseBlockData data = context.GetBlockData(block);
-			var manualCheckingId = context.ManualChecking != null ? (int?)context.ManualChecking.Id : null;
-
-			if (Html != null)
-			{
-				@Html.Action("Submission", "Exercise", new { courseId = context.Course.Id, slideId = context.Slide.Id, submissionId = context.VersionId, manualCheckingId = manualCheckingId, isLti = data.IsLti, instructorView = manualCheckingId != null })
-			}
-			else
-			{
-				<div class="exercise__submission">
-					<textarea class="code code-exercise hidden" data-lang="@block.Language.GetName()">@(block.ExerciseInitialCode.EnsureEnoughLines(4))</textarea>
-					<div class="loading-spinner">
-						<img src="/Content/loading.gif"/>
-					</div>
-					@ExerciseControls(new ExerciseControlsModel(context.Course.Id, (ExerciseSlide)context.Slide)
-					{
-						IsLti = context.IsLti,
-						IsCodeEditableAndSendable = true,
-						DebugView = data.DebugView,
-						RunSolutionUrl = data.RunSolutionUrl,
-					})
-
-					@RunErrors()
-				</div>
-			}
-		}
-
-		@if (data.DebugView)
-		{
-			<div>
-				<h3>Подсказки</h3>
-				<ol>
-					@foreach (var hint in data.Block.HintsMd)
-					{
-						<li>
-							@MvcHtmlString.Create(hint.RenderMarkdown(context.BaseUrl))
-						</li>
-					}
-				</ol>
-				@if (!string.IsNullOrEmpty(data.Block.CommentAfterExerciseIsSolved))
-				{
-					<h3>Комментарий после решения</h3>
-					<p>@data.Block.CommentAfterExerciseIsSolved</p>
-				}
-			</div>
-		}
-
-		@if (context.ManualChecking != null)
-		{
+			var manualCheckingId = context.ManualChecking.Id;
+			@Html.Action("Submission", "Exercise", new { courseId = context.Course.Id, slideId = context.Slide.Id, submissionId = context.VersionId, manualCheckingId = manualCheckingId, isLti = data.IsLti, instructorView = true })
 			@Html.Action("ExerciseScoreForm", "Exercise", new { context = context })
 		}
 	</div>
@@ -720,85 +658,6 @@
 	}
 }
 
-@helper RunErrors()
-{
-	<div class="run-result run-service-error">
-		<div class="run-verdict label-warning">Ошибка сервера :(</div>
-		<pre class="no-rounds"><code class="run-details"></code></pre>
-	</div>
-
-	<div class="run-result run-compile-error">
-		<div class="run-verdict label-danger">Ошибка компиляции</div>
-		<pre class="no-rounds"><code class="run-details"></code></pre>
-	</div>
-
-	<div class="run-result run-style-error">
-		<div class="run-verdict label-warning">Задача сдана. Осталось исправить стилевые ошибки!</div>
-		<pre class="no-rounds"><code class="run-details"></code></pre>
-		<div>
-			<small>Код со стилевыми ошибками трудно или неприятно читать другим программистам, поэтому он может не пройти код-ревью.</small>
-		</div>
-	</div>
-
-	<div class="run-result run-wa">
-		<div class="run-verdict label-danger">Неверный результат</div>
-		<div class="diff-table tablesorter"></div>
-	</div>
-
-	<div class="run-result run-wa-no-diff">
-		<div class="run-verdict label-danger">Неверный результат</div>
-		<pre class="no-rounds"><code class="run-details"></code></pre>
-	</div>
-
-	<div class="run-result run-success">
-		<div class="run-verdict label-success clearfix">Задача сдана!</div>
-		<pre class="no-rounds"><code class="run-details"></code></pre>
-	</div>
-}
-
-@helper ExerciseControls(ExerciseControlsModel model)
-{
-	<div class="solution-control btn-group ctrl-group">
-		@if (!model.IsCodeEditableAndSendable)
-		{
-			<button type="button" class="try-again-button btn btn-primary exercise-version-link @( model.IsLti ? "exercise-controls_button-long" : "")" data-version-id="-1">
-				Ещё раз
-			</button>
-		}
-		else
-		{
-			<button type="button" class="run-solution-button btn btn-primary @( model.IsLti ? "exercise-controls_button-long" : "")" data-url="@( model.RunSolutionUrl)">
-				Отправить
-			</button>
-		}
-		@if (!model.DebugView)
-		{
-			var hints = model.Block.HintsMd;
-			<button id="GetHintButton" type="button" class="btn btn-default hints-btn" data-course-id="@( model.CourseId)" data-slide-id="@( model.Slide.Id)" data-hints-count="@( hints.Count)" data-url="@( model.UseHintUrl)">
-				Взять подсказку
-			</button>
-			if (model.CanShowOutput)
-			{
-				<button type="button" class="show-output-button btn btn-default @( model.IsShowOutputButtonActive ? "active" : "")">
-					Показать вывод
-				</button>
-			}
-			if (!model.IsLti && !model.HideShowSolutionsButton)
-			{
-				<button type="button" class="btn btn-default giveup-btn" onclick="@( model.AcceptedSolutionsAction)">
-					Чужие решения
-				</button>
-			}
-			if (model.IsCodeEditableAndSendable)
-			{
-				<button type="button" class="btn btn-default reset-btn" onclick="cleanUserCode()">
-					Начать с начала
-				</button>
-			}
-		}
-	</div>
-}
-
 @helper ShowCorrectAnswerAndExplanationForChoiceItem(ChoiceBlock block, QuizBlockData model, ChoiceItem item, bool isUserAnswerCorrect)
 {
 	var hasExplanation = model.ShowExplanations && !string.IsNullOrEmpty(item.Explanation);
@@ -852,7 +711,7 @@
 
 	public static string GetGuestOnclick(bool isGuest)
 	{
-		return isGuest ? "onclick=loginForContinue()" : "";
+		return isGuest ? "onclick=window.legacy.loginForContinue()" : "";
 	}
 
 	public static string GetGuestDisable(bool isGuest)

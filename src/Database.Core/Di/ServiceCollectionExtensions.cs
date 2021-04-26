@@ -81,7 +81,6 @@ namespace Database.Di
 			services.AddScoped<IStyleErrorsRepo, StyleErrorsRepo>();
 			services.AddScoped<IWorkQueueRepo, WorkQueueRepo>();
 			services.AddScoped<ICertificatesRepo, CertificatesRepo>();
-			services.AddScoped<IGradersRepo, GradersRepo>();
 			services.AddScoped<IRestoreRequestRepo, RestoreRequestRepo>();
 			services.AddScoped<IStepikRepo, StepikRepo>();
 

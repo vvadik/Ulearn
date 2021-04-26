@@ -32,21 +32,23 @@ function StatisticsHint({
 
 	return (
 		<span className={ statisticsClassName }>
-			<Tooltip
-				pos={ "bottom right" }
-				closeButton={ false }
-				trigger={ tooltipTrigger }
-				render={ renderTooltipContent }>
-				<ShowControlsTextContext.Consumer>
-					{
-						(showControlsTextContext) => (showControlsTextContext || showControlsText)
+			<ShowControlsTextContext.Consumer>
+			{
+				(showControlsTextContext) =>
+					<Tooltip
+						disableAnimations={ !showControlsTextContext && !showControlsText }
+						pos={ "bottom right" }
+						closeButton={ false }
+						trigger={ tooltipTrigger }
+						render={ renderTooltipContent }>
+						{ (showControlsTextContext || showControlsText)
 							? texts.controls.statistics.buildShortText(usersWithRightAnswerCount)
 							: <span className={ styles.exerciseControlsIcon }>
 							<Statistic/>
-						</span>
-					}
-				</ShowControlsTextContext.Consumer>
-			</Tooltip>
+						</span> }
+					</Tooltip>
+			}
+			</ShowControlsTextContext.Consumer>
 		</span>
 	);
 

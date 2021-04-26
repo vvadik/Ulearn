@@ -37,6 +37,7 @@ function MobileCourseMenu({
 
 	return (
 		<DropdownMenu
+			disableAnimations={ true }
 			ref={ ref }
 			menuMaxHeight={ maxDropdownHeight }
 			menuWidth={ 250 }

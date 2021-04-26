@@ -1,5 +1,5 @@
 import React from "react";
-import CommentsList from "./CommentsList.js";
+import CommentsList from "./CommentsList";
 
 const user = {
 	isAuthenticated: true,

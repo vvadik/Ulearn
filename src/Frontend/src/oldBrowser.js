@@ -1,17 +1,17 @@
 import outdatedBrowserRework from 'outdated-browser-rework'
+import 'outdated-browser-rework/dist/style.css';
 
 outdatedBrowserRework({
 	browserSupport: {
-		'Chrome': 45, // Includes Chrome for mobile devices
-		'Edge': 14,
-		'Safari': 9,
-		'Mobile Safari': 9,
-		'Firefox': 47,
-		'Opera': 45,
-		'Vivaldi': 1,
-		'IE': 11
+		Chrome: 89, // Includes Chrome for mobile devices
+		Edge: 89,
+		Firefox: 86,
+		Opera: 70,
+		Safari: 12,
+		"Mobile Safari": 12,
+		Yandex: 20,
 	},
-	requireChromeOnAndroid: false,
+	requireChromeOnAndroid: true,
 	isUnknownBrowserOK: true,
 	messages: {
 		en: {

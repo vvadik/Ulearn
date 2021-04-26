@@ -98,7 +98,7 @@ class Video extends React.Component<Props, State> {
 					onPlaybackRateChange={ this.onPlaybackRateChange }
 				/>
 				{ hide && <BlocksWrapper hide isBlock withoutBottomPaddings={ !!googleDocLink }>
-					<Text className={ styles.withoutBottomMargins }>
+					<Text disableAnchorsScrollHandlers disableTranslatingTex className={ styles.withoutBottomMargins }>
 						<p>Видео выше скрыто</p>
 					</Text>
 				</BlocksWrapper> }
@@ -140,7 +140,7 @@ class Video extends React.Component<Props, State> {
 				hide={ hide }
 				isBlock
 				className={ styles.withoutBottomMargins }>
-				<Text>
+				<Text disableAnchorsScrollHandlers disableTranslatingTex>
 					{
 						annotation
 							? this.renderAnnotationContent(showedAnnotation, annotation, googleDocLink)

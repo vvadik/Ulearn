@@ -189,11 +189,11 @@
 			}
 			else if (Model.QuizState.Status == QuizStatus.ReadyToSend)
 			{
-				<button class="btn btn-primary quiz-button quiz-submit-btn" onclick="submitQuiz('@Model.Course.Id', '@Model.Slide.Id', '@Model.AnswersToQuizzes.Count', @Model.IsLtiToString) ">Готово!</button>
+				<button class="btn btn-primary quiz-button quiz-submit-btn" onclick="window.legacy.submitQuiz('@Model.Course.Id', '@Model.Slide.Id', '@Model.AnswersToQuizzes.Count', @Model.IsLtiToString) ">Готово!</button>
 			}
 			else if (Model.QuizState.Status == QuizStatus.WaitsForManualChecking)
 			{
-				<button class="btn btn-primary quiz-button quiz-submit-btn" onclick="submitQuiz('@Model.Course.Id', '@Model.Slide.Id', '@Model.AnswersToQuizzes.Count', @Model.IsLtiToString) ">Переотправить ответы</button>
+				<button class="btn btn-primary quiz-button quiz-submit-btn" onclick="window.legacy.submitQuiz('@Model.Course.Id', '@Model.Slide.Id', '@Model.AnswersToQuizzes.Count', @Model.IsLtiToString) ">Переотправить ответы</button>
 				<small class="quiz__remains">Вы не потратите дополнительную попытку, пока преподаватель не проверил ваши ответы</small>
 			}
 			/* Quizzes with enabled manual checking can not be resend if user have used all attempts already */

@@ -194,7 +194,13 @@ private.settings
 # Exercises projects zips
 *.exercise.zip
 /src/uLearn.Web/App_Data/error*.xml
+#Copied from frontend build
 /src/uLearn.Web/static/
+/src/uLearn.Web/workbox*
+/src/uLearn.Web/sw.js
+/src/uLearn.Web/manifest.json
+/src/uLearn.Web/asset-manifest.json
+/src/uLearn.Web/favicon.*
 
 # Rider and WebStorm files
 .idea/

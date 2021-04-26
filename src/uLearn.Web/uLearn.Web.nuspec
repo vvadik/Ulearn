@@ -17,6 +17,10 @@
   <files>
     <file src="static\**\*.*" target="static\" />
     <file src="index.html" target="" />
-<!--    <file src="service-worker.js" target="" />-->
+    <file src="workbox-*.js" target="" />
+    <file src="sw.js" target="" />
+    <file src="manifest.json" target="" />
+    <file src="asset-manifest.json" target="" />
+    <file src="favicon.ico" target="" />
   </files>
 </package>

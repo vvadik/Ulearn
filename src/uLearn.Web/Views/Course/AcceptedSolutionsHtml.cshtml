@@ -12,7 +12,7 @@
 		var id = "solution_" + solution.Id;
 		var code = new CodeBlock(solution.Code, model.Slide.Exercise.Language);
 		<div id="@id">
-			<button class="like-left-location btn @( solution.LikedAlready ? "btn-primary" : "btn-default") like-button" onclick="likeSolution(@solution.Id)">
+			<button class="like-left-location btn @( solution.LikedAlready ? "btn-primary" : "btn-default") like-button" onclick="window.legacy.likeSolution(@solution.Id)">
 				<i class="glyphicon glyphicon-heart"></i>
 				<span class="likes-counter">@solution.UsersWhoLike.Count</span>
 			</button>

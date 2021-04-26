@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -53,7 +52,7 @@ namespace uLearn.Web.Controllers
 			this.courseManager = courseManager;
 
 			additionalScoresRepo = new AdditionalScoresRepo(db);
-			userSolutionsRepo = new UserSolutionsRepo(db, courseManager);
+			userSolutionsRepo = new UserSolutionsRepo(db);
 			groupsRepo = new GroupsRepo(db, courseManager);
 			usersRepo = new UsersRepo(db);
 			visitsRepo = new VisitsRepo(db);
@@ -807,43 +806,6 @@ namespace uLearn.Web.Controllers
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		public ActionResult SlideRatings(string courseId, Guid unitId)
-		{
-			var course = courseManager.GetCourse(courseId);
-			var unit = course.FindUnitByIdNotSafe(unitId);
-			if (unit == null)
-				return HttpNotFound();
-
-			var slides = unit.GetSlides(true).ToArray();
-			var model = GetSlideRateStats(course, slides);
-			return PartialView(model);
-		}
-
-		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		public ActionResult DailyStatistics(string courseId, Guid? unitId)
-		{
-			IEnumerable<Slide> slides = null;
-			if (courseId != null && unitId.HasValue)
-			{
-				var course = courseManager.GetCourse(courseId);
-
-				var unit = course.FindUnitByIdNotSafe(unitId.Value);
-				if (unit == null)
-					return HttpNotFound();
-				slides = unit.GetSlides(true).ToArray();
-			}
-
-			var model = GetDailyStatistics(slides);
-			return PartialView(model);
-		}
-
-		[ULearnAuthorize(ShouldBeSysAdmin = true)]
-		public ActionResult SystemStatistics()
-		{
-			return View();
-		}
-
-		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult UsersProgress(string courseId, Guid unitId, DateTime periodStart)
 		{
 			var course = courseManager.GetCourse(courseId);
@@ -859,96 +821,6 @@ namespace uLearn.Web.Controllers
 				GroupsNames = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, users.Select(u => u.UserId), User, actual: true, archived: false),
 				CourseId = courseId
 			});
-		}
-
-		private DailyStatistics[] GetDailyStatistics(IEnumerable<Slide> slides = null)
-		{
-			var slideIds = slides?.Select(s => s.Id).ToArray();
-			var lastDay = DateTime.Now.Date.Add(new TimeSpan(0, 23, 59, 59, 999));
-			var firstDay = lastDay.Date.AddDays(-14);
-			var tasks = GetTasksSolvedStats(slideIds, firstDay, lastDay);
-			var quizes = GetQuizPassedStats(slideIds, firstDay, lastDay);
-			var visits = GetSlidesVisitedStats(slideIds, firstDay, lastDay);
-			var result =
-				Enumerable.Range(0, 14)
-					.Select(diff => lastDay.AddDays(-diff).Date)
-					.Select(date => new DailyStatistics
-					{
-						Day = date,
-						TasksSolved = tasks.GetOrDefault(date, 0) + quizes.GetOrDefault(date, 0),
-						SlidesVisited = visits.GetOrDefault(date, Tuple.Create(0, 0)).Item1,
-						Score = visits.GetOrDefault(date, Tuple.Create(0, 0)).Item2
-					})
-					.ToArray();
-			return result;
-		}
-
-		private Dictionary<DateTime, Tuple<int, int>> SumByDays(IQueryable<Visit> actions)
-		{
-			var q = from s in actions
-				group s by DbFunctions.TruncateTime(s.Timestamp)
-				into day
-				select new { day.Key, sum = day.Sum(v => v.Score), count = day.Select(d => new { d.UserId, d.SlideId }).Distinct().Count() };
-			return q.ToDictionary(d => d.Key.Value, d => Tuple.Create(d.count, d.sum));
-		}
-
-		private IQueryable<T> FilterBySlides<T>(IQueryable<T> source, IEnumerable<Guid> slideIds) where T : class, ISlideAction
-		{
-			return slideIds == null ? source : source.Where(s => slideIds.Contains(s.SlideId));
-		}
-
-		private IQueryable<T> FilterByTime<T>(IQueryable<T> source, DateTime firstDay, DateTime lastDay) where T : class, ITimedSlideAction
-		{
-			return source.Where(s => s.Timestamp > firstDay && s.Timestamp <= lastDay);
-		}
-
-		private Dictionary<DateTime, int> GroupByDays<T>(IQueryable<T> actions) where T : class, ITimedSlideAction
-		{
-			var q = from s in actions
-				group s by DbFunctions.TruncateTime(s.Timestamp)
-				into day
-				select new { day.Key, count = day.Select(d => new { d.UserId, d.SlideId }).Distinct().Count() };
-			return q.ToDictionary(d => d.Key.Value, d => d.count);
-		}
-
-		private Dictionary<DateTime, int> GetTasksSolvedStats(IEnumerable<Guid> slideIds, DateTime firstDay, DateTime lastDay)
-		{
-			return GroupByDays(FilterByTime(FilterBySlides(db.UserExerciseSubmissions, slideIds), firstDay, lastDay).Where(s => s.AutomaticCheckingIsRightAnswer));
-		}
-
-		private Dictionary<DateTime, int> GetQuizPassedStats(IEnumerable<Guid> slideIds, DateTime firstDay, DateTime lastDay)
-		{
-			return GroupByDays(FilterByTime(FilterBySlides(db.UserQuizSubmissions, slideIds), firstDay, lastDay));
-		}
-
-		private Dictionary<DateTime, Tuple<int, int>> GetSlidesVisitedStats(IEnumerable<Guid> slideIds, DateTime firstDay, DateTime lastDay)
-		{
-			return SumByDays(FilterByTime(FilterBySlides(db.Visits, slideIds), firstDay, lastDay));
-		}
-
-		private SlideRateStats[] GetSlideRateStats(Course course, IEnumerable<Slide> slides)
-		{
-			var courseId = course.Id;
-			var rates =
-				(from rate in db.SlideRates
-					where rate.CourseId == courseId
-					group rate by new { rate.SlideId, rate.Rate }
-					into slideRate
-					select new
-					{
-						slideRate.Key.SlideId,
-						slideRate.Key.Rate,
-						count = slideRate.Count()
-					})
-				.ToLookup(r => r.SlideId);
-			return slides.Select(s => new SlideRateStats
-			{
-				SlideId = s.Id,
-				SlideTitle = s.Title,
-				NotUnderstand = rates[s.Id].Where(r => r.Rate == SlideRates.NotUnderstand).Sum(r => r.count),
-				Good = rates[s.Id].Where(r => r.Rate == SlideRates.Good).Sum(r => r.count),
-				Trivial = rates[s.Id].Where(r => r.Rate == SlideRates.Trivial).Sum(r => r.count),
-			}).ToArray();
 		}
 
 		private double GetRating(UserInfo user)

@@ -69,21 +69,24 @@ class InternalUlearnApp extends Component<Props, State> {
 
 	onWindowResize = () => {
 		const { resizeTimeout, } = this.state;
-		const { setDeviceType, } = this.props;
 
 		const throttleTimeout = 66;
 
 		//resize event can be called rapidly, to prevent performance issue, we throttling event handler
 		if(!resizeTimeout) {
 			this.setState({
-				resizeTimeout: setTimeout(() => {
-					this.setState({
-						resizeTimeout: undefined,
-					});
-					setDeviceType(getDeviceType());
-				}, throttleTimeout),
+				resizeTimeout: setTimeout(this.handleResize, throttleTimeout)
 			});
 		}
+	};
+
+	handleResize = () => {
+		const { setDeviceType, } = this.props;
+
+		this.setState({
+			resizeTimeout: undefined,
+		});
+		setDeviceType(getDeviceType());
 	};
 
 	componentDidMount() {

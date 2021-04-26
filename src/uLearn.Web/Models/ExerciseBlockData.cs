@@ -40,18 +40,6 @@ namespace uLearn.Web.Models
 		public string Solution { get; private set; }
 
 		public UrlHelper Url { get; set; }
-		private string runSolutionUrl;
-
-		public string RunSolutionUrl
-		{
-			get
-			{
-				if (!string.IsNullOrEmpty(runSolutionUrl) || Url == null)
-					return runSolutionUrl ?? "";
-				return Url.Action("RunSolution", "Exercise", new { courseId = CourseId, slideId = Slide.Id, IsLti });
-			}
-			set { runSolutionUrl = value; }
-		}
 
 		public ExerciseReviewState ReviewState { get; set; }
 		public List<ExerciseCodeReview> Reviews { get; set; }
