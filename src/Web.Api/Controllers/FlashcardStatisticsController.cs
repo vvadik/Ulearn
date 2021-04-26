@@ -37,7 +37,7 @@ namespace Ulearn.Web.Api.Controllers
 			var course = await courseManager.FindCourseAsync(courseId);
 			if (course == null)
 				return NotFound();
-			var hasUserAccessToCourse = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, course.Id, CourseRoleType.Instructor);
+			var hasUserAccessToCourse = await courseRolesRepo.HasUserAccessToCourse(UserId, course.Id, CourseRoleType.Instructor);
 			if (!hasUserAccessToCourse)
 			{
 				return BadRequest($"You don't have access to course with id {course.Id}");

@@ -92,7 +92,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				});
 			}
 
-			var isInstructor = await courseRolesRepo.HasUserAccessToCourseAsync(UserId, courseId, CourseRoleType.Instructor);
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.Instructor);
 			var exerciseSlide = (await courseManager.FindCourseAsync(courseId))?.FindSlideById(slideId, isInstructor) as ExerciseSlide;
 			if (exerciseSlide == null)
 				return NotFound(new ErrorResponse("Slide not found"));
@@ -139,7 +139,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				hasAutomaticChecking, buildResult, serviceScopeFactory);
 			UserExerciseSubmission submissionNoTracking; // Получается позже, чтобы быть максимально обновленным из базы, и чтобы не занимать память надолго и не попасть в 2 поколение
 
-			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin);
+			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourse(userId, courseId, CourseRoleType.CourseAdmin);
 
 			if (buildResult.HasErrors)
 			{

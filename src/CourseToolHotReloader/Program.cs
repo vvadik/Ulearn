@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -84,6 +85,10 @@ namespace CourseToolHotReloader
 				log.Error(e, "Root error");
 				ConsoleWorker.WriteError("Ошибка. Подробнее в логах");
 			}
+			finally
+			{
+				BeforeProgramEnd();
+			}
 		}
 
 		private static void Init()
@@ -92,6 +97,11 @@ namespace CourseToolHotReloader
 			container = ConfigureAutofac.Build();
 			config = container.Resolve<IConfig>();
 			ulearnApiClient = container.Resolve<IUlearnApiClient>();
+		}
+
+		private static void BeforeProgramEnd()
+		{
+			FileLog.FlushAll();
 		}
 
 		private static void InitLogger()
@@ -138,7 +148,7 @@ namespace CourseToolHotReloader
 					return;
 			config.Flush();
 
-			config.ExcludeCriterias = ReadCourseConfig()?.CourseToolHotReloader?.ExcludeCriterias;
+			config.ExcludeCriterias = ReadCourseConfig()?.CourseToolHotReloader?.ExcludeCriterias ?? new List<string> { "bin/", "obj/", ".vs/", ".idea/", ".git/", "_ReSharper.Caches/" };
 
 			await SendFullCourse();
 			var tempCourseId = GetTmpCourseId(config.CourseId, userId);

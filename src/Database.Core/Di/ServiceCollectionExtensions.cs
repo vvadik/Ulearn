@@ -80,6 +80,9 @@ namespace Database.Di
 			services.AddScoped<IXQueueRepo, XQueueRepo>();
 			services.AddScoped<IStyleErrorsRepo, StyleErrorsRepo>();
 			services.AddScoped<IWorkQueueRepo, WorkQueueRepo>();
+			services.AddScoped<ICertificatesRepo, CertificatesRepo>();
+			services.AddScoped<IRestoreRequestRepo, RestoreRequestRepo>();
+			services.AddScoped<IStepikRepo, StepikRepo>();
 
 			return services;
 		}

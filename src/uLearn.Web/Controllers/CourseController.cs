@@ -37,7 +37,6 @@ namespace uLearn.Web.Controllers
 		private readonly ULearnDb db = new ULearnDb();
 		private readonly WebCourseManager courseManager = WebCourseManager.Instance;
 
-		private readonly SlideRateRepo slideRateRepo;
 		private readonly UserSolutionsRepo solutionsRepo;
 		private readonly UnitsRepo unitsRepo;
 		private readonly VisitsRepo visitsRepo;
@@ -54,7 +53,6 @@ namespace uLearn.Web.Controllers
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
 			visitsRepo = new VisitsRepo(db);
 			unitsRepo = new UnitsRepo(db);
-			slideRateRepo = new SlideRateRepo(db);
 			solutionsRepo = new UserSolutionsRepo(db);
 			ltiRequestsRepo = new LtiRequestsRepo(db);
 			groupsRepo = new GroupsRepo(db, courseManager);
@@ -447,22 +445,6 @@ namespace uLearn.Web.Controllers
 			return model;
 		}
 
-		/* Slide rating don't used anymore */
-		[HttpPost]
-		public async Task<string> ApplyRate(string courseId, Guid slideId, string rate)
-		{
-			var userId = User.Identity.GetUserId();
-			var slideRate = (SlideRates)Enum.Parse(typeof(SlideRates), rate);
-			return await slideRateRepo.AddRate(courseId, slideId, userId, slideRate);
-		}
-
-		[HttpPost]
-		public string GetRate(string courseId, Guid slideId)
-		{
-			var userId = User.Identity.GetUserId();
-			return slideRateRepo.FindRate(courseId, slideId, userId);
-		}
-
 		[HttpPost]
 		public async Task<JsonResult> LikeSolution(int solutionId)
 		{
@@ -534,7 +516,7 @@ namespace uLearn.Web.Controllers
 			else
 				courses = courses.OrderBy(course => course.Title, StringComparer.InvariantCultureIgnoreCase);
 
-			var tempCourses = tempCoursesRepo.GetTempCourses().Select(c => c.CourseId).ToHashSet();
+			var tempCourses = tempCoursesRepo.GetTempCourses().Select(c => c.CourseId).ToHashSet(StringComparer.OrdinalIgnoreCase);
 			var model = new CourseListViewModel
 			{
 				Courses = courses

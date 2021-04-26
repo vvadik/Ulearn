@@ -10,6 +10,7 @@ using Ulearn.Core;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Logging;
 using Ulearn.Core.RunCheckerJobApi;
+using Vostok.Logging.File;
 
 namespace RunCsJob
 {
@@ -24,21 +25,28 @@ namespace RunCsJob
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 			var logsSubdirectory = configuration.GraphiteServiceName + (configuration.Environment == "staging" ? "-dev" : null);
 			LoggerSetup.Setup(configuration.HostLog, logsSubdirectory);
-			DirectoryInfo сompilerDirectory = null;
-			if (args.Any(x => x.StartsWith("-p:")))
+			try
 			{
-				var path = args.FirstOrDefault(x => x.StartsWith("-p:"))?.Substring(3);
-				if (path != null)
-					сompilerDirectory = new DirectoryInfo(path);
+				DirectoryInfo сompilerDirectory = null;
+				if (args.Any(x => x.StartsWith("-p:")))
+				{
+					var path = args.FirstOrDefault(x => x.StartsWith("-p:"))?.Substring(3);
+					if (path != null)
+						сompilerDirectory = new DirectoryInfo(path);
+				}
+
+				var isSelfCheck = args.Contains("--selfcheck");
+
+				var program = new Program(сompilerDirectory);
+				if (isSelfCheck)
+					program.SelfCheck();
+				else
+					program.Run();
 			}
-
-			var isSelfCheck = args.Contains("--selfcheck");
-
-			var program = new Program(сompilerDirectory);
-			if (isSelfCheck)
-				program.SelfCheck();
-			else
-				program.Run();
+			finally
+			{
+				FileLog.FlushAll();
+			}
 		}
 
 		private Program([CanBeNull] DirectoryInfo сompilerDirectory, ManualResetEvent externalShutdownEvent = null)

@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Models.Responses.TempCourses;
 using Ionic.Zip;
+using Ulearn.Common;
 using Vostok.Logging.Abstractions;
 
 
@@ -53,7 +54,7 @@ namespace Ulearn.Web.Api.Controllers
 				};
 			}
 
-			if (!await courseRolesRepo.HasUserAccessToCourseAsync(UserId, courseId, CourseRoleType.CourseAdmin))
+			if (!await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.CourseAdmin))
 			{
 				return new TempCourseUpdateResponse
 				{
@@ -79,7 +80,7 @@ namespace Ulearn.Web.Api.Controllers
 
 			var result = await tempCoursesRepo.AddTempCourseAsync(tmpCourseId, UserId);
 			var loadingTime = result.LoadingTime;
-			await courseRolesRepo.ToggleRoleAsync(tmpCourseId, UserId, CourseRoleType.CourseAdmin, UserId, "Создал временный курс");
+			await courseRolesRepo.ToggleRole(tmpCourseId, UserId, CourseRoleType.CourseAdmin, UserId, "Создал временный курс");
 			return new TempCourseUpdateResponse
 			{
 				Message = $"Временный курс с id {tmpCourseId} успешно создан.",
@@ -134,7 +135,7 @@ namespace Ulearn.Web.Api.Controllers
 				};
 			}
 
-			if (!await courseRolesRepo.HasUserAccessToCourseAsync(UserId, courseId, CourseRoleType.CourseAdmin))
+			if (!await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.CourseAdmin))
 			{
 				return new TempCourseUpdateResponse
 				{
@@ -217,6 +218,7 @@ namespace Ulearn.Web.Api.Controllers
 				courseManager.ReloadCourseNotSafe(courseId, notifyAboutErrors: false);
 				courseManager.UpdateCourseVersion(courseId, Guid.Empty);
 				courseManager.NotifyCourseChanged(courseId);
+				await UpdateStagingZipFromExtracted(courseId);
 			}
 			catch (Exception error)
 			{
@@ -238,6 +240,15 @@ namespace Ulearn.Web.Api.Controllers
 		{
 			filesToDelete.ForEach(file => System.IO.File.Delete(file.Path));
 			directoriesToDelete.ForEach(DeleteNotEmptyDirectory);
+		}
+
+		private async Task UpdateStagingZipFromExtracted(string courseId)
+		{
+			var courseDirectory = courseManager.GetExtractedCourseDirectory(courseId);
+			var stagingFile = courseManager.GetStagingCourseFile(courseId);
+			var stream = ZipUtils.CreateZipFromDirectory(new List<string> { courseDirectory.FullName }, null, null, Encoding.UTF8);
+			await using (var fs = stagingFile.Open(FileMode.Create, FileAccess.Write))
+				await stream.CopyToAsync(fs);
 		}
 
 		private static void DeleteNotEmptyDirectory(string dirPath)

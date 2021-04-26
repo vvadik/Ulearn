@@ -354,7 +354,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		{
 			var baseCourse = new Mock<ICourse>();
 			baseCourse.Setup(c => c.Id).Returns(courseId);
-			await courseRolesRepo.ToggleRoleAsync(baseCourse.Object.Id, TestUsers.User.Id, CourseRoleType.CourseAdmin, TestUsers.Admin.Id, "Создал временный курс");
+			await courseRolesRepo.ToggleRole(baseCourse.Object.Id, TestUsers.User.Id, CourseRoleType.CourseAdmin, TestUsers.Admin.Id, "Создал временный курс");
 			await AuthenticateUserInControllerAsync(tempCourseController, TestUsers.User).ConfigureAwait(false);
 			return baseCourse;
 		}

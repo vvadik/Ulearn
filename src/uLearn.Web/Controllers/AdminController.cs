@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -142,9 +143,19 @@ namespace uLearn.Web.Controllers
 		public ActionResult DownloadPackage(string courseId)
 		{
 			var packageName = courseManager.GetPackageName(courseId);
-			var path = courseManager.GetStagingCoursePath(courseId);
-			var content = System.IO.File.ReadAllBytes(path);
-			return File(content, "application/zip", packageName);
+			var isTempCourse = tempCoursesRepo.Find(courseId) != null;
+			Stream stream;
+			if (!isTempCourse)
+			{
+				var path = courseManager.GetStagingCoursePath(courseId);
+				stream = System.IO.File.OpenRead(path);
+			}
+			else
+			{
+				var path = courseManager.GetExtractedCourseDirectory(courseId);
+				stream = ZipUtils.CreateZipFromDirectory(new List<string> { path.FullName }, null, null, Encoding.UTF8);
+			}
+			return File(stream, "application/zip", packageName);
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
@@ -412,7 +423,7 @@ namespace uLearn.Web.Controllers
 				var courseVersions = coursesRepo.GetCourseVersions(courseId);
 				var previousUnpublishedVersions = courseVersions.Where(v => v.PublishTime == null && v.Id != versionId).ToList();
 				foreach (var unpublishedVersion in previousUnpublishedVersions)
-					await DeleteVersion(courseId, unpublishedVersion.Id).ConfigureAwait(false);
+					await RemoveCourseVersion(courseId, unpublishedVersion.Id).ConfigureAwait(false);
 			}
 			catch (Exception ex)
 			{
@@ -796,7 +807,7 @@ namespace uLearn.Web.Controllers
 		{
 			var userRolesByEmail = User.IsSystemAdministrator() ? usersRepo.FilterUsersByEmail(queryModel) : null;
 			var userRoles = usersRepo.FilterUsers(queryModel);
-			var tempCourses = tempCoursesRepo.GetTempCourses().Select(s => s.CourseId).ToHashSet();
+			var tempCourses = tempCoursesRepo.GetTempCourses().Select(s => s.CourseId).ToHashSet(StringComparer.OrdinalIgnoreCase);
 			var courses = courseManager.GetCourses()
 				.ToDictionary(c => c.Id, c => (c, tempCourses.Contains(c.Id)));
 			var model = GetUserListModel(userRolesByEmail.EmptyIfNull().Concat(userRoles).DistinctBy(r => r.UserId).ToList(),
@@ -981,6 +992,9 @@ namespace uLearn.Web.Controllers
 			courseManager.UpdateCourseVersion(courseId, versionId);
 			courseManager.ReloadCourseNotSafe(courseId);
 
+			log.Info($"Удаляю совсем старые версии курса {courseId}");
+			await RemoveOldCourseVersions(courseId);
+
 			var courseDiff = new CourseDiff(oldCourse, version);
 
 			return View("Diagnostics", new DiagnosticsModel
@@ -993,20 +1007,67 @@ namespace uLearn.Web.Controllers
 			});
 		}
 
+		// Удаляет версии, которые старше на 2 месяца даты загрузки текущей опубликованной (если не использовался git), но не 3 версии, идущие после опубликованной.
+		private async Task RemoveOldCourseVersions(string courseId)
+		{
+			var allVersions = coursesRepo.GetCourseVersions(courseId).ToList();
+			var publishedCourseVersion = allVersions.Where(v => v.CourseId == courseId && v.PublishTime != null).OrderByDescending(v => v.PublishTime).FirstOrDefault();
+			if (publishedCourseVersion == null)
+				return;
+			var isPublishedCourseVersionFound = false;
+			var timeLimit = publishedCourseVersion.LoadingTime.Subtract(TimeSpan.FromDays(60));
+			const int versionsCountLimit = 3;
+			var versionsAfterPublishedCount = 0;
+			foreach (var version in allVersions)
+			{
+				if (!isPublishedCourseVersionFound)
+				{
+					isPublishedCourseVersionFound |= publishedCourseVersion.Id == version.Id;
+					continue;
+				}
+				versionsAfterPublishedCount++;
+				if (version.CommitHash == null && (version.LoadingTime > timeLimit || (version.PublishTime.HasValue && version.PublishTime.Value > timeLimit)))
+					continue;
+				if (versionsAfterPublishedCount <= versionsCountLimit)
+					continue;
+				await RemoveCourseVersion(courseId, version.Id);
+			}
+		}
+
 		[HttpPost]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public async Task<ActionResult> DeleteVersion(string courseId, Guid versionId)
 		{
-			/* Remove notifications from database */
-			await notificationsRepo.RemoveNotifications(versionId);
-
-			/* Remove information from database */
-			await coursesRepo.DeleteCourseVersion(courseId, versionId);
-
-			/* Delete zip-archive from file system */
-			courseManager.GetCourseVersionFile(versionId).Delete();
-
+			await RemoveCourseVersion(courseId, versionId);
 			return RedirectToAction("Packages", new { courseId });
+		}
+
+		private async Task RemoveCourseVersion(string courseId, Guid versionId)
+		{
+			log.Warn($"Remove course version {courseId} {versionId}");
+
+			try
+			{
+				/* Remove notifications from database */
+				await notificationsRepo.RemoveNotifications(versionId);
+
+				/* Delete zip-archive from file system */
+				var file = courseManager.GetCourseVersionFile(versionId);
+				if (file.Exists)
+					file.Delete();
+
+				/* Delete extractedVersionDirectory */
+				var directory = courseManager.GetExtractedVersionDirectory(versionId);
+				if (directory.Exists)
+					directory.Delete(true);
+
+				/* Remove information from database */
+				await coursesRepo.DeleteCourseVersion(courseId, versionId);
+			}
+			catch (Exception ex)
+			{
+				log.Error(ex, "Can't remove course version {VersionId}", versionId);
+			}
 		}
 
 		public ActionResult Groups(string courseId)

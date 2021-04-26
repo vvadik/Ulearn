@@ -1,46 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Threading.Tasks;
 using Database;
-using Database.DataContexts;
 using Database.Models;
+using Database.Repos;
+using Microsoft.Extensions.Options;
 using Ulearn.Common.Extensions;
-using Ulearn.Core;
-using Ulearn.Core.Configuration;
 using Ulearn.Core.Metrics;
 
 namespace Notifications
 {
+	public interface INotificationSender
+	{
+		Task Send(NotificationDelivery notificationDelivery);
+		Task Send(List<NotificationDelivery> notificationDeliveries);
+	}
+
 	public class NotificationSender : INotificationSender
 	{
 		private readonly MetricSender metricSender;
 
 		private readonly IEmailSender emailSender;
 		private readonly ITelegramSender telegramSender;
-		private readonly CourseManager courseManager;
+		private readonly IWebCourseManager courseManager;
 		private readonly string baseUrl;
 		private readonly string secretForHashes;
 
-		public NotificationSender(CourseManager courseManager, IEmailSender emailSender, ITelegramSender telegramSender, MetricSender metricSender)
+		public NotificationSender(IWebCourseManager courseManager, IEmailSender emailSender, ITelegramSender telegramSender, MetricSender metricSender, IOptions<NotificationsConfiguration> options)
 		{
 			this.emailSender = emailSender;
 			this.telegramSender = telegramSender;
 			this.courseManager = courseManager;
 			this.metricSender = metricSender;
 
-			baseUrl = ConfigurationManager.AppSettings["ulearn.baseUrl"] ?? "";
-			secretForHashes = ConfigurationManager.AppSettings["ulearn.secretForHashes"] ?? "";
-		}
-
-		public NotificationSender(CourseManager courseManager)
-			: this(courseManager, new KonturSpamEmailSender(), new TelegramSender(), new MetricSender(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName))
-		{
-		}
-
-		public NotificationSender()
-			: this(WebCourseManager.Instance)
-		{
+			baseUrl = options.Value.BaseUrl ?? "";
+			secretForHashes = options.Value.SecretForHashes ?? "";
 		}
 
 		private string GetEmailTextSignature()
@@ -71,13 +65,13 @@ namespace Notifications
 			*/
 		}
 
-		private async Task SendAsync(MailNotificationTransport transport, NotificationDelivery notificationDelivery)
+		private async Task Send(MailNotificationTransport transport, NotificationDelivery notificationDelivery)
 		{
 			if (string.IsNullOrEmpty(transport.User.Email))
 				return;
 
 			var notification = notificationDelivery.Notification;
-			var course = courseManager.GetCourse(notification.CourseId);
+			var course = await courseManager.GetCourseAsync(notification.CourseId);
 
 			var notificationButton = notification.GetNotificationButton(transport, notificationDelivery, course, baseUrl);
 			var htmlMessage = notification.GetHtmlMessageForDelivery(transport, notificationDelivery, course, baseUrl);
@@ -93,7 +87,7 @@ namespace Notifications
 			);
 		}
 
-		private async Task SendAsync(MailNotificationTransport transport, List<NotificationDelivery> notificationDeliveries)
+		private async Task Send(MailNotificationTransport transport, List<NotificationDelivery> notificationDeliveries)
 		{
 			if (string.IsNullOrEmpty(transport.User.Email))
 				return;
@@ -109,7 +103,7 @@ namespace Notifications
 			foreach (var delivery in notificationDeliveries)
 			{
 				var notification = delivery.Notification;
-				var course = courseManager.GetCourse(notification.CourseId);
+				var course = await courseManager.GetCourseAsync(notification.CourseId);
 
 				var htmlMessage = notification.GetHtmlMessageForDelivery(transport, delivery, course, baseUrl);
 				var textMessage = notification.GetTextMessageForDelivery(transport, delivery, course, baseUrl);
@@ -134,13 +128,13 @@ namespace Notifications
 			);
 		}
 
-		private async Task SendAsync(TelegramNotificationTransport transport, NotificationDelivery notificationDelivery)
+		private async Task Send(TelegramNotificationTransport transport, NotificationDelivery notificationDelivery)
 		{
 			if (!transport.User.TelegramChatId.HasValue)
 				return;
 
 			var notification = notificationDelivery.Notification;
-			var course = courseManager.GetCourse(notification.CourseId);
+			var course = await courseManager.GetCourseAsync(notification.CourseId);
 
 			var notificationButton = notification.GetNotificationButton(transport, notificationDelivery, course, baseUrl);
 
@@ -151,7 +145,7 @@ namespace Notifications
 			);
 		}
 
-		private async Task SendAsync(TelegramNotificationTransport transport, List<NotificationDelivery> notificationDeliveries)
+		private async Task Send(TelegramNotificationTransport transport, List<NotificationDelivery> notificationDeliveries)
 		{
 			if (!transport.User.TelegramChatId.HasValue)
 				return;
@@ -165,7 +159,7 @@ namespace Notifications
 			foreach (var delivery in notificationDeliveries)
 			{
 				var notification = delivery.Notification;
-				var course = courseManager.GetCourse(notification.CourseId);
+				var course = await courseManager.GetCourseAsync(notification.CourseId);
 
 				var htmlMessage = notification.GetHtmlMessageForDelivery(transport, delivery, course, baseUrl);
 				var button = notification.GetNotificationButton(transport, delivery, course, baseUrl);
@@ -178,17 +172,17 @@ namespace Notifications
 			await telegramSender.SendMessageAsync(transport.User.TelegramChatId.Value, string.Join("<br><br>", htmls));
 		}
 
-		public async Task SendAsync(NotificationDelivery notificationDelivery)
+		public async Task Send(NotificationDelivery notificationDelivery)
 		{
 			var transport = notificationDelivery.NotificationTransport;
 
 			metricSender.SendCount($"send_notification.{notificationDelivery.Notification.GetNotificationType()}");
 
 			if (transport is MailNotificationTransport || transport is TelegramNotificationTransport)
-				await SendAsync((dynamic)transport, notificationDelivery);
+				await Send((dynamic)transport, notificationDelivery);
 		}
 
-		public async Task SendAsync(List<NotificationDelivery> notificationDeliveries)
+		public async Task Send(List<NotificationDelivery> notificationDeliveries)
 		{
 			if (notificationDeliveries.Count <= 0)
 				return;
@@ -206,7 +200,7 @@ namespace Notifications
 			metricSender.SendCount($"send_notification.{notificationType}", notificationDeliveries.Count);
 
 			if (transport is MailNotificationTransport || transport is TelegramNotificationTransport)
-				await SendAsync((dynamic)transport, notificationDeliveries);
+				await Send((dynamic)transport, notificationDeliveries);
 		}
 	}
 }

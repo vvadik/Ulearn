@@ -5,6 +5,7 @@ using System.Linq;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Logging;
 using Ulearn.Core.RunCheckerJobApi;
+using Vostok.Logging.File;
 
 namespace RunCheckerJob
 {
@@ -17,14 +18,21 @@ namespace RunCheckerJob
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 			var logsSubdirectory = configuration.GraphiteServiceName + (configuration.Environment == "staging" ? "-dev" : null);
 			LoggerSetup.Setup(configuration.HostLog, logsSubdirectory);
-			var selfCheckIndex = args.FindIndex("--selfcheck");
+			try
+			{
+				var selfCheckIndex = args.FindIndex("--selfcheck");
 
-			var program = new Program(configuration.GraphiteServiceName);
-			var hasNextArg = args.Length > selfCheckIndex + 1;
-			if (selfCheckIndex >= 0 && hasNextArg)
-				program.SelfCheck(args[selfCheckIndex + 1]);
-			else
-				program.Run();
+				var program = new Program(configuration.GraphiteServiceName);
+				var hasNextArg = args.Length > selfCheckIndex + 1;
+				if (selfCheckIndex >= 0 && hasNextArg)
+					program.SelfCheck(args[selfCheckIndex + 1]);
+				else
+					program.Run();
+			}
+			finally
+			{
+				FileLog.FlushAll();
+			}
 		}
 
 		private Program(string serviceName, ManualResetEvent externalShutdownEvent = null)

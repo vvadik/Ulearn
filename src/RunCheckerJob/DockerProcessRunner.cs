@@ -30,7 +30,7 @@ namespace RunCheckerJob
 
 			try
 			{
-				ZipHelper.UnpackZip(submission.ZipFileData, dir.FullName);
+				ZipUtils.UnpackZip(submission.ZipFileData, dir.FullName);
 			}
 			catch (Exception ex)
 			{

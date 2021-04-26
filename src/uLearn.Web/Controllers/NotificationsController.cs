@@ -23,6 +23,7 @@ namespace uLearn.Web.Controllers
 		private readonly UsersRepo usersRepo;
 		private readonly CourseManager courseManager;
 		private readonly VisitsRepo visitsRepo;
+		private readonly TempCoursesRepo tempCoursesRepo;
 
 		private readonly ULearnUserManager userManager;
 
@@ -37,6 +38,7 @@ namespace uLearn.Web.Controllers
 			usersRepo = new UsersRepo(db);
 			visitsRepo = new VisitsRepo(db);
 			userManager = new ULearnUserManager(db);
+			tempCoursesRepo = new TempCoursesRepo(db);
 
 			this.courseManager = courseManager;
 			telegramBotName = WebConfigurationManager.AppSettings["ulearn.telegram.botName"];
@@ -142,7 +144,9 @@ namespace uLearn.Web.Controllers
 			var mailTransport = notificationsRepo.FindUsersNotificationTransport<MailNotificationTransport>(user.Id, includeDisabled: true);
 			var telegramTransport = notificationsRepo.FindUsersNotificationTransport<TelegramNotificationTransport>(user.Id, includeDisabled: true);
 
-			var courseIds = visitsRepo.GetUserCourses(user.Id).Where(c => courseManager.FindCourse(c) != null).ToList();
+			var tempCourses = tempCoursesRepo.GetTempCourses().Select(c => c.CourseId).ToHashSet(StringComparer.OrdinalIgnoreCase);
+			var courseIds = visitsRepo.GetUserCourses(user.Id).Where(c => !tempCourses.Contains(c) && courseManager.FindCourse(c) != null).ToList();
+
 			var courseTitles = courseIds.ToDictionary(c => c, c => courseManager.GetCourse(c).Title);
 			var notificationTypesByCourse = courseIds.ToDictionary(c => c, c => notificationsRepo.GetNotificationTypes(User, c));
 			var allNotificationTypes = NotificationsRepo.GetAllNotificationTypes();

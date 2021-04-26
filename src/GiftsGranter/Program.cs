@@ -9,6 +9,7 @@ using Vostok.Logging.Abstractions;
 using Newtonsoft.Json.Linq;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Logging;
+using Vostok.Logging.File;
 
 namespace GiftsGranter
 {
@@ -69,35 +70,42 @@ namespace GiftsGranter
 			var hostLog = settings["hostLog"].ToObject<HostLogConfiguration>();
 			var graphiteServiceName = settings["graphiteServiceName"].Value<string>();
 			LoggerSetup.Setup(hostLog, graphiteServiceName);
-			var staff = new StaffClient(settings["staff"]["clientAuth"].Value<string>());
-			if (args.Contains("-r"))
-			{
-				Console.WriteLine("Username (example: KONTUR\\pe):");
-				var username = Console.ReadLine();
-				Console.WriteLine($"Password for {username}:");
-				var password = GetConsolePassword();
-				var refreshToken = staff.GetRefreshToken(username, password);
-				Console.WriteLine($"RefreshToken: {refreshToken}");
-				return;
-			}
-
-			var telegramBot = new GiftsTelegramBot();
 			try
 			{
-				staff.UseRefreshToken(settings["staff"]["refreshToken"].Value<string>());
-				var maxGiftsPerRun = args.Length > 0 ? int.Parse(args[0]) : settings["maxGiftsPerRun"].Value<int>();
-				log.Info("UseGiftGrantsLimitPerRun\t" + maxGiftsPerRun);
-				var db = new ULearnDb();
-				var repo = new VisitsRepo(db);
-				var courses = settings["courses"].Values<string>();
-				var program = new Program(repo, staff, maxGiftsPerRun, settings, telegramBot);
-				foreach (var courseId in courses)
-					program.GrantGiftsForCourse(courseId);
+				var staff = new StaffClient(settings["staff"]["clientAuth"].Value<string>());
+				if (args.Contains("-r"))
+				{
+					Console.WriteLine("Username (example: KONTUR\\pe):");
+					var username = Console.ReadLine();
+					Console.WriteLine($"Password for {username}:");
+					var password = GetConsolePassword();
+					var refreshToken = staff.GetRefreshToken(username, password);
+					Console.WriteLine($"RefreshToken: {refreshToken}");
+					return;
+				}
+
+				var telegramBot = new GiftsTelegramBot();
+				try
+				{
+					staff.UseRefreshToken(settings["staff"]["refreshToken"].Value<string>());
+					var maxGiftsPerRun = args.Length > 0 ? int.Parse(args[0]) : settings["maxGiftsPerRun"].Value<int>();
+					log.Info("UseGiftGrantsLimitPerRun\t" + maxGiftsPerRun);
+					var db = new ULearnDb();
+					var repo = new VisitsRepo(db);
+					var courses = settings["courses"].Values<string>();
+					var program = new Program(repo, staff, maxGiftsPerRun, settings, telegramBot);
+					foreach (var courseId in courses)
+						program.GrantGiftsForCourse(courseId);
+				}
+				catch (Exception e)
+				{
+					telegramBot.PostToChannel($"Error while grant staff gifts.\n\n{e}");
+					log.Error(e, "UnhandledException");
+				}
 			}
-			catch (Exception e)
+			finally
 			{
-				telegramBot.PostToChannel($"Error while grant staff gifts.\n\n{e}");
-				log.Error(e, "UnhandledException");
+				FileLog.FlushAll();
 			}
 		}
 

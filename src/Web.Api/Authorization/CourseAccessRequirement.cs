@@ -57,7 +57,7 @@ namespace Ulearn.Web.Api.Authorization
 			}
 
 			var userId = context.User.GetUserId();
-			var user = await usersRepo.FindUserByIdAsync(userId).ConfigureAwait(false);
+			var user = await usersRepo.FindUserById(userId).ConfigureAwait(false);
 			if (user == null)
 			{
 				context.Fail();
@@ -70,8 +70,8 @@ namespace Ulearn.Web.Api.Authorization
 				return;
 			}
 
-			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
-			if (isCourseAdmin || await coursesRepo.HasCourseAccessAsync(userId, courseId, requirement.CourseAccessType).ConfigureAwait(false))
+			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourse(userId, courseId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
+			if (isCourseAdmin || await coursesRepo.HasCourseAccess(userId, courseId, requirement.CourseAccessType).ConfigureAwait(false))
 				context.Succeed(requirement);
 			else
 				context.Fail();

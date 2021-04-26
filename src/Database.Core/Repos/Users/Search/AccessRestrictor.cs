@@ -25,7 +25,7 @@ namespace Database.Repos.Users.Search
 			if (hasSystemAdministratorAccess && usersRepo.IsSystemAdministrator(currentUser))
 				return users;
 
-			if (hasCourseAdminAccess && await courseRolesRepo.HasUserAccessTo_Any_CourseAsync(currentUser.Id, CourseRoleType.CourseAdmin).ConfigureAwait(false))
+			if (hasCourseAdminAccess && await courseRolesRepo.HasUserAccessTo_Any_Course(currentUser.Id, CourseRoleType.CourseAdmin).ConfigureAwait(false))
 				return users;
 
 			var userIds = new HashSet<string>();
@@ -40,7 +40,7 @@ namespace Database.Repos.Users.Search
 			{
 				var courseInstructors =
 					courseId != null
-						? await courseRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, courseId, true)
+						? await courseRolesRepo.GetListOfUsersWithCourseRole(CourseRoleType.Instructor, courseId, true)
 						: (await groupAccessesRepo.GetInstructorsOfAllGroupsAvailableForUserAsync(currentUser.Id).ConfigureAwait(false)).Select(u => u.Id);
 				userIds.UnionWith(courseInstructors);
 			}

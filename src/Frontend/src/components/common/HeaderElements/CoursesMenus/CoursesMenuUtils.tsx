@@ -117,6 +117,10 @@ export function menuItems(courseId: string, role: CourseRoleType, accesses: Cour
 				<MenuItem href={ "/Admin/TempCourseDiagnostics?courseId=" + courseId } key="Diagnostics"
 						  component={ LinkComponent }>
 					Диагностика
+				</MenuItem>,
+				<MenuItem href={ "/Admin/DownloadPackage?courseId=" + courseId } key="DownloadPackage"
+						  component={ LinkComponent }>
+					Скачать архив курса
 				</MenuItem>
 			);
 		} else {
@@ -125,7 +129,6 @@ export function menuItems(courseId: string, role: CourseRoleType, accesses: Cour
 						  component={ LinkComponent }>
 					Экспорт и импорт курса
 				</MenuItem>,
-
 				<MenuItem href={ "/Admin/Units?courseId=" + courseId } key="Units"
 						  component={ LinkComponent }>
 					Модули

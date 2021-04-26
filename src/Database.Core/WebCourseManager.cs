@@ -89,7 +89,7 @@ namespace Database
 			using (var scope = serviceScopeFactory.CreateScope())
 			{
 				var coursesRepo = (CoursesRepo)scope.ServiceProvider.GetService(typeof(ICoursesRepo));
-				var publishedVersion = await coursesRepo.GetPublishedCourseVersionAsync(courseId).ConfigureAwait(false);
+				var publishedVersion = await coursesRepo.GetPublishedCourseVersion(courseId).ConfigureAwait(false);
 
 				if (publishedVersion == null)
 					return course ?? throw new CourseNotFoundException(courseId);
@@ -118,7 +118,7 @@ namespace Database
 			{
 				var coursesRepo = (CoursesRepo)scope.ServiceProvider.GetService(typeof(ICoursesRepo));
 				var tempCoursesRepo = (TempCoursesRepo)scope.ServiceProvider.GetService(typeof(ITempCoursesRepo));
-				var publishedCourseVersions = await coursesRepo.GetPublishedCourseVersionsAsync().ConfigureAwait(false);
+				var publishedCourseVersions = await coursesRepo.GetPublishedCourseVersions().ConfigureAwait(false);
 
 				lastCoursesListFetchTime = DateTime.Now;
 				foreach (var courseVersion in publishedCourseVersions)

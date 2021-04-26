@@ -48,7 +48,7 @@ namespace Ulearn.Core
 		private static readonly CourseLoader loader = new CourseLoader(new UnitLoader(new XmlSlideLoader()));
 		private static readonly ErrorsBot errorsBot = new ErrorsBot();
 
-		private static readonly ConcurrentBag<string> brokenCourses = new ConcurrentBag<string>();
+		private static readonly ConcurrentBag<string> brokenCoursesLowercase = new ConcurrentBag<string>();
 
 		public CourseManager(DirectoryInfo baseDirectory)
 			: this(
@@ -116,7 +116,7 @@ namespace Ulearn.Core
 
 		protected bool CourseIsBroken(string courseId)
 		{
-			return brokenCourses.Contains(courseId);
+			return brokenCoursesLowercase.Contains(courseId.ToLower());
 		}
 
 		///
@@ -212,7 +212,7 @@ namespace Ulearn.Core
 
 		public bool TryReloadCourse(string courseId)
 		{
-			if (brokenCourses.Contains(courseId))
+			if (brokenCoursesLowercase.Contains(courseId.ToLower()))
 				return false;
 			try
 			{
@@ -222,7 +222,7 @@ namespace Ulearn.Core
 			catch (Exception e)
 			{
 				log.Error(e, $"Не могу загрузить курс {courseId}");
-				brokenCourses.Add(courseId);
+				brokenCoursesLowercase.Add(courseId.ToLower());
 			}
 			return false;
 		}
@@ -365,7 +365,7 @@ namespace Ulearn.Core
 			catch (Exception ex)
 			{
 				log.Error(ex, $"Error on create course {courseId}");
-				brokenCourses.Add(courseId);
+				brokenCoursesLowercase.Add(courseId.ToLower());
 				return false;
 			}
 		}
@@ -398,7 +398,7 @@ namespace Ulearn.Core
 			catch (Exception ex)
 			{
 				log.Error(ex, $"Error on create temp course {courseId}");
-				brokenCourses.Add(courseId);
+				brokenCoursesLowercase.Add(courseId.ToLower());
 				return false;
 			}
 		}

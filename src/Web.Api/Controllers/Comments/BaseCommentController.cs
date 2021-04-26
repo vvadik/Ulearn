@@ -104,8 +104,8 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			if (string.IsNullOrEmpty(userId))
 				return false;
 
-			var hasCourseAccessForCommentEditing = await coursesRepo.HasCourseAccessAsync(userId, courseId, CourseAccessType.EditPinAndRemoveComments).ConfigureAwait(false);
-			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourseAsync(userId, courseId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
+			var hasCourseAccessForCommentEditing = await coursesRepo.HasCourseAccess(userId, courseId, CourseAccessType.EditPinAndRemoveComments).ConfigureAwait(false);
+			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourse(userId, courseId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
 			return isCourseAdmin || hasCourseAccessForCommentEditing;
 		}
 

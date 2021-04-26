@@ -74,7 +74,7 @@ namespace RunCsJob
 
 			try
 			{
-				ZipHelper.UnpackZip(projSubmission.ZipFileData, dir.FullName);
+				ZipUtils.UnpackZip(projSubmission.ZipFileData, dir.FullName);
 			}
 			catch (Exception ex)
 			{

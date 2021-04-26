@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Database.Repos.SystemAccessesRepo
 {
-	/* This repo is fully migrated to .NET Core and EF Core */
 	public class SystemAccessesRepo : ISystemAccessesRepo
 	{
 		private readonly UlearnDb db;

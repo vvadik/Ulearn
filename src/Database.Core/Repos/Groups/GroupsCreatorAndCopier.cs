@@ -8,7 +8,6 @@ using Ulearn.Common.Extensions;
 
 namespace Database.Repos.Groups
 {
-	/* This class is fully migrated to .NET Core and EF Core */
 	public class GroupsCreatorAndCopier : IGroupsCreatorAndCopier
 	{
 		private readonly UlearnDb db;
@@ -116,7 +115,7 @@ namespace Database.Repos.Groups
 		{
 			log.Info($"Копирую доступы к группе «{group.Name}» (id={group.Id}) в группу «{newGroup.Name}» (id={newGroup.Id})");
 			var accesses = await db.GroupAccesses.Where(a => a.GroupId == group.Id && a.IsEnabled).ToListAsync().ConfigureAwait(false);
-			var courseInstructorsIds = await courseRolesRepo.GetListOfUsersWithCourseRoleAsync(CourseRoleType.Instructor, newGroup.CourseId, includeHighRoles: true).ConfigureAwait(false);
+			var courseInstructorsIds = await courseRolesRepo.GetListOfUsersWithCourseRole(CourseRoleType.Instructor, newGroup.CourseId, includeHighRoles: true).ConfigureAwait(false);
 			foreach (var access in accesses)
 			{
 				if (!courseInstructorsIds.Contains(access.UserId))
