@@ -386,6 +386,12 @@ namespace Database.Repos
 				.OrderByDescending(r => r.Score)
 				.ToList();
 		}
+
+		public async Task<HashSet<string>> GetUserIdsWithPassedSlide(string courseId, Guid slideId, IEnumerable<string> userIds)
+		{
+			return (await db.Visits.Where(v => v.CourseId == courseId && v.SlideId == slideId && v.IsPassed && userIds.Contains(v.UserId)).Select(v => v.UserId).ToListAsync())
+				.ToHashSet();
+		}
 	}
 
 	public class RatingEntry

@@ -41,6 +41,7 @@ export interface Comment {
 	courseId: string,
 	slideId: string,
 	parentCommentId: string,
+	isPassed: boolean
 }
 
 export interface CommentPolicy {

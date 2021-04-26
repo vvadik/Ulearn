@@ -6,6 +6,7 @@ import { Link, Hint } from "ui";
 import Avatar from "../../common/Avatar/Avatar";
 import CommentSendForm from "../CommentSendForm/CommentSendForm";
 import Like from "./Like/Like";
+import Passed from "./Passed/Passed.tsx";
 import KebabActions from "./Kebab/KebabActions";
 import Header from "./Header/Header";
 import Marks from "./Marks/Marks";
@@ -82,6 +83,8 @@ class Comment extends Component {
 				profileUrl={profileUrl}
 				canViewProfiles={canViewProfiles}
 				name={comment.author.visibleName}>
+				<Passed
+					isPassed={comment.isPassed} />
 				<Like
 					canLike={user.isAuthenticated}
 					isLiked={comment.isLiked}

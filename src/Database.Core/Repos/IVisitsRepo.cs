@@ -35,6 +35,7 @@ namespace Database.Repos
 		Task<HashSet<string>> GetUserCourses(string userId);
 		Task<List<string>> GetCourseUsers(string courseId);
 		Task<List<RatingEntry>> GetCourseRating(string courseId, int minScore, List<Guid> requiredSlides);
+		Task<HashSet<string>> GetUserIdsWithPassedSlide(string courseId, Guid slideId, IEnumerable<string> userIds);
 	}
 
 	public interface ILastVisitsRepo
