@@ -28,40 +28,37 @@
 		manualQuizCheckQueueItem = (ManualQuizChecking)Model.ManualChecking
 	})
 }
-else
+else if (Model.ManualChecking != null)
 {
-	if (Model.ManualChecking != null)
-	{
-		<p class="exercise-status">
-			@Model.ManualChecking.User.VisibleName
-			@if (Model.ContextManualCheckingUserGroups + Model.ContextManualCheckingUserArchivedGroups != "")
-			{
-				<span>
-					@{
-						var groupsStr = "";
-						if (Model.ContextManualCheckingUserGroups != "")
-						{
-							groupsStr = Model.ContextManualCheckingUserGroups;
-						}
-						if (Model.ContextManualCheckingUserGroups != "" && Model.ContextManualCheckingUserArchivedGroups != "")
-						{
-							groupsStr += "; ";
-						}
-						if (Model.ContextManualCheckingUserArchivedGroups != "")
-						{
-							groupsStr += "архивные группы: " + Model.ContextManualCheckingUserArchivedGroups;
-						}
+	<p class="exercise-status">
+		@Model.ManualChecking.User.VisibleName
+		@if (Model.ContextManualCheckingUserGroups + Model.ContextManualCheckingUserArchivedGroups != "")
+		{
+			<span>
+				@{
+					var groupsStr = "";
+					if (Model.ContextManualCheckingUserGroups != "")
+					{
+						groupsStr = Model.ContextManualCheckingUserGroups;
 					}
-					(@groupsStr),
-				</span>
-			}
-			else
-			{
-				<span>,</span>
-			}
-			@Model.ManualChecking.Timestamp.ToPrettyString()
-		</p>
-	}
+					if (Model.ContextManualCheckingUserGroups != "" && Model.ContextManualCheckingUserArchivedGroups != "")
+					{
+						groupsStr += "; ";
+					}
+					if (Model.ContextManualCheckingUserArchivedGroups != "")
+					{
+						groupsStr += "архивные группы: " + Model.ContextManualCheckingUserArchivedGroups;
+					}
+				}
+				(@groupsStr),
+			</span>
+		}
+		else
+		{
+			<span>,</span>
+		}
+		@Model.ManualChecking.Timestamp.ToPrettyString()
+	</p>
 	@SlideHtml.Blocks(Model.BlockRenderContext, Html)
 }
 @if (Model.ManualChecking == null)
