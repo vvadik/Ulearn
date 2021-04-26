@@ -19,12 +19,18 @@ import moment from "moment";
 import { exerciseSolutions, loadFromCache, saveToCache, } from "src/utils/localStorageManager";
 import { convertDefaultTimezoneToLocal } from "src/utils/momentUtils";
 import {
-	GetLastSuccessSubmission,
-	GetSubmissionColor,
-	HasSuccessSubmission,
-	IsFirstRightAnswer,
+	getLastSuccessSubmission,
+	getReviewsWithoutDeleted,
+	getReviewsWithTextMarkers,
+	getSelectedReviewIdByCursor,
+	getSubmissionColor,
+	hasSuccessSubmission,
+	isFirstRightAnswer,
+	loadLanguageStyles,
+	replaceReviewMarker,
+	ReviewInfoWithMarker,
 	SubmissionColor,
-	SubmissionIsLast,
+	submissionIsLast,
 } from "./ExerciseUtils";
 
 import { Language, } from "src/consts/languages";
@@ -33,19 +39,17 @@ import { DeviceType } from "src/consts/deviceType";
 import {
 	AutomaticExerciseCheckingResult as CheckingResult,
 	AutomaticExerciseCheckingResult,
-	ReviewInfo,
 	RunSolutionResponse,
 	SolutionRunStatus,
 } from "src/models/exercise";
-import { ReviewInfoRedux, SubmissionInfoRedux } from "src/models/reduxState";
+import { SubmissionInfoRedux } from "src/models/reduxState";
 import { SlideUserProgress } from "src/models/userProgress";
 import { ExerciseBlockProps } from "src/models/slide";
 
-import CodeMirror, { Doc, Editor, EditorChange, EditorConfiguration, MarkerRange, TextMarker } from "codemirror";
+import CodeMirror, { Doc, Editor, EditorChange, EditorConfiguration, } from "codemirror";
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/addon/edit/matchbrackets';
 import 'codemirror/addon/hint/show-hint';
-import 'codemirror/addon/hint/show-hint.css';
 import 'codemirror/addon/hint/javascript-hint';
 import 'codemirror/addon/hint/anyword-hint';
 import 'codemirror/theme/darcula.css';
@@ -106,10 +110,6 @@ interface SelfCheckup {
 	text: string,
 	checked: boolean,
 	onClick: () => void,
-}
-
-interface ReviewInfoWithMarker extends ReviewInfoRedux {
-	marker: TextMarker,
 }
 
 interface State {
@@ -205,10 +205,6 @@ class Exercise extends React.Component<Props, State> {
 		window.addEventListener("beforeunload", this.saveCodeDraftToCacheEvent);
 	}
 
-	saveCodeDraftToCacheEvent = (): void => {
-		this.saveCodeDraftToCache();
-	};
-
 	loadSlideSubmission = (): void => {
 		const { slideId, submissions, } = this.props;
 
@@ -268,7 +264,7 @@ class Exercise extends React.Component<Props, State> {
 					const { automaticChecking } = submission;
 					if((!automaticChecking || automaticChecking.result === CheckingResult.RightAnswer)
 						&& !slideProgress.isSkipped
-						&& IsFirstRightAnswer(submissions, submission)
+						&& isFirstRightAnswer(submissions, submission)
 					) {
 						this.openModal({
 							type: ModalType.congrats,
@@ -284,6 +280,7 @@ class Exercise extends React.Component<Props, State> {
 			}
 
 			if(solutionRunStatus === SolutionRunStatus.CompilationError
+				|| solutionRunStatus === SolutionRunStatus.Ignored
 				|| submission?.automaticChecking?.result === AutomaticExerciseCheckingResult.WrongAnswer
 				|| submission?.automaticChecking?.result === AutomaticExerciseCheckingResult.CompilationError) {
 				this.setState({
@@ -322,6 +319,10 @@ class Exercise extends React.Component<Props, State> {
 		};
 	};
 
+	saveCodeDraftToCacheEvent = (): void => {
+		this.saveCodeDraftToCache();
+	};
+
 	saveCodeDraftToCache = (slideId?: string, value?: string, language?: Language): void => {
 		const { forceInitialCode, isAuthenticated } = this.props;
 		const { valueChanged, } = this.state;
@@ -357,7 +358,7 @@ class Exercise extends React.Component<Props, State> {
 		const { isEditable, language } = this.state;
 
 		return {
-			mode: Exercise.loadLanguageStyles(language),
+			mode: loadLanguageStyles(language),
 			lineNumbers: true,
 			scrollbarStyle: 'null',
 			lineWrapping: true,
@@ -395,17 +396,17 @@ class Exercise extends React.Component<Props, State> {
 			value, currentSubmission,
 			isEditable, exerciseCodeDoc, modalData,
 			currentReviews, showOutput, selectedReviewId, visibleCheckingResponse,
-			submissionLoading, isAllHintsShowed,
+			submissionLoading, isAllHintsShowed, editor,
 		} = this.state;
 
 		const isReview = !isEditable && currentReviews.length > 0;
 		const automaticChecking = currentSubmission?.automaticChecking ?? visibleCheckingResponse?.automaticChecking ?? visibleCheckingResponse?.submission?.automaticChecking;
-		const selectedSubmissionIsLast = SubmissionIsLast(submissions, currentSubmission);
-		const selectedSubmissionIsLastSuccess = GetLastSuccessSubmission(submissions) === currentSubmission;
+		const selectedSubmissionIsLast = submissionIsLast(submissions, currentSubmission);
+		const selectedSubmissionIsLastSuccess = getLastSuccessSubmission(submissions) === currentSubmission;
 		const isMaxScore = slideProgress.score === maxScore;
-		const submissionColor = GetSubmissionColor(visibleCheckingResponse?.solutionRunStatus,
+		const submissionColor = getSubmissionColor(visibleCheckingResponse?.solutionRunStatus,
 			automaticChecking?.result,
-			HasSuccessSubmission(submissions), selectedSubmissionIsLast, selectedSubmissionIsLastSuccess,
+			hasSuccessSubmission(submissions), selectedSubmissionIsLast, selectedSubmissionIsLastSuccess,
 			slideProgress.prohibitFurtherManualChecking, slideProgress.isSkipped, isMaxScore);
 
 		const wrapperClassName = classNames(
@@ -450,8 +451,8 @@ class Exercise extends React.Component<Props, State> {
 						deleteReviewComment={ this.deleteReviewComment }
 						selectedReviewId={ selectedReviewId }
 						onSelectComment={ this.selectComment }
-						reviews={ this.getReviewsWithoutDeleted(currentReviews) }
-						getReviewAnchorTop={ this.getReviewAnchorTop }
+						reviews={ getReviewsWithoutDeleted(currentReviews) }
+						editor={ editor }
 					/>
 					}
 				</div>
@@ -507,28 +508,12 @@ class Exercise extends React.Component<Props, State> {
 		}
 	};
 
-	getReviewsWithoutDeleted = (reviews: ReviewInfoWithMarker[]): ReviewInfoWithMarker[] => {
-		return reviews.map(r => ({ ...r, comments: r.comments.filter(c => !c.isDeleted && !c.isLoading) }));
-	};
-
-	getReviewAnchorTop = (review: ReviewInfo): number => {
-		const { editor, } = this.state;
-
-		if(editor) {
-			return editor.charCoords({
-				line: review.startLine,
-				ch: review.startPosition,
-			}, 'local').top;
-		}
-		return -1;
-	};
-
 	renderSubmissionsSelect = (): React.ReactElement => {
 		const { currentSubmission } = this.state;
 		const { submissions, } = this.props;
 		const { waitingForManualChecking } = this.props.slideProgress;
 
-		const lastSuccessSubmission = GetLastSuccessSubmission(submissions);
+		const lastSuccessSubmission = getLastSuccessSubmission(submissions);
 		const items = [[this.newTry.id, texts.submissions.newTry], ...submissions.map((submission) => {
 			const caption = texts.submissions
 				.getSubmissionCaption(submission, lastSuccessSubmission === submission, waitingForManualChecking);
@@ -650,10 +635,13 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	setCurrentSubmission = (submission: SubmissionInfoRedux, callback?: () => void): void => {
+		const { exerciseCodeDoc, } = this.state;
 		this.clearAllTextMarkers();
 		this.setState({
 			currentSubmission: submission,
-			currentReviews: this.getReviewsWithTextMarkers(submission),
+			currentReviews: exerciseCodeDoc
+				? getReviewsWithTextMarkers(submission, exerciseCodeDoc, styles.reviewCode)
+				: [],
 		}, () => {
 			const { editor } = this.state;
 			if(editor) {
@@ -674,45 +662,10 @@ class Exercise extends React.Component<Props, State> {
 	openAcceptedSolutionsModal = (): void => {
 		const { courseId, slideId, visitAcceptedSolutions, submissions, } = this.props;
 
-		if(!HasSuccessSubmission(submissions)) {
+		if(!hasSuccessSubmission(submissions)) {
 			visitAcceptedSolutions(courseId, slideId);
 		}
 		this.openModal({ type: ModalType.acceptedSolutions });
-	};
-
-	getReviewsWithTextMarkers = (submission: SubmissionInfoRedux): ReviewInfoWithMarker[] => {
-		const { exerciseCodeDoc } = this.state;
-		const reviews = this.getAllReviewsFromSubmission(submission);
-
-		const reviewsWithTextMarkers: ReviewInfoWithMarker[] = [];
-
-		if(!exerciseCodeDoc) {
-			return reviewsWithTextMarkers;
-		}
-
-		for (const review of reviews) {
-			const { finishLine, finishPosition, startLine, startPosition } = review;
-			const textMarker = this.highlightLine(finishLine, finishPosition, startLine, startPosition,
-				styles.reviewCode,
-				exerciseCodeDoc);
-
-			reviewsWithTextMarkers.push({
-				marker: textMarker,
-				...review
-			});
-		}
-
-		return reviewsWithTextMarkers;
-	};
-
-	getAllReviewsFromSubmission = (submission: SubmissionInfoRedux): ReviewInfoRedux[] => {
-		if(!submission) {
-			return [];
-		}
-
-		const manual = submission.manualCheckingReviews || [];
-		const auto = submission.automaticChecking && submission.automaticChecking.reviews ? submission.automaticChecking.reviews : [];
-		return manual.concat(auto);
 	};
 
 	renderOverview = (submission: SubmissionInfoRedux): React.ReactElement => {
@@ -857,58 +810,28 @@ class Exercise extends React.Component<Props, State> {
 
 	highlightReview = (id: number): void => {
 		const { currentReviews, selectedReviewId, editor, exerciseCodeDoc, } = this.state;
-		const newCurrentReviews = [...currentReviews];
-
 		if(!exerciseCodeDoc) {
 			return;
 		}
 
-		if(selectedReviewId >= 0) {
-			const selectedReview = newCurrentReviews.find(r => r.id === selectedReviewId);
-			if(selectedReview) {
-				const { from, to, } = selectedReview.marker.find() as MarkerRange;
-				selectedReview.marker.clear();
-				selectedReview.marker =
-					this.highlightLine(to.line, to.ch, from.line, from.ch, styles.reviewCode, exerciseCodeDoc);
-			}
-		}
-
-		let line = 0;
-		if(id >= 0) {
-			const review = newCurrentReviews.find(r => r.id === id);
-			if(review) {
-				const { from, to, } = review.marker.find() as MarkerRange;
-				review.marker.clear();
-				review.marker =
-					this.highlightLine(to.line, to.ch, from.line, from.ch, styles.selectedReviewCode, exerciseCodeDoc);
-
-				line = from.line;
-			}
-		}
+		const newCurrentReviews = replaceReviewMarker(
+			currentReviews,
+			selectedReviewId,
+			id,
+			exerciseCodeDoc,
+			styles.reviewCode,
+			styles.selectedReviewCode,
+		);
 
 		this.setState({
-			currentReviews: newCurrentReviews,
+			currentReviews: newCurrentReviews.reviews,
 			selectedReviewId: id,
 		}, () => {
-			if(id >= 0) {
-				if(editor) {
-					editor.scrollIntoView({ ch: 0, line, }, 200);
-				}
+			if(id >= 0 && editor) {
+				editor.scrollIntoView({ ch: 0, line: newCurrentReviews.selectedReviewLine, }, 200);
 			}
 		});
 	};
-
-	highlightLine = (finishLine: number, finishPosition: number, startLine: number, startPosition: number,
-		className: string, exerciseCodeDoc: Doc,
-	): TextMarker => exerciseCodeDoc.markText({
-		line: startLine,
-		ch: startPosition
-	}, {
-		line: finishLine,
-		ch: finishPosition
-	}, {
-		className,
-	});
 
 	resetCodeAndCache = (): void => {
 		const { slideId, exerciseInitialCode, } = this.props;
@@ -1034,101 +957,9 @@ class Exercise extends React.Component<Props, State> {
 			const cursor = exerciseCodeDoc.getCursor();
 
 			if(!isEditable && currentReviews.length > 0) {
-				const reviewId = Exercise.getSelectedReviewIdByCursor(currentReviews, exerciseCodeDoc, cursor);
+				const reviewId = getSelectedReviewIdByCursor(currentReviews, exerciseCodeDoc, cursor);
 				this.highlightReview(reviewId);
 			}
-		}
-	};
-
-	static getSelectedReviewIdByCursor = (
-		reviews: ReviewInfoWithMarker[],
-		exerciseCodeDoc: Doc,
-		cursor: CodeMirror.Position
-	): number => {
-		const { line, ch } = cursor;
-		const reviewsUnderCursor = reviews.filter(r =>
-			r.startLine <= line && r.finishLine >= line
-			&& !(r.startLine === line && ch < r.startPosition)
-			&& !(r.finishLine === line && r.finishPosition < ch)
-		);
-
-		if(reviewsUnderCursor.length === 0) {
-			return -1;
-		}
-
-		reviewsUnderCursor.sort((a, b) => {
-			const aLength = Exercise.getReviewSelectionLength(a, exerciseCodeDoc);
-			const bLength = Exercise.getReviewSelectionLength(b, exerciseCodeDoc);
-			if(aLength !== bLength) {
-				return aLength - bLength;
-			}
-
-			return a.startLine !== b.startLine
-				? a.startLine - b.startLine
-				: a.startPosition !== b.startPosition
-					? a.startPosition - b.startPosition
-					: new Date(a.addingTime ?? Math.random() * 10).getTime()
-					- new Date(b.addingTime ?? Math.random() * 10).getTime();
-		});
-
-		return reviewsUnderCursor[0].id;
-	};
-
-	static getReviewSelectionLength = (review: ReviewInfoWithMarker, exerciseCodeDoc: Doc): number =>
-		exerciseCodeDoc.indexFromPos({ line: review.finishLine, ch: review.finishPosition })
-		- exerciseCodeDoc.indexFromPos({ line: review.startLine, ch: review.startPosition });
-
-	static loadLanguageStyles = (language: Language): string => {
-		switch (language.toLowerCase()) {
-			case Language.cSharp:
-				require('codemirror/mode/clike/clike');
-				return 'text/x-csharp';
-			case Language.python2:
-				require('codemirror/mode/python/python');
-				return 'text/x-python';
-			case Language.python3:
-				require('codemirror/mode/python/python');
-				return 'text/x-python';
-			case Language.java:
-				require('codemirror/mode/clike/clike');
-				return 'text/x-java';
-			case Language.javaScript:
-				require('codemirror/mode/javascript/javascript');
-				return 'text/javascript';
-			case Language.html:
-				require('codemirror/mode/xml/xml');
-				return 'text/html';
-			case Language.typeScript:
-				require('codemirror/mode/javascript/javascript');
-				return 'text/typescript';
-			case Language.css:
-				require('codemirror/mode/css/css');
-				return 'text/css';
-			case Language.haskell:
-				require('codemirror/mode/haskell/haskell');
-				return 'text/x-haskell';
-			case Language.cpp:
-				require('codemirror/mode/clike/clike');
-				return 'text/x-c++src';
-			case Language.c:
-				require('codemirror/mode/clike/clike');
-				return 'text/x-c';
-			case Language.pgsql:
-				require('codemirror/mode/sql/sql');
-				return 'text/x-pgsql';
-			case Language.mikrokosmos:
-				return 'text/plain';
-
-			case Language.text:
-				return 'text/plain';
-
-			case Language.jsx:
-				require('codemirror/mode/jsx/jsx');
-				return 'text/jsx';
-
-			default:
-				require('codemirror/mode/xml/xml');
-				return 'text/html';
 		}
 	};
 
@@ -1138,7 +969,6 @@ class Exercise extends React.Component<Props, State> {
 
 		const code = loadExerciseCodeFromCache(slideId);
 		this.resetCode();
-
 		if(submissions.length > 0 && code) {
 			let newValue = code.value;
 
@@ -1153,7 +983,7 @@ class Exercise extends React.Component<Props, State> {
 
 			this.setState({
 				value: newValue,
-				language: code.language ? code.language : language,
+				language: this.getSupportedLanguage(code.language ? code.language : language),
 			});
 			return;
 		}
@@ -1163,7 +993,7 @@ class Exercise extends React.Component<Props, State> {
 			this.saveCodeDraftToCache(slideId, lastSubmission.code);
 			this.setState({
 				value: lastSubmission.code,
-				language: lastSubmission.language,
+				language: this.getSupportedLanguage(lastSubmission.language),
 			});
 			return;
 		}
@@ -1171,9 +1001,17 @@ class Exercise extends React.Component<Props, State> {
 		if(code) {
 			this.setState({
 				value: code.value,
-				language: code.language ? code.language : language,
+				language: this.getSupportedLanguage(code.language ? code.language : language),
 			});
 		}
+	};
+
+	getSupportedLanguage = (languageToCheck: Language): Language => {
+		const { languages, defaultLanguage, } = this.props;
+
+		return languages.some(l => l === languageToCheck)
+			? languageToCheck
+			: defaultLanguage || languages[0];
 	};
 }
 

@@ -1,5 +1,5 @@
 import React from "react";
-import CommentsView from "./CommentsView.js";
+import CommentsView from "./CommentsView";
 
 const comments = [
 	{

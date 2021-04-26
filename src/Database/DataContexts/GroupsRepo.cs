@@ -37,7 +37,7 @@ namespace Database.DataContexts
 			this.db = db;
 			this.courseManager = courseManager;
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
-			userSolutionsRepo = new UserSolutionsRepo(db, courseManager);
+			userSolutionsRepo = new UserSolutionsRepo(db);
 			userQuizzesRepo = new UserQuizzesRepo(db);
 			visitsRepo = new VisitsRepo(db);
 			userRolesRepo = new UserRolesRepo(db);

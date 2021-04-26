@@ -74,7 +74,7 @@ namespace uLearn.Web.Controllers
 
 		private ActionResult Real404()
 		{
-			return View("404");
+			return HttpNotFound();
 		}
 
 		public ActionResult Error500()

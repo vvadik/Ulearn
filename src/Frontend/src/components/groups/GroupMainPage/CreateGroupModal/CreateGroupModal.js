@@ -15,61 +15,59 @@ class CreateGroupModal extends Component {
 	};
 
 	render() {
-		const {onCloseModal} = this.props;
+		const { onCloseModal } = this.props;
 
 		return (
-			<Modal onClose={onCloseModal} width="100%" alignTop={true}>
+			<Modal onClose={ onCloseModal } width="100%" alignTop={ true }>
 				<Modal.Header>Название группы</Modal.Header>
-				<form onSubmit={this.onSubmit}>
-					<Modal.Body>
-						{this.renderModalBody()}
-					</Modal.Body>
-					<Modal.Footer>
+				<Modal.Body>
+					<form onSubmit={ this.onSubmit }>
+						{ this.renderModalBody() }
 						<Button
 							use="primary"
 							size="medium"
 							type="submit"
-							disabled={!this.state.name}
-							loading={this.state.loading}>
+							disabled={ !this.state.name }
+							loading={ this.state.loading }>
 							Создать
 						</Button>
-					</Modal.Footer>
-				</form>
+					</form>
+				</Modal.Body>
 			</Modal>
 		)
 	}
 
 	renderModalBody() {
-		const {name, hasError} = this.state;
+		const { name, hasError } = this.state;
 
 		return (
-			<div className={styles["modal-content"]}>
-				<Tooltip render={this.checkError} trigger='focus' pos="right top">
+			<div className={ styles["modal-content"] }>
+				<Tooltip render={ this.checkError } trigger='focus' pos="right top">
 					<Input placeholder="КН-201 УрФУ 2017"
 						   maxLength="300"
-						   value={name || ''}
-						   error={hasError}
-						   onValueChange={this.onChangeInput}
-						   onFocus={this.onFocus}
-						   autoFocus />
+						   value={ name || '' }
+						   error={ hasError }
+						   onValueChange={ this.onChangeInput }
+						   onFocus={ this.onFocus }
+						   autoFocus/>
 				</Tooltip>
-				<p className={styles["common-info"]}>
-					Студенты увидят название группы, поэтому постарайтесь сделать его понятным.<br />
-					Пример хорошего названия группы: <span className={styles["good-name"]}>
-					КН-201 УрФУ 2017,</span><br />
-					пример плохого: <span className={styles["bad-name"]}>Моя группа 2</span>
+				<p className={ styles["common-info"] }>
+					Студенты увидят название группы, поэтому постарайтесь сделать его понятным.<br/>
+					Пример хорошего названия группы: <span className={ styles["good-name"] }>
+					КН-201 УрФУ 2017,</span><br/>
+					пример плохого: <span className={ styles["bad-name"] }>Моя группа 2</span>
 				</p>
 			</div>
 		)
 	}
 
 	onSubmit = async (e) => {
-		const {name} = this.state;
-		const {onCloseModal, onSubmit, courseId} = this.props;
+		const { name } = this.state;
+		const { onCloseModal, onSubmit, courseId } = this.props;
 
 		e.preventDefault();
 
-		if (!name) {
+		if(!name) {
 			this.setState({
 				hasError: true,
 				error: 'Введите название группы',
@@ -77,7 +75,7 @@ class CreateGroupModal extends Component {
 			return;
 		}
 
-		this.setState({loading: true,});
+		this.setState({ loading: true, });
 		try {
 			const newGroup = await api.groups.createGroup(courseId, name);
 			onCloseModal();
@@ -85,14 +83,14 @@ class CreateGroupModal extends Component {
 		} catch (e) {
 			console.error(e);
 		} finally {
-			this.setState({loading: false,});
+			this.setState({ loading: false, });
 		}
 	};
 
 	checkError = () => {
-		const {error} = this.state;
+		const { error } = this.state;
 
-		if (!error) {
+		if(!error) {
 			return null;
 		}
 		return error;

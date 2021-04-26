@@ -1,5 +1,5 @@
 import React from "react";
-import CommentSendForm from "./CommentSendForm.js";
+import CommentSendForm from "./CommentSendForm";
 
 const nameOnlyUser = {
 	id: "1",

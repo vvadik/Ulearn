@@ -8,6 +8,7 @@ const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeM
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
+const pwaPlugins = require('./pwa.webpack.plugins.ts');
 
 const publicPath = '/';
 const publicUrl = '';
@@ -18,18 +19,13 @@ const { merge } = require('webpack-merge');
 
 module.exports = merge([base, {
 	mode: 'development',
-	devtool: 'eval-cheap-source-map',
+	devtool: 'eval-source-map',
 	entry: {
-		main: [
-			'react-dev-utils/webpackHotDevClient',
-			paths.appIndexTsx,
-		],
-		oldBrowser: [
-			paths.oldBrowserJs
-		],
+		oldBrowser: paths.oldBrowserJs,
+		hmr: 'react-dev-utils/webpackHotDevClient',
+		main: [paths.legacy, paths.appIndexTsx],
 	},
 	output: {
-		pathinfo: true,
 		filename: '[name].[hash:8].js',
 		sourceMapFilename: '[name].[hash:8].map',
 		chunkFilename: 'chunk_[id].[hash:8].js',
@@ -60,7 +56,7 @@ module.exports = merge([base, {
 						loader: 'url-loader',
 						options: {
 							limit: 10000,
-							name: 'static/media/[name].[hash:8].[ext]',
+							name: paths.static.media + '/[name].[hash:8].[ext]',
 						},
 					},
 					{
@@ -84,7 +80,7 @@ module.exports = merge([base, {
 										mode: 'local',
 										localIdentName: '[name]__[local]--[hash:5]',
 									},
-									importLoaders: 1,
+									importLoaders: 2,
 								},
 							},
 							{
@@ -114,7 +110,10 @@ module.exports = merge([base, {
 							{
 								loader: 'css-loader',
 								options: {
-									modules: 'global',
+									modules: {
+										auto: (resourcePath) => !resourcePath.endsWith('.global.css'),
+										mode: 'global',
+									},
 									importLoaders: 1,
 								},
 							},
@@ -138,7 +137,7 @@ module.exports = merge([base, {
 						loader: 'file-loader',
 						exclude: [/\.(js|jsx|mjs|ts|tsx)$/, /\.html$/, /\.json$/],
 						options: {
-							name: 'static/media/[name].[hash:8].[ext]',
+							name: paths.static.media + '/[name].[hash:8].[ext]',
 						},
 					},
 				],
@@ -151,6 +150,7 @@ module.exports = merge([base, {
 		new HtmlWebpackPlugin({
 			inject: true,
 			template: paths.appHtml,
+			favicon: paths.appPublic + '/favicon.ico',
 			chunksSortMode: (chunk1, chunk2) => {
 				if(chunk1 === 'oldBrowser') return -1;
 				if(chunk2 === 'oldBrowser') return 1;
@@ -161,13 +161,18 @@ module.exports = merge([base, {
 		new webpack.DefinePlugin(env.stringified),
 		new webpack.ProvidePlugin({
 			process: 'process/browser',
+			$: 'jquery',
+			jQuery: 'jquery',
+			"window.$": 'jquery',
+			"window.jQuery": 'jquery',
 		}),
 		new CaseSensitivePathsPlugin(),
 		new WatchMissingNodeModulesPlugin(paths.appNodeModules),
 		new webpack.IgnorePlugin({
 			resourceRegExp: /^\.\/locale$/,
 			contextRegExp: /moment$/,
-		})
+		}),
+		...pwaPlugins,
 	],
 	performance: {
 		hints: false,

@@ -12,7 +12,7 @@ class AnyPage extends Component<RouteComponentProps, State> {
 	constructor(props: RouteComponentProps) {
 		super(props);
 
-		window.reactHistory = this.props.history;
+		window.legacy.reactHistory = this.props.history;
 
 		this.state = {
 			href: props.location.pathname + props.location.search,

@@ -65,13 +65,11 @@ function NavigationHeader({
 	function renderCourseProgress() {
 		const percentage = courseProgress.current / courseProgress.max;
 
-		if(percentage) {
-			return (
-				<div className={ styles.progressBarWrapper }>
-					<ProgressBar value={ percentage }/>
-				</div>
-			);
-		}
+		return (
+			<div className={ styles.progressBarWrapper }>
+				<ProgressBar value={ percentage }/>
+			</div>
+		);
 	}
 
 	function renderReturnToCourseNavigationLink() {

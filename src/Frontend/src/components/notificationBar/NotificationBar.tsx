@@ -42,7 +42,7 @@ function NotificationBar({ cookies }: ReactCookieProps): React.ReactElement<Reac
 
 		const date = new Date();
 		date.setDate(date.getDate() + 1);
-		cookies.set(notificationBarCookieName, true, { expires: date });
+		cookies.set(notificationBarCookieName, true, { expires: date, domain: location.origin });
 	}
 }
 

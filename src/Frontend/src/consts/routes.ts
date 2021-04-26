@@ -7,7 +7,9 @@ export const flashcardsPreview = "preview";
 export const commentsPath = "comments";
 export const exerciseStudentSubmissions = 'exercise/studentSubmissions';
 export const commentPoliciesPath = "comment-policies";
-export const courseStatistics = "/analytics/courseStatistics";
+export const analytics = "/analytics";
+export const courseStatistics = analytics + '/courseStatistics';
+export const userSolutions = analytics + '/userSolutions';
 export const slides = "slides";
 export const ltiSlide = "ltislide";
 export const acceptedAlert = "acceptedalert";
@@ -20,10 +22,12 @@ export const accountPath = '/' + account + '/manage';
 export const register = account + '/register';
 export const logoutPath = account + '/logout';
 export const rolesPath = account + '/roles';
+export const accountProfile = '/' + account + '/profile';
 export const externalLoginConfirmation = login + '/externalLoginConfirmation';
 export const externalLoginCallback = login + '/externalLoginCallback';
 export const feed = 'feed';
 export const notificationsFeed = feed + '/notificationsPartial';
+export const groups = 'groups';
 
 export function constructPathToSlide(courseId: string, slideId: string): string {
 	return `/${ coursePath }/${ courseId }/${ slideId }`;
@@ -33,7 +37,7 @@ export function constructPathToAcceptedSolutions(courseId: string, slideId: stri
 	return `/${ coursePath }/${ courseId }/${ acceptedSolutions }?slideId=${ slideId }`;
 }
 
-export function constructPathToComment(commentId: string, isLike?: boolean): string {
+export function constructPathToComment(commentId: number, isLike?: boolean): string {
 	const url = `${ commentsPath }/${ commentId }`;
 
 	if(isLike) {
@@ -56,4 +60,16 @@ export function constructPathToFlashcardsPreview(courseId: string, openUnitId?: 
 
 export function constructLinkWithReturnUrl(link: string, returnUrl?: string): string {
 	return `/${ link }${ buildQuery({ returnUrl: returnUrl || window.location.pathname }) }`;
+}
+
+export function getUserSolutionsUrl(courseId: string, slideId: string, userId: string): string {
+	return userSolutions + buildQuery({ courseId, slideId, userId });
+}
+
+export function constructPathToAccount(userId: string): string {
+	return accountProfile + buildQuery({ userId });
+}
+
+export function constructPathToGroup(courseId: string, groupId: string): string {
+	return `/${ courseId }/${ groups }/${ groupId }`;
 }

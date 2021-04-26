@@ -2,35 +2,41 @@ import React, { useState } from 'react';
 import { UnControlled, } from "react-codemirror2";
 import { Hint, Toast } from "ui";
 import { Copy } from "icons";
-import CodeMirror from "./Exercise";
 
-import classNames from "classnames";
+import cn from "classnames";
 
 import { Language } from "src/consts/languages";
 import { Editor, EditorConfiguration } from "codemirror";
 import "codemirror/lib/codemirror.css";
+
+import { loadLanguageStyles } from "./ExerciseUtils";
 
 import styles from './Exercise.less';
 import texts from "src/components/course/Course/Slide/Blocks/Exercise/Exercise.texts";
 
 
 export interface Props {
-	language: Language,
-	code: string,
-	className?: string,
-	hide?: boolean,
-	disableStyles?: boolean,
-	codeMirrorOptions?: EditorConfiguration,
+	language: Language;
+	code: string;
+	className?: string;
+	editorClassName?: string;
+	hide?: boolean;
+	disableStyles?: boolean;
+	codeMirrorOptions?: EditorConfiguration;
 }
 
-function StaticCode({
-	language,
-	code,
-	className,
-	hide,
-	codeMirrorOptions,
-	disableStyles
-}: Props): React.ReactElement<Props> {
+function StaticCode(props: Props): React.ReactElement<Props> {
+	const {
+		language,
+		code,
+		className,
+		editorClassName,
+		hide,
+		codeMirrorOptions,
+		disableStyles,
+	} = props;
+
+
 	const lines = code.split('\n');
 	const [collapseEditor, showAllCode] = useState(hide && lines.length > 20);
 
@@ -47,15 +53,16 @@ function StaticCode({
 		},
 	};
 
-	opts.mode = CodeMirror.loadLanguageStyles(language);
+	opts.mode = loadLanguageStyles(language);
 	const value = collapseEditor ? lines.splice(0, 5).join('\n') : code;
 
 	return (
-		<div className={ disableStyles ? '' : classNames(styles.wrapper, className) }>
+		<div className={ disableStyles ? '' : cn(styles.wrapper, className) }>
 			<UnControlled
 				editorDidMount={ onEditorMount }
-				className={ disableStyles ? '' : classNames(styles.editor,
-					{ [styles.lastLinesFading]: collapseEditor }) }
+				className={ disableStyles
+					? ''
+					: cn(styles.editor, { [styles.lastLinesFading]: collapseEditor }, editorClassName) }
 				options={ opts }
 				value={ value }
 			/>

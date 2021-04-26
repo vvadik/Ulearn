@@ -10,7 +10,7 @@
 		<div class="btn-group">
 			@for (var i = 0; i < switches.Length; ++i)
 			{
-				<button type="button" class="btn btn-default @( i == 0 ? "btn-primary" : "")" onclick="ShowPanel(event)" data-div-id="@idPrefix-@i">@switches[i].Name</button>
+				<button type="button" class="btn btn-default @( i == 0 ? "btn-primary" : "")" onclick="window.legacy.ShowPanel(event)" data-div-id="@idPrefix-@i">@switches[i].Name</button>
 			}
 		</div>
 		@for (var i = 0; i < switches.Length; ++i)

@@ -1,7 +1,6 @@
 import React from "react";
-import { Ok } from "icons";
-import texts from "../../../course/Course/Slide/Blocks/Exercise/Exercise.texts";
 import { Hint } from "ui";
+import { Ok } from "icons";
 
 interface Props {
 	isPassed: boolean,

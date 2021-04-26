@@ -9,7 +9,7 @@ import {
 } from "../Navigation/types";
 import { ScoringGroupsIds } from "src/consts/scoringGroup";
 import { ShortSlideInfo, SlideType } from "src/models/slide";
-import { flashcardsPreview } from "src/consts/routes";
+import { flashcards, flashcardsPreview } from "src/consts/routes";
 
 export interface CourseSlideInfo {
 	slideType: SlideType;
@@ -204,9 +204,12 @@ export function getSlideInfoById(
 			}
 		}
 	}
+
 	const slideType = slideId === flashcardsPreview
 		? SlideType.PreviewFlashcards
-		: SlideType.CourseFlashcards;
+		: slideId === flashcards
+			? SlideType.CourseFlashcards
+			: SlideType.NotFound;
 
 	return { slideType };
 }

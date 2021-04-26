@@ -132,19 +132,7 @@
 				@foreach (var review in Model.Reviews.OrderBy(r => r.StartLine).ThenBy(r => r.StartPosition))
 				{
 					/* Instructors can reply always. Students can reply only if exists a human (not ulearn bot) replied before and if checking is already checked */
-					var canReply = false;
-					if (Model.InstructorView)
-					{
-						canReply = true;
-					}
-					else
-					{
-						var existHumanReply = !review.Author.IsUlearnBot() || review.NotDeletedComments.Any(c => !c.Author.IsUlearnBot());
-						if ((!review.ExerciseCheckingId.HasValue || review.ExerciseChecking.IsChecked) && existHumanReply)
-						{
-							canReply = true;
-						}
-					}
+					bool canReply = Model.InstructorView;
 
 					if (showOnlyAutomaticReviews && !review.Author.IsUlearnBot())
 					{
@@ -177,31 +165,6 @@
 
 		if (Model.ShowControls)
 		{
-			if (!Model.InstructorView)
-			{
-				var acceptedSolutionsUrl = Model.Url != null
-					? Model.Url.Action("AcceptedSolutions", "Course", new { courseId = Model.CourseId, slideId = Model.Slide.Id })
-					: "";
-				var acceptedSolutionsAction = !Model.IsSkippedOrPassed ? "$('#ShowSolutionsAlert').modal('show')" : $"window.reactHistory.push('{acceptedSolutionsUrl}')";
-				@SlideHtml.ExerciseControls(new ExerciseControlsModel(Model.CourseId, Model.Slide)
-				{
-					IsLti = Model.IsLti,
-					IsCodeEditableAndSendable = Model.SubmissionSelectedByUser == null,
-					CanShowOutput = Model.SubmissionSelectedByUser != null,
-					IsShowOutputButtonActive = Model.ShowOutputImmediately,
-					AcceptedSolutionsAction = acceptedSolutionsAction,
-					RunSolutionUrl = Model.RunSolutionUrl,
-					UseHintUrl = Url.Action("UseHint", "Hint"),
-				})
-
-				@SlideHtml.RunErrors()
-
-				if (!Model.IsLti)
-				{
-					@YouWillLoseScoresDialog(Model)
-				}
-			}
-
 			if (Model.ManualChecking == null &&
 				Model.SubmissionSelectedByUser != null &&
 				Model.SubmissionSelectedByUser.AutomaticChecking != null &&
@@ -235,30 +198,4 @@
 {
 	//NOTE: feature is disabled due to performance
 	@Html.Action("SlideCodeReviewComments", "Exercise", new { courseId = Model.CourseId, slideId = Model.Slide.Id })
-}
-
-@helper YouWillLoseScoresDialog(ExerciseBlockData data)
-{
-	var acceptedSolutionsUrl = data.Url != null
-		? data.Url.Action("AcceptedSolutions", "Course", new { data.CourseId, slideId = data.Slide.Id })
-		: "";
-	<div class="modal fade" id="ShowSolutionsAlert" tabindex="-1" role="dialog" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-					<h4 class="modal-title">Внимание</h4>
-				</div>
-				<div class="modal-body">
-					<p>Вы потеряете возможность получить баллы за эту задачу, если продолжите.</p>
-				</div>
-				<div class="modal-footer">
-					<a class="btn btn-default" href="@acceptedSolutionsUrl">Продолжить</a>
-					<button type="button" class="btn btn-primary" data-dismiss="modal">Отмена</button>
-				</div>
-			</div>
-		</div>
-	</div>
 }

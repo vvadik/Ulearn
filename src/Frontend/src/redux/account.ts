@@ -6,24 +6,15 @@ import {
 } from "src/actions/account.types";
 import { CourseAccessType, CourseRoleType, SystemAccessType } from "src/consts/accessType";
 
-import { Gender } from "src/models/users";
+import { ShortUserInfo } from "src/models/users";
 import { AccountProblem } from "src/models/account";
 import { GroupAsStudentInfo } from "../models/groups";
 
-export interface AccountState {
-	id?: string | null;
-	login?: string | null;
-	firstName?: string | null;
-	lastName?: string | null;
-	visibleName?: string | null;
-	gender?: Gender | null;
-
+export interface AccountState extends Partial<ShortUserInfo>{
 	accountLoaded: boolean;
 	isAuthenticated: boolean;
 	isSystemAdministrator: boolean;
 	isHijacked: boolean;
-
-	avatarUrl?: string | null;
 
 	accountProblems: AccountProblem[];
 	systemAccesses: SystemAccessType[];

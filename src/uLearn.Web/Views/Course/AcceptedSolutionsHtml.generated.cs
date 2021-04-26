@@ -86,11 +86,11 @@ WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 634),
 , Tuple.Create(Tuple.Create(" ", 722), Tuple.Create("like-button", 723), true)
 );
 
-WriteAttributeTo(__razor_helper_writer, "onclick", Tuple.Create(" onclick=\"", 735), Tuple.Create("\"", 771)
-, Tuple.Create(Tuple.Create("", 745), Tuple.Create("likeSolution(", 745), true)
-                                                                , Tuple.Create(Tuple.Create("", 758), Tuple.Create<System.Object, System.Int32>(solution.Id
-, 758), false)
-, Tuple.Create(Tuple.Create("", 770), Tuple.Create(")", 770), true)
+WriteAttributeTo(__razor_helper_writer, "onclick", Tuple.Create(" onclick=\"", 735), Tuple.Create("\"", 785)
+, Tuple.Create(Tuple.Create("", 745), Tuple.Create("window.legacy.likeSolution(", 745), true)
+                                                                              , Tuple.Create(Tuple.Create("", 772), Tuple.Create<System.Object, System.Int32>(solution.Id
+, 772), false)
+, Tuple.Create(Tuple.Create("", 784), Tuple.Create(")", 784), true)
 );
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t\t<i");

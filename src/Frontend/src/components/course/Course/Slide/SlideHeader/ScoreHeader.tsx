@@ -3,7 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 import classNames from 'classnames';
 
 import DownloadedHtmlContent from 'src/components/common/DownloadedHtmlContent.js';
-import { Modal } from "@skbkontur/react-ui";
+import { Modal, } from "ui";
 
 import { isInstructor } from "src/utils/courseRoles";
 import { getSlideInfoById } from "../../CourseUtils";
@@ -51,7 +51,7 @@ const ScoreHeaderInternal = (props: PropsFromRedux & ScoreHeaderProps) => {
 	const maxModalWidth = window.innerWidth - 40;
 	const modalWidth: undefined | number = maxModalWidth > 880 ? 880 : maxModalWidth; //TODO пока что это мок, в будущем width будет другой
 	const anyTryUsed = isSkipped || hasReviewedSubmissions || waitingForManualChecking;
-	
+
 	return (
 		<div className={ styles.header }>
 			<span className={ classNames(styles.headerText, styles.scoreTextWeight, styles.scoreTextColor) }>
