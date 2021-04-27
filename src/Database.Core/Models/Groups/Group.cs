@@ -55,7 +55,7 @@ namespace Database.Models
 		/* Значение по умолчанию для галочки «Не принимать больше код-ревью у этого студента по этой задаче» */
 		public bool DefaultProhibitFutherReview { get; set; }
 
-		public DateTime? CreateTime { get; set; }
+		public DateTime? CreateTime { get; set; } // При разархивировании обновляется
 
 		public virtual ICollection<GroupMember> Members { get; set; }
 
