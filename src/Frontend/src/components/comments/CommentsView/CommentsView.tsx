@@ -29,11 +29,13 @@ interface Props {
 
 	commentPolicy?: CommentPolicy;
 	comments?: Comment[];
+	commentsCount: number;
 	instructorComments?: Comment[];
+	instructorCommentsCount: number;
 
 	api: {
-		getCommentPolicy: (courseId: string) => Promise<unknown>;
-		getComments: (courseId: string, slideId: string, forInstructor: boolean) => Promise<unknown>;
+		getCommentPolicy: (courseId: string) => Promise<CommentPolicy>;
+		getComments: (courseId: string, slideId: string, forInstructor: boolean) => Promise<Comment[]>;
 
 		addComment: (courseId: string, slideId: string, text: string, forInstructor: boolean,
 			parentCommentId?: number
@@ -103,13 +105,16 @@ class CommentsView extends Component<Props, State> {
 			slideType,
 			isSlideReady,
 			comments,
+			commentsCount,
 			instructorComments,
+			instructorCommentsCount,
 			commentPolicy,
 			api,
 		} = this.props;
 		const { activeTab, } = this.state;
 
 		const commentsInList = activeTab === TabsType.allComments ? comments : instructorComments;
+		const commentsInListCount = activeTab === TabsType.allComments ? commentsCount : instructorCommentsCount;
 		const commentsLoaded = isInstructor(user)
 			? commentPolicy && comments && instructorComments
 			: commentPolicy && comments;
@@ -130,6 +135,7 @@ class CommentsView extends Component<Props, State> {
 							courseId={ courseId }
 							isSlideReady={ isSlideReady }
 							comments={ commentsInList! }
+							commentsCount={ commentsInListCount }
 							api={ {
 								addComment: this.handleAddComment,
 								deleteComment: this.handleDeleteComment,

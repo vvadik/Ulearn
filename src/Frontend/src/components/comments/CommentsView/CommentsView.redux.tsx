@@ -25,22 +25,27 @@ const mapStateToProps = (state: RootState, { courseId, slideId }: { courseId: st
 	let comments = undefined;
 	let instructorComments = undefined;
 
-	const convertReduxCommentToComment = ({ repliesIds, ...rest }:CommentRedux) => ({ ...rest, replies: repliesIds?.map(id => byIds[id]) || [] } as Comment);
+	const convertReduxCommentToComment = ({ repliesIds, ...rest }: CommentRedux) => ({
+		...rest,
+		replies: repliesIds?.map(id => byIds[id]) || []
+	} as Comment);
 
 	const filterDeletedAndSort = (commentsIds: number[],) => {
 		const comments = [];
+		let repliesCount = 0;
 
 		for (const commentId of commentsIds) {
 			const comment = { ...byIds[commentId] };
 			if(!comment.isDeleted) {
 				comment.repliesIds = comment.repliesIds?.filter(replyId => !byIds[replyId].isDeleted);
+				repliesCount += comment.repliesIds?.length || 0;
 				comments.push(convertReduxCommentToComment(comment));
 			}
 		}
 
 		sortComments(comments);
 
-		return comments;
+		return { comments, count: comments.length + repliesCount };
 	};
 
 	if(slideCommentsIds) {
@@ -55,8 +60,10 @@ const mapStateToProps = (state: RootState, { courseId, slideId }: { courseId: st
 
 	return {
 		deviceType: state.device.deviceType,
-		comments,
-		instructorComments,
+		comments: comments?.comments,
+		commentsCount: comments?.count || 0,
+		instructorComments: instructorComments?.comments,
+		instructorCommentsCount: instructorComments?.count || 0,
 		commentPolicy: state.comments.byCourses[courseId]?.policy,
 	};
 };
@@ -64,8 +71,8 @@ const mapStateToProps = (state: RootState, { courseId, slideId }: { courseId: st
 const mapDispatchToProps = (dispatch: Dispatch) => ({
 	api: {
 		getComments: (courseId: string, slideId: string, forInstructor: boolean) =>
-			getComments(courseId, slideId, forInstructor)(dispatch),
-		getCommentPolicy: (courseId: string) => getCommentPolicy(courseId)(dispatch),
+			getComments(courseId, slideId, forInstructor)(dispatch).then(c => c.comments),
+		getCommentPolicy: (courseId: string) => getCommentPolicy(courseId)(dispatch).then(c => c.policy),
 
 		addComment: (courseId: string, slideId: string, text: string, forInstructor: boolean,
 			parentCommentId?: number
