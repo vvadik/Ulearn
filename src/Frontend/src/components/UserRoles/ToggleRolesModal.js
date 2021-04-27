@@ -24,11 +24,11 @@ class ToggleRolesModal extends Component {
 				this.setState({
 					modalOpened: this.root.getAttribute(mutation.attributeName) === 'true',
 					toggleRoles: {
-						role: window.toggleRoles.role,
-						userName: window.toggleRoles.userName,
-						isRole: window.toggleRoles.isRole,
-						courseTitle: window.toggleRoles.courseTitle,
-						isGrant: window.toggleRoles.isGrant,
+						role: window.legacy.toggleRoles.role,
+						userName: window.legacy.toggleRoles.userName,
+						isRole: window.legacy.toggleRoles.isRole,
+						courseTitle: window.legacy.toggleRoles.courseTitle,
+						isGrant: window.legacy.toggleRoles.isGrant,
 					}
 				});
 			});
