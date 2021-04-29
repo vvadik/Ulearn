@@ -1129,7 +1129,6 @@
     <Folder Include="Courses.Staging\" />
     <Folder Include="Courses.Versions\" />
     <Folder Include="Courses\" />
-    <Folder Include="Views\Telegram\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Microsoft.Owin.Security.VK\Resources.resx" />
