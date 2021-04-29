@@ -809,7 +809,7 @@ namespace uLearn.Web.Controllers
 			var userRoles = usersRepo.FilterUsers(queryModel);
 			var tempCourses = tempCoursesRepo.GetTempCourses().Select(s => s.CourseId).ToHashSet(StringComparer.OrdinalIgnoreCase);
 			var courses = courseManager.GetCourses()
-				.ToDictionary(c => c.Id, c => (c, tempCourses.Contains(c.Id)));
+				.ToDictionary(c => c.Id, c => (c, tempCourses.Contains(c.Id)), StringComparer.OrdinalIgnoreCase);
 			var model = GetUserListModel(userRolesByEmail.EmptyIfNull().Concat(userRoles).DistinctBy(r => r.UserId).ToList(),
 				courses,
 				queryModel.CourseId);
