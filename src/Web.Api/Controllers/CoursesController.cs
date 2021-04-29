@@ -98,7 +98,7 @@ namespace Ulearn.Web.Api.Controllers
 				courses = courses.OrderBy(c => c.Title);
 
 			var tempCourseLabel =  "Временный - ";
-			var tempCoursesIds = (await tempCoursesRepo.GetTempCoursesAsync())
+			var tempCoursesIds = (await tempCoursesRepo.GetTempCourses())
 				.Select(t => t.CourseId)
 				.ToHashSet(StringComparer.OrdinalIgnoreCase);
 			var coursesList = courses.ToList();
@@ -171,8 +171,8 @@ namespace Ulearn.Web.Api.Controllers
 
 			var containsFlashcards = visibleUnits.Any(x => x.GetSlides(true).OfType<FlashcardSlide>().Any());
 			var scoringSettings = GetScoringSettings(course);
-			var tempCourseError = (await tempCoursesRepo.GetCourseErrorAsync(courseId))?.Error;
-			var isTempCourse = await tempCoursesRepo.FindAsync(courseId) != null;
+			var tempCourseError = (await tempCoursesRepo.GetCourseError(courseId))?.Error;
+			var isTempCourse = await tempCoursesRepo.Find(courseId) != null;
 			return new CourseInfo
 			{
 				Id = course.Id,

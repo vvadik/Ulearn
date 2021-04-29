@@ -63,7 +63,7 @@ namespace Ulearn.Web.Api.Controllers
 				};
 			}
 
-			var tmpCourse = await tempCoursesRepo.FindAsync(tmpCourseId);
+			var tmpCourse = await tempCoursesRepo.Find(tmpCourseId);
 			if (tmpCourse != null)
 			{
 				return new TempCourseUpdateResponse
@@ -78,7 +78,7 @@ namespace Ulearn.Web.Api.Controllers
 			if (!courseManager.TryCreateTempCourse(tmpCourseId, courseTitle, versionId))
 				throw new Exception();
 
-			var result = await tempCoursesRepo.AddTempCourseAsync(tmpCourseId, UserId);
+			var result = await tempCoursesRepo.AddTempCourse(tmpCourseId, UserId);
 			var loadingTime = result.LoadingTime;
 			await courseRolesRepo.ToggleRole(tmpCourseId, UserId, CourseRoleType.CourseAdmin, UserId, "Создал временный курс");
 			return new TempCourseUpdateResponse
@@ -95,7 +95,7 @@ namespace Ulearn.Web.Api.Controllers
 		[HttpGet("{courseId}/errors")]
 		public async Task<ActionResult<TempCourseErrorsResponse>> GetError([FromRoute] string courseId)
 		{
-			var tmpCourseError = await tempCoursesRepo.GetCourseErrorAsync(courseId);
+			var tmpCourseError = await tempCoursesRepo.GetCourseError(courseId);
 			return new TempCourseErrorsResponse
 			{
 				TempCourseError = tmpCourseError?.Error
@@ -125,7 +125,7 @@ namespace Ulearn.Web.Api.Controllers
 		private async Task<TempCourseUpdateResponse> UploadCourse(string courseId, List<IFormFile> files, bool isFull)
 		{
 			var tmpCourseId = TempCourse.GetTmpCourseId(courseId, UserId);
-			var tmpCourse = await tempCoursesRepo.FindAsync(tmpCourseId);
+			var tmpCourse = await tempCoursesRepo.Find(tmpCourseId);
 			if (tmpCourse is null)
 			{
 				return new TempCourseUpdateResponse
@@ -160,7 +160,7 @@ namespace Ulearn.Web.Api.Controllers
 			var error = await TryPublishChanges(tmpCourseId, filesToDelete, isFull);
 			if (error != null)
 			{
-				await tempCoursesRepo.UpdateOrAddTempCourseErrorAsync(tmpCourseId, error);
+				await tempCoursesRepo.UpdateOrAddTempCourseError(tmpCourseId, error);
 				return new TempCourseUpdateResponse
 				{
 					Message = error,
@@ -168,8 +168,8 @@ namespace Ulearn.Web.Api.Controllers
 				};
 			}
 
-			await tempCoursesRepo.MarkTempCourseAsNotErroredAsync(tmpCourseId);
-			var loadingTime = await tempCoursesRepo.UpdateTempCourseLoadingTimeAsync(tmpCourseId);
+			await tempCoursesRepo.MarkTempCourseAsNotErrored(tmpCourseId);
+			var loadingTime = await tempCoursesRepo.UpdateTempCourseLoadingTime(tmpCourseId);
 			return new TempCourseUpdateResponse
 			{
 				Message = $"Временный курс {tmpCourseId} успешно обновлен",

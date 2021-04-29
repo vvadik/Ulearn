@@ -142,7 +142,7 @@ namespace Database
 
 		private async Task LoadTempCoursesIfNotYetAsync(ITempCoursesRepo tempCoursesRepo)
 		{
-			var tempCourses = await tempCoursesRepo.GetTempCoursesAsync();
+			var tempCourses = await tempCoursesRepo.GetTempCourses();
 			tempCourses
 				.Where(tempCourse => !HasCourse(tempCourse.CourseId))
 				.ToList()
