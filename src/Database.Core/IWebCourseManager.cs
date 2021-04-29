@@ -40,5 +40,6 @@ namespace Database
 		void ExtractTempCourseChanges(string tempCourseId);
 		bool TryCreateTempCourse(string courseId, string courseTitle, Guid firstVersionId);
 		void NotifyCourseChanged(string courseId);
+		void RemoveTempCourse(string baseCourseId, string authorId);
 	}
 }

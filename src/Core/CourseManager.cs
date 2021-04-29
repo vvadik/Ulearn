@@ -48,7 +48,7 @@ namespace Ulearn.Core
 		private static readonly CourseLoader loader = new CourseLoader(new UnitLoader(new XmlSlideLoader()));
 		private static readonly ErrorsBot errorsBot = new ErrorsBot();
 
-		private static readonly ConcurrentBag<string> brokenCoursesLowercase = new ConcurrentBag<string>();
+		private static ConcurrentBag<string> brokenCoursesLowercase = new ConcurrentBag<string>();
 
 		public CourseManager(DirectoryInfo baseDirectory)
 			: this(
@@ -648,6 +648,31 @@ namespace Ulearn.Core
 				coursesDirectory = Utils.GetAppPath() + @"\..\Courses\";
 
 			return new DirectoryInfo(coursesDirectory);
+		}
+
+		// Можно вызывать несколько раз. Нужно вызывать на всех сервисах, которые загрузили курс в память.
+		public void RemoveTempCourse(string baseCourseId, string authorId)
+		{
+			var tempCourseId = GetTmpCourseId(baseCourseId, authorId);
+			var staging = GetStagingCourseFile(tempCourseId);
+			var tempStaging = GetStagingTempCourseFile(tempCourseId);
+			var directory = GetExtractedCourseDirectory(tempCourseId);
+
+			if (staging.Exists)
+				staging.Delete();
+			if (tempStaging.Exists)
+				tempStaging.Delete();
+			if (directory.Exists)
+				directory.Delete(true);
+
+			courses.TryRemove(tempCourseId, out _);
+			if (brokenCoursesLowercase.Contains(tempCourseId))
+				brokenCoursesLowercase = new ConcurrentBag<string>(brokenCoursesLowercase.Except(new[] { tempCourseId }));
+		}
+
+		private static string GetTmpCourseId(string baseCourseId, string userId)
+		{
+			return $"{baseCourseId}_{userId}";
 		}
 	}
 }
