@@ -19,5 +19,10 @@ namespace Database.Models
 		public string AuthorId { get; set; }
 
 		public virtual ApplicationUser Author { get; set; }
+
+		public static string GetTmpCourseId(string baseCourseId, string userId)
+		{
+			return $"{baseCourseId}_{userId}";
+		}
 	}
 }

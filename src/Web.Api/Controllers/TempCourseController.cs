@@ -43,7 +43,7 @@ namespace Ulearn.Web.Api.Controllers
 		[HttpPost("{courseId}")]
 		public async Task<ActionResult<TempCourseUpdateResponse>> CreateCourse([FromRoute] string courseId)
 		{
-			var tmpCourseId = GetTmpCourseId(courseId, UserId);
+			var tmpCourseId = TempCourse.GetTmpCourseId(courseId, UserId);
 
 			if (!DontCheckBaseCourseExistsOnCreate && !await courseManager.HasCourseAsync(courseId))
 			{
@@ -124,7 +124,7 @@ namespace Ulearn.Web.Api.Controllers
 
 		private async Task<TempCourseUpdateResponse> UploadCourse(string courseId, List<IFormFile> files, bool isFull)
 		{
-			var tmpCourseId = GetTmpCourseId(courseId, UserId);
+			var tmpCourseId = TempCourse.GetTmpCourseId(courseId, UserId);
 			var tmpCourse = await tempCoursesRepo.FindAsync(tmpCourseId);
 			if (tmpCourse is null)
 			{
@@ -369,11 +369,6 @@ namespace Ulearn.Web.Api.Controllers
 			log.Info($"Start upload course '{courseId}'");
 			var stagingFile = courseManager.GetStagingTempCourseFile(courseId);
 			System.IO.File.WriteAllBytes(stagingFile.FullName, content);
-		}
-
-		private static string GetTmpCourseId(string baseCourseId, string userId)
-		{
-			return $"{baseCourseId}_{userId}";
 		}
 	}
 
