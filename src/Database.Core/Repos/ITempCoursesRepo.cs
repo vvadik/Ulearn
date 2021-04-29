@@ -15,5 +15,6 @@ namespace Database.Repos
 		Task<DateTime> UpdateTempCourseLastUpdateTimeAsync(string courseId);
 		Task<TempCourseError> UpdateOrAddTempCourseErrorAsync(string courseId, string error);
 		Task MarkTempCourseAsNotErroredAsync(string courseId);
+		Task RemoveTempCourse(string baseCourseId, string authorId, IServiceProvider serviceProvider);
 	}
 }

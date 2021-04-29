@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Database.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Database.Repos
 {
@@ -103,6 +104,13 @@ namespace Database.Repos
 
 			error.Error = null;
 			await db.SaveChangesAsync();
+		}
+
+		public async Task RemoveTempCourse(string baseCourseId, string authorId, IServiceProvider serviceProvider)
+		{
+			var tempCourseId = TempCourse.GetTmpCourseId(baseCourseId, authorId);
+			var courseRemover = serviceProvider.GetService<ICourseRemover>();
+			await courseRemover.RemoveCourseWithAllData(tempCourseId);
 		}
 	}
 }

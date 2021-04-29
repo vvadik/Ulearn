@@ -84,6 +84,7 @@ namespace Database.Di
 			services.AddScoped<ICertificatesRepo, CertificatesRepo>();
 			services.AddScoped<IRestoreRequestRepo, RestoreRequestRepo>();
 			services.AddScoped<IStepikRepo, StepikRepo>();
+			services.AddScoped<ICourseRemover, CourseRemover>();
 
 			return services;
 		}
