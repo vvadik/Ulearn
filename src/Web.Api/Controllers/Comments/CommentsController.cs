@@ -17,6 +17,7 @@ using Ulearn.Common;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Web.Api.Authorization;
 using Ulearn.Web.Api.Models.Parameters.Comments;
 using Ulearn.Web.Api.Models.Responses.Comments;
@@ -31,8 +32,8 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		public CommentsController(IWebCourseManager courseManager, UlearnDb db,
 			ICommentsRepo commentsRepo, ICommentLikesRepo commentLikesRepo, ICommentPoliciesRepo commentPoliciesRepo,
 			IUsersRepo usersRepo, ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo, INotificationsRepo notificationsRepo,
-			IGroupMembersRepo groupMembersRepo, IGroupAccessesRepo groupAccessesRepo)
-			: base(courseManager, db, usersRepo, commentsRepo, commentLikesRepo, coursesRepo, courseRolesRepo, notificationsRepo, groupMembersRepo, groupAccessesRepo)
+			IGroupMembersRepo groupMembersRepo, IGroupAccessesRepo groupAccessesRepo, IVisitsRepo visitsRepo)
+			: base(courseManager, db, usersRepo, commentsRepo, commentLikesRepo, coursesRepo, courseRolesRepo, notificationsRepo, groupMembersRepo, groupAccessesRepo, visitsRepo)
 		{
 			this.commentPoliciesRepo = commentPoliciesRepo;
 		}
@@ -85,6 +86,9 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			var totalCount = comments.Count;
 			comments = comments.Skip(parameters.Offset).Take(parameters.Count).ToList();
 
+			var slide = (await courseManager.FindCourseAsync(parameters.CourseId))?.FindSlideById(parameters.SlideId, false);
+			var slideIsExercise = slide is ExerciseSlide;
+
 			var replies = await commentsRepo.GetRepliesAsync(comments.Select(c => c.Id)).ConfigureAwait(false);
 			var allComments = comments.Concat(replies.SelectMany(g => g.Value)).ToList();
 
@@ -95,11 +99,12 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			var userAvailableGroupsIds = !isInstructor ? null : (await groupAccessesRepo.GetAvailableForUserGroupsAsync(User.GetUserId(), false, true, true).ConfigureAwait(false)).Select(g => g.Id).ToHashSet();
 			var authorsIds = allComments.Select(c => c.Author.Id).Distinct().ToList();
 			var authors2Groups = !isInstructor ? null : await groupMembersRepo.GetUsersGroupsAsync(courseId, authorsIds, true).ConfigureAwait(false);
+			var passedSlideAuthorsIds = !slideIsExercise ? null : await visitsRepo.GetUserIdsWithPassedSlide(parameters.CourseId, parameters.SlideId, authorsIds);
 
 			return new CommentsListResponse
 			{
 				TopLevelComments = BuildCommentsListResponse(comments, canUserSeeNotApprovedComments, replies, commentLikesCount, likedByUserCommentsIds,
-					authors2Groups, userAvailableGroupsIds, canViewAllGroupMembers,
+					authors2Groups, passedSlideAuthorsIds, userAvailableGroupsIds, canViewAllGroupMembers,
 					addCourseIdAndSlideId: false, addParentCommentId: true, addReplies: true),
 				Pagination = new PaginationResponse
 				{
@@ -127,6 +132,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			var slide = await GetSlide(courseId, slideId, isInstructor);
 			if (slide == null)
 				return StatusCode((int)HttpStatusCode.NotFound, $"No slide with id {slideId}");
+			var slideIsExercise = slide is ExerciseSlide;
 
 			if (parameters.ForInstructors)
 			{
@@ -162,14 +168,15 @@ namespace Ulearn.Web.Api.Controllers.Comments
 
 			if (comment.IsApproved)
 				await NotifyAboutNewCommentAsync(comment).ConfigureAwait(false);
-	
+
 			var userAvailableGroupsIds = !isInstructor ? null : (await groupAccessesRepo.GetAvailableForUserGroupsAsync(User.GetUserId(), false, true, true).ConfigureAwait(false)).Select(g => g.Id).ToHashSet();
 			var authors2Groups = !isInstructor ? null : await groupMembersRepo.GetUsersGroupsAsync(courseId, new List<string> {UserId}, true).ConfigureAwait(false);
+			var passed = slideIsExercise ? await visitsRepo.IsPassed(comment.CourseId, comment.SlideId, comment.AuthorId) : false;
 
 			return BuildCommentResponse(
 				comment,
 				false, new DefaultDictionary<int, List<Comment>>(), new DefaultDictionary<int, int>(), new HashSet<int>(), // canUserSeeNotApprovedComments not used if addReplies == false
-				authors2Groups, userAvailableGroupsIds, false, addCourseIdAndSlideId: true, addParentCommentId: true, addReplies: false
+				authors2Groups, passed ? new HashSet<string>{comment.AuthorId} : null, userAvailableGroupsIds, false, addCourseIdAndSlideId: true, addParentCommentId: true, addReplies: false
 			);
 		}
 

@@ -63,5 +63,8 @@ namespace Ulearn.Web.Api.Models.Responses.Comments
 
 		[DataMember(EmitDefaultValue = false)]
 		public int? ParentCommentId { get; set; }
+
+		[DataMember(EmitDefaultValue = false)]
+		public bool IsPassed { get; set; }
 	}
 }

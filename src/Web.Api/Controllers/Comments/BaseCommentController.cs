@@ -25,10 +25,11 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		protected readonly INotificationsRepo notificationsRepo;
 		protected readonly IGroupMembersRepo groupMembersRepo;
 		protected readonly IGroupAccessesRepo groupAccessesRepo;
+		protected readonly IVisitsRepo visitsRepo;
 
 		public BaseCommentController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
 			ICommentsRepo commentsRepo, ICommentLikesRepo commentLikesRepo, ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo,
-			INotificationsRepo notificationsRepo, IGroupMembersRepo groupMembersRepo, IGroupAccessesRepo groupAccessesRepo)
+			INotificationsRepo notificationsRepo, IGroupMembersRepo groupMembersRepo, IGroupAccessesRepo groupAccessesRepo, IVisitsRepo visitsRepo)
 			: base(courseManager, db, usersRepo)
 		{
 			this.commentsRepo = commentsRepo;
@@ -38,19 +39,22 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			this.notificationsRepo = notificationsRepo;
 			this.groupMembersRepo = groupMembersRepo;
 			this.groupAccessesRepo = groupAccessesRepo;
+			this.visitsRepo = visitsRepo;
 		}
 
 		protected List<CommentResponse> BuildCommentsListResponse(IEnumerable<Comment> comments,
 			bool canUserSeeNotApprovedComments, DefaultDictionary<int, List<Comment>> replies, DefaultDictionary<int, int> commentLikesCount, HashSet<int> likedByUserCommentsIds,
-			[CanBeNull] Dictionary<string, List<Group>> authorId2Groups, [CanBeNull] HashSet<int> userAvailableGroups, bool canViewAllGroupMembers, bool addCourseIdAndSlideId, bool addParentCommentId, bool addReplies)
+			[CanBeNull] Dictionary<string, List<Group>> authorId2Groups, [CanBeNull]HashSet<string> authorsWithPassed,  [CanBeNull] HashSet<int> userAvailableGroups, bool canViewAllGroupMembers, bool addCourseIdAndSlideId, bool addParentCommentId, bool addReplies)
 		{
-			return comments.Select(c => BuildCommentResponse(c, canUserSeeNotApprovedComments, replies, commentLikesCount, likedByUserCommentsIds, authorId2Groups, userAvailableGroups, canViewAllGroupMembers, addCourseIdAndSlideId, addParentCommentId, addReplies)).ToList();
+			return comments.Select(c => BuildCommentResponse(c, canUserSeeNotApprovedComments, replies, commentLikesCount, likedByUserCommentsIds,
+				authorId2Groups, authorsWithPassed, userAvailableGroups, canViewAllGroupMembers, addCourseIdAndSlideId, addParentCommentId, addReplies)).ToList();
 		}
 
 		protected CommentResponse BuildCommentResponse(
 			Comment comment,
 			bool canUserSeeNotApprovedComments, DefaultDictionary<int, List<Comment>> replies, DefaultDictionary<int, int> commentLikesCount, HashSet<int> likedByUserCommentsIds,
-			[CanBeNull] Dictionary<string, List<Group>> authorId2Groups, [CanBeNull] HashSet<int> userAvailableGroups, bool canViewAllGroupMembers, bool addCourseIdAndSlideId, bool addParentCommentId, bool addReplies
+			[CanBeNull] Dictionary<string, List<Group>> authorId2Groups, [CanBeNull]HashSet<string> authorsWithPassed, [CanBeNull] HashSet<int> userAvailableGroups,
+			bool canViewAllGroupMembers, bool addCourseIdAndSlideId, bool addParentCommentId, bool addReplies
 		)
 		{
 			var commentInfo = new CommentResponse
@@ -63,6 +67,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 				IsApproved = comment.IsApproved,
 				IsLiked = likedByUserCommentsIds.Contains(comment.Id),
 				LikesCount = commentLikesCount[comment.Id],
+				IsPassed = authorsWithPassed?.Contains(comment.AuthorId) ?? false,
 				Replies = new List<CommentResponse>()
 			};
 
@@ -93,7 +98,8 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			if (addReplies)
 			{
 				var commentReplies = FilterVisibleComments(replies[comment.Id], canUserSeeNotApprovedComments);
-				commentInfo.Replies = BuildCommentsListResponse(commentReplies, canUserSeeNotApprovedComments, null, commentLikesCount, likedByUserCommentsIds, authorId2Groups, userAvailableGroups, canViewAllGroupMembers, addCourseIdAndSlideId, addParentCommentId, addReplies);
+				commentInfo.Replies = BuildCommentsListResponse(commentReplies, canUserSeeNotApprovedComments, null, commentLikesCount, likedByUserCommentsIds,
+					authorId2Groups, authorsWithPassed, userAvailableGroups, canViewAllGroupMembers, addCourseIdAndSlideId, addParentCommentId, addReplies);
 			}
 
 			return commentInfo;
