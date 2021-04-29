@@ -199,8 +199,7 @@ class Comment extends Component<Props, unknown> {
 			return false;
 		}
 
-		return (commentPolicy.areCommentsEnabled && ((role.courseRole === CourseRoleType.student || role.courseRole === null ||
-			role.courseRole.length === 0) || role.isSystemAdministrator || role.courseRole === CourseRoleType.courseAdmin ||
+		return (commentPolicy.areCommentsEnabled && ((role.courseRole === CourseRoleType.student || !role.courseRole) || role.isSystemAdministrator || role.courseRole === CourseRoleType.courseAdmin ||
 			role.courseRole === CourseRoleType.instructor));
 	};
 

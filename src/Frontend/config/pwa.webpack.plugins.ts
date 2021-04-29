@@ -44,9 +44,8 @@ module.exports = [
 		swDest: 'sw',
 		exclude: [/\.map$/, /asset-manifest\.json$/, /\.(?:png|jpg|jpeg|svg)/],
 		navigateFallbackAllowlist: [/^(?!\/__).*/],
-		clientsClaim: true,
-		skipWaiting: true,
 		maximumFileSizeToCacheInBytes: 1024 * 1024 * 4,
+		skipWaiting: true,
 		// Define runtime caching rules.
 		runtimeCaching: [{
 			// Match any request that ends with .png, .jpg, .jpeg or .svg.

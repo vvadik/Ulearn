@@ -111,7 +111,7 @@ export default function comments(state = initialCommentsState, action: CommentsA
 				...state,
 				byIds: {
 					...state.byIds,
-					[comment.id]: { ...comment, },
+					[comment.id]: { ...comment, repliesIds: state.byIds[comment.id].repliesIds },
 				}
 			};
 		}

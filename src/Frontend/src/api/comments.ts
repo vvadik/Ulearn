@@ -14,19 +14,21 @@ import {
 	commentUpdatedAction,
 } from "src/actions/comments";
 import {
-	CommentAddedAction, CommentDeletedAction, CommentLikeUpdatedAction,
-	CommentsAction,
+	CommentAddedAction,
+	CommentDeletedAction,
+	CommentLikeUpdatedAction,
+	CommentsLoadedAction,
 	CommentsPolicyAction,
 	CommentUpdatedAction
 } from "src/actions/comments.types";
 
 export function getComments(courseId: string, slideId: string, forInstructors: boolean, offset?: number,
 	count?: number
-): (dispatch: Dispatch) => Promise<CommentsAction> {
+): (dispatch: Dispatch) => Promise<CommentsLoadedAction> {
 	const query = buildQuery({ courseId, slideId, forInstructors, count, offset }, convertCamelCaseToSnakeCase);
 	const url = commentsPath + query;
 
-	return (dispatch: Dispatch): Promise<CommentsAction> => {
+	return (dispatch: Dispatch): Promise<CommentsLoadedAction> => {
 		return api.get<SlideCommentsResponse>(url)
 			.then(comments => dispatch(commentsAction(slideId, courseId, comments.topLevelComments, forInstructors)));
 	};

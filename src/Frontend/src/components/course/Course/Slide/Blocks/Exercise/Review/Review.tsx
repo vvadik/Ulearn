@@ -70,14 +70,14 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 		});
 	};
 
-	buildCommentsReplies = (reviews: ReviewInfo[]): CommentReplies => {
-		const commentsReplies: CommentReplies = {};
+	buildCommentsReplies = (reviews: ReviewInfo[], oldReplies?: CommentReplies): CommentReplies => {
+		const newCommentReplies: CommentReplies = {};
 
 		for (const { id } of reviews) {
-			commentsReplies[id] = '';
+			newCommentReplies[id] = oldReplies?.[id] || '';
 		}
 
-		return commentsReplies;
+		return newCommentReplies;
 	};
 
 	componentDidMount(): void {
@@ -124,7 +124,7 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 						review: r,
 						ref: React.createRef<HTMLLIElement>(),
 					})),
-				commentsReplies: this.buildCommentsReplies(reviews),
+				commentsReplies: this.buildCommentsReplies(reviews, this.state.commentsReplies),
 				marginsAdded: false,
 			});
 		} else if(!this.state.marginsAdded
@@ -352,11 +352,14 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 		const { commentsReplies, } = this.state;
 
 		addReviewComment(selectedReviewId, commentsReplies[selectedReviewId]);
+		this.setState({
+			commentsReplies: { ...commentsReplies, [selectedReviewId]: '' },
+		});
 	};
 
 	getReviewAnchorTop = (review: ReviewInfo, editor: Editor | null,): number => {
 		if(!editor) {
-			return - 1;
+			return -1;
 		}
 
 		return editor.charCoords({

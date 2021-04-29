@@ -30,9 +30,11 @@ class AnyPage extends Component<RouteComponentProps, State> {
 	}
 
 	render() {
-		let url = this.state.href;
+		let url = this.props.location.pathname;
 		if(url === "" || url === "/") {
 			url = "/CourseList";
+		} else {
+			url = this.state.href;
 		}
 
 		return (

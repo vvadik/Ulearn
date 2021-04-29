@@ -340,18 +340,12 @@ class DownloadedHtmlContent extends Component {
 
 						let newUrlParts = getUrlParts(response.url);
 
-						/* Is URL has not been changed then add random query parameter to enforce page reloading */
-						let oldUrlParts = getUrlParts(window.location.href);
-						const isUrlChanged = oldUrlParts.pathname + oldUrlParts.search !== newUrlParts.pathname + newUrlParts.search;
-						if(!isUrlChanged)
-							newUrlParts.search += (newUrlParts.search === '' ? '?' : '&') + 'rnd=' + Math.random();
-
 						if(formUrlParts.startsWith('/Account/ReturnHijack') || formUrlParts.startsWith('/Account/Hijack')) {
 							removeFromCache(exerciseSolutions);
 							setBlockCache(true);
 							window.location.href = newUrlParts.pathname + newUrlParts.search;
 						} else {
-							this.props.history.replace(newUrlParts.pathname + newUrlParts.search);
+							window.location.href = newUrlParts.pathname + newUrlParts.search;
 							return Promise.resolve(undefined);
 						}
 					}
