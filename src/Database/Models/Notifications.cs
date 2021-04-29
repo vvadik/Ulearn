@@ -237,6 +237,11 @@ namespace Database.Models
 		[IsEnabledByDefault(true)]
 		NewCommentFromYourGroupStudent = 108,
 
+		[Display(Name = @"Ваша группа архивирована", GroupName = @"Ваша группа архивирована")]
+		[MinCourseRole(CourseRole.Instructor)]
+		[IsEnabledByDefault(true)]
+		GroupIsArchived = 109,
+
 		// Course admins
 		[Display(Name = @"Добавлен новый преподаватель", GroupName = @"Добавлены новые преподаватели")]
 		[MinCourseRole(CourseRole.CourseAdmin)]
@@ -1387,6 +1392,43 @@ namespace Database.Models
 		public override List<Notification> GetBlockerNotifications(ULearnDb db)
 		{
 			return new NotificationsRepo(db).FindNotifications<RepliedToYourCommentNotification>(n => n.CommentId == CommentId).Cast<Notification>().ToList();
+		}
+	}
+	
+	[NotificationType(NotificationType.GroupIsArchived)]
+	public class GroupIsArchivedNotification : Notification
+	{
+		[Required]
+		[Column("GroupIsArchivedNotification_GroupId")]
+		public int GroupId { get; set; }
+
+		public virtual Group Group { get; set; }
+
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
+		{
+			return $"Ваша группа <b>«{Group.Name.EscapeHtml()}»</b> в курсе «{course.Title.EscapeHtml()}» архивирована. Чтобы восстановить, используйте вкладку Архивные на странице групп.";
+		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
+		{
+			return $"Ваша группа «{Group.Name.EscapeHtml()}» в курсе «{course.Title.EscapeHtml()}» архивирована. Чтобы восстановить, используйте вкладку Архивные на странице групп.";
+		}
+
+		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
+		{
+			return new NotificationButton("Перейти к группам", GetGroupsUrl(course, baseUrl));
+		}
+
+		public override List<string> GetRecipientsIds(ULearnDb db, Course course)
+		{
+			var groupsRepo = new GroupsRepo(db, WebCourseManager.Instance);
+			var accesses = groupsRepo.GetGroupAccesses(GroupId);
+			return accesses.Select(a => a.UserId).Concat(new[] { Group.OwnerId }).ToList();
+		}
+
+		public override bool IsActual()
+		{
+			return Group is { IsDeleted: false, IsArchived: true };
 		}
 	}
 

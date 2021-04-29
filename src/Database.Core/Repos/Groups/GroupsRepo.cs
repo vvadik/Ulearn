@@ -92,6 +92,8 @@ namespace Database.Repos.Groups
 		{
 			var group = await FindGroupByIdAsync(groupId).ConfigureAwait(false) ?? throw new ArgumentNullException($"Can't find group with id={groupId}");
 			group.IsArchived = isArchived;
+			if (!isArchived)
+				group.CreateTime = DateTime.Now; // Обновляем при восстановлении, чтобы автоархивация эту группу снова не съела.
 
 			await db.SaveChangesAsync().ConfigureAwait(false);
 			return group;

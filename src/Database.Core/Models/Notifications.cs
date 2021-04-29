@@ -229,6 +229,11 @@ namespace Database.Models
 		[IsEnabledByDefault(true)]
 		NewCommentFromYourGroupStudent = 108,
 
+		[Display(Name = @"Ваша группа архивирована", GroupName = @"Ваша группа архивирована")]
+		[MinCourseRole(CourseRoleType.Instructor)]
+		[IsEnabledByDefault(true)]
+		GroupIsArchived = 109,
+
 		// Course admins
 		[Display(Name = @"Добавлен новый преподаватель", GroupName = @"Добавлены новые преподаватели")]
 		[MinCourseRole(CourseRoleType.CourseAdmin)]
@@ -1414,6 +1419,43 @@ namespace Database.Models
 		public override bool IsBlockedByAnyNotificationFrom(IServiceProvider serviceProvider, List<Notification> notifications)
 		{
 			return notifications.OfType<RepliedToYourCommentNotification>().Any(n => n.CommentId == CommentId);
+		}
+	}
+	
+	
+	[NotificationType(NotificationType.GroupIsArchived)]
+	public class GroupIsArchivedNotification : Notification
+	{
+		[Required]
+		public int GroupId { get; set; }
+
+		public virtual Group Group { get; set; }
+
+		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
+		{
+			return $"Ваша группа <b>«{Group.Name.EscapeHtml()}»</b> в курсе «{course.Title.EscapeHtml()}» архивирована. Чтобы восстановить, используйте вкладку Архивные на странице групп.";
+		}
+
+		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
+		{
+			return $"Ваша группа «{Group.Name.EscapeHtml()}» в курсе «{course.Title.EscapeHtml()}» архивирована. Чтобы восстановить, используйте вкладку Архивные на странице групп.";
+		}
+
+		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
+		{
+			return new NotificationButton("Перейти к группам", GetGroupsUrl(course, baseUrl));
+		}
+
+		public override async Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider, Course course)
+		{
+			var groupAccessesRepo = serviceProvider.GetService<IGroupAccessesRepo>();
+			var accesses = await groupAccessesRepo.GetGroupAccessesAsync(GroupId);
+			return accesses.Select(a => a.UserId).Concat(new[] { Group.OwnerId }).ToList();
+		}
+
+		public override bool IsActual()
+		{
+			return Group is { IsDeleted: false, IsArchived: true };
 		}
 	}
 

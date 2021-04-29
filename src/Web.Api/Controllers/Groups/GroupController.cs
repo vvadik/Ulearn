@@ -35,11 +35,12 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		private readonly IGroupsCreatorAndCopier groupsCreatorAndCopier;
 		private readonly IUnitsRepo unitsRepo;
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
+		private readonly IGroupsArchiver groupsArchiver;
 		private static ILog log => LogProvider.Get().ForContext(typeof(GroupController));
 
 		public GroupController(IWebCourseManager courseManager, UlearnDb db,
 			IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, INotificationsRepo notificationsRepo,
-			IGroupsCreatorAndCopier groupsCreatorAndCopier, IUnitsRepo unitsRepo, ISlideCheckingsRepo slideCheckingsRepo)
+			IGroupsCreatorAndCopier groupsCreatorAndCopier, IUnitsRepo unitsRepo, ISlideCheckingsRepo slideCheckingsRepo, IGroupsArchiver groupsArchiver)
 			: base(courseManager, db, usersRepo)
 		{
 			this.groupsRepo = groupsRepo;
@@ -50,6 +51,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			this.groupsCreatorAndCopier = groupsCreatorAndCopier;
 			this.unitsRepo = unitsRepo;
 			this.slideCheckingsRepo = slideCheckingsRepo;
+			this.groupsArchiver = groupsArchiver;
 		}
 
 		public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
@@ -118,12 +120,33 @@ namespace Ulearn.Web.Api.Controllers.Groups
 			).ConfigureAwait(false);
 
 			if (parameters.IsArchived.HasValue)
+			{
 				await groupsRepo.ArchiveGroupAsync(groupId, parameters.IsArchived.Value).ConfigureAwait(false);
+				if (parameters.IsArchived.Value)
+				{
+					var notification = new GroupIsArchivedNotification { GroupId = groupId };
+					await notificationsRepo.AddNotification(group.CourseId, notification, UserId);
+					await ArchiveAllOldGroups();
+				}
+			}
 
 			if (parameters.IsInviteLinkEnabled.HasValue)
 				await groupsRepo.EnableInviteLinkAsync(groupId, parameters.IsInviteLinkEnabled.Value).ConfigureAwait(false);
 
 			return BuildGroupInfo(await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false));
+		}
+
+		private async Task ArchiveAllOldGroups()
+		{
+			var groupsIdsToArchive = await groupsArchiver.GetOldGroupsToArchive();
+			var bot = await usersRepo.GetUlearnBotUser();
+			foreach (var groupId in groupsIdsToArchive)
+			{
+				var group = await groupsRepo.FindGroupByIdAsync(groupId);
+				await groupsRepo.ArchiveGroupAsync(groupId, true);
+				var notification = new GroupIsArchivedNotification { GroupId = groupId };
+				await notificationsRepo.AddNotification(group.CourseId, notification, bot.Id);
+			}
 		}
 
 		/// <summary>

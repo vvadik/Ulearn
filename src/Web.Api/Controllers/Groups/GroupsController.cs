@@ -53,7 +53,7 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		{
 			var groups = await groupAccessesRepo.GetAvailableForUserGroupsAsync(parameters.CourseId, UserId, false, !parameters.Archived, parameters.Archived).ConfigureAwait(false);
 			/* Order groups by (name, createTime) and get one page of data (offset...offset+count) */
-			var groupIds = groups.OrderBy(g => g.Name, StringComparer.InvariantCultureIgnoreCase).ThenBy(g => g.CreateTime)
+			var groupIds = groups.OrderBy(g => g.Name, StringComparer.InvariantCultureIgnoreCase).ThenBy(g => g.Id)
 				.Skip(parameters.Offset)
 				.Take(parameters.Count)
 				.Select(g => g.Id)
