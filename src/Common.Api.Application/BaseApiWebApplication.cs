@@ -52,8 +52,11 @@ namespace Ulearn.Common.Api
 					   See https://github.com/IharYakimush/asp-net-core-exception-handling */
 					app.UseExceptionHandlingPolicies();
 
+					UseStaticFiles(app);
+
 					app.UseAuthentication();
 					app.UseAuthorization();
+
 					app.UseMvc();
 
 					/* Configure swagger documentation. Now it's available at /swagger/v1/swagger.json.
@@ -93,6 +96,11 @@ namespace Ulearn.Common.Api
 		public class UlearnPortConfiguration
 		{
 			public string Port { get; set; }
+		}
+
+		protected virtual IApplicationBuilder UseStaticFiles(IApplicationBuilder app)
+		{
+			return app;
 		}
 
 		protected virtual IApplicationBuilder ConfigureCors(IApplicationBuilder app)

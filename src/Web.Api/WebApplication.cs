@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Database;
 using Database.Di;
@@ -15,9 +16,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Rewrite;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
@@ -93,9 +97,9 @@ namespace Ulearn.Web.Api
 		}
 
 		private const string websocketsPath = "/ws";
+
 		private static void ConfigureWebsockets(IApplicationBuilder app)
 		{
-			
 			app.Map(
 				new PathString(websocketsPath), // Map применяет middleware только при обработке запросов по указанному префиксу пути
 				a =>
@@ -110,6 +114,50 @@ namespace Ulearn.Web.Api
 						});
 					});
 				});
+		}
+
+		private static readonly Regex coursesStaticFilesPattern = new Regex("/courses/[^/]+/files", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+		private static readonly Dictionary<string, string> allowedExtensions
+			= new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+			{
+				{ ".png", "image/png" },
+				{ ".jpg", "image/jpeg" },
+				{ ".bmp", "image/bmp" },
+				{ ".gif", "image/gif" },
+				{ ".zip", "application/x-zip-compressed" },
+				{ ".odp", "application/vnd.oasis.opendocument.presentation" },
+				{ ".pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation" },
+				{ ".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
+				{ ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
+				{ ".pdf", "application/pdf" },
+				{ ".html", "text/html" },
+				{ ".mmap", "application/vnd.mindjet.mindmanage" },
+				{ ".xmind", "application/vnd.xmind.workbook" },
+				{ ".fig", "application/octet-stream" }
+			};
+
+		protected override IApplicationBuilder UseStaticFiles(IApplicationBuilder app)
+		{
+			var contentTypeProvider = new FileExtensionContentTypeProvider(allowedExtensions);
+			var coursesDirectory = Path.Combine(CourseManager.GetCoursesDirectory().FullName, "Courses");
+
+			var options = new RewriteOptions()
+				.AddRewrite(@"^courses/([^/]+)/files/(.+)", "courses/$1/$2", skipRemainingRules: true);
+			app.UseRewriter(options);
+			app.MapWhen(c => coursesStaticFilesPattern.IsMatch(c.Request.Path.Value),
+				a =>
+				{
+					app.UseStaticFiles(new StaticFileOptions
+					{
+						ContentTypeProvider = contentTypeProvider,
+						ServeUnknownFileTypes = false,
+						FileProvider = new PhysicalFileProvider(coursesDirectory),
+						RequestPath = "/courses",
+						OnPrepareResponse = ctx => ctx.Context.Response.Headers.Append("Cache-Control", "no-cache")
+					});
+				});
+			return app;
 		}
 
 		protected override void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment)
