@@ -1,9 +1,20 @@
 import { FLAT_THEME, ThemeFactory, } from "ui";
 
-export default ThemeFactory.create({
+const roundButtons = {
 	btnBorderRadiusLarge: '8px',
 	btnBorderRadiusMedium: '8px',
 	btnBorderRadiusSmall: '8px',
+};
+
+const roundSwitcher = {
+	switcherButtonBorderRadiusLarge: '2px',
+	switcherButtonPaddingXLarge: '30px',
+	switcherLabelGapLarge: '24px',
+};
+
+export default ThemeFactory.create({
+	...roundButtons,
+	...roundSwitcher
 }, FLAT_THEME);
 
 export const textareaHidden = ThemeFactory.create({
