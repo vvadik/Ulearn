@@ -483,10 +483,10 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 
 			var usersLimit = max;
-			if (usersLimit > 300)
-				usersLimit = 300;
+			if (usersLimit > 400)
+				usersLimit = 400;
 			if (usersLimit < 0)
-				usersLimit = 200;
+				usersLimit = 100;
 
 			var model = GetCourseStatisticsModel(param, usersLimit);
 			if (model == null)
