@@ -11,6 +11,7 @@ export interface Props {
 	scores?: string[];
 	exerciseTitle: string;
 	prevReviewScore?: number | 0 | 25 | 50 | 75 | 100;
+	toggleChecked?: boolean;
 
 	onSubmit: (score: number) => void;
 	onToggleChange: (value: boolean) => void;
@@ -19,6 +20,7 @@ export interface Props {
 interface State {
 	score?: number;
 	scoreSaved: boolean;
+	toggleChecked: boolean;
 }
 
 function ScoreControls({
@@ -27,8 +29,9 @@ function ScoreControls({
 	onSubmit,
 	onToggleChange,
 	prevReviewScore,
+	toggleChecked,
 }: Props): React.ReactElement {
-	const [state, setState] = useState<State>({ scoreSaved: false, });
+	const [state, setState] = useState<State>({ scoreSaved: false, toggleChecked: !!toggleChecked });
 
 	return (
 		<Gapped gap={ 24 } vertical>
@@ -36,7 +39,7 @@ function ScoreControls({
 				? renderControlsAfterSubmit(state.score)
 				: renderControls(scores, state.score, prevReviewScore)
 			}
-			{ renderKeepReviewingToggle() }
+			{ renderKeepReviewingToggle(state.toggleChecked) }
 		</Gapped>
 	);
 
@@ -126,9 +129,9 @@ function ScoreControls({
 		lastReviewNode.style.left = `${ button.offsetLeft + (button.offsetWidth - lastReviewNode.offsetWidth) / 2 }px`;
 	}
 
-	function renderKeepReviewingToggle() {
+	function renderKeepReviewingToggle(toggleChecked: boolean,) {
 		return (
-			<Toggle captionPosition={ "right" } onValueChange={ onToggleValueChange }>
+			<Toggle checked={ toggleChecked } captionPosition={ "right" } onValueChange={ onToggleValueChange }>
 				<span className={ styles.toggleLabel }>
 					{ texts.getCodeReviewToggleText(exerciseTitle) }
 				</span>
@@ -152,6 +155,10 @@ function ScoreControls({
 
 	function onToggleValueChange(value: boolean) {
 		onToggleChange(value);
+		setState({
+			...state,
+			toggleChecked: value,
+		});
 	}
 
 	function onSubmitClick() {
