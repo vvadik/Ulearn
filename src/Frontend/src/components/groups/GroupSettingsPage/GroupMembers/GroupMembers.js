@@ -9,7 +9,7 @@ import ComboboxInstructorsSearch from "./Combobox/ComboboxInstructorsSearch";
 import Avatar from "src/components/common/Avatar/Avatar";
 import GroupStudents from "./GroupStudents/GroupStudents";
 import InviteBlock from "./InviteBlock/InviteBlock";
-import Profile from './Profile';
+import { Profile } from './Profile';
 import getGenderForm from "src/utils/getGenderForm";
 import styles from './groupMembers.less';
 import { Mobile, NotMobile } from "src/utils/responsive";
