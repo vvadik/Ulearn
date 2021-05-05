@@ -77,7 +77,6 @@ class DownloadedHtmlContent extends Component {
 			bodyClassName: '',
 			meta: {},
 			links: [],
-			error: null,
 		};
 	}
 
@@ -111,20 +110,13 @@ class DownloadedHtmlContent extends Component {
 	}
 
 	fetchContentFromServer(url) {
-		this.setState({
-			error: null,
-		});
-
 		fetch(this.BASE_URL + url, { credentials: 'include' })
 			.then(response => {
 				if(url !== this.props.url) {
 					return;
 				}
 				if(response.headers.has('ReactRender')) {
-					this.setState({
-						error: new UrlError(),
-					});
-					return;
+					throw new UrlError();
 				}
 				if(response.status === 404) {
 					throw new UrlError();
@@ -177,10 +169,7 @@ class DownloadedHtmlContent extends Component {
 				}
 
 				this.processNewHtmlContent(url, data);
-			}).catch((error) => {
-			console.error(error);
-			this.setState({ error });
-		});
+			});
 	}
 
 	processNewHtmlContent(url, data) {
@@ -261,8 +250,6 @@ class DownloadedHtmlContent extends Component {
 	}
 
 	render() {
-		if(this.state.error)
-			return <Error404/>;
 		if(this.props.injectInWrapperAfterContentReady) {
 			if(!this.state.body)
 				return null;
@@ -354,7 +341,7 @@ class DownloadedHtmlContent extends Component {
 					if(typeof data === 'undefined')
 						return;
 					this.processNewHtmlContent(formUrl, data)
-				})
+				});
 			});
 		});
 	}
