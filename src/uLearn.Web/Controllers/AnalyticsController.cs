@@ -483,10 +483,10 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 
 			var usersLimit = max;
-			if (usersLimit > 300)
-				usersLimit = 300;
+			if (usersLimit > 400)
+				usersLimit = 400;
 			if (usersLimit < 0)
-				usersLimit = 200;
+				usersLimit = 100;
 
 			var model = GetCourseStatisticsModel(param, usersLimit);
 			if (model == null)
@@ -550,7 +550,7 @@ namespace uLearn.Web.Controllers
 			var scoreByUserUnitScoringGroup = GetScoreByUserUnitScoringGroup(filterOptions, slidesIds, unitBySlide, course);
 
 			var shouldBeSolvedSlides = visibleUnits.SelectMany(u => u.GetSlides(isInstructor)).Where(s => s.ShouldBeSolved).ToList();
-			var shouldBeSolvedSlidesIds = shouldBeSolvedSlides.Select(s => s.Id).ToList();
+			var shouldBeSolvedSlidesIds = shouldBeSolvedSlides.Select(s => s.Id).ToHashSet();
 			var shouldBeSolvedSlidesByUnitScoringGroup = GetShouldBeSolvedSlidesByUnitScoringGroup(shouldBeSolvedSlides, unitBySlide);
 			var scoreByUserAndSlide = GetScoreByUserAndSlide(filterOptions, shouldBeSolvedSlidesIds);
 
@@ -613,11 +613,12 @@ namespace uLearn.Web.Controllers
 				.ToDefaultDictionary();
 		}
 
-		private DefaultDictionary<Tuple<string, Guid>, int> GetScoreByUserAndSlide(VisitsFilterOptions filterOptions, List<Guid> shouldBeSolvedSlidesIds)
+		private DefaultDictionary<Tuple<string, Guid>, int> GetScoreByUserAndSlide(VisitsFilterOptions filterOptions, HashSet<Guid> shouldBeSolvedSlidesIds)
 		{
-			return visitsRepo.GetVisitsInPeriod(filterOptions.WithSlidesIds(shouldBeSolvedSlidesIds))
+			return visitsRepo.GetVisitsInPeriod(filterOptions)
 				.Select(v => new { v.UserId, v.SlideId, v.Score })
 				.AsEnumerable()
+				.Where(e => shouldBeSolvedSlidesIds.Contains(e.SlideId))
 				.GroupBy(v => Tuple.Create(v.UserId, v.SlideId))
 				.ToDictionary(g => g.Key, g => g.Sum(v => v.Score))
 				.ToDefaultDictionary();

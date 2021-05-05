@@ -64,7 +64,8 @@ namespace Notifications
 				metricSender.SendCount("send_to_telegram.fail");
 				metricSender.SendCount($"send_to_telegram.fail.to.{chatId}");
 
-				var isBotBlockedByUser = (e as ApiRequestException)?.Message.Contains("bot was blocked by the user") ?? false;
+				var message = (e as ApiRequestException)?.Message;
+				var isBotBlockedByUser = (message?.Contains("bot was blocked by the user") ?? false) || (message?.Contains("user is deactivated") ?? false);
 				if (isBotBlockedByUser)
 				{
 					metricSender.SendCount("send_to_telegram.fail.blocked_by_user");

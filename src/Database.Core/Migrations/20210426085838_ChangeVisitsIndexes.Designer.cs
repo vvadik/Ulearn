@@ -3,15 +3,17 @@ using System;
 using Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Database.Migrations
 {
     [DbContext(typeof(UlearnDb))]
-    partial class UlearnDbModelSnapshot : ModelSnapshot
+    [Migration("20210426085838_ChangeVisitsIndexes")]
+    partial class ChangeVisitsIndexes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2423,19 +2425,6 @@ namespace Database.Migrations
                     b.HasDiscriminator().HasValue("GrantedAccessToGroupNotification");
                 });
 
-            modelBuilder.Entity("Database.Models.GroupIsArchivedNotification", b =>
-                {
-                    b.HasBaseType("Database.Models.Notification");
-
-                    b.Property<int>("GroupId")
-                        .HasColumnType("integer")
-                        .HasColumnName("GroupIsArchivedNotification_GroupId");
-
-                    b.HasIndex("GroupId");
-
-                    b.HasDiscriminator().HasValue("GroupIsArchivedNotification");
-                });
-
             modelBuilder.Entity("Database.Models.GroupMemberHasBeenRemovedNotification", b =>
                 {
                     b.HasBaseType("Database.Models.Notification");
@@ -3539,17 +3528,6 @@ namespace Database.Migrations
                         .IsRequired();
 
                     b.Navigation("Access");
-                });
-
-            modelBuilder.Entity("Database.Models.GroupIsArchivedNotification", b =>
-                {
-                    b.HasOne("Database.Models.Group", "Group")
-                        .WithMany()
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Group");
                 });
 
             modelBuilder.Entity("Database.Models.GroupMemberHasBeenRemovedNotification", b =>

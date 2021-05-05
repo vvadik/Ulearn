@@ -3,15 +3,17 @@ using System;
 using Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Database.Migrations
 {
     [DbContext(typeof(UlearnDb))]
-    partial class UlearnDbModelSnapshot : ModelSnapshot
+    [Migration("20210427075205_AddGroupIsArchivedNotification")]
+    partial class AddGroupIsArchivedNotification
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2122,7 +2124,9 @@ namespace Database.Migrations
 
                     b.HasIndex("CourseId", "UserId");
 
-                    b.HasIndex("CourseId", "SlideId", "Timestamp");
+                    b.HasIndex("SlideId", "Timestamp");
+
+                    b.HasIndex("SlideId", "UserId");
 
                     b.HasIndex("CourseId", "SlideId", "UserId");
 

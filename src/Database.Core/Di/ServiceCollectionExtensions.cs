@@ -40,6 +40,7 @@ namespace Database.Di
 			services.AddScoped<IManualCheckingsForOldSolutionsAdder, ManualCheckingsForOldSolutionsAdder>();
 			services.AddScoped<IGroupsCreatorAndCopier, GroupsCreatorAndCopier>();
 			services.AddScoped<IAdditionalScoresRepo, AdditionalScoresRepo>();
+			services.AddScoped<IGroupsArchiver, GroupsArchiver>();
 
 			/* Comments */
 			services.AddScoped<ICommentsRepo, CommentsRepo>();

@@ -5,7 +5,7 @@ import { Checkbox, Gapped } from "ui";
 import { Copy, Trash, UserSettings } from "icons";
 import Avatar from "../../../../common/Avatar/Avatar";
 import CopyStudentsModal from "../CopyStudentsModal/CopyStudentsModal";
-import Profile from '../Profile';
+import { Profile, GetNameWithSecondNameFirst } from '../Profile';
 import getGenderForm from "src/utils/getGenderForm";
 import ResetLimitsForStudentsModal from "../ResetLimitsForStudentsModal/ResetLimitsForStudentsModal";
 
@@ -95,7 +95,7 @@ class GroupStudents extends Component {
 		return (
 			<div>
 				{students
-				.sort((a, b) => a.user.visibleName.localeCompare(b.user.visibleName))
+				.sort((a, b) => GetNameWithSecondNameFirst(a.user).localeCompare(GetNameWithSecondNameFirst(b.user)))
 				.map(item =>
 					<div className={styles["student-block"]}
 						 key={item.user.id}>
@@ -107,7 +107,8 @@ class GroupStudents extends Component {
 								<Profile
 									user={item.user}
 									systemAccesses={systemAccesses}
-									isSysAdmin={isSysAdmin} /> {item.addingTime && <span className={styles.addingTime}>
+									isSysAdmin={isSysAdmin}
+									showLastNameFirst={true} /> {item.addingTime && <span className={styles.addingTime}>
 										{`${getGenderForm(item.user.gender, 'вступила', 'вступил')}
 										${getMoment(item.addingTime)}`}</span>}
 							</span>

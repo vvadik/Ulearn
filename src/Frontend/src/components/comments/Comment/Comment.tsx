@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import Avatar from "../../common/Avatar/Avatar";
 import CommentSendForm from "../CommentSendForm/CommentSendForm";
 import Like from "./Like/Like";
+import Passed from "./Passed/Passed";
 import KebabActions from "./Kebab/KebabActions";
 import Header from "./Header/Header";
 import Marks from "./Marks/Marks";
@@ -69,7 +70,7 @@ class Comment extends Component<Props, unknown> {
 	};
 
 	render(): React.ReactNode {
-		const { children, commentEditing, comment, user,} = this.props;
+		const { children, commentEditing, comment, user, } = this.props;
 		const canViewProfiles = (user.systemAccesses.includes(SystemAccessType.viewAllProfiles)) ||
 			user.isSystemAdministrator;
 
@@ -108,6 +109,9 @@ class Comment extends Component<Props, unknown> {
 				profileUrl={ constructPathToAccount(comment.author.id) }
 				canViewProfiles={ canViewProfiles }
 				name={ comment.author.visibleName }>
+				<Passed
+					isPassed={ comment.isPassed }
+					gender={ comment.author.gender }/>
 				<Like
 					canLike={ user.isAuthenticated }
 					isLiked={ comment.isLiked }

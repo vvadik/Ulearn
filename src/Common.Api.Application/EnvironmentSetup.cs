@@ -82,8 +82,7 @@ namespace Ulearn.Common.Api
 				herculesLogBuilder.SetApiKeyProvider(() => ulearnConfiguration.Hercules.ApiKey);
 				herculesLogBuilder.CustomizeLog(lb =>
 					lb
-						.DropEvents(LoggerSetup.FilterLogs)
-						.SelectEvents(le => le.Level >= (LoggerSetup.IsDbSource(le) ? dbMinimumLevel : minimumLevel))
+						.WithMinimumLevelForSourceContext("ULearnDb", dbMinimumLevel) // Database
 						.WithMinimumLevel(min)
 				);
 			});

@@ -106,12 +106,7 @@ export function initCodeEditor($parent) {
 		$exerciseCodeBlock = $('.code-review')[0];
 	else
 		$exerciseCodeBlock = $('.code-reviewed')[0];
-
-	CodeMirror.commands.autocomplete = function (cm) {
-		const hint = cm.options.langInfo.hint;
-		if(hint)
-			cm.showHint({ hint: hint });
-	};
+	
 
 	codeMirrorClass($parent.find('.code-exercise'), true, false, false);
 	codeMirrorClass($parent.find('.code-sample'), false, false, false);
