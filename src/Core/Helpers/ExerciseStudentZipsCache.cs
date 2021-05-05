@@ -1,9 +1,10 @@
 ﻿using System.IO;
-using Vostok.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses.Slides;
+using Vostok.Logging.Abstractions;
 
 namespace Ulearn.Core.Helpers
 {
@@ -13,25 +14,19 @@ namespace Ulearn.Core.Helpers
 
 		private readonly DirectoryInfo cacheDirectory;
 		private readonly ExerciseStudentZipBuilder builder;
-		private static readonly UlearnConfiguration configuration;
 
-		static ExerciseStudentZipsCache()
+		public ExerciseStudentZipsCache(IOptions<UlearnConfiguration> options)
 		{
-			configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
-		}
-
-		public ExerciseStudentZipsCache()
-		{
-			cacheDirectory = GetCacheDirectory();
+			var exerciseStudentZipsDirectory = options.Value.ExerciseStudentZipsDirectory;
+			cacheDirectory = GetCacheDirectory(exerciseStudentZipsDirectory);
 			cacheDirectory.EnsureExists();
 			builder = new ExerciseStudentZipBuilder();
 		}
 
-		private static DirectoryInfo GetCacheDirectory()
+		private static DirectoryInfo GetCacheDirectory(string exerciseStudentZipsDirectory)
 		{
-			var directory = configuration.ExerciseStudentZipsDirectory;
-			if (!string.IsNullOrEmpty(directory))
-				return new DirectoryInfo(directory);
+			if (!string.IsNullOrEmpty(exerciseStudentZipsDirectory))
+				return new DirectoryInfo(exerciseStudentZipsDirectory);
 
 			return CourseManager.GetCoursesDirectory().GetSubdirectory("ExerciseStudentZips");
 		}

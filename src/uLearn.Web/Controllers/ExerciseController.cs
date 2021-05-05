@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.Serialization;
@@ -23,8 +22,6 @@ using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
-using Ulearn.Core.Courses.Slides.Exercises.Blocks;
-using Ulearn.Core.Helpers;
 using Ulearn.Core.Metrics;
 using Vostok.Logging.Abstractions;
 
@@ -36,7 +33,6 @@ namespace uLearn.Web.Controllers
 		protected readonly ULearnDb db;
 		protected readonly CourseManager courseManager;
 		protected readonly MetricSender metricSender;
-		private readonly ExerciseStudentZipsCache exerciseStudentZipsCache;
 
 		protected readonly UserSolutionsRepo userSolutionsRepo;
 		protected readonly SlideCheckingsRepo slideCheckingsRepo;
@@ -55,7 +51,6 @@ namespace uLearn.Web.Controllers
 
 		public ExerciseController(ULearnDb db, WebCourseManager courseManager, MetricSender metricSender)
 		{
-			exerciseStudentZipsCache = new ExerciseStudentZipsCache();
 			this.db = db;
 			this.courseManager = courseManager;
 			this.metricSender = metricSender;
@@ -575,27 +570,6 @@ namespace uLearn.Web.Controllers
 				HasFilterByName = hasFilterByName,
 				UserGroups = userGroups,
 			};
-		}
-
-		[System.Web.Mvc.AllowAnonymous]
-		public ActionResult StudentZip(string courseId, Guid slideId)
-		{
-			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
-			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId, isInstructor);
-			if (!(slide is ExerciseSlide))
-				return HttpNotFound();
-
-			var exerciseSlide = slide as ExerciseSlide;
-			if (exerciseSlide.Exercise is SingleFileExerciseBlock)
-				return HttpNotFound();
-			if ((exerciseSlide.Exercise as UniversalExerciseBlock)?.NoStudentZip ?? false)
-				return HttpNotFound();
-
-			var zipFile = exerciseStudentZipsCache.GenerateOrFindZip(courseId, exerciseSlide);
-
-			var block = exerciseSlide.Exercise;
-			var fileName = (block as CsProjectExerciseBlock)?.CsprojFile.Name ?? new DirectoryInfo((block as UniversalExerciseBlock).ExerciseDirPath).Name;
-			return File(zipFile.FullName, "application/zip", fileName + ".zip");
 		}
 	}
 

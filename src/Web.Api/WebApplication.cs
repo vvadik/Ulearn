@@ -32,6 +32,7 @@ using Ulearn.Common.Api.Swagger;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Helpers;
 using Ulearn.Core.Metrics;
 using Ulearn.Core.RunCheckerJobApi;
 using Ulearn.Core.Telegram;
@@ -255,6 +256,7 @@ namespace Ulearn.Web.Api
 			services.AddScoped<AntiPlagiarismResultObserver>();
 			services.AddScoped<StyleErrorsResultObserver>();
 			services.AddScoped<LtiResultObserver>();
+			services.AddSingleton<ExerciseStudentZipsCache, ExerciseStudentZipsCache>();
 
 			services.AddDatabaseServices();
 		}
