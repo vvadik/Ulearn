@@ -10,7 +10,7 @@ const defaultScores = ['0', '25', '50', '75', '100'];
 export interface Props {
 	scores?: string[];
 	exerciseTitle: string;
-	prevReviewScore?: number;
+	prevReviewScore?: number | 0 | 25 | 50 | 75 | 100;
 
 	onSubmit: (score: number) => void;
 	onToggleChange: (value: boolean) => void;
@@ -32,7 +32,7 @@ function ScoreControls({
 
 	return (
 		<Gapped gap={ 24 } vertical>
-			{ state.scoreSaved && state.score
+			{ state.scoreSaved && state.score !== undefined
 				? renderControlsAfterSubmit(state.score)
 				: renderControls(scores, state.score, prevReviewScore)
 			}
@@ -59,7 +59,7 @@ function ScoreControls({
 
 	function renderControls(scores: string[], score?: number, prevReviewScore?: number,) {
 		return (
-			<Gapped gap={ 24 } vertical={ false }>
+			<Gapped gap={ 24 } vertical={ false } className={ styles.controlsWrapper }>
 				{ renderSwitcherWithLastReviewMarker(scores, score, prevReviewScore,) }
 				<Button
 					size={ 'large' }
@@ -74,12 +74,12 @@ function ScoreControls({
 	}
 
 	function renderSwitcherWithLastReviewMarker(scores: string[], score?: number, prevReviewScore?: number,) {
-		if(!prevReviewScore) {
+		if(prevReviewScore === undefined) {
 			return (
 				<Switcher
 					className={ styles.scoresLabel }
 					label={ texts.scoresText }
-					size={ "large" }
+					size={ "medium" }
 					value={ score?.toString() }
 					items={ scores }
 					onValueChange={ onValueChange }/>
@@ -89,13 +89,14 @@ function ScoreControls({
 			injecting/changing something down here? check injectPrevReviewScore first or you can break something
 		*/
 		return (
-			<span ref={ (ref) => prevReviewScore
+			<span ref={ (ref) =>
+				prevReviewScore !== undefined
 				&& ref?.children[0]
 				&& injectPrevReviewScore(ref, scores.findIndex(s => s === prevReviewScore.toString())) }>
 				<Switcher
 					className={ styles.scoresLabel }
 					label={ texts.scoresText }
-					size={ "large" }
+					size={ "medium" }
 					value={ score?.toString() }
 					items={ scores }
 					onValueChange={ onValueChange }/>
@@ -112,16 +113,17 @@ function ScoreControls({
 			return;
 		}
 		const buttons = element.children[0].getElementsByTagName('button'); //[2]
-
-		const position = buttons[index].getBoundingClientRect(); //[3]
+		const button = buttons[index];
 
 		const lastReviewNode = document.createElement('span');
 		lastReviewNode.className = styles.lastReviewWrapper;
 		lastReviewNode.textContent = texts.lastReviewScoreText;
-		lastReviewNode.style.top = `${ (position.top + position.height) }px`;
-		lastReviewNode.style.left = `${ position.left }px`;
 
 		element.appendChild(lastReviewNode);
+
+		//[3]
+		lastReviewNode.style.top = `${ button.offsetHeight + 6 }px`; // 6 = 2px borders + 4px margin
+		lastReviewNode.style.left = `${ button.offsetLeft + (button.offsetWidth - lastReviewNode.offsetWidth) / 2 }px`;
 	}
 
 	function renderKeepReviewingToggle() {
@@ -153,7 +155,7 @@ function ScoreControls({
 	}
 
 	function onSubmitClick() {
-		if(state.score) {
+		if(state.score !== undefined) {
 			onSubmit(state.score);
 		}
 		setState({

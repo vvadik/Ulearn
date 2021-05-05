@@ -7,9 +7,11 @@ const roundButtons = {
 };
 
 const roundSwitcher = {
-	switcherButtonBorderRadiusLarge: '2px',
-	switcherButtonPaddingXLarge: '30px',
-	switcherLabelGapLarge: '24px',
+	switcherButtonBorderRadiusMedium: '2px',
+	switcherButtonPaddingXMedium: '30px',
+	switcherButtonLineHeightMedium: '22px',
+
+	switcherLabelGapMedium: '24px',
 };
 
 export default ThemeFactory.create({
