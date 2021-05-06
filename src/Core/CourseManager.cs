@@ -10,6 +10,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using Ionic.Zip;
 using JetBrains.Annotations;
+using Microsoft.Extensions.Options;
 using Vostok.Logging.Abstractions;
 using Telegram.Bot.Types.Enums;
 using Ulearn.Common;
@@ -42,7 +43,7 @@ namespace Ulearn.Core
 		/* LRU-cache for course versions. 50 is a capactiy of the cache. */
 		private readonly LruCache<Guid, Course> versionsCache = new LruCache<Guid, Course>(50);
 
-		private readonly ExerciseStudentZipsCache exerciseStudentZipsCache = new ExerciseStudentZipsCache();
+		private readonly ExerciseStudentZipsCache exerciseStudentZipsCache = new ExerciseStudentZipsCache(Options.Create(ApplicationConfiguration.Read<UlearnConfiguration>()));
 
 		/* TODO (andgein): Use DI */
 		private static readonly CourseLoader loader = new CourseLoader(new UnitLoader(new XmlSlideLoader()));

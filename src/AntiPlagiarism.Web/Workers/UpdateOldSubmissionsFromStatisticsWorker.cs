@@ -1,20 +1,21 @@
 ﻿using System;
-using System.Threading;
 using AntiPlagiarism.Web.Configuration;
 using AntiPlagiarism.Web.Database.Repos;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Vostok.Applications.Scheduled;
+using Vostok.Hosting.Abstractions;
 using Vostok.Logging.Abstractions;
 
 namespace AntiPlagiarism.Web.Workers
 {
-	public class UpdateOldSubmissionsFromStatisticsWorker
+	public class UpdateOldSubmissionsFromStatisticsWorker : VostokScheduledApplication
 	{
 		private readonly IServiceScopeFactory serviceScopeFactory;
 		private readonly AntiPlagiarismConfiguration configuration;
+
 		private static ILog log => LogProvider.Get().ForContext(typeof(UpdateOldSubmissionsFromStatisticsWorker));
 // ReSharper disable once NotAccessedField.Local
-		private readonly Timer timer;
 
 		public UpdateOldSubmissionsFromStatisticsWorker(
 			IOptions<AntiPlagiarismConfiguration> configuration,
@@ -22,23 +23,23 @@ namespace AntiPlagiarism.Web.Workers
 		{
 			this.serviceScopeFactory = serviceScopeFactory;
 			this.configuration = configuration.Value;
-			timer = CreateWorkerTimer();
 		}
 
-		private Timer CreateWorkerTimer()
+		public override void Setup(IScheduledActionsBuilder builder, IVostokHostingEnvironment environment)
+		{
+			RunUpdateOldSubmissionsFromStatisticsWorker(builder);
+		}
+
+		private void RunUpdateOldSubmissionsFromStatisticsWorker(IScheduledActionsBuilder builder)
 		{
 			var startTime = configuration.AntiPlagiarism.Actions.UpdateOldSubmissionsFromStatistics.StartTime;
-			if (startTime == null)
-				return null;
-			var now = DateTime.Now;
-			var startDateTime = new DateTime(now.Year, now.Month, now.Day, startTime.Value.Hour, startTime.Value.Minute, startTime.Value.Second);
-			if (startDateTime < now)
-				startDateTime = startDateTime.Add(TimeSpan.FromDays(1));
-			var diffFromNowToStart = startDateTime - DateTime.Now;
-			return new Timer(ThreadFunc, null, diffFromNowToStart, TimeSpan.FromDays(1));
+			if (string.IsNullOrEmpty(startTime))
+				return;
+			var scheduler = Scheduler.Crontab(startTime);
+			builder.Schedule("UpdateOldSubmissionsFromStatisticsWorker", scheduler, Task);
 		}
 
-		private void ThreadFunc(object stateInfo)
+		private void Task(object stateInfo)
 		{
 			using (var scope = serviceScopeFactory.CreateScope())
 			{

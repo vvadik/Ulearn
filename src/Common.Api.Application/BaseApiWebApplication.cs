@@ -91,6 +91,7 @@ namespace Ulearn.Common.Api
 				s.LogQueryString = new LoggingCollectionSettings(_ => true);
 			})
 			.SetupThrottling(b => b.DisableThrottling());
+			ConfigureBackgroundWorkers(builder);
 		}
 
 		public class UlearnPortConfiguration
@@ -111,6 +112,10 @@ namespace Ulearn.Common.Api
 		protected virtual IApplicationBuilder ConfigureWebApplication(IApplicationBuilder app)
 		{
 			return app;
+		}
+		
+		protected virtual void ConfigureBackgroundWorkers(IVostokAspNetCoreApplicationBuilder builder)
+		{
 		}
 
 		protected virtual void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment)
