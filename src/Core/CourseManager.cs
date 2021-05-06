@@ -650,5 +650,10 @@ namespace Ulearn.Core
 
 			return new DirectoryInfo(coursesDirectory);
 		}
+
+		public FileInfo GenerateOrFindStudentZip(string courseId, Slide slide)
+		{
+			return exerciseStudentZipsCache.GenerateOrFindZip(courseId, slide);
+		}
 	}
 }

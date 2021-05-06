@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
 
 namespace Database
 {
@@ -40,5 +41,6 @@ namespace Database
 		void ExtractTempCourseChanges(string tempCourseId);
 		bool TryCreateTempCourse(string courseId, string courseTitle, Guid firstVersionId);
 		void NotifyCourseChanged(string courseId);
+		FileInfo GenerateOrFindStudentZip(string courseId, Slide slide);
 	}
 }

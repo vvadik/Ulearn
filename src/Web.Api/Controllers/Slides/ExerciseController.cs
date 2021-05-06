@@ -21,7 +21,6 @@ using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.CSharp;
-using Ulearn.Core.Helpers;
 using Ulearn.Core.Metrics;
 using Ulearn.Core.RunCheckerJobApi;
 using Ulearn.Core.Telegram;
@@ -44,14 +43,13 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		private readonly MetricSender metricSender;
 		private readonly IServiceScopeFactory serviceScopeFactory;
 		private readonly StyleErrorsResultObserver styleErrorsResultObserver;
-		private readonly ExerciseStudentZipsCache exerciseStudentZipsCache;
 		private readonly ErrorsBot errorsBot = new ErrorsBot();
 		private static ILog log => LogProvider.Get().ForContext(typeof(ExerciseController));
 
 		public ExerciseController(IWebCourseManager courseManager, UlearnDb db, MetricSender metricSender,
 			IUsersRepo usersRepo, IUserSolutionsRepo userSolutionsRepo, ICourseRolesRepo courseRolesRepo, IVisitsRepo visitsRepo,
 			ISlideCheckingsRepo slideCheckingsRepo, IGroupsRepo groupsRepo, StyleErrorsResultObserver styleErrorsResultObserver,
-			IStyleErrorsRepo styleErrorsRepo, IServiceScopeFactory serviceScopeFactory, ExerciseStudentZipsCache exerciseStudentZipsCache)
+			IStyleErrorsRepo styleErrorsRepo, IServiceScopeFactory serviceScopeFactory)
 			: base(courseManager, db, usersRepo)
 		{
 			this.metricSender = metricSender;
@@ -63,7 +61,6 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			this.styleErrorsRepo = styleErrorsRepo;
 			this.styleErrorsResultObserver = styleErrorsResultObserver;
 			this.serviceScopeFactory = serviceScopeFactory;
-			this.exerciseStudentZipsCache = exerciseStudentZipsCache;
 		}
 
 		[HttpPost("/slides/{courseId}/{slideId}/exercise/submit")]
@@ -277,7 +274,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			if ((exerciseSlide.Exercise as UniversalExerciseBlock)?.NoStudentZip ?? false)
 				return NotFound();
 
-			var zipFile = exerciseStudentZipsCache.GenerateOrFindZip(courseId, exerciseSlide);
+			var zipFile = courseManager.GenerateOrFindStudentZip(courseId, exerciseSlide);
 
 			var block = exerciseSlide.Exercise;
 			var fileName = (block as CsProjectExerciseBlock)?.CsprojFile.Name ?? new DirectoryInfo(((UniversalExerciseBlock)block).ExerciseDirPath).Name;

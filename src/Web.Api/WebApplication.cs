@@ -258,7 +258,6 @@ namespace Ulearn.Web.Api
 			services.AddScoped<AntiPlagiarismResultObserver>();
 			services.AddScoped<StyleErrorsResultObserver>();
 			services.AddScoped<LtiResultObserver>();
-			services.AddSingleton<ExerciseStudentZipsCache, ExerciseStudentZipsCache>();
 
 			services.AddDatabaseServices();
 		}
