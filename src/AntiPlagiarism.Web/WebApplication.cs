@@ -27,12 +27,6 @@ namespace AntiPlagiarism.Web
 			updateOldSubmissionsFromStatisticsWorker = app.ApplicationServices.GetService<UpdateOldSubmissionsFromStatisticsWorker>();
 			return app;
 		}
-		
-		protected override void ConfigureBackgroundWorkers(IVostokAspNetCoreApplicationBuilder builder)
-		{
-			builder.AddHostedServiceFromApplication<AddNewSubmissionWorker>();
-			builder.AddHostedServiceFromApplication<UpdateOldSubmissionsFromStatisticsWorker>();
-		}
 
 		protected override void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment)
 		{
@@ -73,6 +67,12 @@ namespace AntiPlagiarism.Web
 			services.AddScoped<NewSubmissionHandler>();
 			services.AddSingleton<TokensExtractor>();
 			services.AddSingleton<CodeUnitsExtractor>();
+		}
+
+		protected override void ConfigureBackgroundWorkers(IVostokAspNetCoreApplicationBuilder builder)
+		{
+			builder.AddHostedServiceFromApplication<AddNewSubmissionWorker>();
+			builder.AddHostedServiceFromApplication<UpdateOldSubmissionsFromStatisticsWorker>();
 		}
 	}
 }

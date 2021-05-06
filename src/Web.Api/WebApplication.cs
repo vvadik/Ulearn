@@ -46,6 +46,8 @@ using Ulearn.Web.Api.Models;
 using Ulearn.Web.Api.Models.Binders;
 using Ulearn.Web.Api.Models.Responses.SlideBlocks;
 using Ulearn.Web.Api.Swagger;
+using Ulearn.Web.Api.Workers;
+using Vostok.Applications.AspNetCore.Builders;
 using Vostok.Hosting.Abstractions;
 using Web.Api.Configuration;
 using Enum = System.Enum;
@@ -259,6 +261,11 @@ namespace Ulearn.Web.Api
 			services.AddSingleton<ExerciseStudentZipsCache, ExerciseStudentZipsCache>();
 
 			services.AddDatabaseServices();
+		}
+
+		protected override void ConfigureBackgroundWorkers(IVostokAspNetCoreApplicationBuilder builder)
+		{
+			builder.AddHostedServiceFromApplication<ArchiveGroupsWorker>();
 		}
 
 		public void ConfigureAuthServices(IServiceCollection services, WebApiConfiguration configuration)

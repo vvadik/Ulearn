@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using AntiPlagiarism.Web.Configuration;
 using AntiPlagiarism.Web.Database.Repos;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +14,6 @@ namespace AntiPlagiarism.Web.Workers
 	{
 		private readonly IServiceScopeFactory serviceScopeFactory;
 		private readonly AntiPlagiarismConfiguration configuration;
-
 		private static ILog log => LogProvider.Get().ForContext(typeof(UpdateOldSubmissionsFromStatisticsWorker));
 // ReSharper disable once NotAccessedField.Local
 
@@ -39,8 +39,9 @@ namespace AntiPlagiarism.Web.Workers
 			builder.Schedule("UpdateOldSubmissionsFromStatisticsWorker", scheduler, Task);
 		}
 
-		private void Task(object stateInfo)
+		private async Task Task(object stateInfo)
 		{
+			log.Info("Start UpdateOldSubmissionsFromStatisticsWorker");
 			using (var scope = serviceScopeFactory.CreateScope())
 			{
 				var snippetsRepo = scope.ServiceProvider.GetService<ISnippetsRepo>();
@@ -48,17 +49,18 @@ namespace AntiPlagiarism.Web.Workers
 				{
 					var now = DateTime.Now;
 					var submissionInfluenceLimitInMonths = configuration.AntiPlagiarism.SubmissionInfluenceLimitInMonths;
-					var border = snippetsRepo.GetOldSubmissionsInfluenceBorderAsync().Result;
+					var border = await snippetsRepo.GetOldSubmissionsInfluenceBorderAsync();
 					var from = border?.Date ?? new DateTime(2000, 1, 1);
 					var to = now.AddMonths(-submissionInfluenceLimitInMonths);
-					snippetsRepo.UpdateOldSnippetsStatisticsAsync(from, to).Wait();
-					snippetsRepo.SetOldSubmissionsInfluenceBorderAsync(to).Wait();
+					await snippetsRepo.UpdateOldSnippetsStatisticsAsync(from, to);
+					await snippetsRepo.SetOldSubmissionsInfluenceBorderAsync(to);
 				}
 				catch (Exception ex)
 				{
 					log.Error(ex, "Exception during UpdateOldSubmissionsFromStatistics");
 				}
 			}
+			log.Info("End UpdateOldSubmissionsFromStatisticsWorker");
 		}
 	}
 }

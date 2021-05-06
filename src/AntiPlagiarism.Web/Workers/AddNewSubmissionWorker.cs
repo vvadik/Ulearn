@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using AntiPlagiarism.Web.CodeAnalyzing;
 using AntiPlagiarism.Web.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -48,7 +49,7 @@ namespace AntiPlagiarism.Web.Workers
 			}
 		}
 
-		private void Task()
+		private async Task Task()
 		{
 			while (true)
 			{
@@ -58,7 +59,7 @@ namespace AntiPlagiarism.Web.Workers
 					var newSubmissionHandler = scope.ServiceProvider.GetService<NewSubmissionHandler>();
 					try
 					{
-						newSubmissionHandled = newSubmissionHandler.HandleNewSubmission().Result;
+						newSubmissionHandled = await newSubmissionHandler.HandleNewSubmission();
 					}
 					catch (Exception ex)
 					{
