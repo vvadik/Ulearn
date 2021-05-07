@@ -25,7 +25,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 
 			var tarGzPath = Dir.GetSingleFile(CourseTarGz ?? "*.tar.gz");
 
-			EdxInteraction.ExtractEdxCourseArchive(Dir, tarGzPath);
+			EdxInteraction.ExtractEdxCourseArchive(Dir, tarGzPath, true);
 
 			Console.WriteLine("Loading edx course...");
 			var edxCourse = EdxCourse.Load(Dir + "/olx");
