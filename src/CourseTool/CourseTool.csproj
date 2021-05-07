@@ -104,6 +104,18 @@
     <Content Include="examples\video.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Remove="templates\code.html" />
+    <Content Include="templates\code.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Remove="templates\gallery.html" />
+    <Content Include="templates\gallery.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Remove="templates\iframe.html" />
+    <Content Include="templates\iframe.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Include="templates\config.xml">
