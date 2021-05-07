@@ -202,7 +202,6 @@ namespace Ulearn.Core.Courses.Slides
 		private static IEnumerable<Vertical> OrdinarySlideToVerticals(string courseId, Slide slide, string ulearnBaseUrl, Dictionary<string, string> videoGuids, string ltiId, DirectoryInfo coursePackageRoot)
 		{
 			var componentIndex = 0;
-			var ignoredComponentIndexes = new HashSet<int>();
 			var components = new List<Component>();
 			while (componentIndex < slide.Blocks.Length)
 			{
@@ -221,7 +220,7 @@ namespace Ulearn.Core.Courses.Slides
 							}
 							catch (NotImplementedException ex)
 							{
-								Console.WriteLine("Block NotSupportedException");
+								Console.WriteLine($"{block.GetType().Name} block NotSupportedException");
 							}
 						}
 
