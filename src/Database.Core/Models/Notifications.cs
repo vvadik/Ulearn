@@ -905,7 +905,7 @@ namespace Database.Models
 
 		private static string GetCertificateUrl(Certificate certificate, string baseUrl)
 		{
-			return baseUrl + $"/Certificates/{certificate.Id}";
+			return baseUrl + $"/Certificate/{certificate.Id}";
 		}
 
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
