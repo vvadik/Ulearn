@@ -272,21 +272,6 @@
 	</div>
 }
 
-@helper Notification(GroupMemberHasBeenRemovedNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
-{
-	<div class="notifications__group-member-has-been-removed-notification media" data-href="@Url.Action("Groups", "Admin", new { courseId = notification.CourseId })">
-		<div class="media-left">
-			@UserAvatar.Avatar(notification.InitiatedBy)
-		</div>
-		<div class="media-body">
-			<div class="notifications__notification__header">
-				@UserName(notification.InitiatedBy) удалил@( notification.InitiatedBy.Gender.ChooseEnding()) студента @notification.User.VisibleName из группы <b>«@notification.Group.Name.MakeNestedQuotes()»</b> в курсе «@course.Title.MakeNestedQuotes()».
-			</div>
-			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
-		</div>
-	</div>
-}
-
 @helper Notification(GroupMembersHaveBeenRemovedNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
 {
 	<div class="notifications__group-members-have-been-removed-notification media" data-href="@Url.Action("Groups", "Admin", new { courseId = notification.CourseId })">

@@ -99,8 +99,6 @@ namespace Database.DataContexts
 			CancelCascaseDeleting<JoinedToYourGroupNotification, Group, int>(modelBuilder, c => c.Group, c => c.GroupId);
 			CancelCascaseDeleting<GrantedAccessToGroupNotification, GroupAccess, int>(modelBuilder, c => c.Access, c => c.AccessId);
 			CancelCascaseDeleting<RevokedAccessToGroupNotification, GroupAccess, int>(modelBuilder, c => c.Access, c => c.AccessId);
-			CancelCascaseDeleting<GroupMemberHasBeenRemovedNotification, Group, int>(modelBuilder, c => c.Group, c => c.GroupId);
-			CancelCascaseDeleting<GroupMemberHasBeenRemovedNotification, ApplicationUser, string>(modelBuilder, c => c.User, c => c.UserId);
 			CancelCascaseDeleting<GroupMembersHaveBeenRemovedNotification, Group, int>(modelBuilder, c => c.Group, c => c.GroupId);
 			CancelCascaseDeleting<GroupMembersHaveBeenAddedNotification, Group, int>(modelBuilder, c => c.Group, c => c.GroupId);
 			CancelCascaseDeleting<CreatedGroupNotification, Group, int>(modelBuilder, c => c.Group, c => c.GroupId);

@@ -209,14 +209,6 @@ namespace Database.Models
 		[IsEnabledByDefault(true)]
 		RevokedAccessToGroup = 103,
 
-		/*
-		 * Not used more. Use GroupMembersHaveBeenRemoved instead.
-		[Display(Name = @"Преподаватель удалил студента из вашей группы", GroupName = @"Преподаватель удалил студентов из ваших групп")]
-		[MinCourseRole(CourseRole.Instructor)]
-		[IsEnabledByDefault(true)]
-		GroupMemberHasBeenRemoved = 104,
-		*/
-
 		[Display(Name = @"Преподаватель удалил студентов из вашей группы", GroupName = @"Преподаватель удалил студентов из ваших групп")]
 		[MinCourseRole(CourseRole.Instructor)]
 		[IsEnabledByDefault(true)]
@@ -406,6 +398,7 @@ namespace Database.Models
 	public class SystemMessageNotification : Notification
 	{
 		[Required]
+		[Column("Text")]
 		public string Text { get; set; }
 
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
@@ -439,6 +432,7 @@ namespace Database.Models
 	public class InstructorMessageNotification : Notification
 	{
 		[Required]
+		[Column("Text1")]
 		public string Text { get; set; }
 
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
@@ -1211,47 +1205,6 @@ namespace Database.Models
 		}
 	}
 
-	[Obsolete("Use GroupMembersHaveBeenRemovedNotification instead")]
-	public class GroupMemberHasBeenRemovedNotification : Notification
-	{
-		public string UserId { get; set; }
-
-		public virtual ApplicationUser User { get; set; }
-
-		[Required]
-		[Column("GroupMemberHasBeenRemovedNotification_GroupId")]
-		public int GroupId { get; set; }
-
-		public virtual Group Group { get; set; }
-
-		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
-		{
-			return $"<b>{InitiatedBy.VisibleName.EscapeHtml()}</b> удалил{InitiatedBy.Gender.ChooseEnding()} студента <b>{User.VisibleName.EscapeHtml()}</b> из группы <b>«{Group.Name.EscapeHtml()}»</b> (курс «{course.Title.EscapeHtml()}»).";
-		}
-
-		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
-		{
-			return $"{InitiatedBy.VisibleName} удалил{InitiatedBy.Gender.ChooseEnding()} студента {User.VisibleName} из группы «{Group.Name}» (курс «{course.Title}»).";
-		}
-
-		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
-		{
-			return new NotificationButton("Перейти к группам", GetGroupsUrl(course, baseUrl));
-		}
-
-		public override List<string> GetRecipientsIds(ULearnDb db, Course course)
-		{
-			var groupsRepo = new GroupsRepo(db, WebCourseManager.Instance);
-			var accesses = groupsRepo.GetGroupAccesses(GroupId);
-			return accesses.Select(a => a.UserId).Concat(new[] { Group.OwnerId }).ToList();
-		}
-
-		public override bool IsActual()
-		{
-			return User != null && !Group.IsDeleted;
-		}
-	}
-
 	public abstract class AbstractMassGroupOperationNotification : Notification
 	{
 		protected AbstractMassGroupOperationNotification()
@@ -1284,6 +1237,7 @@ namespace Database.Models
 		public string UserDescriptions { get; set; }
 
 		[Required]
+		[Column("GroupId")]
 		public int GroupId { get; set; }
 
 		public virtual Group Group { get; set; }
@@ -1471,6 +1425,7 @@ namespace Database.Models
 	public class CreatedGroupNotification : Notification
 	{
 		[Required]
+		[Column("GroupId1")]
 		public int GroupId { get; set; }
 
 		public virtual Group Group { get; set; }
