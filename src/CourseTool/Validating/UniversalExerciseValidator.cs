@@ -7,7 +7,6 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
-using Ulearn.Core.Helpers;
 using Ulearn.Core.RunCheckerJobApi;
 
 namespace uLearn.CourseTool.Validating
@@ -17,7 +16,7 @@ namespace uLearn.CourseTool.Validating
 		private readonly UniversalExerciseBlock ex;
 		private readonly ExerciseSlide slide;
 		private readonly DockerSandboxRunnerSettings settings;
-		private readonly ExerciseStudentZipBuilder exerciseStudentZipBuilder = new ExerciseStudentZipBuilder();
+		private readonly UniversalExerciseBlock.FilesProvider fp;
 
 		public UniversalExerciseValidator(BaseValidator baseValidator, DockerSandboxRunnerSettings settings, ExerciseSlide slide, UniversalExerciseBlock exercise)
 			: base(baseValidator)
@@ -25,6 +24,7 @@ namespace uLearn.CourseTool.Validating
 			this.settings = settings;
 			this.slide = slide;
 			ex = exercise;
+			fp = new UniversalExerciseBlock.FilesProvider((UniversalExerciseBlock)slide.Exercise, CourseDirectory);
 		}
 
 		public void ValidateExercises()
@@ -80,19 +80,19 @@ namespace uLearn.CourseTool.Validating
 		private bool ReportErrorIfExerciseFolderMissesRequiredFiles()
 		{
 			var doNotFindNextErrors =
-				ReportSlideError(!ex.ExerciseDirectory.Exists,
+				ReportSlideError(!fp.ExerciseDirectory.Exists,
 					$"Exercise directory '{ex.ExerciseDirPath}' doesn't exist")
-				|| ReportSlideError(!ex.UserCodeFile.Exists,
+				|| ReportSlideError(!fp.UserCodeFile.Exists,
 					$"User code file '{ex.UserCodeFilePath}' doesn't exist in exercise directory '{ex.ExerciseDirPath}")
-				|| ReportSlideError(!ex.InitialUserCodeFile.Exists && (!ex.NoStudentZip || ex.NoStudentZip && ex.ExerciseInitialCode == null),
+				|| ReportSlideError(!fp.InitialUserCodeFile.Exists && (!ex.NoStudentZip || ex.NoStudentZip && ex.ExerciseInitialCode == null),
 					$"Exercise directory '{ex.ExerciseDirPath}' doesn't contain '{ex.InitialUserCodeFilePath}'");
 			foreach (var pathToIncludeForChecker in ex.PathsToIncludeForChecker.EmptyIfNull())
 			{
 				if (!doNotFindNextErrors)
 				{
-					var di = new DirectoryInfo(Path.Combine(ex.UnitDirectory.FullName, pathToIncludeForChecker));
+					var di = new DirectoryInfo(Path.Combine(fp.UnitDirectory.FullName, pathToIncludeForChecker));
 					doNotFindNextErrors =
-						ReportSlideError(!ex.CourseDirectory.IsInside(di),
+						ReportSlideError(!new DirectoryInfo(CourseDirectory).IsInside(di),
 							$"includePathForChecker '{pathToIncludeForChecker}' is not in subtree of directory with course.xml")
 						|| ReportSlideError(!di.Exists,
 							$"includePathForChecker '{pathToIncludeForChecker}' doesn't exist");
@@ -104,17 +104,17 @@ namespace uLearn.CourseTool.Validating
 
 		private void ReportErrorIfInitialCodeIsSolutionOrVerdictNotOk()
 		{
-			CheckBuildAndTests(ex.GetInitialCode(), "Initial code", false);
+			CheckBuildAndTests(ex.GetInitialCode(fp), "Initial code", false);
 		}
 
 		private void ReportErrorIfSolutionNotBuildingOrNotPassesTests()
 		{
-			CheckBuildAndTests(ex.GetCorrectSolution(), $"Solution file '{ex.CorrectSolutionFilePath}'", true);
+			CheckBuildAndTests(ex.GetCorrectSolution(fp), $"Solution file '{ex.CorrectSolutionFilePath}'", true);
 		}
 
 		private void ReportErrorIfWrongAnswerExistsButNotBuildingOrPassesTests()
 		{
-			var wrongAnswerFiles = ex.WrongAnswerFiles;
+			var wrongAnswerFiles = fp.WrongAnswerFiles;
 			foreach (var waFile in wrongAnswerFiles)
 			{
 				var code = ex.GetRegionContent(waFile) ?? waFile.ContentAsUtf8();
@@ -129,7 +129,7 @@ namespace uLearn.CourseTool.Validating
 
 		private void CheckBuildAndTests(string code, string fileDescription, bool shouldPassTests)
 		{
-			var submission = (CommandRunnerSubmission)ex.CreateSubmission(Utils.NewNormalizedGuid(), code);
+			var submission = (CommandRunnerSubmission)ex.CreateSubmission(Utils.NewNormalizedGuid(), code, fp.CourseDirectory);
 			submission.RunCommand = settings.RunCommand;
 			var result = new DockerSandboxRunner().Run(submission);
 			var condition = ex.ExerciseType == ExerciseType.CheckOutput && result.Verdict != Verdict.Ok && shouldPassTests || 

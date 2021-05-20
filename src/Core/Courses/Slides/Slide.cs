@@ -15,6 +15,7 @@ using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
+using Ulearn.Core.Courses.Units;
 using Ulearn.Core.Extensions;
 using Ulearn.Core.Model.Edx;
 using Ulearn.Core.Model.Edx.EdxComponents;
@@ -95,7 +96,10 @@ namespace Ulearn.Core.Courses.Slides
 		};
 
 		[XmlIgnore]
-		public SlideInfo Info { get; set; }
+		public Unit Unit { get; set; }
+
+		[XmlIgnore]
+		public string SlideFilePathRelativeToCourse { get; set; }
 
 		public virtual bool ShouldBeSolved => false;
 
@@ -135,8 +139,8 @@ namespace Ulearn.Core.Courses.Slides
 		/// </summary>
 		public virtual void BuildUp(SlideLoadingContext context)
 		{
-			Meta?.FixPaths(context.SlideFile);
-			Info = new SlideInfo(context.Unit, context.SlideFile);
+			Unit = context.Unit;
+			SlideFilePathRelativeToCourse = context.SlideFilePathRelativeToCourse;
 			if (Blocks == null)
 				Blocks = new SlideBlock[0];
 
@@ -162,7 +166,7 @@ namespace Ulearn.Core.Courses.Slides
 			{
 				if (!AllowedBlockTypes.Any(type => type.IsInstanceOfType(block)))
 					throw new CourseLoadingException(
-						$"Недопустимый тип блока в слайде {Info.SlideFile.FullName}: <{block.GetType().GetXmlType()}>. " +
+						$"Недопустимый тип блока в слайде {SlideFilePathRelativeToCourse}: <{block.GetType().GetXmlType()}>. " +
 						$"В этом слайде разрешены только следующие блоки: {string.Join(", ", AllowedBlockTypes.Select(t => $"<{t.GetXmlType()}>"))}"
 					);
 			}
@@ -199,8 +203,9 @@ namespace Ulearn.Core.Courses.Slides
 
 		#region ExportToEdx
 
-		private static IEnumerable<Vertical> OrdinarySlideToVerticals(string courseId, Slide slide, string ulearnBaseUrl, Dictionary<string, string> videoGuids, string ltiId, DirectoryInfo coursePackageRoot)
+		private static IEnumerable<Vertical> OrdinarySlideToVerticals(EdxComponentBuilderContext context, Dictionary<string, string> videoGuids, string ltiId)
 		{
+			var slide = context.Slide;
 			var componentIndex = 0;
 			var components = new List<Component>();
 			while (componentIndex < slide.Blocks.Length)
@@ -213,7 +218,7 @@ namespace Ulearn.Core.Courses.Slides
 					{
 						if (!block.Hide)
 						{
-							var component = block.ToEdxComponent("", courseId, slide, componentIndex, ulearnBaseUrl, coursePackageRoot);
+							var component = block.ToEdxComponent(context with { ComponentIndex = componentIndex });
 							innerComponents.Add(component);
 						}
 
@@ -241,7 +246,7 @@ namespace Ulearn.Core.Courses.Slides
 
 				var exerciseBlock = slide.Blocks[componentIndex] as AbstractExerciseBlock;
 				var otherComponent = exerciseBlock != null
-					? ((ExerciseSlide)slide).GetExerciseComponent(componentIndex == 0 ? slide.Title : "Упражнение", slide, componentIndex, string.Format(ulearnBaseUrl + SlideUrlFormat, courseId, slide.Id), ltiId)
+					? ((ExerciseSlide)slide).GetExerciseComponent(componentIndex == 0 ? slide.Title : "Упражнение", slide, componentIndex, string.Format(context.UlearnBaseUrlWeb + SlideUrlFormat, context.CourseId, slide.Id), ltiId)
 					: ((YoutubeBlock)slide.Blocks[componentIndex]).GetVideoComponent(componentIndex == 0 ? slide.Title : "", slide, componentIndex, videoGuids);
 
 				components.Add(otherComponent);
@@ -256,7 +261,7 @@ namespace Ulearn.Core.Courses.Slides
 				var comp = exerciseSlide.GetSolutionsComponent(
 					"Решения",
 					slide, componentIndex,
-					string.Format(ulearnBaseUrl + SolutionsUrlFormat, courseId, slide.Id), ltiId);
+					string.Format(context.UlearnBaseUrlWeb + SolutionsUrlFormat, context.CourseId, slide.Id), ltiId);
 				components.Add(comp);
 				//yield return new Vertical(slide.NormalizedGuid + "0", "Решения", new[] { comp });
 			}
@@ -281,9 +286,9 @@ namespace Ulearn.Core.Courses.Slides
 		protected const string SlideUrlFormat = "/Course/{0}/LtiSlide?slideId={1}";
 		protected const string SolutionsUrlFormat = "/Course/{0}/AcceptedAlert?slideId={1}&isLti=True";
 
-		public IEnumerable<Vertical> ToVerticals(string courseId, string ulearnBaseUrl, Dictionary<string, string> videoGuids, string ltiId, DirectoryInfo coursePackageRoot)
+		public IEnumerable<Vertical> ToVerticals(string courseId, string ulearnBaseUrlApi, string ulearnBaseUrlWeb, Dictionary<string, string> videoGuids, string ltiId, DirectoryInfo courseDirectory)
 		{
-			var slideUrl = ulearnBaseUrl + SlideUrlFormat;
+			var slideUrl = ulearnBaseUrlWeb + SlideUrlFormat;
 			try
 			{
 				if (this is QuizSlide quizSlide)
@@ -291,7 +296,7 @@ namespace Ulearn.Core.Courses.Slides
 					return QuizToVerticals(courseId, quizSlide, slideUrl, ltiId).ToList();
 				}
 
-				return OrdinarySlideToVerticals(courseId, this, ulearnBaseUrl, videoGuids, ltiId, coursePackageRoot).ToList();
+				return OrdinarySlideToVerticals(new EdxComponentBuilderContext("", courseId, this, 0, ulearnBaseUrlApi, ulearnBaseUrlWeb, courseDirectory), videoGuids, ltiId).ToList();
 			}
 			catch (Exception e)
 			{
@@ -301,6 +306,9 @@ namespace Ulearn.Core.Courses.Slides
 
 		#endregion
 	}
+
+	public record EdxComponentBuilderContext(string DisplayName, string CourseId, Slide Slide, int ComponentIndex,
+		string UlearnBaseUrlApi, string UlearnBaseUrlWeb, DirectoryInfo CourseDirectory);
 
 	[JsonConverter(typeof(StringEnumConverter), true)]
 	public enum SlideType

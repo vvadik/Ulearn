@@ -96,7 +96,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 
 		public abstract SolutionBuildResult BuildSolution(string userWrittenCode);
 
-		public abstract RunnerSubmission CreateSubmission(string submissionId, string code);
+		public abstract RunnerSubmission CreateSubmission(string submissionId, string code, string courseDirectory);
 		public abstract bool HasAutomaticChecking();
 
 		#region equals
@@ -133,7 +133,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			return $"Exercise: {ExerciseInitialCode}, Hints: {string.Join("; ", HintsMd)}";
 		}
 
-		public override Component ToEdxComponent(string displayName, string courseId, Slide slide, int componentIndex, string ulearnBaseUrl, DirectoryInfo coursePackageRoot)
+		public override Component ToEdxComponent(EdxComponentBuilderContext context)
 		{
 			throw new NotSupportedException();
 		}

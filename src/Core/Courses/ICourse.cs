@@ -12,7 +12,6 @@ namespace Ulearn.Core.Courses
 		string Id { get; set; }
 		string Title { get; }
 		CourseSettings Settings { get; }
-		DirectoryInfo CourseXmlDirectory { get; }
 		List<Unit> GetUnits([NotNull]IEnumerable<Guid> visibleUnits);
 		List<Unit> GetUnitsNotSafe();
 
@@ -23,6 +22,6 @@ namespace Ulearn.Core.Courses
 		Unit FindUnitByIdNotSafe(Guid unitId);
 		Unit GetUnitByIdNotSafe(Guid unitId);
 		Unit FindUnitBySlideId(Guid slideId, bool withHidden);
-		InstructorNote FindInstructorNoteById(Guid slideId);
+		Slide FindInstructorNoteById(Guid slideId);
 	}
 }

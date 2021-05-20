@@ -81,16 +81,19 @@ namespace Ulearn.Web.Api.Controllers.Runner
 				courseManager.WaitWhileCourseIsLocked(submission.CourseId);
 				log.Info($"Курс {submission.CourseId} разблокирован");
 
+				var courseDictionary = courseManager.GetExtractedCourseDirectory(submission.CourseId).FullName;
 				if (exerciseSlide is PolygonExerciseSlide)
 					return ((PolygonExerciseBlock)exerciseSlide.Exercise).CreateSubmission(
 						submission.Id.ToString(),
 						submission.SolutionCode.Text,
-						submission.Language
+						submission.Language,
+						courseDictionary
 					);
 
 				return exerciseSlide.Exercise.CreateSubmission(
 					submission.Id.ToString(),
-					submission.SolutionCode.Text
+					submission.SolutionCode.Text,
+					courseDictionary
 				);
 			}
 

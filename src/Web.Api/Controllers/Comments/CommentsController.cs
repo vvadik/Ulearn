@@ -73,7 +73,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			{
 				var instructorNote = course.FindInstructorNoteById(slideId);
 				if (instructorNote != null && isInstructor)
-					slide = instructorNote.Slide;
+					slide = instructorNote;
 			}
 			return slide;
 		}

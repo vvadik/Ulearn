@@ -24,7 +24,7 @@ namespace uLearn.Web.Models
 			var unitResults = new Dictionary<Guid, UserCourseUnitModel>();
 			foreach (var slide in Course.GetSlides(true))
 			{
-				var unit = slide.Info.Unit;
+				var unit = slide.Unit;
 				if (!unitResults.ContainsKey(unit.Id))
 					unitResults.Add(unit.Id, new UserCourseUnitModel
 					{

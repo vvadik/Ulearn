@@ -13,7 +13,8 @@ namespace uLearn.Web.Models
 	{
 		public Course Course { get; private set; }
 		public Slide Slide { get; private set; }
-		public string BaseUrl { get; private set; }
+		public string BaseUrlApi { get; private set; }
+		public string BaseUrlWeb { get; private set; }
 		public dynamic[] BlockData { get; private set; }
 		public bool IsGuest { get; set; }
 		public bool IsLti { get; set; }
@@ -32,7 +33,7 @@ namespace uLearn.Web.Models
 		/* User's version of slide, i.e. for exercises */
 		public int? VersionId { get; set; }
 
-		public BlockRenderContext(Course course, Slide slide, string baseUrl, dynamic[] blockData,
+		public BlockRenderContext(Course course, Slide slide, string baseUrlApi, string baseUrlWeb, dynamic[] blockData,
 			bool isGuest = false, bool revealHidden = false, AbstractManualSlideChecking manualChecking = null,
 			int manualCheckingsLeftInQueue = 0, bool canUserFillQuiz = false, List<string> groupsIds = null, bool isLti = false, bool autoplay = false,
 			bool isManualCheckingReadonly = false, bool defaultProhibitFurtherReview = true, Dictionary<string, int> userScores = null)
@@ -41,7 +42,8 @@ namespace uLearn.Web.Models
 				throw new ArgumentException("BlockRenderContext(): BlockData.Length should be slide.Blocks.Length");
 			Course = course;
 			Slide = slide;
-			BaseUrl = baseUrl;
+			BaseUrlApi = baseUrlApi;
+			BaseUrlWeb = baseUrlWeb;
 			BlockData = blockData;
 			IsGuest = isGuest;
 			RevealHidden = revealHidden;

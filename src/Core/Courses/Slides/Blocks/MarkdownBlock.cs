@@ -6,7 +6,6 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
-using JetBrains.Annotations;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides.Exercises;
@@ -40,18 +39,13 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 		{
 		}
 
-		public string RenderMarkdown(string courseId, Slide slide, string baseUrl)
+		public string RenderMarkdown(Slide slide, MarkdownRenderContext context)
 		{
-			return GetMarkdownWithReplacedLinksToStudentZips(courseId, slide).RenderMarkdown(baseUrl);
-		}
-
-		public string RenderMarkdown(string courseId, Slide slide, FileInfo sourceFile, string baseUrl = "")
-		{
-			return GetMarkdownWithReplacedLinksToStudentZips(courseId, slide).RenderMarkdown(sourceFile, baseUrl);
+			return GetMarkdownWithReplacedLinksToStudentZips(context.CourseId, slide, context.BaseUrlApi).RenderMarkdown(context);
 		}
 
 		/* Replace links to (/Exercise/StudentZip) and to (ExerciseZip): automagically add courseId and slideId */
-		private string GetMarkdownWithReplacedLinksToStudentZips(string courseId, Slide slide)
+		private string GetMarkdownWithReplacedLinksToStudentZips(string courseId, Slide slide, string baseUrlApi)
 		{
 			if (string.IsNullOrEmpty(Markdown))
 				return "";
@@ -60,8 +54,8 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 				return Markdown;
 			if (!(Markdown.Contains("(/Exercise/StudentZip)") || Markdown.Contains("(ExerciseZip)")))
 				return Markdown;
-			var studentZipName = (exerciseSlide.Exercise as CsProjectExerciseBlock)?.CsprojFile.Name ?? new DirectoryInfo((exerciseSlide.Exercise as UniversalExerciseBlock).ExerciseDirPath).Name;
-			var studentZipFullPath = $"(/Exercise/{courseId}/{slide.Id}/StudentZip/{studentZipName}.zip)";
+			var studentZipName = (exerciseSlide.Exercise as CsProjectExerciseBlock)?.CsprojFileName ?? new DirectoryInfo((exerciseSlide.Exercise as UniversalExerciseBlock).ExerciseDirPath).Name;
+			var studentZipFullPath = CourseUrlHelper.GetAbsoluteUrlToStudentZip(baseUrlApi, courseId, slide.Id, studentZipName);
 			return Markdown.Replace("(/Exercise/StudentZip)", studentZipFullPath).Replace("(ExerciseZip)", studentZipFullPath);
 		}
 
@@ -70,20 +64,17 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 			return $"Markdown {Markdown}";
 		}
 
-		public override Component ToEdxComponent(string displayName, string courseId, Slide slide, int componentIndex, string ulearnBaseUrl, DirectoryInfo coursePackageRoot)
+		public override Component ToEdxComponent(EdxComponentBuilderContext context)
 		{
-			var slideDirectory = slide.Info.SlideFile.Directory;
-			var directoryRelativePath = "/Courses/" + courseId + "/" + slideDirectory.GetRelativePath(coursePackageRoot.FullName);
-			var baseUrl = ulearnBaseUrl + directoryRelativePath.Replace('\\', '/');
-			var html = RenderMarkdown(courseId, slide, baseUrl);
-			var urlName = slide.NormalizedGuid + componentIndex;
-			return new HtmlComponent(urlName, displayName, urlName, html);
+			var html = RenderMarkdown(context.Slide, new MarkdownRenderContext(context.UlearnBaseUrlApi, context.UlearnBaseUrlWeb, context.CourseId, context.Slide.Unit.UnitDirectoryRelativeToCourse));
+			var urlName = context.Slide.NormalizedGuid + context.ComponentIndex;
+			return new HtmlComponent(urlName, context.DisplayName, urlName, html);
 		}
 
-		public Component ToEdxComponent(string urlName, string displayName, string directoryName)
+		public Component ToEdxComponent(string urlName, string displayName, string courseDirectory, string unitDirectoryRelativeToCourse)
 		{
 			var htmlWithUrls = Markdown.GetHtmlWithUrls("/static/" + urlName + "_");
-			return new HtmlComponent(urlName, displayName, urlName, htmlWithUrls.Item1, directoryName, htmlWithUrls.Item2);
+			return new HtmlComponent(urlName, displayName, urlName, htmlWithUrls.Item1, courseDirectory, unitDirectoryRelativeToCourse, htmlWithUrls.Item2);
 		}
 
 		public override IEnumerable<SlideBlock> BuildUp(SlideBuildingContext context, IImmutableSet<string> filesInProgress)

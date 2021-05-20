@@ -8,8 +8,9 @@ namespace uLearn.CourseTool.Validating
 {
 	public abstract class BaseValidator
 	{
-		protected BaseValidator()
+		protected BaseValidator(string courseDirectory)
 		{
+			CourseDirectory = courseDirectory;
 		}
 
 		protected BaseValidator(BaseValidator fromValidator)
@@ -17,20 +18,22 @@ namespace uLearn.CourseTool.Validating
 			InfoMessage = fromValidator.InfoMessage;
 			Error = fromValidator.Error;
 			Warning = fromValidator.Warning;
+			CourseDirectory = fromValidator.CourseDirectory;
 		}
 
 		public event Action<string> InfoMessage;
 		public event Action<string> Error;
 		public event Action<string> Warning;
+		public string CourseDirectory;
 
 		private static string FormatSlideIssueMessage(Slide slide, string warning)
 		{
-			return $"{slide.Info.Unit.Title}: {slide.Info.SlideFile?.Name} ({slide.Title})\n{warning}";
+			return $"{slide.Unit.Title}: {slide.SlideFilePathRelativeToCourse} ({slide.Title})\n{warning}";
 		}
 
 		private static string FormatFlashcardIssueMessage(Flashcard flashcard, Slide slide, string warning)
 		{
-			return $" flashcard id {flashcard.Id} in slide {slide.Info.Unit.Title}: {slide.Info.SlideFile?.Name} ({slide.Title})\n{warning}";
+			return $" flashcard id {flashcard.Id} in slide {slide.Unit.Title}: {slide.SlideFilePathRelativeToCourse} ({slide.Title})\n{warning}";
 		}
 
 		protected void ReportSlideWarning(Slide slide, string warning)

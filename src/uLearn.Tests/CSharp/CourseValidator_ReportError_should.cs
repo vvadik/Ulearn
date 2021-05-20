@@ -19,36 +19,39 @@ namespace uLearn.CSharp
 	[TestFixture]
 	public class CourseValidator_ReportError_should
 	{
-		private static readonly string tempSlideFolderPath = Path.Combine(TestsHelper.TestDirectory,
-			"ReportErrorTests_Temp_SlideFolder");
-
-		private static readonly DirectoryInfo tempSlideFolder = new DirectoryInfo(tempSlideFolderPath);
+		private static readonly string courseDirectory = TestsHelper.TestDirectory;
+		private static readonly string unitDirectoryPathRelativeToCourse = "ReportErrorTests_Temp_SlideFolder";
+		private static readonly string unitDirectoryAbsolutePath = Path.Combine(courseDirectory, unitDirectoryPathRelativeToCourse);
+		private static readonly DirectoryInfo unitDirectory = new DirectoryInfo(unitDirectoryAbsolutePath);
 
 		private static CsProjectExerciseBlock exerciseBlock;
+		private static CsProjectExerciseBlock.FilesProvider fp;
 
 		[OneTimeSetUp]
 		public void OneTimeSetUp()
 		{
-			TestsHelper.RecreateDirectory(tempSlideFolderPath);
+			TestsHelper.RecreateDirectory(unitDirectoryAbsolutePath);
 		}
 
 		[SetUp]
 		public void SetUp()
 		{
+			FileSystem.CopyDirectory(TestsHelper.ProjSlideFolderPath, unitDirectoryAbsolutePath, true);
+
 			exerciseBlock = new CsProjectExerciseBlock
 			{
 				StartupObject = "test.Program",
 				UserCodeFilePath = TestsHelper.UserCodeFileName,
-				SlideFolderPath = tempSlideFolder,
+				UnitDirectoryPathRelativeToCourse = unitDirectoryPathRelativeToCourse,
 				CsProjFilePath = TestsHelper.CsProjFilePath,
 			};
-			FileSystem.CopyDirectory(TestsHelper.ProjSlideFolderPath, tempSlideFolderPath, true);
+			fp = new CsProjectExerciseBlock.FilesProvider(exerciseBlock, courseDirectory);
 
-			string studentZipFilepath = Path.Combine(tempSlideFolderPath, "ProjDir.exercise.zip");
+			var studentZipFilepath = Path.Combine(unitDirectoryAbsolutePath, "ProjDir.exercise.zip");
 			if (File.Exists(studentZipFilepath))
 				File.Delete(studentZipFilepath);
 
-			var context = new SlideBuildingContext("Test", new Unit(null, exerciseBlock.SlideFolderPath), CourseSettings.DefaultSettings, exerciseBlock.SlideFolderPath, null);
+			var context = new SlideBuildingContext("Test", new Unit(null, unitDirectoryPathRelativeToCourse), CourseSettings.DefaultSettings, new DirectoryInfo(courseDirectory), unitDirectory, null);
 			// ReSharper disable once ReturnValueOfPureMethodIsNotUsed
 			exerciseBlock.BuildUp(context, ImmutableHashSet<string>.Empty).ToList();
 		}
@@ -57,8 +60,8 @@ namespace uLearn.CSharp
 		[Ignore("ProjectExerciseValidator generates exercise zip from exercise block. Zip file built here is not care")]
 		public void ReportError_If_StudentZip_HasErrors()
 		{
-			FileSystem.CopyDirectory(tempSlideFolder.GetSubdirectory("projDir").FullName,
-				tempSlideFolder.GetSubdirectory("FullProjDir").FullName);
+			FileSystem.CopyDirectory(unitDirectory.GetSubdirectory("projDir").FullName,
+				unitDirectory.GetSubdirectory("FullProjDir").FullName);
 			exerciseBlock.CsProjFilePath = Path.Combine("FullProjDir", TestsHelper.CsProjFilename);
 			SaveTempZipFileWithFullProject();
 
@@ -76,7 +79,7 @@ namespace uLearn.CSharp
 
 		private void SaveTempZipFileWithFullProject()
 		{
-			var zipWithFullProj = new FileInfo(Path.Combine(tempSlideFolderPath, "FullProjDir.exercise.zip"));
+			var zipWithFullProj = new FileInfo(Path.Combine(unitDirectoryAbsolutePath, "FullProjDir.exercise.zip"));
 			var noExcludedFiles = new Func<FileInfo, bool>(_ => false);
 			var noExcludedDirs = new string[0];
 
@@ -100,27 +103,27 @@ namespace uLearn.CSharp
 		[Test]
 		public void ReportError_If_ExerciseFolder_HasErrors()
 		{
-			File.Delete(exerciseBlock.UserCodeFile.FullName);
-			File.Delete(Path.Combine(tempSlideFolderPath, exerciseBlock.CsProjFilePath));
+			File.Delete(fp.UserCodeFile.FullName);
+			File.Delete(Path.Combine(unitDirectoryAbsolutePath, exerciseBlock.CsProjFilePath));
 
 			var validatorOutput = TestsHelper.ValidateBlock(exerciseBlock);
 
 			validatorOutput
-				.Should().Contain($"Exercise folder ({exerciseBlock.ExerciseFolder.Name}) doesn't contain ({exerciseBlock.CsprojFileName})");
+				.Should().Contain($"Exercise folder ({fp.ExerciseDirectory.Name}) doesn't contain ({exerciseBlock.CsprojFileName})");
 			validatorOutput
-				.Should().Contain($"Exercise folder ({exerciseBlock.ExerciseFolder.Name}) doesn't contain ({exerciseBlock.UserCodeFilePath})");
+				.Should().Contain($"Exercise folder ({fp.ExerciseDirectory.Name}) doesn't contain ({exerciseBlock.UserCodeFilePath})");
 		}
 
 		[Test]
 		public void ReportError_If_CorrectSolution_Not_Building()
 		{
-			File.WriteAllText(exerciseBlock.CorrectSolutionFile.FullName, "");
+			File.WriteAllText(fp.CorrectSolutionFile.FullName, "");
 
 			var validatorOutput = TestsHelper.ValidateBlock(exerciseBlock);
 
 			validatorOutput
 				.Should().Contain(
-					$"Correct solution file {exerciseBlock.CorrectSolutionFileName} verdict is not OK. RunResult = Id: test.csproj, Verdict: CompilationError");
+					$"Correct solution file {fp.CorrectSolutionFile.Name} verdict is not OK. RunResult = Id: test.csproj, Verdict: CompilationError");
 		}
 
 		[Test]
@@ -134,7 +137,7 @@ namespace uLearn.CSharp
 			validatorOutput
 				.Should()
 				.Contain(
-					$"Correct solution file {exerciseBlock.CorrectSolutionFileName} verdict is not OK. RunResult = Id: test.csproj, Verdict: RuntimeError: System.ArgumentException: Error in checking system: test class non_existing.test_class does not exist");
+					$"Correct solution file {fp.CorrectSolutionFile.Name} verdict is not OK. RunResult = Id: test.csproj, Verdict: RuntimeError: System.ArgumentException: Error in checking system: test class non_existing.test_class does not exist");
 		}
 
 		[Test]
@@ -147,7 +150,7 @@ namespace uLearn.CSharp
 			validatorOutput
 				.Should()
 				.Contain(
-					$"Correct solution file {exerciseBlock.CorrectSolutionFileName} is not solution. RunResult = Id: test.csproj, Verdict: Ok")
+					$"Correct solution file {fp.CorrectSolutionFile.Name} is not solution. RunResult = Id: test.csproj, Verdict: Ok")
 				.And
 				.Contain("Как минимум один из тестов не пройден")
 				.And

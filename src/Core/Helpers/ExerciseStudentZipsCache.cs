@@ -31,15 +31,15 @@ namespace Ulearn.Core.Helpers
 			return CourseManager.GetCoursesDirectory().GetSubdirectory("ExerciseStudentZips");
 		}
 
-		public FileInfo GenerateOrFindZip(string courseId, Slide slide)
+		public FileInfo GenerateOrFindZip(string courseId, Slide slide, string courseDirectory)
 		{
-			var courseDirectory = cacheDirectory.GetSubdirectory(courseId);
-			var zipFile = courseDirectory.GetFile($"{slide.Id}.zip");
+			var cacheCourseDirectory = cacheDirectory.GetSubdirectory(courseId);
+			var zipFile = cacheCourseDirectory.GetFile($"{slide.Id}.zip");
 			if (!zipFile.Exists)
 			{
-				courseDirectory.EnsureExists();
+				cacheCourseDirectory.EnsureExists();
 				log.Info($"Собираю zip-архив с упражнением: курс {courseId}, слайд «{slide.Title}» ({slide.Id}), файл {zipFile.FullName}");
-				builder.BuildStudentZip(slide, zipFile);
+				builder.BuildStudentZip(slide, zipFile, courseDirectory);
 			}
 
 			return zipFile;

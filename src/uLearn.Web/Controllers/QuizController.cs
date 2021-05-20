@@ -49,9 +49,15 @@ namespace uLearn.Web.Controllers
 		private readonly NotificationsRepo notificationsRepo;
 		private readonly UnitsRepo unitsRepo;
 
+		private readonly string baseUrlWeb;
+		private readonly string baseUrlApi;
+
 		public QuizController()
 		{
-			metricSender = new MetricSender(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName);
+			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
+			baseUrlWeb = configuration.BaseUrl;
+			baseUrlApi = configuration.BaseUrlApi;
+			metricSender = new MetricSender(configuration.GraphiteServiceName);
 
 			userQuizzesRepo = new UserQuizzesRepo(db);
 			visitsRepo = new VisitsRepo(db);
@@ -154,6 +160,8 @@ namespace uLearn.Web.Controllers
 			{
 				Course = course,
 				Slide = slide,
+				BaseUrlWeb = baseUrlWeb,
+				BaseUrlApi = baseUrlApi,
 				QuizState = state,
 				MaxAttemptsCount = maxAttemptsCount,
 				UserScores = userScores,
@@ -557,6 +565,8 @@ namespace uLearn.Web.Controllers
 			{
 				Course = course,
 				Slide = slide,
+				BaseUrlWeb = baseUrlWeb,
+				BaseUrlApi = baseUrlApi,
 				IsGuest = true,
 				QuizState = new QuizState(QuizStatus.ReadyToSend, 0, 0, slide.MaxScore),
 			};

@@ -30,7 +30,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 				Console.WriteLine("Only slide " + SlideId);
 			}
 
-			var validator = new CourseValidator(slides);
+			var validator = new CourseValidator(slides, ulearnDir.FullName);
 			validator.InfoMessage += m => Write(ConsoleColor.Gray, m);
 			var errors = new List<string>();
 			validator.Error += m =>
@@ -43,7 +43,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 				Write(ConsoleColor.DarkYellow, m);
 				errors.Add(m);
 			};
-			validator.ValidateSpelling(course);
+			validator.ValidateSpelling(course, ulearnDir.Name);
 			validator.ValidateExercises();
 			validator.ValidateVideos();
 			validator.ValidateFlashcardSlides();

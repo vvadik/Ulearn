@@ -10,14 +10,11 @@ namespace Ulearn.Core.Courses
 
 		public DirectoryInfo CourseDirectory { get; }
 
-		public FileInfo CourseXml { get; }
-
-		public CourseLoadingContext(string courseId, CourseSettings courseSettings, DirectoryInfo courseDirectory, FileInfo courseXml)
+		public CourseLoadingContext(string courseId, CourseSettings courseSettings, DirectoryInfo courseDirectory)
 		{
 			CourseId = courseId;
 			CourseSettings = courseSettings;
 			CourseDirectory = courseDirectory;
-			CourseXml = courseXml;
 		}
 	}
 }

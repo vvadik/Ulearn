@@ -50,10 +50,10 @@ namespace Ulearn.Core
 			}
 		}
 
-		public static void PrepareForStudentZip(Project proj, CsProjectExerciseBlock ex)
+		public static void PrepareForStudentZip(Project proj, CsProjectExerciseBlock ex, CsProjectExerciseBlock.FilesProvider fp)
 		{
 			var toExclude = FindItemNames(proj, file => ExerciseStudentZipBuilder.NeedExcludeFromStudentZip(ex, file)).ToList();
-			var solutionsOfOtherTasks = toExclude.Where(n => ExerciseStudentZipBuilder.IsAnySolution(n) && ex.CorrectFullSolutionPath != n).ToList();
+			var solutionsOfOtherTasks = toExclude.Where(n => ExerciseStudentZipBuilder.IsAnySolution(n) && fp.CorrectFullSolutionPath != n).ToList();
 
 			/* Remove StartupObject from csproj: it's not needed in student zip */
 			var startupObject = proj.GetProperty("StartupObject");
@@ -83,10 +83,10 @@ namespace Ulearn.Core
 				|| item.DirectMetadata.Any(md => md.Name == "Link" && md.EvaluatedValue.StartsWith("checking" + Path.DirectorySeparatorChar));
 		}
 
-		public static void PrepareForCheckingUserCode(Project proj, CsProjectExerciseBlock ex, List<string> excludedPaths)
+		public static void PrepareForCheckingUserCode(Project proj, CsProjectExerciseBlock ex, List<string> excludedPaths, CsProjectExerciseBlock.FilesProvider fp)
 		{
-			var solutionRelativePath = ex.ExerciseFolder.GetRelativePathsOfFiles()
-				.SingleOrDefault(n => n.Equals(ex.CorrectFullSolutionPath, StringComparison.InvariantCultureIgnoreCase));
+			var solutionRelativePath = fp.ExerciseDirectory.GetRelativePathsOfFiles()
+				.SingleOrDefault(n => n.Equals(fp.CorrectFullSolutionPath, StringComparison.InvariantCultureIgnoreCase));
 
 			if (solutionRelativePath != null)
 				excludedPaths.Add(solutionRelativePath);

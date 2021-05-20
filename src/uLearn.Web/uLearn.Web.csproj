@@ -882,7 +882,6 @@
     <Compile Include="Controllers\AnalyticsController.cs" />
     <Compile Include="Controllers\QuizController.cs" />
     <Compile Include="Controllers\ExerciseController.cs" />
-    <Compile Include="Controllers\HintController.cs" />
     <Compile Include="Controllers\VisitsController.cs" />
     <Compile Include="FilterAttributes\ULearnAuthorizeAttribute.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
@@ -1025,11 +1024,6 @@
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Course\Slide.cshtml" />
     <Content Include="Views\Course\AcceptedSolutions.cshtml" />
-    <Content Include="Views\Shared\DisplayTemplates\CodeBlock.cshtml" />
-    <Content Include="Views\Shared\DisplayTemplates\MdBlock.cshtml" />
-    <Content Include="Views\Shared\DisplayTemplates\YoutubeBlock.cshtml" />
-    <Content Include="Views\Shared\DisplayTemplates\HintWithLikeButton.cshtml" />
-    <Content Include="Views\Hint\UseHint.cshtml" />
     <Content Include="Views\Account\List.cshtml" />
     <Content Include="Views\Admin\Units.cshtml" />
     <Content Include="Views\Analytics\UnitSheet.cshtml" />
@@ -1038,11 +1032,9 @@
     <Content Include="Views\Analytics\UsersProgress.cshtml" />
     <Content Include="Views\Analytics\UserSolutions.cshtml" />
     <Content Include="Views\Account\ChangeDetailsPartial.cshtml" />
-    <Content Include="Views\Shared\DisplayTemplates\TexBlock.cshtml" />
     <Content Include="Views\Quiz\Quiz.cshtml" />
     <Content Include="Views\Account\Info.cshtml" />
     <Content Include="Views\Account\CourseInfo.cshtml" />
-    <Content Include="Views\Shared\DisplayTemplates\ImageGaleryBlock.cshtml" />
     <Content Include="Views\Course\SlideHtml.cshtml">
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>SlideHtml.generated.cs</LastGenOutput>

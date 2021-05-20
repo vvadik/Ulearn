@@ -236,7 +236,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 
 		private static string GenerateSubmissionName(Slide exerciseSlide, string userName)
 		{
-			return $"{userName}: {exerciseSlide.Info.Unit.Title} - {exerciseSlide.Title}";
+			return $"{userName}: {exerciseSlide.Unit.Title} - {exerciseSlide.Title}";
 		}
 
 		private async Task<List<StyleError>> ConvertStyleErrors(SolutionBuildResult buildResult)
@@ -277,7 +277,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			var zipFile = courseManager.GenerateOrFindStudentZip(courseId, exerciseSlide);
 
 			var block = exerciseSlide.Exercise;
-			var fileName = (block as CsProjectExerciseBlock)?.CsprojFile.Name ?? new DirectoryInfo(((UniversalExerciseBlock)block).ExerciseDirPath).Name;
+			var fileName = (block as CsProjectExerciseBlock)?.CsprojFileName ?? new DirectoryInfo(((UniversalExerciseBlock)block).ExerciseDirPath).Name;
 			return File(zipFile.FullName, "application/zip", fileName + ".zip");
 		}
 	}

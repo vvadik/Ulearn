@@ -55,8 +55,9 @@ namespace uLearn.CourseTool.CmdLineOptions
 			Converter.ToEdxCourse(
 				course,
 				Config,
-				profile.UlearnUrl,
-				video.Records.ToDictionary(x => x.Data.Id, x => x.Guid.GetNormalizedGuid()), CoursePackageRoot).Save(Dir + "/olx");
+				profile.UlearnBaseUrlApi,
+				profile.UlearnBaseUrlWeb,
+				video.Records.ToDictionary(x => x.Data.Id, x => x.Guid.GetNormalizedGuid()), CourseDirectory).Save(Dir + "/olx");
 
 			EdxInteraction.CreateEdxCourseArchive(Dir, course.Id);
 

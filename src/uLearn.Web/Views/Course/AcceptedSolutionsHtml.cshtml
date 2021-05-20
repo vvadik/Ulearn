@@ -6,7 +6,6 @@
 @helper AcceptedSolutions(AcceptedSolutionsPageModel model)
 {
 	<div id="LikeSolutionUrl" data-url="@( model.LikeSolutionUrl)"></div>
-	<p>@MvcHtmlString.Create(model.Slide.Exercise.CommentAfterExerciseIsSolved.RenderMarkdown(model.Slide.Info.SlideFile))</p>
 	foreach (var solution in model.AcceptedSolutions)
 	{
 		var id = "solution_" + solution.Id;

@@ -37,21 +37,14 @@ namespace Ulearn.Core.Courses
 			}
 		}
 
-		private Course UnsafeLoad(DirectoryInfo dir)
+		private Course UnsafeLoad(DirectoryInfo courseDirectory)
 		{
-			var courseId = dir.Name;
-
-			var loadFromDirectory = dir;
-			var courseXmls = dir.GetFiles("course.xml", SearchOption.AllDirectories).ToList();
-			if (courseXmls.Count == 1)
-				loadFromDirectory = courseXmls[0].Directory;
-			else
-				loadFromDirectory = loadFromDirectory.HasSubdirectory("Slides") ? loadFromDirectory.GetSubdirectory("Slides") : loadFromDirectory;
+			var courseId = courseDirectory.Name;
 
 			CourseSettings settings;
 			try
 			{
-				settings = CourseSettings.Load(loadFromDirectory);
+				settings = CourseSettings.Load(courseDirectory);
 			}
 			catch (Exception e)
 			{
@@ -62,7 +55,7 @@ namespace Ulearn.Core.Courses
 			{
 				try
 				{
-					settings.Title = GetCourseTitleFromFile(loadFromDirectory);
+					settings.Title = GetCourseTitleFromFile(courseDirectory);
 				}
 				catch (Exception e)
 				{
@@ -77,7 +70,7 @@ namespace Ulearn.Core.Courses
 				settings.Description = "";
 			}
 
-			var context = new CourseLoadingContext(courseId, settings, dir, loadFromDirectory.GetFile("course.xml"));
+			var context = new CourseLoadingContext(courseId, settings, courseDirectory);
 
 			var units = LoadUnits(context).ToList();
 			var slides = units.SelectMany(u => u.GetSlides(true)).ToList();
@@ -91,7 +84,7 @@ namespace Ulearn.Core.Courses
 			AddDefaultScoringGroupIfNeeded(units, slides, settings);
 			CalculateScoringGroupScores(units, settings);
 
-			return new Course(courseId, units, settings, dir, context.CourseXml.Directory);
+			return new Course(courseId, units, settings);
 		}
 
 		private static string GetValidationLog(List<Unit> units)
@@ -140,10 +133,10 @@ namespace Ulearn.Core.Courses
 		{
 			var unitFiles = context.CourseSettings
 				.UnitPaths
-				.SelectMany(path => context.CourseXml.Directory.GetFilesByMask(path).OrderBy(f => f.FullName, StringComparer.InvariantCultureIgnoreCase))
+				.SelectMany(path => context.CourseDirectory.GetFilesByMask(path).OrderBy(f => f.FullName, StringComparer.InvariantCultureIgnoreCase))
 				.Distinct()
 				/* Don't load unit from course file! Even accidentally */
-				.Where(f => f != context.CourseXml);
+				.Where(f => f.Name != "course.xml");
 
 			var unitIds = new HashSet<Guid>();
 			var unitUrls = new HashSet<string>();

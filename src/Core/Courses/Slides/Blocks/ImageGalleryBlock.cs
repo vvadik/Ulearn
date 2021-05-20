@@ -12,28 +12,15 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 	{
 		[XmlElement("image")]
 		public string[] RelativeToUnitDirectoryImagePaths { get; set; }
-		
-		[XmlIgnore]
-		public string[] ImageUrls {
-			get
-			{
-				return RelativeToUnitDirectoryImagePaths.Select(p => Path.Combine(BaseUrl, p)).ToArray();
-			}
-			set { }
-		}
-		
-		[XmlIgnore]
-		public string BaseUrl;
-
-		public ImageGalleryBlock(string[] relativeToUnitDirectoryImagePaths, string baseUrl)
-			: this(relativeToUnitDirectoryImagePaths)
-		{
-			this.BaseUrl = baseUrl;
-		}
 
 		public ImageGalleryBlock(string[] relativeToUnitDirectoryImagePaths)
 		{
 			RelativeToUnitDirectoryImagePaths = relativeToUnitDirectoryImagePaths;
+		}
+
+		public IEnumerable<string> GetAbsoluteImageUrls(string baseUrlApi, string courseId, string unitPathRelativeToCourse)
+		{
+			return RelativeToUnitDirectoryImagePaths.Select(p => CourseUrlHelper.GetAbsoluteUrlToFile(baseUrlApi, courseId, unitPathRelativeToCourse, p));
 		}
 
 		public ImageGalleryBlock()
@@ -42,7 +29,6 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 
 		public override IEnumerable<SlideBlock> BuildUp(SlideBuildingContext context, IImmutableSet<string> filesInProgress)
 		{
-			BaseUrl ??= context.Slide.Info.DirectoryRelativePath;
 			yield return this;
 		}
 
@@ -51,10 +37,10 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 			return $"Gallery with images:\n{string.Join("\n", RelativeToUnitDirectoryImagePaths)}";
 		}
 
-		public override Component ToEdxComponent(string displayName, string courseId, Slide slide, int componentIndex, string ulearnBaseUrl, DirectoryInfo coursePackageRoot)
+		public override Component ToEdxComponent(EdxComponentBuilderContext context)
 		{
-			var urlName = slide.NormalizedGuid + componentIndex;
-			return new GalleryComponent(urlName, displayName, urlName, ImageUrls);
+			var urlName = context.Slide.NormalizedGuid + context.ComponentIndex;
+			return new GalleryComponent(urlName, context.DisplayName, urlName, GetAbsoluteImageUrls(context.UlearnBaseUrlApi, context.CourseId, context.Slide.Unit.UnitDirectoryRelativeToCourse).ToArray());
 		}
 	}
 }

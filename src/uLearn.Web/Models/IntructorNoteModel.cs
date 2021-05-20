@@ -1,18 +1,22 @@
-using Ulearn.Core.Courses;
+using System.Linq;
+using Ulearn.Core;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Courses.Slides.Blocks;
 
 namespace uLearn.Web.Models
 {
-	public class IntructorNoteModel
+	public class InstructorNoteModel
 	{
-		public IntructorNoteModel(string courseId, InstructorNote note, string noteEditUrl)
+		public InstructorNoteModel(Slide slide, string noteEditUrl, MarkdownRenderContext markdownContext)
 		{
-			CourseId = courseId;
-			Note = note;
+			UnitTitle = slide.Unit.Title;
 			NoteEditUrl = noteEditUrl;
+			var markdown = slide.Blocks.OfType<MarkdownBlock>().First().Markdown;
+			RenderedMarkdownRaw = markdown.RenderMarkdown(markdownContext);
 		}
 
-		public string CourseId;
+		public string UnitTitle;
 		public string NoteEditUrl;
-		public InstructorNote Note;
+		public string RenderedMarkdownRaw;
 	}
 }

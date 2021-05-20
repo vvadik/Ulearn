@@ -1,32 +1,26 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
-using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
-using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Units;
 
 namespace Ulearn.Core.Courses
 {
 	public class Course : ICourse
 	{
-		public Course(string id, List<Unit> units, [NotNull]CourseSettings settings, DirectoryInfo courseDirectory, DirectoryInfo courseXmlDirectory)
+		public Course(string id, List<Unit> units, [NotNull]CourseSettings settings)
 		{
 			Id = id;
 			this.units = units;
 			Settings = settings;
-			CourseXmlDirectory = courseXmlDirectory;
-			CourseDirectory = courseDirectory;
 		}
 
 		public string Id { get; set; }
 		public string Title => Settings.Title;
 		[NotNull]
 		public CourseSettings Settings { get; private set; }
-		public DirectoryInfo CourseXmlDirectory { get; set; }
-		public DirectoryInfo CourseDirectory { get; set; }
+
 		private List<Unit> units;
 
 		private List<Slide> slidesCache { get; set; }
@@ -65,7 +59,7 @@ namespace Ulearn.Core.Courses
 		}
 
 		[CanBeNull]
-		public InstructorNote FindInstructorNoteById(Guid slideId)
+		public Slide FindInstructorNoteById(Guid slideId)
 		{
 			var unitWithId = FindUnitByIdNotSafe(slideId);
 			return unitWithId?.InstructorNote;
@@ -127,34 +121,5 @@ namespace Ulearn.Core.Courses
 		{
 			return $"Course(Id: {Id}, Title: {Title})";
 		}
-	}
-
-	public class InstructorNote
-	{
-		public InstructorNote(string markdown, Unit unit, FileInfo file, CourseLoadingContext courseLoadingContext)
-		{
-			Markdown = markdown;
-			Unit = unit;
-			File = file;
-			Slide = new Slide(new MarkdownBlock(Markdown) { Hide = true })
-			{
-				Id = Unit.Id,
-				Title = "Заметки преподавателю",
-				Hide = true
-			};
-			var slideLoadingContext = new SlideLoadingContext(courseLoadingContext, unit, file);
-			Slide.BuildUp(slideLoadingContext);
-			Slide.Validate(slideLoadingContext);
-		}
-
-		public static InstructorNote Load(CourseLoadingContext context, FileInfo file, Unit unit)
-		{
-			return new InstructorNote(file.ContentAsUtf8(), unit, file, context);
-		}
-
-		public string Markdown;
-		public Unit Unit;
-		public FileInfo File;
-		public Slide Slide;
 	}
 }

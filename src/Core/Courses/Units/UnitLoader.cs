@@ -39,7 +39,7 @@ namespace Ulearn.Core.Courses.Units
 				}
 			}
 
-			var unit = new Unit(unitSettings, unitDirectory);
+			var unit = new Unit(unitSettings, unitDirectory.GetRelativePath(context.CourseDirectory));
 
 			var slideFiles = unitSettings
 				.SlidesPaths
@@ -61,7 +61,7 @@ namespace Ulearn.Core.Courses.Units
 				}
 			}
 
-			unit.LoadInstructorNote(context);
+			LoadInstructorNote(unit, unitDirectory, context);
 
 			return unit;
 		}
@@ -81,13 +81,11 @@ namespace Ulearn.Core.Courses.Units
 			}
 		}
 
-		[Obsolete("It's old slide filename format. Don't use it now.")]
-		public static bool IsSlideFile(string name)
+		private void LoadInstructorNote(Unit unit, DirectoryInfo unitDirectory, CourseLoadingContext context)
 		{
-			//S001_slide.ext
-			var id = name.Split(new[] { '_', '-', ' ' }, 2)[0];
-			return id.StartsWith("S", StringComparison.InvariantCultureIgnoreCase)
-					&& id.Skip(1).All(char.IsDigit);
+			var instructorNoteFile = unitDirectory.GetFile("InstructorNotes.md");
+			if (instructorNoteFile.Exists)
+				unit.InstructorNote = InstructorNoteLoader.Load(new SlideLoadingContext(context, unit, instructorNoteFile));
 		}
 
 		private static string GetUnitTitleFromFile(DirectoryInfo dir)

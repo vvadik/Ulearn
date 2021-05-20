@@ -21,12 +21,12 @@ namespace Ulearn.Core.Courses.Slides
 
 		private List<RegionsExtractor> Extractors { get; }
 
-		public SlideBuildingContext(string courseId, Unit unit, CourseSettings courseSettings, DirectoryInfo courseDirectory, Slide slide)
+		public SlideBuildingContext(string courseId, Unit unit, CourseSettings courseSettings, DirectoryInfo courseDirectory, DirectoryInfo unitDirectory, Slide slide)
 		{
 			CourseId = courseId;
 
 			Unit = unit;
-			UnitDirectory = unit.Directory;
+			UnitDirectory = unitDirectory;
 			CourseDirectory = courseDirectory;
 			CourseSettings = courseSettings;
 			Slide = slide;
@@ -34,7 +34,7 @@ namespace Ulearn.Core.Courses.Slides
 		}
 
 		public SlideBuildingContext(SlideLoadingContext slideContext, Slide slide)
-			: this(slideContext.CourseId, slideContext.Unit, slideContext.CourseSettings, slideContext.CourseDirectory, slide)
+			: this(slideContext.CourseId, slideContext.Unit, slideContext.CourseSettings, slideContext.CourseDirectory, slideContext.UnitDirectory, slide)
 		{
 		}
 

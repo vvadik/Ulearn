@@ -39,6 +39,10 @@ namespace uLearn.Web.Models
 
 		public string GroupsIdsJoined => string.Join(",", GroupsIds ?? new List<string>());
 
+		public string BaseUrlWeb { get; set; }
+
+		public string BaseUrlApi { get; set; }
+
 		public int Score
 		{
 			get { return UserScores?.AsEnumerable().Sum(res => res.Value) ?? 0; }

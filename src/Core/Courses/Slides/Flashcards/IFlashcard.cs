@@ -13,7 +13,7 @@ namespace Ulearn.Core.Courses.Slides.Flashcards
 
 		void Validate(SlideLoadingContext context, Slide flashcardSlide);
 
-		string RenderQuestion();
-		string RenderAnswer();
+		string RenderQuestion(MarkdownRenderContext markdownContext);
+		string RenderAnswer(MarkdownRenderContext markdownContext);
 	}
 }

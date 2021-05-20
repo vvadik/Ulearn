@@ -38,10 +38,11 @@ namespace uLearn.CourseTool.CmdLineOptions
 					.Where(s => guids == null || guids.Contains(s.NormalizedGuid))
 					.Select(s => s.ToVerticals(
 						ulearnCourse.Id,
-						profile.UlearnUrl,
+						profile.UlearnBaseUrlApi,
+						profile.UlearnBaseUrlWeb,
 						videoGuids,
 						config.LtiId,
-						CoursePackageRoot
+						CourseDirectory
 					).ToArray()),
 				guids != null || !SkipExistingGuids
 			);
@@ -67,7 +68,8 @@ namespace uLearn.CourseTool.CmdLineOptions
 				var sequentialNote = new Sequential(sequentialId, displayName,
 					new[]
 					{
-						new Vertical(verticalId, displayName, new[] { new MarkdownBlock(chapterNote.Markdown).ToEdxComponent(mdBlockId, displayName, chapterUnit.Directory.FullName) })
+						new Vertical(verticalId, displayName,
+							new[] { chapterNote.Blocks.OfType<MarkdownBlock>().First().ToEdxComponent(mdBlockId, displayName, CourseDirectory.FullName, chapterUnit.UnitDirectoryRelativeToCourse) })
 					}) { VisibleToStaffOnly = true };
 				if (!File.Exists($"{olxPath}/sequential/{sequentialNote.UrlName}.xml"))
 				{

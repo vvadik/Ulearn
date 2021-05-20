@@ -11,7 +11,7 @@ namespace uLearn.CourseTool
 {
 	public static class Converter
 	{
-		private static Sequential[] UnitToSequentials(Course course, Config config, List<Unit> units, int unitIndex, string ulearnBaseUrl, Dictionary<string, string> videoGuids, DirectoryInfo coursePackageRoot)
+		private static Sequential[] UnitToSequentials(Course course, Config config, List<Unit> units, int unitIndex, string ulearnBaseUrlApi, string ulearnBaseUrlWeb, Dictionary<string, string> videoGuids, DirectoryInfo courseDirectory)
 		{
 			var unit = units[unitIndex];
 			var result = new List<Sequential>
@@ -19,7 +19,7 @@ namespace uLearn.CourseTool
 				new Sequential($"{course.Id}-{unitIndex}-{0}", unit.Title,
 					unit.GetSlides(false)
 						.Where(s => !config.IgnoredUlearnSlides.Select(Guid.Parse).Contains(s.Id))
-						.SelectMany(y => y.ToVerticals(course.Id, ulearnBaseUrl, videoGuids, config.LtiId, coursePackageRoot))
+						.SelectMany(y => y.ToVerticals(course.Id, ulearnBaseUrlApi, ulearnBaseUrlWeb, videoGuids, config.LtiId, courseDirectory))
 						.ToArray())
 			};
 			var note = unit.InstructorNote;
@@ -31,7 +31,7 @@ namespace uLearn.CourseTool
 					result.Add(new Sequential($"{course.Id}-{unitIndex}-{0}", unit.Title,
 							hiddenSlides
 							.Where(s => !config.IgnoredUlearnSlides.Select(Guid.Parse).Contains(s.Id))
-							.SelectMany(y => y.ToVerticals(course.Id, ulearnBaseUrl, videoGuids, config.LtiId, coursePackageRoot))
+							.SelectMany(y => y.ToVerticals(course.Id, ulearnBaseUrlApi, ulearnBaseUrlWeb, videoGuids, config.LtiId, courseDirectory))
 							.ToArray()) { VisibleToStaffOnly = true }
 					);
 				}
@@ -49,8 +49,8 @@ namespace uLearn.CourseTool
 									displayName,
 									new[]
 									{
-										new MarkdownBlock(unit.InstructorNote.Markdown)
-											.ToEdxComponent(mdBlockId, displayName, unit.Directory.FullName)
+										unit.InstructorNote.Blocks.OfType<MarkdownBlock>().First()
+											.ToEdxComponent(mdBlockId, displayName, courseDirectory.FullName, unit.UnitDirectoryRelativeToCourse)
 									})
 							}) { VisibleToStaffOnly = true }
 					);
@@ -60,7 +60,7 @@ namespace uLearn.CourseTool
 			return result.ToArray();
 		}
 
-		private static Chapter[] CourseToChapters(Course course, Config config, string ulearnBaseUrl, Dictionary<string, string> videoGuids, DirectoryInfo coursePackageRoot)
+		private static Chapter[] CourseToChapters(Course course, Config config, string ulearnBaseUrlApi, string ulearnBaseUrlWeb, Dictionary<string, string> videoGuids, DirectoryInfo courseDirectory)
 		{
 			var units = course.GetUnitsNotSafe();
 			return Enumerable
@@ -69,12 +69,12 @@ namespace uLearn.CourseTool
 					$"{course.Id}-{idx}",
 					units[idx].Title,
 					null,
-					UnitToSequentials(course, config, units, idx, ulearnBaseUrl, videoGuids, coursePackageRoot)))
+					UnitToSequentials(course, config, units, idx, ulearnBaseUrlApi, ulearnBaseUrlWeb, videoGuids, courseDirectory)))
 				.ToArray();
 		}
 
-		public static EdxCourse ToEdxCourse(Course course, Config config, string ulearnBaseUrl,
-			Dictionary<string, string> youtubeId2UlearnVideoIds, DirectoryInfo coursePackageRoot)
+		public static EdxCourse ToEdxCourse(Course course, Config config, string ulearnBaseUrlApi, string ulearnBaseUrlWeb,
+			Dictionary<string, string> youtubeId2UlearnVideoIds, DirectoryInfo courseDirectory)
 		{
 			return new EdxCourse(
 				course.Id,
@@ -82,7 +82,7 @@ namespace uLearn.CourseTool
 				course.Title,
 				new[] { "lti" },
 				null,
-				CourseToChapters(course, config, ulearnBaseUrl, youtubeId2UlearnVideoIds, coursePackageRoot));
+				CourseToChapters(course, config, ulearnBaseUrlApi, ulearnBaseUrlWeb, youtubeId2UlearnVideoIds, courseDirectory));
 		}
 	}
 }

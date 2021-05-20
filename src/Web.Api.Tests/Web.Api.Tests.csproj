@@ -33,50 +33,16 @@
 			<HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
 		</Reference>
 	</ItemGroup>
-	
+
 	<ItemGroup>
-		<Content Include="Controllers\Slides\TestData\SimpleSlideWithMarkdownBlocks.xml">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Controllers\Slides\TestData\SlideWithCodeInMarkdown.xml">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Controllers\Slides\TestData\SlideWithImageInMarkdown.xml">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Controllers\Slides\TestData\SlideWithSpoilerBlockAndMarkdown.xml">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Compile Remove="TestData\TempCourses\Help\Properties\AssemblyInfo.cs" />
-		<Content Include="TestData\TempCourses\Help\Properties\AssemblyInfo.cs" />
+		<Compile Remove="TestData\TempCourses\Help\U99_Presentation\_Code.cs" />
+		<Compile Remove="TestData\TempCourses\Help\U99_Presentation\_FirstStep.cs" />
+		<Compile Remove="TestData\TempCourses\Help\Prelude.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="TestData\TempCourses\Help\Properties" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Content Include="TestData\**">
+		<Content Include="TestData\**\*.*">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Content>
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Include="TestData\TempCourses\Help\Slides\U99_Presentation\_FirstStep.cs" />
-		<None Include="TestData\TempCourses\Help\Slides\U99_Presentation\_Code.cs" />
-		<None Include="TestData\TempCourses\Help\Slides\Prelude.cs" />
-		<Compile Remove="TestData\TempCourses\Help\Slides\U99_Presentation\_Code.cs" />
-		<None Include="TestData\TempCourses\Help\Slides\U99_Presentation\_Code.cs" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Compile Remove="TestData\TempCourses\Help\CourseTests.cs" />
-		<None Include="TestData\TempCourses\Help\CourseTests.cs" />
-		<Compile Remove="TestData\TempCourses\Help\Slides\U99_Presentation\_FirstStep.cs" />
-		<None Include="TestData\TempCourses\Help\Slides\U99_Presentation\_FirstStep.cs">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<Compile Remove="TestData\TempCourses\Help\Slides\Prelude.cs" />
-		<None Include="TestData\TempCourses\Help\Slides\Prelude.cs" />
 	</ItemGroup>
 </Project>

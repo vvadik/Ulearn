@@ -5,12 +5,10 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Microsoft.VisualBasic.FileIO;
-using NUnit.Framework;
 using RunCsJob;
 using test;
 using uLearn.CourseTool.Validating;
 using Ulearn.Core.Courses.Slides;
-using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Courses.Units;
@@ -70,7 +68,7 @@ namespace uLearn.CSharp
 
 		public static CourseValidator BuildValidator(ExerciseSlide slide, StringBuilder valOut)
 		{
-			var v = new CourseValidator(new List<Slide> { slide });
+			var v = new CourseValidator(new List<Slide> { slide }, TestDirectory);
 			v.Warning += msg => { valOut.Append(msg); };
 			v.Error += msg => { valOut.Append(msg); };
 			return v;
@@ -79,12 +77,11 @@ namespace uLearn.CSharp
 		public static ExerciseSlide BuildSlide(AbstractExerciseBlock exerciseBlock)
 		{
 			var unit = new Unit(new UnitSettings { Title = "UnitTitle" }, null);
-			var slideInfo = new SlideInfo(unit, null);
 			return new ExerciseSlide(exerciseBlock)
 			{
 				Id = Guid.Empty,
 				Title = "SlideTitle",
-				Info = slideInfo,
+				Unit = unit,
 			};
 		}
 

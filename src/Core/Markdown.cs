@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 using MarkdownDeep;
@@ -9,26 +8,21 @@ using Ulearn.Core.Courses;
 
 namespace Ulearn.Core
 {
+
+	public record MarkdownRenderContext(string BaseUrlApi, string BaseUrlWeb, string CourseId, string UnitDirectoryRelativeToCourse);
+
 	public static class Markdown
 	{
-		public static string RenderMarkdown(this string markdown, FileInfo sourceFile, string baseUrl = "")
-		{
-			var relativeUrl = CourseUnitUtils.GetDirectoryRelativeWebPath(sourceFile);
-			baseUrl = baseUrl + relativeUrl;
-			return markdown.RenderMarkdown(baseUrl);
-		}
-
-		public static string RenderMarkdown(this string markdown, string baseUrlForRelativeLinks = null)
+		public static string RenderMarkdown(this string markdown, MarkdownRenderContext context)
 		{
 			var texReplacer = new TexReplacer(markdown);
 
-			var markdownObject = new ExtendedMarkdownDeep
+			var markdownObject = new ExtendedMarkdownDeep(context)
 			{
 				NewWindowForExternalLinks = true,
 				ExtraMode = true,
 				SafeMode = false,
 				MarkdownInHtml = false,
-				UrlBaseLocation = baseUrlForRelativeLinks,
 			};
 
 			markdownObject.FormatCodeBlock += FormatCodePrettyPrint;
@@ -106,19 +100,50 @@ namespace Ulearn.Core
 
 		private class ExtendedMarkdownDeep : MarkdownDeep.Markdown
 		{
-			private readonly Regex fileLinkRegex = new Regex(@".*\.(zip|odp|pptx|docx|xlsx|pdf|mmap|xmind)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+			private MarkdownRenderContext context;
+
+			public ExtendedMarkdownDeep(MarkdownRenderContext context)
+			{
+				this.context = context;
+			}
+
+			private readonly Regex fileToDownloadLinkRegex = new Regex(@".*\.(zip|odp|pptx|docx|xlsx|pdf|mmap|xmind)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 			public override void OnPrepareLink(HtmlTag tag)
 			{
 				base.OnPrepareLink(tag);
-				var isFileLink = fileLinkRegex.IsMatch(tag.attributes["href"]);
-				if (isFileLink)
+				var href = tag.attributes["href"];
+
+				var isFileToDownload = fileToDownloadLinkRegex.IsMatch(href);
+				if (isFileToDownload)
 					tag.attributes["download"] = "";
+
+				if (!IsAbsoluteUrl(href)) {
+					if (!href.StartsWith("/") && IsFile(href))
+						tag.attributes["href"] = CourseUrlHelper.GetAbsoluteUrlToFile(context.BaseUrlApi, context.CourseId, context.UnitDirectoryRelativeToCourse, href);
+					else
+						tag.attributes["href"] = CourseUrlHelper.GetAbsoluteUrl(context.BaseUrlWeb, href);
+				}
 			}
 
 			public override void OnPrepareImage(HtmlTag tag, bool TitledImage)
 			{
 				base.OnPrepareImage(tag, TitledImage);
 				tag.attributes["class"] = "slide-image";
+
+				var src = tag.attributes["src"];
+				if (!IsAbsoluteUrl(src)) 
+					tag.attributes["src"] = CourseUrlHelper.GetAbsoluteUrlToFile(context.BaseUrlApi, context.CourseId, context.UnitDirectoryRelativeToCourse, src);
+			}
+
+			private bool IsAbsoluteUrl(string url)
+			{
+				return Uri.TryCreate(url, UriKind.Absolute, out _);
+			}
+
+			private readonly Regex fileLinkRegex = new Regex(@".*\.\w{1,5}$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+			private bool IsFile(string url)
+			{
+				return fileLinkRegex.IsMatch(url);
 			}
 		}
 	}

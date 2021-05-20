@@ -17,10 +17,10 @@ namespace uLearn.CourseTool
 		private const string testRvToken = "name=\"" + rvTokenSignal + "\"";
 		private static readonly Regex getValue = new Regex("value=\"(.*?)\"");
 
-		private static CookieAwareWebClient Login(string baseUrl, string login, string password)
+		private static CookieAwareWebClient Login(string ulearnBaseUrlWeb, string login, string password)
 		{
-			var signinUrl = baseUrl + "/Login";
-			var loginUrl = baseUrl + "/Login";
+			var signinUrl = ulearnBaseUrlWeb + "/Login";
+			var loginUrl = ulearnBaseUrlWeb + "/Login";
 			var client = new CookieAwareWebClient();
 
 			var rvToken = GetRequestVerificationToken(client, signinUrl);
@@ -44,13 +44,13 @@ namespace uLearn.CourseTool
 			return match == null ? null : getValue.Match(match.Value).Groups[1].Value;
 		}
 
-		public static void Download(string baseDir, bool force, Config config, string ulearnUrl, Credentials credentials)
+		public static void Download(string baseDir, bool force, Config config, string ulearnBaseUrlWeb, Credentials credentials)
 		{
 			var fileName = config.ULearnCourseId + ".zip";
 			var fileFullName = Path.Combine(baseDir, fileName);
-			var downloadUrl = string.Format("{0}/Unit/DownloadPackage?courseId={1}", ulearnUrl, HttpUtility.UrlEncode(config.ULearnCourseId));
+			var downloadUrl = string.Format("{0}/Unit/DownloadPackage?courseId={1}", ulearnBaseUrlWeb, HttpUtility.UrlEncode(config.ULearnCourseId));
 
-			var client = Login(ulearnUrl, credentials.Email, credentials.GetPassword());
+			var client = Login(ulearnBaseUrlWeb, credentials.Email, credentials.GetPassword());
 			client.TryDownloadFile(downloadUrl, fileFullName);
 			Console.Out.WriteLine("Package downloaded to {0}", fileFullName);
 
@@ -66,10 +66,10 @@ namespace uLearn.CourseTool
 			new FileInfo(fileFullName).Delete();
 		}
 
-		public static void Upload(string baseDir, Config config, string ulearnUrl, Credentials credentials)
+		public static void Upload(string baseDir, Config config, string ulearnBaseUrlWeb, Credentials credentials)
 		{
 			var fileFullName = Path.Combine(baseDir, config.ULearnCourseId + ".zip");
-			var uploadUrl = ulearnUrl + "/Unit/UploadCourse?courseId=" + config.ULearnCourseId;
+			var uploadUrl = ulearnBaseUrlWeb + "/Unit/UploadCourse?courseId=" + config.ULearnCourseId;
 			var courseDir = Path.Combine(baseDir, config.ULearnCourseId);
 
 			if (File.Exists(fileFullName))
@@ -80,7 +80,7 @@ namespace uLearn.CourseTool
 				zip.Save();
 			}
 
-			var client = Login(ulearnUrl, credentials.Email, credentials.GetPassword());
+			var client = Login(ulearnBaseUrlWeb, credentials.Email, credentials.GetPassword());
 			client.UploadFile(uploadUrl, fileFullName);
 		}
 	}

@@ -18,7 +18,7 @@ namespace GitCourseUpdater
 {
 	public interface IGitRepo : IDisposable
 	{
-		MemoryStream GetCurrentStateAsZip(string courseSubdirectoryInRepo = null);
+		(MemoryStream zip, string courseXmlSubdirectoryInRepo) GetCurrentStateAsZip(string courseSubdirectoryInRepo = "");
 		CommitInfo GetCurrentCommitInfo();
 		CommitInfo GetCommitInfo(string hash);
 		List<string> GetChangedFiles(string fromHash, string toHash, string courseSubdirectoryInRepo = null);
@@ -90,14 +90,19 @@ namespace GitCourseUpdater
 			}
 		}
 
-		public MemoryStream GetCurrentStateAsZip(string courseSubdirectoryInRepo = null)
+		public (MemoryStream zip, string courseXmlSubdirectoryInRepo) GetCurrentStateAsZip(string courseSubdirectoryInRepo = "")
 		{
 			log.Info($"Start load '{repoDirName}' to zip");
-			var dir = reposBaseDir.GetSubdirectory(repoDirName).FullName;
-			dir = courseSubdirectoryInRepo == null ? dir : Path.Combine(dir, courseSubdirectoryInRepo);
-			var zip = ZipUtils.CreateZipFromDirectory(new List<string> {dir}, new List<string> {".git/"},  null, Encoding.UTF8);
+			var repoDir = reposBaseDir.GetSubdirectory(repoDirName);
+			if (!new DirectoryInfo(Path.Combine(repoDir.FullName, courseSubdirectoryInRepo)).GetFile("course.xml").Exists)
+			{
+				var courseXmlDirectory = new DirectoryInfo(Path.Combine(repoDir.FullName, courseSubdirectoryInRepo)).GetFiles("course.xml", SearchOption.AllDirectories).FirstOrDefault()?.Directory;
+				if (courseXmlDirectory != null)
+					courseSubdirectoryInRepo = courseXmlDirectory.GetRelativePath(reposBaseDir.GetSubdirectory(repoDirName));
+			}
+			var zip = ZipUtils.CreateZipFromDirectory(new List<string> {courseSubdirectoryInRepo}, new List<string> {".git/"},  null, Encoding.UTF8);
 			log.Info($"Successfully load '{repoDirName}' to zip");
-			return zip;
+			return (zip, courseSubdirectoryInRepo);
 		}
 
 		public CommitInfo GetCurrentCommitInfo()

@@ -18,7 +18,6 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
-using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Courses.Units;
 using Ulearn.Core.Helpers;
 using Ulearn.Core.Telegram;
@@ -126,17 +125,7 @@ namespace Ulearn.Core
 		public Course GetVersion(Guid versionId)
 		{
 			if (versionsCache.TryGet(versionId, out var version))
-			{
-				var extractedVersionDirectory = GetExtractedVersionDirectory(versionId);
-				if (!extractedVersionDirectory.Exists)
-				{
-					var zipFile = GetCourseVersionFile(versionId);
-					extractedVersionDirectory = UnzipCourseFile(zipFile, Cp866);
-				}
-
-				FixFileReferencesInCourse(version, version.CourseDirectory, extractedVersionDirectory);
 				return version;
-			}
 
 			var versionFile = GetCourseVersionFile(versionId);
 			version = LoadCourseFromZip(versionFile, Cp866);
@@ -588,8 +577,6 @@ namespace Ulearn.Core
 					throw;
 				}
 
-				FixFileReferencesInCourse(course, sourceDirectory, destinationDirectory);
-
 				UpdateCourse(course);
 			}
 			finally
@@ -598,47 +585,6 @@ namespace Ulearn.Core
 			}
 
 			FuncUtils.TrySeveralTimes(() => tempDirectoryName.ClearDirectory(true), updateCourseEachOperationTriesCount);
-		}
-
-		private void FixFileReferencesInCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory)
-		{
-			if (sourceDirectory.FullName == destinationDirectory.FullName)
-				return;
-
-			course.CourseDirectory = (DirectoryInfo)GetNewPathForFileAfterMoving(course.CourseDirectory, sourceDirectory, destinationDirectory);
-			course.CourseXmlDirectory = (DirectoryInfo)GetNewPathForFileAfterMoving(course.CourseXmlDirectory, sourceDirectory, destinationDirectory);
-
-			foreach (var unit in course.GetUnitsNotSafe())
-			{
-				unit.Directory = (DirectoryInfo)GetNewPathForFileAfterMoving(unit.Directory, sourceDirectory, destinationDirectory);
-				if (unit.InstructorNote != null)
-					unit.InstructorNote.File = (FileInfo)GetNewPathForFileAfterMoving(unit.InstructorNote.File, sourceDirectory, destinationDirectory);
-			}
-
-			foreach (var slide in course.GetSlides(true))
-			{
-				slide.Info.SlideFile = (FileInfo)GetNewPathForFileAfterMoving(slide.Info.SlideFile, sourceDirectory, destinationDirectory);
-
-				foreach (var exerciseBlock in slide.Blocks.OfType<CsProjectExerciseBlock>())
-					exerciseBlock.SlideFolderPath = (DirectoryInfo)GetNewPathForFileAfterMoving(exerciseBlock.SlideFolderPath, sourceDirectory, destinationDirectory);
-
-				slide.Meta?.FixPaths(slide.Info.SlideFile);
-			}
-		}
-
-		private static FileSystemInfo GetNewPathForFileAfterMoving(FileSystemInfo file, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory)
-		{
-			if (!file.IsInDirectory(sourceDirectory))
-				return file;
-			if (sourceDirectory.FullName == file.FullName)
-				return destinationDirectory;
-
-			var relativePath = file.GetRelativePath(sourceDirectory.FullName);
-			var newPath = Path.Combine(destinationDirectory.FullName, relativePath);
-
-			if (file is DirectoryInfo)
-				return new DirectoryInfo(newPath);
-			return new FileInfo(newPath);
 		}
 
 		public static DirectoryInfo GetCoursesDirectory()
@@ -653,7 +599,7 @@ namespace Ulearn.Core
 
 		public FileInfo GenerateOrFindStudentZip(string courseId, Slide slide)
 		{
-			return exerciseStudentZipsCache.GenerateOrFindZip(courseId, slide);
+			return exerciseStudentZipsCache.GenerateOrFindZip(courseId, slide, GetExtractedCourseDirectory(courseId).FullName);
 		}
 	}
 }

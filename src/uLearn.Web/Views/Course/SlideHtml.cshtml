@@ -165,7 +165,7 @@
 { @( maxScore == 0 ? "" : string.Format("{0} из {1}", currentScore.PluralizeInRussian(RussianPluralizationOptions.Score), maxScore)) }
 
 @helper Block(MarkdownBlock block, BlockRenderContext context, HtmlHelper Html)
-{ @MvcHtmlString.Create(block.RenderMarkdown(context.Course.Id, context.Slide, context.BaseUrl)) }
+{ @MvcHtmlString.Create(block.RenderMarkdown(context.Slide, new MarkdownRenderContext(context.BaseUrlApi, context.BaseUrlWeb, context.Course.Id, context.Slide.Unit.UnitDirectoryRelativeToCourse))) }
 
 @helper Block(CodeBlock block, BlockRenderContext context, HtmlHelper Html)
 {
@@ -286,7 +286,7 @@
 {
 	<div class="flexslider">
 		<ul class="slides">
-			@foreach (var imageUrl in block.ImageUrls)
+			@foreach (var imageUrl in block.GetAbsoluteImageUrls(context.BaseUrlApi, context.Course.Id, context.Slide.Unit.UnitDirectoryRelativeToCourse))
 			{
 				<li>
 					<img src="@imageUrl" alt="@imageUrl"/>

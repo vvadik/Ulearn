@@ -52,9 +52,9 @@ namespace Ulearn.Common.Extensions
 			return Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
 		}
 
-		public static string GetRelativePath(this FileSystemInfo file, DirectoryInfo folder)
+		public static string GetRelativePath(this FileSystemInfo fileOrDirectory, DirectoryInfo parentDirectory)
 		{
-			return file.GetRelativePath(folder.FullName);
+			return fileOrDirectory.GetRelativePath(parentDirectory.FullName);
 		}
 
 		public static IEnumerable<string> GetRelativePathsOfFiles(this DirectoryInfo dir)

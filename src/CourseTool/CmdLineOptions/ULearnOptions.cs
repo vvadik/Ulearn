@@ -28,9 +28,9 @@ namespace uLearn.CourseTool.CmdLineOptions
 			var credentials = Credentials.GetCredentials(Dir, Profile, "uLearn");
 
 			if (Download)
-				ULearnInteractor.Download(Dir, Force, Config, profile.UlearnUrl, credentials);
+				ULearnInteractor.Download(Dir, Force, Config, profile.UlearnBaseUrlWeb, credentials);
 			if (Upload)
-				ULearnInteractor.Upload(Dir, Config, profile.UlearnUrl, credentials);
+				ULearnInteractor.Upload(Dir, Config, profile.UlearnBaseUrlWeb, credentials);
 		}
 	}
 }

@@ -166,7 +166,7 @@ namespace Ulearn.Web.Api.Controllers
 			{
 				var instructorNote = course.FindInstructorNoteById(slideId);
 				if (instructorNote != null && isInstructor)
-					slide = instructorNote.Slide;
+					slide = instructorNote;
 			}
 			if (slide == null)
 				return StatusCode((int)HttpStatusCode.NotFound, $"No slide with id {slideId}");
