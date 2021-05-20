@@ -79,7 +79,7 @@ export function menuItems(courseId: string, role: CourseRoleType, accesses: Cour
 			Группы
 		</MenuItem>,
 
-		<MenuItem href={ "/Analytics/CourseStatistics?courseId=" + courseId } key="CourseStatistics"
+		<MenuItem href={ "/Analytics/CourseStatistics?courseId=" + courseId + "&max=200" } key="CourseStatistics"
 				  component={ LinkComponent }>
 			Ведомость курса
 		</MenuItem>,

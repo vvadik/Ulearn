@@ -69,8 +69,7 @@ namespace Ulearn.Core.Logging
 				};
 				var min = dbMinimumLevel > minimumLevel ? minimumLevel : dbMinimumLevel;
 				fileLog = new FileLog(fileLogSettings)
-					.DropEvents(FilterLogs)
-					.SelectEvents(le => le.Level >= (IsDbSource(le) ? dbMinimumLevel : minimumLevel))
+					.WithMinimumLevelForSourceContext("ULearnDb", dbMinimumLevel) // Database
 					.WithMinimumLevel(min);
 			}
 
@@ -89,31 +88,6 @@ namespace Ulearn.Core.Logging
 			if (@event?.Properties == null)
 				return null;
 			return @event.Properties.TryGetValue(WellKnownProperties.SourceContext, out var value) ? value as SourceContextValue : null;
-		}
-
-		public static bool IsDbSource(LogEvent le)
-		{
-			var sourceContext = GetSourceContext(le);
-			if (sourceContext == null)
-				return false;
-			return sourceContext.Any(str =>
-				str.StartsWith("Microsoft.EntityFrameworkCore.Database.Command")
-				|| str.StartsWith("Microsoft.EntityFrameworkCore.Infrastructure")
-			);
-		}
-
-		public static bool FilterLogs(LogEvent le)
-		{
-			var sourceContext = GetSourceContext(le);
-			if (sourceContext == null)
-				return false;
-			return sourceContext.Any(str =>
-				str.StartsWith("Microsoft.AspNetCore.Mvc.Infrastructure")
-				|| str.StartsWith("Microsoft.AspNetCore.Hosting.Diagnostics")
-				|| str.StartsWith("Microsoft.AspNetCore.Cors.Infrastructure")
-				|| str.StartsWith("Microsoft.AspNetCore.Authentication")
-				|| str.StartsWith("Microsoft.AspNetCore.Authorization")
-			);
 		}
 
 		// Для совместимости с настройками appsettings.json, написанными для серилога

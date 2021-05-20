@@ -1,6 +1,7 @@
 import diff_match_patch from 'diff-match-patch';
 import Highcharts from 'highcharts';
 import Data from 'highcharts/modules/data';
+import { postExerciseCodeReview } from "src/legacy/scripts/slide-editor";
 Data(Highcharts); //initializing module
 
 export function fetchAntiPlagiarismStatus($plagiarismStatus) {

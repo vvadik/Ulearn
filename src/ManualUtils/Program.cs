@@ -11,8 +11,6 @@ using Database;
 using Database.Di;
 using Database.Models;
 using Database.Repos;
-using Database.Repos.Groups;
-using Database.Repos.Users;
 using ManualUtils.AntiPlagiarism;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -90,6 +88,7 @@ namespace ManualUtils
 			//await XQueueRunAutomaticChecking(db);
 			//TextBlobsWithZeroByte(db);
 			//UpdateCertificateArchives(db);
+			//GetVKByEmail(serviceProvider);
 		}
 
 		private static void GenerateUpdateSequences()
@@ -330,6 +329,27 @@ namespace ManualUtils
 					db.SaveChanges();
 				}
 				Console.WriteLine(guid);
+			}
+		}
+
+		private static async Task GetVKByEmail(IServiceProvider serviceProvider)
+		{
+			var emails = File.ReadAllLines("emails.txt").Select(l => l.Trim());
+			var db = serviceProvider.GetService<UlearnDb>();
+
+			foreach (var email in emails)
+			{
+				string vk = null;
+				var user = db.Users.FirstOrDefault(u => u.Email == email);
+				if (user != null)
+				{
+					var vkLogin = db.UserLogins.FirstOrDefault(l => l.LoginProvider == "ВКонтакте" && l.UserId == user.Id);
+					if (vkLogin != null)
+					{
+						vk = $"https://vk.com/id{vkLogin.ProviderKey}";
+					}
+				}
+				Console.WriteLine($"{email}\t{vk}");
 			}
 		}
 	}

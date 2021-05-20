@@ -218,8 +218,15 @@ namespace Ulearn.Core.Courses.Slides
 					{
 						if (!block.Hide)
 						{
-							var component = block.ToEdxComponent(context with { ComponentIndex = componentIndex });
-							innerComponents.Add(component);
+							try
+							{
+								var component = block.ToEdxComponent(context with { ComponentIndex = componentIndex });
+								innerComponents.Add(component);
+							}
+							catch (NotImplementedException ex)
+							{
+								Console.WriteLine($"{block.GetType().Name} block NotSupportedException");
+							}
 						}
 
 						componentIndex++;

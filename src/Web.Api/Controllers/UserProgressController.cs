@@ -148,7 +148,7 @@ namespace Ulearn.Web.Api.Controllers
 						return g.GroupBy(t => t.unitId)
 							.ToDictSafe(g2 => g2.Key,
 								g2 =>
-									g.ToDictSafe(t => t.scoringGroupId, t => t.additionalScore));
+									g2.ToDictSafe(t => t.scoringGroupId, t => t.additionalScore));
 					});
 		}
 
