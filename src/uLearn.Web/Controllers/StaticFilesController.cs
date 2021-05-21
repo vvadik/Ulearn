@@ -5,6 +5,7 @@ using Ulearn.Common.Api;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
+using Vostok.Clusterclient.Core.Model;
 using Web.Api.Client;
 
 namespace uLearn.Web.Controllers
@@ -24,12 +25,14 @@ namespace uLearn.Web.Controllers
 			IWebApiClient webApiClient = new WebApiClient(new ApiClientSettings(config.BaseUrlApi));
 			var response = await webApiClient.GetCourseStaticFile(courseId, path);
 			if (response == null)
-				return HttpNotFound();
+				return new HttpStatusCodeResult(500);
+			if (response.Code != ResponseCode.Ok)
+				return new HttpStatusCodeResult((int)response.Code);
 			if (response.HasStream)
 				return new FileStreamResult(response.Stream, mimeType);
 			if (response.HasContent)
 				return new FileContentResult(response.Content.ToArray(), mimeType);
-			return HttpNotFound();
+			return new HttpStatusCodeResult(500);
 		}
 	}
 }

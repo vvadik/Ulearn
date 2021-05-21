@@ -157,7 +157,15 @@ namespace Ulearn.Common.Api
 
 		public async Task<ClusterResult> MakeRequestAsync(Request request) 
 		{
-			return await clusterClient.SendAsync(request).ConfigureAwait(false);
+			var response = await clusterClient.SendAsync(request).ConfigureAwait(false);
+
+			if (response.Status != ClusterResultStatus.Success)
+			{
+				log.Error("Bad response status from {serviceName}: {status}", settings.ServiceName, response.Status.ToString());
+				throw new ApiClientException($"Bad response status from {settings.ServiceName}: {response.Status}");
+			}
+
+			return response;
 		}
 	}
 

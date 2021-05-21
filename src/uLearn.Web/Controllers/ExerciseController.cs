@@ -17,6 +17,7 @@ using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 using Ulearn.Common;
+using Ulearn.Common.Api;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Configuration;
@@ -25,7 +26,10 @@ using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Metrics;
+using Vostok.Clusterclient.Core.Model;
 using Vostok.Logging.Abstractions;
+using Web.Api.Client;
+using Web.Api.Configuration;
 
 namespace uLearn.Web.Controllers
 {
@@ -45,20 +49,22 @@ namespace uLearn.Web.Controllers
 		private readonly UnitsRepo unitsRepo;
 
 		private readonly string baseUrlApi;
+		private readonly string authCookieName;
 
 		private static ILog log => LogProvider.Get().ForContext(typeof(ExerciseController));
 
 		public ExerciseController()
-			: this(new ULearnDb(), WebCourseManager.Instance, new MetricSender(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName), ApplicationConfiguration.Read<UlearnConfiguration>())
+			: this(new ULearnDb(), WebCourseManager.Instance, new MetricSender(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName), ApplicationConfiguration.Read<WebApiConfiguration>())
 		{
 		}
 
-		public ExerciseController(ULearnDb db, WebCourseManager courseManager, MetricSender metricSender, UlearnConfiguration configuration)
+		public ExerciseController(ULearnDb db, WebCourseManager courseManager, MetricSender metricSender, WebApiConfiguration configuration)
 		{
 			this.db = db;
 			this.courseManager = courseManager;
 			this.metricSender = metricSender;
 			baseUrlApi = configuration.BaseUrlApi;
+			authCookieName = configuration.Web.CookieName;
 
 			userSolutionsRepo = new UserSolutionsRepo(db);
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
@@ -579,7 +585,7 @@ namespace uLearn.Web.Controllers
 
 		[Obsolete("Use api")]
 		[System.Web.Mvc.AllowAnonymous]
-		public ActionResult StudentZip(string courseId, Guid slideId, string fileName)
+		public async Task<ActionResult> StudentZip(string courseId, Guid slideId, string fileName)
 		{
 			log.Warn("StudentZip request {courseId} {slideId}");
 			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
@@ -595,8 +601,21 @@ namespace uLearn.Web.Controllers
 
 			var studentZipName = !string.IsNullOrEmpty(fileName)
 				? fileName
-				: (exerciseSlide.Exercise as CsProjectExerciseBlock)?.CsprojFileName ?? new DirectoryInfo((exerciseSlide.Exercise as UniversalExerciseBlock).ExerciseDirPath).Name;
-			return Redirect(CourseUrlHelper.GetAbsoluteUrlToStudentZip(baseUrlApi, courseId, slideId, $"{studentZipName}.zip"));
+				: ((exerciseSlide.Exercise as CsProjectExerciseBlock)?.CsprojFileName ?? new DirectoryInfo((exerciseSlide.Exercise as UniversalExerciseBlock).ExerciseDirPath).Name) + ".zip";
+
+			var cookie = Request.Headers.Get("Cookie");
+			IWebApiClient webApiClient = new WebApiClient(new ApiClientSettings(baseUrlApi));
+			var response = await webApiClient.GetStudentZipFile(courseId, slideId, studentZipName, cookie == null ? null : new Header("Cookie", cookie));
+
+			if (response == null)
+				return new HttpStatusCodeResult(500);
+			if (response.Code != ResponseCode.Ok)
+				return new HttpStatusCodeResult((int)response.Code);
+			if (response.HasStream)
+				return new FileStreamResult(response.Stream, "application/zip");
+			if (response.HasContent)
+				return new FileContentResult(response.Content.ToArray(), "application/zip");
+			return new HttpStatusCodeResult(500);
 		}
 	}
 

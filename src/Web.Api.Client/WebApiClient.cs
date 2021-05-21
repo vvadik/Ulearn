@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Ulearn.Common.Api;
@@ -22,6 +21,16 @@ namespace Web.Api.Client
 		{
 			var builder = new UriBuilder(endpointUrl + $"courses/{courseId}/files/{filePathRelativeToCourse}");
 			var request = Request.Get(builder.Uri);
+			return (await MakeRequestAsync(request).ConfigureAwait(false)).Response;
+		}
+
+		public async Task<Response> GetStudentZipFile(string courseId, Guid slideId, string studentZipName, Header? cookieHeader)
+		{
+			var builder = new UriBuilder(endpointUrl + $"slides/{courseId}/{slideId}/exercise/student-zip/{studentZipName}");
+			var request = Request
+				.Get(builder.Uri);
+			if (cookieHeader != null)
+				request = request.WithHeader(cookieHeader.Value.Name, cookieHeader.Value.Value);
 			return (await MakeRequestAsync(request).ConfigureAwait(false)).Response;
 		}
 	}

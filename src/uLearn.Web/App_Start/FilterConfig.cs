@@ -38,7 +38,8 @@ namespace uLearn.Web
 				"/Certificate/",
 				"/Analytics/ExportCourseStatisticsAs",
 				"/Content/",
-				"/Courses/"
+				"/Courses/",
+				"/Exercise/StudentZip"
 			}, excludedRegexps: new List<Regex>
 			{
 				new Regex("^/Exercise/.*/.*/StudentZip/.*", RegexOptions.Compiled | RegexOptions.IgnoreCase)
