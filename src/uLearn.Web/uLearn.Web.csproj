@@ -820,6 +820,7 @@
     <Compile Include="Controllers\JsonDataContractHelpers.cs" />
     <Compile Include="Controllers\NotificationsController.cs" />
     <Compile Include="Controllers\SpaController.cs" />
+    <Compile Include="Controllers\StaticFilesController.cs" />
     <Compile Include="Controllers\StepikController.cs" />
     <Compile Include="Controllers\TelegramController.cs" />
     <Compile Include="Controllers\BaseUserController.cs" />
@@ -1118,9 +1119,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Courses.Staging\" />
-    <Folder Include="Courses.Versions\" />
-    <Folder Include="Courses\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Microsoft.Owin.Security.VK\Resources.resx" />
@@ -1157,6 +1155,10 @@
     <ProjectReference Include="..\VideoAnnotations.Api\VideoAnnotations.Api.csproj">
       <Project>{8dbf67fc-f88e-4f33-bf81-8033ff597c91}</Project>
       <Name>VideoAnnotations.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Web.Api.Client\Web.Api.Client.csproj">
+      <Project>{bea02a48-3d9e-47ce-a005-f96601d07bbb}</Project>
+      <Name>Web.Api.Client</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

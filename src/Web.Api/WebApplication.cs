@@ -121,28 +121,11 @@ namespace Ulearn.Web.Api
 
 		private static readonly Regex coursesStaticFilesPattern = new Regex("/courses/[^/]+/files", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-		private static readonly Dictionary<string, string> allowedExtensions
-			= new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-			{
-				{ ".png", "image/png" },
-				{ ".jpg", "image/jpeg" },
-				{ ".bmp", "image/bmp" },
-				{ ".gif", "image/gif" },
-				{ ".zip", "application/x-zip-compressed" },
-				{ ".odp", "application/vnd.oasis.opendocument.presentation" },
-				{ ".pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation" },
-				{ ".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
-				{ ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
-				{ ".pdf", "application/pdf" },
-				{ ".html", "text/html" },
-				{ ".mmap", "application/vnd.mindjet.mindmanage" },
-				{ ".xmind", "application/vnd.xmind.workbook" },
-				{ ".fig", "application/octet-stream" }
-			};
+		
 
 		protected override IApplicationBuilder UseStaticFiles(IApplicationBuilder app)
 		{
-			var contentTypeProvider = new FileExtensionContentTypeProvider(allowedExtensions);
+			var contentTypeProvider = new FileExtensionContentTypeProvider(CourseStaticFilesHelper.AllowedExtensions);
 			var coursesDirectory = Path.Combine(CourseManager.GetCoursesDirectory().FullName, "Courses");
 
 			var options = new RewriteOptions()
