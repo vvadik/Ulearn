@@ -61,7 +61,7 @@ namespace Ulearn.Web.Api.Controllers.Review
 			{
 				var course = await courseManager.FindCourseAsync(submissionCourseId);
 				var slideId = review.ExerciseChecking.SlideId;
-				var unit = course?.FindUnitBySlideId(slideId, isInstructor);
+				var unit = course?.FindUnitBySlideIdNotSafe(slideId, isInstructor);
 				if (unit != null && await unitsRepo.IsUnitVisibleForStudents(course, unit.Id))
 					await NotifyAboutCodeReviewComment(comment);
 			}

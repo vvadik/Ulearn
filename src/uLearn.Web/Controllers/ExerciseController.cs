@@ -191,7 +191,7 @@ namespace uLearn.Web.Controllers
 			{
 				var course = courseManager.FindCourse(submissionCourseId);
 				var slideId = review.ExerciseChecking.SlideId;
-				var unit = course?.FindUnitBySlideId(slideId, isInstructor);
+				var unit = course?.FindUnitBySlideIdNotSafe(slideId, isInstructor);
 				if (unit != null && unitsRepo.IsUnitVisibleForStudents(course, unit.Id))
 					await NotifyAboutCodeReviewComment(comment).ConfigureAwait(false);
 			}
@@ -258,7 +258,7 @@ namespace uLearn.Web.Controllers
 					await slideCheckingsRepo.DisableProhibitFurtherManualCheckings(checking.CourseId, checking.UserId, checking.SlideId).ConfigureAwait(false);
 				await visitsRepo.UpdateScoreForVisit(checking.CourseId, slide, checking.UserId).ConfigureAwait(false);
 
-				var unit = course.FindUnitBySlideId(checking.SlideId, true);
+				var unit = course.FindUnitBySlideIdNotSafe(checking.SlideId, true);
 				if (unit != null && unitsRepo.IsUnitVisibleForStudents(course, unit.Id))
 					await NotifyAboutManualExerciseChecking(checking).ConfigureAwait(false);
 

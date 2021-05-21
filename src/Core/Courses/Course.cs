@@ -112,7 +112,7 @@ namespace Ulearn.Core.Courses
 		}
 
 		[CanBeNull]
-		public Unit FindUnitBySlideId(Guid slideId, bool withHiddenSlides)
+		public Unit FindUnitBySlideIdNotSafe(Guid slideId, bool withHiddenSlides) // не проверяет, что unit опубликован
 		{
 			return units.FirstOrDefault(u => u.GetSlides(withHiddenSlides).Any(s => s.Id == slideId));
 		}

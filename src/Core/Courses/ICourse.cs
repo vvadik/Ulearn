@@ -21,7 +21,7 @@ namespace Ulearn.Core.Courses
 		Unit GetUnitById(Guid unitId, [NotNull] List<Guid> visibleUnits);
 		Unit FindUnitByIdNotSafe(Guid unitId);
 		Unit GetUnitByIdNotSafe(Guid unitId);
-		Unit FindUnitBySlideId(Guid slideId, bool withHidden);
+		Unit FindUnitBySlideIdNotSafe(Guid slideId, bool withHidden);
 		Slide FindInstructorNoteById(Guid slideId);
 	}
 }

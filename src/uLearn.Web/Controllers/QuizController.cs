@@ -324,7 +324,7 @@ namespace uLearn.Web.Controllers
 				var checking = slideCheckingsRepo.FindManualCheckingById<ManualQuizChecking>(id);
 
 				var course = courseManager.GetCourse(checking.CourseId);
-				var unit = course.FindUnitBySlideId(checking.SlideId, true);
+				var unit = course.FindUnitBySlideIdNotSafe(checking.SlideId, true);
 				var slide = course.GetSlideById(checking.SlideId, true);
 
 				metricSender.SendCount($"quiz.manual_score.{checking.CourseId}");
