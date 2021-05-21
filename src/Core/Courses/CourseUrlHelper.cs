@@ -14,7 +14,7 @@ namespace Ulearn.Core.Courses
 		// Не учитывает возможность /../
 		public static string GetAbsoluteUrlToStudentZip(string baseUrlApi, string courseId, Guid slideId, string studentZipName)
 		{
-			return GetUrlFromParts(baseUrlApi, $"Exercise/{courseId}/{slideId}/StudentZip/{studentZipName}");
+			return GetUrlFromParts(baseUrlApi, $"slides/{courseId}/{slideId}/exercise/student-zip/{studentZipName}");
 		}
 
 		// Не учитывает возможность /../

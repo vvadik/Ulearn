@@ -260,9 +260,10 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			return styleErrors;
 		}
 
-		[HttpPost("/slides/{courseId}/{slideId}/exercise/student-zip")]
-		[Authorize]
-		public async Task<ActionResult<RunSolutionResponse>> GetStudentZip([FromRoute] string courseId, [FromRoute] Guid slideId)
+		[HttpGet("/slides/{courseId}/{slideId}/exercise/student-zip/{studentZipName}")]
+		[AllowAnonymous]
+		[Authorize(AuthenticationSchemes = "Bearer,Identity.Application")]
+		public async Task<ActionResult<RunSolutionResponse>> GetStudentZip([FromRoute] string courseId, [FromRoute] Guid slideId, [FromRoute] string studentZipName)
 		{
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.Instructor);
 			var slide = (await courseManager.FindCourseAsync(courseId))?.FindSlideById(slideId, isInstructor);
@@ -276,9 +277,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 
 			var zipFile = courseManager.GenerateOrFindStudentZip(courseId, exerciseSlide);
 
-			var block = exerciseSlide.Exercise;
-			var fileName = (block as CsProjectExerciseBlock)?.CsprojFileName ?? new DirectoryInfo(((UniversalExerciseBlock)block).ExerciseDirPath).Name;
-			return File(zipFile.FullName, "application/zip", fileName + ".zip");
+			return PhysicalFile(zipFile.FullName, "application/zip", studentZipName);
 		}
 	}
 }

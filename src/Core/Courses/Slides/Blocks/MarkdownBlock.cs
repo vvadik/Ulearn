@@ -55,8 +55,8 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 			if (!(Markdown.Contains("(/Exercise/StudentZip)") || Markdown.Contains("(ExerciseZip)")))
 				return Markdown;
 			var studentZipName = (exerciseSlide.Exercise as CsProjectExerciseBlock)?.CsprojFileName ?? new DirectoryInfo((exerciseSlide.Exercise as UniversalExerciseBlock).ExerciseDirPath).Name;
-			var studentZipFullPath = CourseUrlHelper.GetAbsoluteUrlToStudentZip(baseUrlApi, courseId, slide.Id, studentZipName);
-			return Markdown.Replace("(/Exercise/StudentZip)", studentZipFullPath).Replace("(ExerciseZip)", studentZipFullPath);
+			var studentZipFullPath = CourseUrlHelper.GetAbsoluteUrlToStudentZip(baseUrlApi, courseId, slide.Id, $"{studentZipName}.zip");
+			return Markdown.Replace("(/Exercise/StudentZip)", $"({studentZipFullPath})").Replace("(ExerciseZip)", $"({studentZipFullPath})");
 		}
 
 		public override string ToString()

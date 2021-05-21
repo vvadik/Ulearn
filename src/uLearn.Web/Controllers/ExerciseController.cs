@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Runtime.Serialization;
@@ -22,6 +23,7 @@ using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Metrics;
 using Vostok.Logging.Abstractions;
 
@@ -30,30 +32,33 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize]
 	public class ExerciseController : JsonDataContractController
 	{
-		protected readonly ULearnDb db;
-		protected readonly CourseManager courseManager;
-		protected readonly MetricSender metricSender;
+		private readonly ULearnDb db;
+		private readonly CourseManager courseManager;
+		private readonly MetricSender metricSender;
 
-		protected readonly UserSolutionsRepo userSolutionsRepo;
-		protected readonly SlideCheckingsRepo slideCheckingsRepo;
-		protected readonly GroupsRepo groupsRepo;
-		protected readonly VisitsRepo visitsRepo;
-		protected readonly NotificationsRepo notificationsRepo;
-		protected readonly UsersRepo usersRepo;
-		protected readonly UnitsRepo unitsRepo;
+		private readonly UserSolutionsRepo userSolutionsRepo;
+		private readonly SlideCheckingsRepo slideCheckingsRepo;
+		private readonly GroupsRepo groupsRepo;
+		private readonly VisitsRepo visitsRepo;
+		private readonly NotificationsRepo notificationsRepo;
+		private readonly UsersRepo usersRepo;
+		private readonly UnitsRepo unitsRepo;
+
+		private readonly string baseUrlApi;
 
 		private static ILog log => LogProvider.Get().ForContext(typeof(ExerciseController));
 
 		public ExerciseController()
-			: this(new ULearnDb(), WebCourseManager.Instance, new MetricSender(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName))
+			: this(new ULearnDb(), WebCourseManager.Instance, new MetricSender(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName), ApplicationConfiguration.Read<UlearnConfiguration>())
 		{
 		}
 
-		public ExerciseController(ULearnDb db, WebCourseManager courseManager, MetricSender metricSender)
+		public ExerciseController(ULearnDb db, WebCourseManager courseManager, MetricSender metricSender, UlearnConfiguration configuration)
 		{
 			this.db = db;
 			this.courseManager = courseManager;
 			this.metricSender = metricSender;
+			baseUrlApi = configuration.BaseUrlApi;
 
 			userSolutionsRepo = new UserSolutionsRepo(db);
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
@@ -570,6 +575,28 @@ namespace uLearn.Web.Controllers
 				HasFilterByName = hasFilterByName,
 				UserGroups = userGroups,
 			};
+		}
+
+		[Obsolete("Use api")]
+		[System.Web.Mvc.AllowAnonymous]
+		public ActionResult StudentZip(string courseId, Guid slideId, string fileName)
+		{
+			log.Warn("StudentZip request {courseId} {slideId}");
+			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
+			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId, isInstructor);
+			if (!(slide is ExerciseSlide))
+				return HttpNotFound();
+
+			var exerciseSlide = slide as ExerciseSlide;
+			if (exerciseSlide.Exercise is SingleFileExerciseBlock)
+				return HttpNotFound();
+			if ((exerciseSlide.Exercise as UniversalExerciseBlock)?.NoStudentZip ?? false)
+				return HttpNotFound();
+
+			var studentZipName = !string.IsNullOrEmpty(fileName)
+				? fileName
+				: (exerciseSlide.Exercise as CsProjectExerciseBlock)?.CsprojFileName ?? new DirectoryInfo((exerciseSlide.Exercise as UniversalExerciseBlock).ExerciseDirPath).Name;
+			return Redirect(CourseUrlHelper.GetAbsoluteUrlToStudentZip(baseUrlApi, courseId, slideId, $"{studentZipName}.zip"));
 		}
 	}
 

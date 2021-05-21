@@ -68,7 +68,7 @@ namespace Ulearn.Common.Api
 						{
 							var isLocalhost = httpReq.Host.Host.StartsWith("localhost");
 							var schemas = isLocalhost ? new[] { "http", "https" } : new[] { "https", "http" };
-							swagger.Servers = schemas.Select(s => new OpenApiServer { Url = $"{s}://{httpReq.Host.Host}" }).ToList();
+							swagger.Servers = schemas.Select(s => new OpenApiServer { Url = $"{s}://{httpReq.Host.Host}:{httpReq.Host.Port}" }).ToList();
 						});
 					});
 					/* And add swagger UI, available at /documentation */
