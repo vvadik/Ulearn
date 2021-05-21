@@ -59,7 +59,7 @@ namespace Ulearn.Core.Courses
 		}
 
 		[CanBeNull]
-		public Slide FindInstructorNoteById(Guid slideId)
+		public Slide FindInstructorNoteByIdNotSafe(Guid slideId)
 		{
 			var unitWithId = FindUnitByIdNotSafe(slideId);
 			return unitWithId?.InstructorNote;

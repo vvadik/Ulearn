@@ -71,7 +71,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			var slide = course.FindSlideById(slideId, isInstructor);
 			if (slide == null)
 			{
-				var instructorNote = course.FindInstructorNoteById(slideId);
+				var instructorNote = course.FindInstructorNoteByIdNotSafe(slideId);
 				if (instructorNote != null && isInstructor)
 					slide = instructorNote;
 			}

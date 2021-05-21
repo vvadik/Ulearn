@@ -101,7 +101,7 @@ namespace uLearn.Web.Controllers
 
 			if (slide == null)
 			{
-				var instructorNote = course.FindInstructorNoteById(slideGuid);
+				var instructorNote = course.FindInstructorNoteByIdNotSafe(slideGuid);
 				if (instructorNote != null && isInstructor)
 					slide = instructorNote;
 			}
