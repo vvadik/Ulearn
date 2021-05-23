@@ -13,11 +13,13 @@ import DataArea from "./DataArea";
 import StepsCounter from "./StepsCounter";
 import { Loader } from "@skbkontur/react-ui";
 
-import styles from './Visualizer.less';
+import './visualizer.css'
 import Controls from "./Controls";
+import JSONView from './react-json-view/src/js/index';
 
 export interface Props {
 	code: string;
+	input: string;
 }
 
 function getCodeMirrorOptions(): EditorConfiguration {
@@ -40,6 +42,8 @@ interface State {
 	input: string;
 	output: string;
 
+	variables: Record<string, any>;
+
 	totalSteps: number;
 	currentStep: number;
 
@@ -54,11 +58,12 @@ class Visualizer extends React.Component<Props, State> {
 		this.state = {
 			code: props.code,
 			input: props.input,
-			output: props.output,
+			output: "",
 			totalSteps: 0,
 			currentStep: 0,
 			trace: [],
 			isLoading: false,
+			variables: {}
 		};
 		this.updateInput = this.updateInput.bind(this);
 		this.previousStep = this.previousStep.bind(this);
@@ -67,15 +72,11 @@ class Visualizer extends React.Component<Props, State> {
 	}
 
 	nextStep() : void {
-		console.log('next step');
-		this.setState({currentStep: this.state.currentStep + 1});
-		this.showStep();
+		this.showStep(this.state.currentStep + 1);
 	}
 
 	previousStep() : void {
-		console.log('previous step');
-		this.setState({currentStep: this.state.currentStep - 1});
-		this.showStep();
+		this.showStep(this.state.currentStep - 1);
 	}
 
 	getRuntimeData() : void {
@@ -91,18 +92,29 @@ class Visualizer extends React.Component<Props, State> {
 	run(trace: string) : void {
 		this.setState({isLoading: false, output: ''});
 		const steps = JSON.parse(trace).message.trace;
-		console.log('run');
-		console.log(steps.length);
-		this.setState({trace: steps, totalSteps: steps.length, currentStep: 1});
+		this.setState({trace: steps, totalSteps: steps.length, currentStep: 0});
 	}
 
-	showStep() : void {
-		const stepNumber = this.state.currentStep - 1;
-		console.log('current step: ' + stepNumber);
+	showStep(stepNumber: number) : void {
 		const currentStep = this.state.trace[stepNumber];
-		console.log(JSON.stringify(currentStep));
-		console.log('stdout: ' + currentStep.stdout);
-		this.setState({output: currentStep.stdout});
+		this.setState({
+			output: currentStep.stdout,
+			variables: this.getVariables(currentStep),
+			currentStep: stepNumber,
+		});
+	}
+
+	getVariables(trace) {
+		let globals = trace["globals"];
+		/*for (let variable of globals) {
+			if (variable === "LIST") {
+				variable = "list";
+			}
+		}*/
+		return {
+			"Глобальные": globals,
+			"Локальные": trace["stack_locals"],
+		};
 	}
 
 	updateInput(e) : void {
@@ -116,22 +128,32 @@ class Visualizer extends React.Component<Props, State> {
 					<Loader active={this.state.isLoading}>
 						<StepsCounter totalSteps={this.state.totalSteps} currentStep={this.state.currentStep} />
 
-						<Controlled
-							options={getCodeMirrorOptions()}
-							className={styles["editor"]}
-							onBeforeChange={ (editor, data, value) =>
-							{this.setState({code: value});} }
-							onChange={ (editor, data, value) =>
-							{this.setState({code: value});} }
-							value={ this.state.code }
-						/>
+						<div className={"main"}>
+							<div id={"code-mirror"}>
+								<Controlled
+									options={getCodeMirrorOptions()}
+									onBeforeChange={ (editor, data, value) =>
+									{this.setState({code: value});} }
+									onChange={ (editor, data, value) =>
+									{this.setState({code: value});} }
+									value={ this.state.code }
+								/>
+							</div>
 
+							<div className={"variables"}>
+								<JSONView src={this.state.variables} />
+							</div>
+						</div>
+
+						<div className={"fields"}>
 						<DataArea
 							input={this.state.input}
 							output={this.state.output}
 							updateInput={this.updateInput}
 						/>
+						</div>
 
+						<div className={"actions"}>
 						<Controls
 							run={this.getRuntimeData}
 							next={this.nextStep}
@@ -139,6 +161,7 @@ class Visualizer extends React.Component<Props, State> {
 							currentStep={this.state.currentStep}
 							totalSteps={this.state.totalSteps}
 						/>
+						</div>
 					</Loader>
 				</Modal>
 			</div>

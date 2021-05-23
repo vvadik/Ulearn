@@ -18,12 +18,12 @@ class Controls extends React.Component<Props> {
 				<RunButton onClick={this.props.run} text={"Запустить"} />
 				<StepButton
 					onClick={this.props.previous}
-					disabled={this.props.currentStep === 0 || this.props.currentStep === 1}
+					disabled={this.props.currentStep === 0}
 					text={"Назад"}
 				/>
 				<StepButton
 					onClick={this.props.next}
-					disabled={this.props.currentStep === this.props.totalSteps}
+					disabled={this.props.currentStep === this.props.totalSteps - 1}
 					text={"Дальше"}
 				/>
 			</div>

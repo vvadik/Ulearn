@@ -1,0 +1,14 @@
+.main {
+  display: flex;
+  width: 1000px;
+}
+
+#code-mirror {
+	border: 1px solid gray;
+	max-width: 60%;
+	min-width: 60%;
+}
+
+.fields {
+  display: flex;
+}

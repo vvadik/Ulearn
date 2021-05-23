@@ -11,7 +11,7 @@ function StepsCounter(props: Props): React.ReactElement<Props> {
 
 	return (
 		<div>
-			<p>Шаг {currentStep} из {totalSteps}</p>
+			<p>Шаг {totalSteps === 0 ? currentStep : currentStep + 1} из {totalSteps}</p>
 		</div>
 	);
 }
