@@ -3,8 +3,6 @@ import { Controlled, } from "react-codemirror2";
 import Modal from "../../../../../../modal/Modal";
 
 import CodeMirror, { EditorConfiguration, } from "codemirror";
-require('codemirror/addon/selection/active-line.js');
-require('codemirror/addon/selection/mark-selection.js');
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/darcula.css';
 

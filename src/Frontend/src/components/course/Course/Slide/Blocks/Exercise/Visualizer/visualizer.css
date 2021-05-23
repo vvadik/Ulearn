@@ -4,13 +4,8 @@
 }
 
 #code-mirror {
-	border: 1px solid gray;
 	max-width: 60%;
 	min-width: 60%;
-}
-
-.lol {
-	border: 2px solid red;
 }
 
 .CodeMirror-gutter {

@@ -1,4 +1,4 @@
-import { rjv_default, rjv_grey } from './base16/rjv-themes';
+import { rjv_default } from './base16/rjv-themes';
 import constants from './styleConstants';
 import { createStyling } from 'react-base16-styling';
 
@@ -390,12 +390,7 @@ const getDefaultThemeStyling = theme => {
 };
 
 const getStyle = theme => {
-    let rjv_theme = rjv_default;
-    if (theme === false || theme === 'none') {
-        rjv_theme = rjv_grey;
-    }
-
-    return createStyling(getDefaultThemeStyling, { defaultBase16: rjv_theme })(
+	return createStyling(getDefaultThemeStyling, { defaultBase16: rjv_default })(
         theme
     );
 };
