@@ -9,6 +9,14 @@
 	min-width: 60%;
 }
 
+.lol {
+	border: 2px solid red;
+}
+
+.CodeMirror-gutter {
+	width: 10px;
+}
+
 .fields {
   display: flex;
 }
