@@ -152,14 +152,19 @@ namespace Ulearn.Core.RunCheckerJobApi
 			{
 				return $"{startOutput}\n" +
 						$"Входные данные:\n" +
-						$"{Test}\n\n" +
+						$"{Truncate(Test, 100)}\n\n" +
 						$"Ожидаемый результат:\n" +
-						$"{Answer}\n\n" +
+						$"{Truncate(Answer, 100)}\n\n" +
 						$"Ваш результат:\n" +
-						$"{StudentAnswer}";
+						$"{Truncate(StudentAnswer, 100)}";
 			}
 
 			return startOutput;
 		}
+
+		private string Truncate(string source, int limit)
+			=> source.Length <= limit
+				? source
+				: $"{source.Take(limit)}...";
 	}
 }
