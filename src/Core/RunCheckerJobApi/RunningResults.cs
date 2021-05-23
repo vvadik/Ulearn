@@ -128,7 +128,7 @@ namespace Ulearn.Core.RunCheckerJobApi
 								  + (TestNumber == null ? " все тесты" : " тест") 
 								  + (timeLimit == null ? null : $" за {timeLimit} " + timeLimit.Value.SelectPluralWordInRussian(RussianPluralizationOptions.Seconds));
 				case Verdict.WrongAnswer:
-					return output + TestNumberOutput + WrongAnswerOutput(withFullDescription);
+					return output + WrongAnswerOutput(withFullDescription);
 				case Verdict.RuntimeError:
 					return output + TestNumberOutput + "\nПрограмма завершилась с ошибкой";
 				default:
