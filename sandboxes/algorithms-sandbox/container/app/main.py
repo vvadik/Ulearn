@@ -13,6 +13,10 @@ TEMPORARY_FILENAME = 'Program'
 SUFFIX_ANSWER_FILENAME = '.a'
 STUDENT_USER = 'student'
 
+def read_all(filename):
+    with open(filename, 'r') as f:
+        return f.read()
+
 class Logger:
     def __init__(self):
         self.__data = []
@@ -88,12 +92,12 @@ def check(source_code_run_info, code_filename):
     runner = TaskCodeRunner(source_code_run_info)
     for test_number, test_filename in enumerate(sorted(filter(is_test_file, listdir(TEST_DIRECTORY))), 1):
         log.info(f'check - Номер теста: {test_number}; Имя файла: {test_filename}')
+        full_path_test = path_join(TEST_DIRECTORY, test_filename)
+        full_path_student_answer = f'{path_join(TEST_DIRECTORY, test_filename)}.o'
+        full_path_test_answer = path_join(TEST_DIRECTORY, f'{test_filename}{SUFFIX_ANSWER_FILENAME}')
         try:
             runner.run_test(code_filename, path_join(TEST_DIRECTORY, test_filename))
-            check_command = [path_join('.', 'check'),
-                             path_join(TEST_DIRECTORY, test_filename),
-                             f'{path_join(TEST_DIRECTORY, test_filename)}.o',
-                             path_join(TEST_DIRECTORY, f'{test_filename}{SUFFIX_ANSWER_FILENAME}')]
+            check_command = [path_join('.', 'check'), full_path_test, full_path_student_answer, full_path_test_answer]
             process = Popen(check_command, stdout=DEVNULL, stderr=PIPE)
             _, err = process.communicate()
             log.info(f'Вердикт чеккера: {err.decode()}')
@@ -117,7 +121,10 @@ def check(source_code_run_info, code_filename):
         except WrongAnswerException:
             return {
                 'Verdict': Verdict.WrongAnswer.name,
-                'TestNumber': test_number
+                'TestNumber': test_number,
+                'Answer': read_all(full_path_test_answer),
+                'Test': read_all(full_path_test),
+                'StudentAnswer': read_all(full_path_student_answer)
             }
         except SecurityException:
             return {

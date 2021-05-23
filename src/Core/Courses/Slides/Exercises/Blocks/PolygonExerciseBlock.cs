@@ -54,6 +54,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public double TimeLimitPerTest { get; set; }
 		public override string[] PathsToExcludeForChecker => new[] { "statements", "statements-sections" };
 		public Language? DefaultLanguage { get; set; }
+		public bool ShowTestDescription { get; set; }
 		
 		public RunnerSubmission CreateSubmission(string submissionId, string code, Language language)
 		{
