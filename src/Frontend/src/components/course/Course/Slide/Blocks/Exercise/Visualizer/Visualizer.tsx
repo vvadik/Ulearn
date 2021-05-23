@@ -95,17 +95,29 @@ class Visualizer extends React.Component<Props, State> {
 	run(trace: string) : void {
 		this.setState({status: VisualizerStatus.Ok, output: ''});
 		const steps = JSON.parse(trace).message.trace;
+		this.setArrow(0);
 		this.setState({trace: steps, totalSteps: steps.length, currentStep: 0});
 	}
 
 	showStep(stepNumber: number) : void {
 		const currentStep = this.state.trace[stepNumber];
 		const lineNumber = parseInt(currentStep["line"]);
+		const event = currentStep["event"];
+
+		let newStatus = VisualizerStatus.Ok;
+		if (event === "exception") {
+			newStatus = VisualizerStatus.Error;
+		}
+		else if (event === "return") {
+			newStatus = VisualizerStatus.Return;
+		}
+
 		this.setArrow(lineNumber);
 		this.setState({
 			output: currentStep.stdout,
 			variables: this.getVariables(currentStep),
 			currentStep: stepNumber,
+			status: newStatus,
 		});
 	}
 

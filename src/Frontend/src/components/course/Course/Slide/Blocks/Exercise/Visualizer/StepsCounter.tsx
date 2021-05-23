@@ -13,7 +13,7 @@ function StepsCounter(props: Props): React.ReactElement<Props> {
 			<p>
 				Шаг {props.totalSteps === 0 ?
 				props.currentStep : props.currentStep + 1} из {props.totalSteps}
-				<b>{getStatus(props.status) === null ? '' : getStatus(props.status)}</b>
+				<b> {getStatus(props.status) === null ? '' : getStatus(props.status)}</b>
 			</p>
 		</div>
 	);
