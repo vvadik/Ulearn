@@ -129,9 +129,7 @@ class Header extends Component<Props, State> {
 				<div className={ styles.header + " header" } id="header">
 					<div className={ styles.controlsWrapper }>
 						{ this.renderLogo() }
-						<Visualizer code={"a = {'a': 5, 'c': 6}\n" +
-						"c = [1, 2, 3, 4]\n" +
-						"print(0)"} input={"2\n2"}/>
+						<Visualizer code={"a = {'a': 5, 'c': {'a': [1, 2, 3], 'b': {'k': 'aaaaa'}}}\nb = [1, 2, [1, 2]]"} input={"2\n2"}/>
 						{ courses.currentCourseId && this.renderNavMenuIcon() }
 						<Hijack name={ account.visibleName }/>
 						{ !initializing && this.renderUserRoleMenu() }
