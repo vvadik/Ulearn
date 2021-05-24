@@ -17,6 +17,19 @@ def read_all(filename):
     with open(filename, 'r') as f:
         return f.read()
 
+def set_test_result_info(running_result,
+                         test_number,
+                         input,
+                         correct_output,
+                         student_output):
+    running_result["TestResultInfo"] = {
+        "TestNumber": test_number,
+        "Input": input,
+        "CorrectOutput": correct_output,
+        "StudentOutput": student_output
+    }
+    return running_result
+
 class Logger:
     def __init__(self):
         self.__data = []
@@ -109,23 +122,29 @@ def check(source_code_run_info, code_filename):
                 'CompilationOutput': e.message()
             }
         except RuntimeException:
-            return {
-                'Verdict': Verdict.RuntimeError.name,
-                'TestNumber': test_number
-            }
+            return set_test_result_info({
+                'Verdict': Verdict.RuntimeError.name
+            }, test_number,
+                read_all(full_path_test),
+                read_all(full_path_test_answer),
+                read_all(full_path_student_answer)
+            )
         except TimeLimitException:
-            return {
-                'Verdict': Verdict.TimeLimit.name,
-                'TestNumber': test_number
-            }
+            return set_test_result_info({
+                'Verdict': Verdict.TimeLimit.name
+            }, test_number,
+                read_all(full_path_test),
+                read_all(full_path_test_answer),
+                ""
+            )
         except WrongAnswerException:
-            return {
-                'Verdict': Verdict.WrongAnswer.name,
-                'TestNumber': test_number,
-                'Answer': read_all(full_path_test_answer),
-                'Test': read_all(full_path_test),
-                'StudentAnswer': read_all(full_path_student_answer)
-            }
+            return set_test_result_info({
+                'Verdict': Verdict.WrongAnswer.name
+            },  test_number,
+                read_all(full_path_test),
+                read_all(full_path_test_answer),
+                read_all(full_path_student_answer)
+            )
         except SecurityException:
             return {
                 'Verdict': Verdict.SecurityException.name
