@@ -3,7 +3,10 @@ function parseGlobals(globals){
 
 	for (const key in globals) {
 		const val = globals[key];
-		parsedGlobals[key] = parseVal(val);
+		const parsedVal = parseVal(val);
+		if (parsedVal !== null) {
+			parsedGlobals[key] = parseVal(val);
+		}
 	}
 
 	return parsedGlobals;

@@ -1,11 +1,10 @@
 .main {
-  display: flex;
-  width: 1000px;
+  	display: grid;
+	grid-template-columns: 3fr 1fr;
 }
 
-#code-mirror {
-	max-width: 60%;
-	min-width: 60%;
+.react-json-view {
+	height: 100%;
 }
 
 .CodeMirror-gutter {
