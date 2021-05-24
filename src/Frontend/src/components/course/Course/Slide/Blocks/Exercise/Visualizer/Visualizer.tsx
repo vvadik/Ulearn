@@ -17,6 +17,8 @@ import Controls from "./Controls";
 import JSONView from './react-json-view/src/js/index';
 import VisualizerStatus from "./VusualizerStatus";
 
+import parseGlobals from './helpers/parseTrace';
+
 export interface Props {
 	code: string;
 	input: string;
@@ -130,14 +132,10 @@ class Visualizer extends React.Component<Props, State> {
 	}
 
 	getVariables(trace) {
-		let globals = trace["globals"];
-		/*for (let variable of globals) {
-			if (variable === "LIST") {
-				variable = "list";
-			}
-		}*/
+		const globals = trace["globals"];
+
 		return {
-			"Глобальные": globals,
+			"Глобальные": parseGlobals(globals),
 			"Локальные": trace["stack_locals"],
 		};
 	}

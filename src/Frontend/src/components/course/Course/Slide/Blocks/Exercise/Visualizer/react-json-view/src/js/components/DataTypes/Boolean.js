@@ -12,7 +12,7 @@ export default class extends React.PureComponent {
         return (
             <div {...Theme(props.theme, 'boolean')}>
                 <DataTypeLabel type_name={type_name} {...props} />
-                {props.value ? 'true' : 'false'}
+                {props.value ? 'True' : 'False'}
             </div>
         );
     }

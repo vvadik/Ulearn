@@ -38,7 +38,7 @@ export default class extends React.PureComponent {
     };
 
     render() {
-        const type_name = 'string';
+        const type_name = 'str';
         const { collapsed } = this.state;
         const { props } = this;
         const { collapseStringsAfterLength, theme } = props;
