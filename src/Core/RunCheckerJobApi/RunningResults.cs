@@ -59,6 +59,18 @@ namespace Ulearn.Core.RunCheckerJobApi
 
 		[DataMember]
 		public int? TestNumber { get; set; }
+		
+		[DataMember] 
+		[CanBeNull]
+		public string Answer { get; set; }
+		
+		[DataMember]
+		[CanBeNull]
+		public string Test { get; set; }
+		
+		[DataMember]
+		[CanBeNull] 
+		public string StudentAnswer { get; set; }
 
 		[IgnoreDataMember]
 		private readonly int? timeLimit;
@@ -102,7 +114,7 @@ namespace Ulearn.Core.RunCheckerJobApi
 			return $"Id: {Id}, Verdict: {Verdict}: {message}" + (pointsString == null ? null : $", Points: {pointsString}");
 		}
 
-		public string GetOutput()
+		public string GetOutput(bool withFullDescription = false)
 		{
 			var output = string.Join("\n", new[] { Output, Error }.Where(s => !string.IsNullOrWhiteSpace(s)));
 
@@ -116,7 +128,7 @@ namespace Ulearn.Core.RunCheckerJobApi
 								  + (TestNumber == null ? " все тесты" : " тест") 
 								  + (timeLimit == null ? null : $" за {timeLimit} " + timeLimit.Value.SelectPluralWordInRussian(RussianPluralizationOptions.Seconds));
 				case Verdict.WrongAnswer:
-					return output + TestNumberOutput +  "\nНеправильный ответ";
+					return output + WrongAnswerOutput(withFullDescription);
 				case Verdict.RuntimeError:
 					return output + TestNumberOutput + "\nПрограмма завершилась с ошибкой";
 				default:
@@ -132,5 +144,27 @@ namespace Ulearn.Core.RunCheckerJobApi
 		}
 
 		private string TestNumberOutput => TestNumber == null ? null : $" \nТест №{TestNumber}";
+
+		private string WrongAnswerOutput(bool withFullDescription)
+		{
+			var startOutput = TestNumberOutput +  "\nНеправильный ответ\n";
+			if (withFullDescription)
+			{
+				return $"{startOutput}\n" +
+						$"Входные данные:\n" +
+						$"{Truncate(Test, 100)}\n\n" +
+						$"Ожидаемый результат:\n" +
+						$"{Truncate(Answer, 100)}\n\n" +
+						$"Ваш результат:\n" +
+						$"{Truncate(StudentAnswer, 100)}";
+			}
+
+			return startOutput;
+		}
+
+		private string Truncate(string source, int limit)
+			=> source.Length <= limit
+				? source
+				: $"{source.Take(limit)}...";
 	}
 }
