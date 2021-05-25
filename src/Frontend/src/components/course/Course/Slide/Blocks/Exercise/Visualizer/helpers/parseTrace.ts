@@ -1,3 +1,12 @@
+interface VisualizerStep {
+	line: string;
+	event: 'exception' | 'uncaught_exception' | 'return';
+	stdout: string;
+	globals: any;
+	stack_locals: any;
+	exception_str?: string;
+}
+
 function parseGlobals(globals: Record<string, number | string | Array<any>>) :
 	Record<string, any>{
 	const parsedGlobals = {}
@@ -44,4 +53,23 @@ const parseDict = (data: Record<string, any>) : Record<string, any> => {
 	return dict;
 }
 
-export default parseGlobals;
+const isObjectEmpty = (obj: Record<string, any>) : boolean =>
+	JSON.stringify(obj) === "{}";
+
+const getVariables = (visualizerStep: VisualizerStep) : Record<string, any> => {
+	const variables = {};
+	const parsedGlobals = parseGlobals(visualizerStep.globals);
+	const parsedLocals = visualizerStep.stack_locals;
+
+	if (!isObjectEmpty(parsedGlobals)) {
+		variables["Глобальные"] = parsedGlobals;
+	}
+	if (!isObjectEmpty(parsedLocals)) {
+		variables["Локальные"] = parsedLocals;
+	}
+
+	return variables
+};
+
+
+export { getVariables, VisualizerStep };

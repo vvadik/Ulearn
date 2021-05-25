@@ -17,7 +17,7 @@ import { Controls } from "./Controls";
 import JSONView from './react-json-view/src/js/index';
 import { VisualizerStatus } from "./VusualizerStatus";
 
-import parseGlobals from './helpers/parseTrace';
+import { getVariables, VisualizerStep } from './helpers/parseTrace';
 
 import texts from './Visualizer.texts';
 
@@ -65,14 +65,7 @@ interface RunData {
 	};
 }
 
-interface VisualizerStep {
-	line: string;
-	event: 'exception' | 'uncaught_exception' | 'return';
-	stdout: string;
-	globals: any;
-	stack_locals: any;
-	exception_str?: string;
-}
+
 
 class Visualizer extends React.Component<VisualizerProps, State> {
 	constructor(props: VisualizerProps) {
@@ -112,7 +105,7 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 			.then(r => this.run(r));
 	}
 
-	run(runData: RunData) : void {
+	run = (runData: RunData) : void => {
 		this.setArrow(0);
 		const steps = runData.message.trace;
 		this.setState({
@@ -124,7 +117,7 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 		}, () => this.showStep(0));
 	}
 
-	showStep(stepNumber: number) : void {
+	showStep = (stepNumber: number) : void => {
 		const currentStep = this.state.trace[stepNumber] as VisualizerStep;
 		const lineNumber = parseInt(currentStep.line);
 		const event = currentStep.event;
@@ -142,7 +135,7 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 		this.setArrow(lineNumber);
 		this.setState({
 			output: stdout,
-			variables: this.getVariables(currentStep),
+			variables: getVariables(currentStep),
 			currentStep: stepNumber,
 			status: newStatus,
 		}, () => console.log(this.state.currentStep));
@@ -155,13 +148,6 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 		arrow.style.color = "#FF9E59";
 		this.state.editor?.setGutterMarker(lineNumber - 1, "arrow", arrow);
 	}
-
-	getVariables = (visualizerStep: VisualizerStep) : Record<string, any> => {
-		return {
-			"Глобальные": parseGlobals(visualizerStep.globals),
-			"Локальные": visualizerStep.stack_locals,
-		}
-	};
 
 	updateInput = (value: string) : void =>
 		this.setState({input: value});

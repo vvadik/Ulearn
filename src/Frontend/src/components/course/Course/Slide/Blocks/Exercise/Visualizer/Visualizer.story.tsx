@@ -14,7 +14,7 @@ Print1000.args = {
 
 export const aPlusB = Template.bind({});
 aPlusB.args = {
-	code: "a = int(input())\nb = int(input()\nprint(a + b)",
+	code: "a = int(input())\nb = int(input())\nprint(a + b)",
 	input: "2\n2",
 }
 
