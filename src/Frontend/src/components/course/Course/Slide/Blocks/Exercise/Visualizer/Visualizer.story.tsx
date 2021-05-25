@@ -42,6 +42,43 @@ uncaughtException.args = {
 	input: "10",
 }
 
+export const longCode = Template.bind({});
+longCode.args = {
+	code: "print(1)\nprint(1)\nprint(1)\nprint(1)\nprint(1)\nprint(1)\nprint(1)" +
+		"\nprint(1)\nprint(1)\nprint(1)\nprint(1)\nprint(1)\nprint(1)\nprint(1)" +
+		"\nprint(1)\nprint(1)\nprint(1)\nprint(1)\nprint(1)\nprint(1)\nprint(1)" +
+		"\nprint(1)\nprint(1)\nprint(1)\nprint(1)\nprint(1)\nprint(1)\nprint(1)" +
+		"\nprint(1)\nprint(1)\nprint(1)\nprint(1)\n",
+	input: "",
+}
+
+export const wideCode = Template.bind({});
+wideCode.args = {
+	code:
+		"# Создадим пустой словать Capitals\n" +
+		"Capitals = dict()\n" +
+		"\n" +
+		"# Заполним его несколькими значениями. Заполним его несколькими значениями. Заполним его несколькими " +
+		"значениями. Заполним его несколькими значениями. Заполним его несколькими значениями. Заполним его несколькими " +
+		"значениями. Заполним его несколькими значениями. Заполним его несколькими значениями. Заполним его несколькими " +
+		"значениями. Заполним его несколькими значениями. Заполним его несколькими значениями Заполним его несколькими значениями\n" +
+		"Capitals['Russia'] = 'Moscow'\n" +
+		"Capitals['Ukraine'] = 'Kiev'\n" +
+		"Capitals['USA'] = 'Washington'\n" +
+		"\n" +
+		"Countries = ['Russia', 'France', 'USA', 'Russia']\n" +
+		"\n" +
+		"for country in Countries:\n" +
+		"    # Для каждой страны из списка проверим, есть ли она в словаре Capitals. Для каждой страны из списка " +
+		"проверим, есть ли она в словаре Capitals. Для каждой страны из списка проверим, есть ли она в словаре Capitals. " +
+		"Для каждой страны из списка проверим, есть ли она в словаре Capitals\n" +
+		"    if country in Capitals:\n" +
+		"        print('Столица страны ' + country + ': ' + Capitals[country])\n" +
+		"    else:\n" +
+		"        print('В базе нет страны c названием ' + country)\n",
+	input: "",
+}
+
 export default {
 	title: "Exercise/Visualizer",
 	component: Visualizer,

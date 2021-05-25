@@ -6,6 +6,8 @@
 .react-json-view {
 	height: 300px;
 	overflow: scroll;
+	border-left: 1px solid #999;
+	padding-left: 10px;
 }
 
 ::-webkit-scrollbar {
