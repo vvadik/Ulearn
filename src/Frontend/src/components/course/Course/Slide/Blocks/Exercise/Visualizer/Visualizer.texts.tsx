@@ -5,7 +5,7 @@ const texts = {
 
 	stepsCounter: {
 		currentStepNumber: (currentStep: number, totalSteps: number) : string =>
-			`Шаг ${currentStep === 0 ? currentStep : currentStep + 1} из ${ totalSteps }`,
+			`Шаг ${totalSteps === 0 ? 0 : currentStep + 1} из ${ totalSteps }`,
 		status: (status: VisualizerStatus) : string | null => {
 			if (status === VisualizerStatus.Ok) {
 				return null;

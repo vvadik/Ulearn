@@ -71,6 +71,7 @@ interface VisualizerStep {
 	stdout: string;
 	globals: any;
 	stack_locals: any;
+	exception_str?: string;
 }
 
 class Visualizer extends React.Component<VisualizerProps, State> {
@@ -124,7 +125,7 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 	}
 
 	showStep(stepNumber: number) : void {
-		const currentStep = this.state.trace[stepNumber];
+		const currentStep = this.state.trace[stepNumber] as VisualizerStep;
 		const lineNumber = parseInt(currentStep.line);
 		const event = currentStep.event;
 		let stdout = currentStep.stdout === undefined ? '' : currentStep.stdout;
@@ -144,7 +145,7 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 			variables: this.getVariables(currentStep),
 			currentStep: stepNumber,
 			status: newStatus,
-		});
+		}, () => console.log(this.state.currentStep));
 	}
 
 	setArrow = (lineNumber: number) : void => {
