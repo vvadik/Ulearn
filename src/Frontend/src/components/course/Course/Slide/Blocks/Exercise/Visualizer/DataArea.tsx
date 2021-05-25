@@ -1,39 +1,37 @@
-import React, { ChangeEventHandler, ReactNode } from 'react';
+import React from 'react';
 
 import { Center, Textarea } from "ui";
 
 import styles from './DataArea.less';
 import texts from './Visualizer.texts';
 
-export interface Props {
+interface DataAreaProps {
 	input: string;
 	output: string;
-	updateInput: ChangeEventHandler;
+	updateInput: (value: string) => void;
 }
 
-class DataArea extends React.Component<Props> {
-	render() : ReactNode {
-		return (
-			<div className={ styles.dataArea }>
-				<Center>
-					<Textarea
-						value={ this.props.input }
-						className={ styles.inputArea }
-						autoResize
-						onChange={ this.props.updateInput }
-						placeholder={ texts.dataArea.inputData }
-					/>
-					<Textarea
-						value={ this.props.output }
-						className={ styles.inputArea }
-						autoResize
-						readOnly={ true }
-						placeholder={ texts.dataArea.outputData }
-					/>
-				</Center>
-			</div>
-		);
-	}
+function DataArea({ input, updateInput, output } : DataAreaProps) : React.ReactElement {
+	return (
+		<div className={ styles.dataArea }>
+			<Center>
+				<Textarea
+					value={ input }
+					className={ styles.inputArea }
+					autoResize
+					onValueChange={ updateInput }
+					placeholder={ texts.dataArea.inputData }
+				/>
+				<Textarea
+					value={ output }
+					className={ styles.inputArea }
+					autoResize
+					readOnly={ true }
+					placeholder={ texts.dataArea.outputData }
+				/>
+			</Center>
+		</div>
+	);
 }
 
 export default DataArea;

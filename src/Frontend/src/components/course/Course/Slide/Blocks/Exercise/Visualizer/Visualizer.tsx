@@ -19,22 +19,21 @@ import VisualizerStatus from "./VusualizerStatus";
 import parseGlobals from './helpers/parseTrace';
 
 import texts from './Visualizer.texts';
+import * as codemirror from "codemirror";
 
-function getCodeMirrorOptions(): EditorConfiguration {
-	return {
-		mode: loadLanguageStyles(Language.python3),
-		lineNumbers: true,
-		scrollbarStyle: 'native',
-		lineWrapping: true,
-		readOnly: false,
-		matchBrackets: true,
-		tabSize: 4,
-		indentUnit: 4,
-		indentWithTabs: true,
-		theme: 'darcula',
-		gutters: ["CodeMirror-linenumbers", "arrow"]
-	};
-}
+const codeMirrorOptions: EditorConfiguration = {
+	mode: loadLanguageStyles(Language.python3),
+	lineNumbers: true,
+	scrollbarStyle: 'native',
+	lineWrapping: true,
+	readOnly: false,
+	matchBrackets: true,
+	tabSize: 4,
+	indentUnit: 4,
+	indentWithTabs: true,
+	theme: 'darcula',
+	gutters: ["CodeMirror-linenumbers", "arrow"]
+};
 
 interface VisualizerProps {
 	code: string;
@@ -71,21 +70,15 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 			status: VisualizerStatus.Ok,
 			variables: {}
 		};
-		this.updateInput = this.updateInput.bind(this);
-		this.previousStep = this.previousStep.bind(this);
-		this.nextStep = this.nextStep.bind(this);
-		this.getRuntimeData = this.getRuntimeData.bind(this);
 	}
 
-	nextStep() : void {
+	nextStep = () : void =>
 		this.showStep(this.state.currentStep + 1);
-	}
 
-	previousStep() : void {
+	previousStep = () : void =>
 		this.showStep(this.state.currentStep - 1);
-	}
 
-	getRuntimeData() : void {
+	getRuntimeData = () : void => {
 		this.setState({status: VisualizerStatus.Loading});
 
 		fetch('https://python-visualizer-api.vercel.app/run',
@@ -147,9 +140,15 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 		};
 	}
 
-	updateInput(e) : void {
-		this.setState({input: e.target.value});
+	updateInput = (value: string) : void => {
+		this.setState({input: value});
 	}
+
+	updateCode = (editor: CodeMirror.Editor, data: codemirror.EditorChange, value: string) : void =>
+		this.setState({ code: value });
+
+	setEditorToState = (editor: CodeMirror.Editor) : void =>
+		this.setState({ editor: editor });
 
 	render() : React.ReactElement {
 		return (
@@ -158,6 +157,7 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 					<Modal.Header>{ texts.visualizer }</Modal.Header>
 					<Modal.Body>
 						<Loader active={ this.state.status === VisualizerStatus.Loading }>
+
 							<StepsCounter
 								totalSteps={ this.state.totalSteps }
 								currentStep={ this.state.currentStep }
@@ -167,15 +167,11 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 							<div className={ "main" }>
 								<div id={ "code-mirror" }>
 									<Controlled
-										options={ getCodeMirrorOptions() }
-										onBeforeChange={ (editor, data, value) =>
-										{ this.setState({code: value}); } }
-										onChange={ (editor, data, value) =>
-										{ this.setState({ code: value }); } }
+										options={ codeMirrorOptions }
+										onBeforeChange={ this.updateCode }
+										onChange={ this.updateCode }
 										value={ this.state.code }
-										editorDidMount={ editor => {
-											this.setState({ editor: editor });
-										} }
+										editorDidMount={ this.setEditorToState }
 									/>
 								</div>
 
