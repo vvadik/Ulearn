@@ -4,8 +4,12 @@ const texts = {
 	visualizer: "Визуализатор",
 
 	stepsCounter: {
-		currentStepNumber: (currentStep: number, totalSteps: number) : string =>
-			`Шаг ${totalSteps === 0 ? 0 : currentStep + 1} из ${ totalSteps }`,
+		currentStepNumber: (currentStep: number, totalSteps: number) : string => {
+			if (totalSteps === 0) {
+				return "Ожидание запуска";
+			}
+			return `Шаг ${ currentStep + 1 } из ${ totalSteps }`;
+		},
 		status: (status: VisualizerStatus) : string | null => {
 			if (status === VisualizerStatus.Ok) {
 				return null;
