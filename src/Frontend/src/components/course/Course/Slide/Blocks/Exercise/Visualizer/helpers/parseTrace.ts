@@ -1,4 +1,5 @@
-function parseGlobals(globals: Record<string, any>) : Record<string, any>{
+function parseGlobals(globals: Record<string, number | string | Array<any>>) :
+	Record<string, any>{
 	const parsedGlobals = {}
 
 	for (const key in globals) {
@@ -12,7 +13,8 @@ function parseGlobals(globals: Record<string, any>) : Record<string, any>{
 	return parsedGlobals;
 }
 
-function parseVal(val: any) : any {
+const parseVal = (val: number | string | Array<any>) :
+	number | string | Array<any> | Record<string, any> | null | undefined => {
 	if (!Array.isArray(val)) {
 		return val;
 	}
@@ -31,11 +33,10 @@ function parseVal(val: any) : any {
 	}
 }
 
-function parseList(data) {
-	return data.slice(2).map(parseVal);
-}
+const parseList = (data: Array<any>) : Array<any> =>
+	data.slice(2).map(parseVal);
 
-function parseDict(data) {
+const parseDict = (data: Record<string, any>) : Record<string, any> => {
 	const dict = {};
 	for (const key of data.slice(2).values()) {
 		dict[key[0]] = parseVal(key[1]);

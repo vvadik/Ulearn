@@ -19,6 +19,6 @@ FirstStory.args = {
 }
 
 export default {
-	title: "Visualizer",
+	title: "Exercise/Visualizer",
 	component: Visualizer,
 }
