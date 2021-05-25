@@ -131,6 +131,7 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 		}
 
 		this.setArrow(lineNumber);
+		this.state.editor?.scrollIntoView({line: lineNumber - 1, ch: 0});
 		this.setState({
 			output: stdout,
 			variables: getVariables(currentStep),
@@ -178,14 +179,6 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 	renderControls = () : React.ReactElement =>
 		(
 			<div>
-				<div className={ "fields" }>
-					<DataArea
-						input={ this.state.input }
-						output={ this.state.output }
-						updateInput={ this.updateInput }
-					/>
-				</div>
-
 				<div className={ "actions" }>
 				<Controls
 					run={ this.getRuntimeData }
@@ -203,7 +196,7 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 		return (
 			<div>
 				<Modal width={ "90vw" }>
-					<Modal.Header>{ texts.visualizer }</Modal.Header>
+					<Modal.Header sticky={ false }>{ texts.visualizer }</Modal.Header>
 					<Modal.Body>
 						<Loader active={ this.state.status === VisualizerStatus.Loading }>
 
@@ -214,9 +207,19 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 							/>
 
 							{ this.renderEditor() }
-							{ this.renderControls() }
+
+							<div className={ "fields" }>
+								<DataArea
+									input={ this.state.input }
+									output={ this.state.output }
+									updateInput={ this.updateInput }
+								/>
+							</div>
 						</Loader>
 					</Modal.Body>
+					<Modal.Footer>
+						{ this.renderControls() }
+					</Modal.Footer>
 				</Modal>
 			</div>
 		);
