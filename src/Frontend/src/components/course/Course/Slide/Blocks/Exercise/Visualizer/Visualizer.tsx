@@ -20,11 +20,6 @@ import parseGlobals from './helpers/parseTrace';
 
 import texts from './Visualizer.texts';
 
-export interface Props {
-	code: string;
-	input: string;
-}
-
 function getCodeMirrorOptions(): EditorConfiguration {
 	return {
 		mode: loadLanguageStyles(Language.python3),
@@ -39,6 +34,11 @@ function getCodeMirrorOptions(): EditorConfiguration {
 		theme: 'darcula',
 		gutters: ["CodeMirror-linenumbers", "arrow"]
 	};
+}
+
+interface VisualizerProps {
+	code: string;
+	input: string;
 }
 
 interface State {
@@ -57,8 +57,8 @@ interface State {
 	status: VisualizerStatus;
 }
 
-class Visualizer extends React.Component<Props, State> {
-	constructor(props) {
+class Visualizer extends React.Component<VisualizerProps, State> {
+	constructor(props: VisualizerProps) {
 		super(props);
 		this.state = {
 			editor: null,
@@ -203,4 +203,4 @@ class Visualizer extends React.Component<Props, State> {
 	}
 }
 
-export default Visualizer;
+export { Visualizer, VisualizerProps };

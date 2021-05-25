@@ -27,7 +27,6 @@ import { RootState } from "src/models/reduxState";
 import { DeviceType } from "src/consts/deviceType";
 
 import styles from './Header.less';
-import Visualizer from "../course/Course/Slide/Blocks/Exercise/Visualizer/Visualizer";
 
 
 interface Props extends RouteComponentProps {
@@ -129,7 +128,6 @@ class Header extends Component<Props, State> {
 				<div className={ styles.header + " header" } id="header">
 					<div className={ styles.controlsWrapper }>
 						{ this.renderLogo() }
-						<Visualizer code={"a = {'a': 5, 'c': {'a': [1, 2, 3], 'b': {'k': 'aaaaa'}}}\nb = [1, 2, [1, 2]]"} input={"2\n2"}/>
 						{ courses.currentCourseId && this.renderNavMenuIcon() }
 						<Hijack name={ account.visibleName }/>
 						{ !initializing && this.renderUserRoleMenu() }
