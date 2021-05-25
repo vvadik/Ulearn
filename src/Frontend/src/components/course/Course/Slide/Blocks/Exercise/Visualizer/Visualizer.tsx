@@ -112,10 +112,15 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 	}
 
 	run(runData: RunData) : void {
-		this.setState({status: VisualizerStatus.Ok, output: ''});
-		const steps = runData.message.trace;
 		this.setArrow(0);
-		this.setState({trace: steps, totalSteps: steps.length, currentStep: 0});
+		const steps = runData.message.trace;
+		this.setState({
+			trace: steps,
+			totalSteps: steps.length,
+			status: VisualizerStatus.Ok,
+			currentStep: 0,
+			output: ''
+		});
 	}
 
 	showStep(stepNumber: number) : void {
@@ -210,7 +215,7 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 	render() : React.ReactElement {
 		return (
 			<div>
-				<Modal onClose={ () => {return 0;} }>
+				<Modal>
 					<Modal.Header>{ texts.visualizer }</Modal.Header>
 					<Modal.Body>
 						<Loader active={ this.state.status === VisualizerStatus.Loading }>

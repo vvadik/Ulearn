@@ -1,4 +1,4 @@
-function parseGlobals(globals){
+function parseGlobals(globals: Record<string, any>) : Record<string, any>{
 	const parsedGlobals = {}
 
 	for (const key in globals) {
@@ -12,7 +12,7 @@ function parseGlobals(globals){
 	return parsedGlobals;
 }
 
-function parseVal(val) {
+function parseVal(val: any) : any {
 	if (!Array.isArray(val)) {
 		return val;
 	}
