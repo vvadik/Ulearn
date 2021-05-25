@@ -204,7 +204,7 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 	render() : React.ReactElement {
 		return (
 			<div>
-				<Modal>
+				<Modal width={ "90vw" }>
 					<Modal.Header>{ texts.visualizer }</Modal.Header>
 					<Modal.Body>
 						<Loader active={ this.state.status === VisualizerStatus.Loading }>
