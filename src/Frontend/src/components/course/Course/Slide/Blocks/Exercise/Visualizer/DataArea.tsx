@@ -15,21 +15,21 @@ export const DataArea =
 	({ input, updateInput, output } : DataAreaProps) : React.ReactElement =>
 	 (
 		<div className={ styles.dataArea }>
-			<Center>
+			<div className={ styles.textArea }>
+				<p>{ texts.dataArea.inputData }</p>
 				<Textarea
 					value={ input }
-					className={ styles.inputArea }
 					autoResize
 					onValueChange={ updateInput }
-					placeholder={ texts.dataArea.inputData }
 				/>
+			</div>
+			<div className={ styles.textArea }>
+				<p>{ texts.dataArea.outputData }</p>
 				<Textarea
 					value={ output }
-					className={ styles.inputArea }
 					autoResize
 					readOnly={ true }
-					placeholder={ texts.dataArea.outputData }
 				/>
-			</Center>
+			</div>
 		</div>
 	);
