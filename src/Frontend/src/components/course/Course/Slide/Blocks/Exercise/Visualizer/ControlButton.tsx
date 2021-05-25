@@ -6,10 +6,10 @@ import cn from 'classnames';
 import styles from './Controls.less';
 
 interface ControlButtonProps {
-	onClick: MouseEventHandler,
-	text: string,
-	disabled: boolean,
-	use: ButtonUse,
+	onClick: MouseEventHandler;
+	text: string;
+	disabled: boolean;
+	use: ButtonUse;
 }
 
 export const ControlButton =

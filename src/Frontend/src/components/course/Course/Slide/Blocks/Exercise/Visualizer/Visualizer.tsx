@@ -45,15 +45,32 @@ interface State {
 	input: string;
 	output: string;
 
-	variables: Record<string, any>;
+	variables: {
+		"Глобальные"?: any;
+		"Локальные"?: any;
+	};
 
 	totalSteps: number;
 	currentStep: number;
 
-	trace: Array<Record<string, any>>;
+	trace: Array<VisualizerStep>;
 
 	editor: CodeMirror.Editor | null;
 	status: VisualizerStatus;
+}
+
+interface RunData {
+	message: {
+		trace: Array<VisualizerStep>;
+	};
+}
+
+interface VisualizerStep {
+	line: string;
+	event: 'exception' | 'return';
+	stdout: string;
+	globals: any;
+	stack_locals: any;
 }
 
 class Visualizer extends React.Component<VisualizerProps, State> {
@@ -94,17 +111,17 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 			.then(r => this.run(r));
 	}
 
-	run(trace: Record<string, any>) : void {
+	run(runData: RunData) : void {
 		this.setState({status: VisualizerStatus.Ok, output: ''});
-		const steps = trace.message.trace;
+		const steps = runData.message.trace;
 		this.setArrow(0);
 		this.setState({trace: steps, totalSteps: steps.length, currentStep: 0});
 	}
 
 	showStep(stepNumber: number) : void {
 		const currentStep = this.state.trace[stepNumber];
-		const lineNumber = parseInt(currentStep["line"]);
-		const event = currentStep["event"];
+		const lineNumber = parseInt(currentStep.line);
+		const event = currentStep.event;
 
 		let newStatus = VisualizerStatus.Ok;
 		if (event === "exception") {
@@ -123,7 +140,7 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 		});
 	}
 
-	setArrow(lineNumber: number) : void {
+	setArrow = (lineNumber: number) : void => {
 		this.state.editor?.clearGutter("arrow");
 		const arrow = document.createElement("div");
 		arrow.innerHTML = "→";
@@ -131,24 +148,64 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 		this.state.editor?.setGutterMarker(lineNumber - 1, "arrow", arrow);
 	}
 
-	getVariables(trace) {
-		const globals = trace["globals"];
-
+	getVariables = (visualizerStep: VisualizerStep) : Record<string, any> => {
 		return {
-			"Глобальные": parseGlobals(globals),
-			"Локальные": trace["stack_locals"],
-		};
-	}
+			"Глобальные": parseGlobals(visualizerStep.globals),
+			"Локальные": visualizerStep.stack_locals,
+		}
+	};
 
-	updateInput = (value: string) : void => {
+	updateInput = (value: string) : void =>
 		this.setState({input: value});
-	}
 
-	updateCode = (editor: CodeMirror.Editor, data: codemirror.EditorChange, value: string) : void =>
+	updateCode = (editor: CodeMirror.Editor, data: codemirror.EditorChange,
+		value: string) : void =>
 		this.setState({ code: value });
 
 	setEditorToState = (editor: CodeMirror.Editor) : void =>
 		this.setState({ editor: editor });
+
+	renderEditor = () : React.ReactElement =>
+		(
+			<div className={ "main" }>
+				<div id={ "code-mirror" }>
+					<Controlled
+						options={ codeMirrorOptions }
+						onBeforeChange={ this.updateCode }
+						onChange={ this.updateCode }
+						value={ this.state.code }
+						editorDidMount={ this.setEditorToState }
+					/>
+				</div>
+
+				<div className={ "variables" }>
+					<JSONView src={ this.state.variables } />
+				</div>
+			</div>
+	);
+
+	renderControls = () : React.ReactElement =>
+		(
+			<div>
+				<div className={ "fields" }>
+					<DataArea
+						input={ this.state.input }
+						output={ this.state.output }
+						updateInput={ this.updateInput }
+					/>
+				</div>
+
+				<div className={ "actions" }>
+				<Controls
+					run={ this.getRuntimeData }
+					next={ this.nextStep }
+					previous={ this.previousStep }
+					currentStep={ this.state.currentStep }
+					totalSteps={ this.state.totalSteps }
+				/>
+				</div>
+			</div>
+	);
 
 	render() : React.ReactElement {
 		return (
@@ -164,39 +221,8 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 								status={ this.state.status }
 							/>
 
-							<div className={ "main" }>
-								<div id={ "code-mirror" }>
-									<Controlled
-										options={ codeMirrorOptions }
-										onBeforeChange={ this.updateCode }
-										onChange={ this.updateCode }
-										value={ this.state.code }
-										editorDidMount={ this.setEditorToState }
-									/>
-								</div>
-
-								<div className={ "variables" }>
-									<JSONView src={ this.state.variables } />
-								</div>
-							</div>
-
-							<div className={ "fields" }>
-							<DataArea
-								input={ this.state.input }
-								output={ this.state.output }
-								updateInput={ this.updateInput }
-							/>
-							</div>
-
-							<div className={ "actions" }>
-							<Controls
-								run={ this.getRuntimeData }
-								next={ this.nextStep }
-								previous={ this.previousStep }
-								currentStep={ this.state.currentStep }
-								totalSteps={ this.state.totalSteps }
-							/>
-							</div>
+							{ this.renderEditor() }
+							{ this.renderControls() }
 						</Loader>
 					</Modal.Body>
 				</Modal>
