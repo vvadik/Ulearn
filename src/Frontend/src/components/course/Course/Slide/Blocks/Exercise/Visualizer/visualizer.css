@@ -4,7 +4,12 @@
 }
 
 .react-json-view {
-	height: 100%;
+	height: 300px;
+	overflow: scroll;
+}
+
+::-webkit-scrollbar {
+	display: none;
 }
 
 .CodeMirror-gutter {

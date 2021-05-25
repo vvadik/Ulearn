@@ -65,8 +65,6 @@ interface RunData {
 	};
 }
 
-
-
 class Visualizer extends React.Component<VisualizerProps, State> {
 	private getRuntimeData = () : void => {
 		this.setState({status: VisualizerStatus.Loading});

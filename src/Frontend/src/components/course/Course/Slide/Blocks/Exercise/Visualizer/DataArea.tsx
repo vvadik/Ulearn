@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Center, Textarea } from "ui";
+import { Textarea } from "ui";
 
 import styles from './DataArea.less';
 import texts from './Visualizer.texts';
@@ -13,7 +13,7 @@ interface DataAreaProps {
 
 export const DataArea =
 	({ input, updateInput, output } : DataAreaProps) : React.ReactElement =>
-	 (
+		(
 		<div className={ styles.dataArea }>
 			<div className={ styles.textArea }>
 				<p>{ texts.dataArea.inputData }</p>
