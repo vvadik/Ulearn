@@ -18,6 +18,8 @@ import VisualizerStatus from "./VusualizerStatus";
 
 import parseGlobals from './helpers/parseTrace';
 
+import texts from './Visualizer.texts';
+
 export interface Props {
 	code: string;
 	input: string;
@@ -147,50 +149,50 @@ class Visualizer extends React.Component<Props, State> {
 		return (
 			<div>
 				<Modal onClose={ () => {return 0;} }>
-					<Modal.Header>Визуализатор</Modal.Header>
+					<Modal.Header>{ texts.visualizer }</Modal.Header>
 					<Modal.Body>
-						<Loader active={this.state.status === VisualizerStatus.Loading}>
+						<Loader active={ this.state.status === VisualizerStatus.Loading }>
 							<StepsCounter
-								totalSteps={this.state.totalSteps}
-								currentStep={this.state.currentStep}
-								status={this.state.status}
+								totalSteps={ this.state.totalSteps }
+								currentStep={ this.state.currentStep }
+								status={ this.state.status }
 							/>
 
-							<div className={"main"}>
-								<div id={"code-mirror"}>
+							<div className={ "main" }>
+								<div id={ "code-mirror" }>
 									<Controlled
-										options={getCodeMirrorOptions()}
+										options={ getCodeMirrorOptions() }
 										onBeforeChange={ (editor, data, value) =>
-										{this.setState({code: value});} }
+										{ this.setState({code: value}); } }
 										onChange={ (editor, data, value) =>
-										{this.setState({code: value});} }
+										{ this.setState({ code: value }); } }
 										value={ this.state.code }
-										editorDidMount={editor => {
-											this.setState({editor: editor});
-										}}
+										editorDidMount={ editor => {
+											this.setState({ editor: editor });
+										} }
 									/>
 								</div>
 
-								<div className={"variables"}>
-									<JSONView src={this.state.variables} />
+								<div className={ "variables" }>
+									<JSONView src={ this.state.variables } />
 								</div>
 							</div>
 
-							<div className={"fields"}>
+							<div className={ "fields" }>
 							<DataArea
-								input={this.state.input}
-								output={this.state.output}
-								updateInput={this.updateInput}
+								input={ this.state.input }
+								output={ this.state.output }
+								updateInput={ this.updateInput }
 							/>
 							</div>
 
-							<div className={"actions"}>
+							<div className={ "actions" }>
 							<Controls
-								run={this.getRuntimeData}
-								next={this.nextStep}
-								previous={this.previousStep}
-								currentStep={this.state.currentStep}
-								totalSteps={this.state.totalSteps}
+								run={ this.getRuntimeData }
+								next={ this.nextStep }
+								previous={ this.previousStep }
+								currentStep={ this.state.currentStep }
+								totalSteps={ this.state.totalSteps }
 							/>
 							</div>
 						</Loader>

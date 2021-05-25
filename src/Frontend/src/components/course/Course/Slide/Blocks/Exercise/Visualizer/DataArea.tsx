@@ -3,6 +3,7 @@ import React, { ChangeEventHandler, ReactNode } from 'react';
 import { Center, Textarea } from "ui";
 
 import styles from './DataArea.less';
+import texts from './Visualizer.texts';
 
 export interface Props {
 	input: string;
@@ -13,21 +14,21 @@ export interface Props {
 class DataArea extends React.Component<Props> {
 	render() : ReactNode {
 		return (
-			<div className={styles["data-area"]}>
+			<div className={ styles["data-area"] }>
 				<Center>
 					<Textarea
 						value={ this.props.input }
-						className={styles["input-area"]}
+						className={ styles["input-area"] }
 						autoResize
-						onChange={this.props.updateInput}
-						placeholder="Входные данные"
+						onChange={ this.props.updateInput }
+						placeholder={ texts.dataArea.inputData }
 					/>
 					<Textarea
 						value={ this.props.output }
-						className={styles["input-area"]}
+						className={ styles["input-area"] }
 						autoResize
-						readOnly={true}
-						placeholder="Выходные данные"
+						readOnly={ true }
+						placeholder={ texts.dataArea.outputData }
 					/>
 				</Center>
 			</div>
