@@ -19,7 +19,9 @@ export const DataArea =
 				<p>{ texts.dataArea.inputData }</p>
 				<Textarea
 					value={ input }
-					maxRows={ 10 }
+					rows={ 5 }
+					maxRows={ 5 }
+					autoResize
 					onValueChange={ updateInput }
 				/>
 			</div>
@@ -27,7 +29,9 @@ export const DataArea =
 				<p>{ texts.dataArea.outputData }</p>
 				<Textarea
 					value={ output }
-					maxRows={ 10 }
+					rows={ 5 }
+					maxRows={ 5 }
+					autoResize
 					readOnly={ true }
 				/>
 			</div>
