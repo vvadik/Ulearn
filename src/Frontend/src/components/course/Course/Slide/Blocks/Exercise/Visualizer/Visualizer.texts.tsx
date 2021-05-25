@@ -16,6 +16,9 @@ const texts = {
 			if (status === VisualizerStatus.Error) {
 				return "Произошла ошибка";
 			}
+			if (status === VisualizerStatus.Blocked) {
+				return "Необходим перезапуск";
+			}
 			return null;
 		}
 	},

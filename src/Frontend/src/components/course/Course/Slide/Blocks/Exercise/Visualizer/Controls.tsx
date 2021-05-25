@@ -7,12 +7,14 @@ interface ControlsProps {
 	next: MouseEventHandler;
 	previous: MouseEventHandler;
 
+	movesBlocked: boolean;
+
 	currentStep: number;
 	totalSteps: number;
 }
 
 export const Controls =
-	({ run, next, previous, currentStep, totalSteps } : ControlsProps) :
+	({ run, next, previous, movesBlocked, currentStep, totalSteps } : ControlsProps) :
 		React.ReactElement =>
 	 (
 		<div>
@@ -25,13 +27,13 @@ export const Controls =
 			<ControlButton
 				use={ "default" }
 				onClick={ previous }
-				disabled={ currentStep === 0 }
+				disabled={ movesBlocked || currentStep === 0 }
 				text={ texts.controls.back }
 			/>
 			<ControlButton
 				use={ "default" }
 				onClick={ next }
-				disabled={ currentStep === totalSteps - 1 || totalSteps === 0 }
+				disabled={ movesBlocked || currentStep === totalSteps - 1 || totalSteps === 0 }
 				text={ texts.controls.next }
 			/>
 		</div>

@@ -3,4 +3,5 @@ export enum VisualizerStatus {
 	Error,
 	Return,
 	Loading,
+	Blocked,
 }

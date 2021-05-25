@@ -68,6 +68,22 @@ interface RunData {
 
 
 class Visualizer extends React.Component<VisualizerProps, State> {
+	private getRuntimeData = () : void => {
+		this.setState({status: VisualizerStatus.Loading});
+
+		fetch('https://python-visualizer-api.vercel.app/run',
+			{
+				method: "POST",
+				body: JSON.stringify({
+					code: this.state.code,
+					input_data: this.state.input
+				})
+			}
+		)
+			.then(r => r.json())
+			.then(r => this.run(r));
+	}
+
 	constructor(props: VisualizerProps) {
 		super(props);
 		this.state = {
@@ -83,27 +99,11 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 		};
 	}
 
-	nextStep = () : void =>
+	showNextStep = () : void =>
 		this.showStep(this.state.currentStep + 1);
 
-	previousStep = () : void =>
+	showPreviousStep = () : void =>
 		this.showStep(this.state.currentStep - 1);
-
-	getRuntimeData = () : void => {
-		this.setState({status: VisualizerStatus.Loading});
-
-		fetch('https://python-visualizer-api.vercel.app/run',
-			{
-					method: "POST",
-					body: JSON.stringify({
-						code: this.state.code,
-						input_data: this.state.input
-					})
-				}
-		)
-			.then(r => r.json())
-			.then(r => this.run(r));
-	}
 
 	run = (runData: RunData) : void => {
 		this.setArrow(0);
@@ -138,7 +138,7 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 			variables: getVariables(currentStep),
 			currentStep: stepNumber,
 			status: newStatus,
-		}, () => console.log(this.state.currentStep));
+		});
 	}
 
 	setArrow = (lineNumber: number) : void => {
@@ -154,7 +154,7 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 
 	updateCode = (editor: CodeMirror.Editor, data: codemirror.EditorChange,
 		value: string) : void =>
-		this.setState({ code: value });
+		this.setState({ code: value, status: VisualizerStatus.Blocked});
 
 	setEditorToState = (editor: CodeMirror.Editor) : void =>
 		this.setState({ editor: editor });
@@ -166,7 +166,6 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 					<Controlled
 						options={ codeMirrorOptions }
 						onBeforeChange={ this.updateCode }
-						onChange={ this.updateCode }
 						value={ this.state.code }
 						editorDidMount={ this.setEditorToState }
 					/>
@@ -192,8 +191,9 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 				<div className={ "actions" }>
 				<Controls
 					run={ this.getRuntimeData }
-					next={ this.nextStep }
-					previous={ this.previousStep }
+					next={ this.showNextStep }
+					previous={ this.showPreviousStep }
+					movesBlocked={ this.state.status === VisualizerStatus.Blocked }
 					currentStep={ this.state.currentStep }
 					totalSteps={ this.state.totalSteps }
 				/>
