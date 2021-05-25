@@ -6,7 +6,7 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/darcula.css';
 
 import { loadLanguageStyles } from "../ExerciseUtils";
-import { Language } from "../../../../../../../consts/languages";
+import { Language } from "src/consts/languages";
 import DataArea from "./DataArea";
 import StepsCounter from "./StepsCounter";
 import { Loader, Modal } from "@skbkontur/react-ui";
@@ -87,17 +87,23 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 
 	getRuntimeData() : void {
 		this.setState({status: VisualizerStatus.Loading});
-		const xhr = new XMLHttpRequest();
-		xhr.addEventListener('load', () => {
-			this.run(xhr.responseText)
-		});
-		xhr.open('POST', 'https://python-visualizer-api.vercel.app/run');
-		xhr.send(JSON.stringify({code: this.state.code, input_data: this.state.input}));
+
+		fetch('https://python-visualizer-api.vercel.app/run',
+			{
+					method: "POST",
+					body: JSON.stringify({
+						code: this.state.code,
+						input_data: this.state.input
+					})
+				}
+		)
+			.then(r => r.json())
+			.then(r => this.run(r));
 	}
 
-	run(trace: string) : void {
+	run(trace: Record<string, any>) : void {
 		this.setState({status: VisualizerStatus.Ok, output: ''});
-		const steps = JSON.parse(trace).message.trace;
+		const steps = trace.message.trace;
 		this.setArrow(0);
 		this.setState({trace: steps, totalSteps: steps.length, currentStep: 0});
 	}
