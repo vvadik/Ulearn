@@ -1,25 +1,25 @@
 import React from 'react';
 import { Controlled, } from "react-codemirror2";
 
-import CodeMirror, { EditorConfiguration, } from "codemirror";
+import CodeMirror, * as codemirror from "codemirror";
+import { EditorConfiguration } from "codemirror";
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/darcula.css';
 
 import { loadLanguageStyles } from "../ExerciseUtils";
 import { Language } from "src/consts/languages";
-import DataArea from "./DataArea";
-import StepsCounter from "./StepsCounter";
+import { DataArea } from "./DataArea";
+import { StepsCounter } from "./StepsCounter";
 import { Loader, Modal } from "@skbkontur/react-ui";
 
 import './visualizer.css';
-import Controls from "./Controls";
+import { Controls } from "./Controls";
 import JSONView from './react-json-view/src/js/index';
-import VisualizerStatus from "./VusualizerStatus";
+import { VisualizerStatus } from "./VusualizerStatus";
 
 import parseGlobals from './helpers/parseTrace';
 
 import texts from './Visualizer.texts';
-import * as codemirror from "codemirror";
 
 const codeMirrorOptions: EditorConfiguration = {
 	mode: loadLanguageStyles(Language.python3),

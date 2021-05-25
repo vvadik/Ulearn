@@ -11,8 +11,9 @@ interface DataAreaProps {
 	updateInput: (value: string) => void;
 }
 
-function DataArea({ input, updateInput, output } : DataAreaProps) : React.ReactElement {
-	return (
+export const DataArea =
+	({ input, updateInput, output } : DataAreaProps) : React.ReactElement =>
+	 (
 		<div className={ styles.dataArea }>
 			<Center>
 				<Textarea
@@ -32,6 +33,3 @@ function DataArea({ input, updateInput, output } : DataAreaProps) : React.ReactE
 			</Center>
 		</div>
 	);
-}
-
-export default DataArea;

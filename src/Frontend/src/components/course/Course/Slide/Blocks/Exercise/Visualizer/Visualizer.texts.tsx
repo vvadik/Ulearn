@@ -1,4 +1,4 @@
-import VisualizerStatus from "./VusualizerStatus";
+import { VisualizerStatus } from "./VusualizerStatus";
 
 const texts = {
 	visualizer: "Визуализатор",

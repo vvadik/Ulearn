@@ -1,29 +1,26 @@
 import React, { MouseEventHandler } from "react";
-import { Button } from "ui";
+import { Button, ButtonUse } from "ui";
 
 import cn from 'classnames';
 
 import styles from './Controls.less';
 
-export interface Props {
+interface ControlButtonProps {
 	onClick: MouseEventHandler,
 	text: string,
 	disabled: boolean,
+	use: ButtonUse,
 }
 
-function StepButton(props: Props): React.ReactElement {
-	const { onClick, text, disabled, } = props;
-
-	return (
+export const ControlButton =
+	({ onClick, text, disabled, use }: ControlButtonProps): React.ReactElement =>
+		(
 		<span className={ cn(styles.exerciseControls, styles.sendButton) }>
 			<Button
-				use={ "default" }
+				use={ use }
 				onClick={ onClick }
 				disabled={ disabled }>
 				{ text }
 			</Button>
 		</span>
-	);
-}
-
-export default StepButton;
+		);
