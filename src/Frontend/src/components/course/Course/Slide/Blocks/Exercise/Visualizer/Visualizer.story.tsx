@@ -36,6 +36,12 @@ defineFunction.args = {
 	input: "10",
 }
 
+export const uncaughtException = Template.bind({});
+uncaughtException.args = {
+	code: "def a(b):\n\tc = 6\n\treturn b + c\n\nk = 6\nprint(a(k + int(input()))",
+	input: "10",
+}
+
 export default {
 	title: "Exercise/Visualizer",
 	component: Visualizer,

@@ -67,7 +67,7 @@ interface RunData {
 
 interface VisualizerStep {
 	line: string;
-	event: 'exception' | 'return';
+	event: 'exception' | 'uncaught_exception' | 'return';
 	stdout: string;
 	globals: any;
 	stack_locals: any;
@@ -120,17 +120,19 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 			status: VisualizerStatus.Ok,
 			currentStep: 0,
 			output: ''
-		});
+		}, () => this.showStep(0));
 	}
 
 	showStep(stepNumber: number) : void {
 		const currentStep = this.state.trace[stepNumber];
 		const lineNumber = parseInt(currentStep.line);
 		const event = currentStep.event;
+		let stdout = currentStep.stdout === undefined ? '' : currentStep.stdout;
 
 		let newStatus = VisualizerStatus.Ok;
-		if (event === "exception") {
+		if (event === "exception" || event === "uncaught_exception") {
 			newStatus = VisualizerStatus.Error;
+			stdout += `\n========\n${ currentStep.exception_str }`
 		}
 		else if (event === "return") {
 			newStatus = VisualizerStatus.Return;
@@ -138,7 +140,7 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 
 		this.setArrow(lineNumber);
 		this.setState({
-			output: currentStep.stdout,
+			output: stdout,
 			variables: this.getVariables(currentStep),
 			currentStep: stepNumber,
 			status: newStatus,
