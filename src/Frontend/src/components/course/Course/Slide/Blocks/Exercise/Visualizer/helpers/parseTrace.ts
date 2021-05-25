@@ -66,7 +66,6 @@ const getVariables = (visualizerStep: VisualizerStep) : Record<string, any> => {
 	}
 	if (!isObjectEmpty(parsedLocals)) {
 		variables["Локальные"] = parsedLocals;
-		console.log(parsedLocals);
 	}
 
 	return variables
