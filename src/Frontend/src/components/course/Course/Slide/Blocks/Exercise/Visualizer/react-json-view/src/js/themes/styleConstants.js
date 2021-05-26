@@ -11,7 +11,7 @@ export default {
     braceFontWeight: 'bold',
     braceCursor: 'pointer',
 
-    ellipsisFontSize: '18px',
+    ellipsisFontSize: '14px',
     ellipsisLineHeight: '10px',
     ellipsisCursor: 'pointer',
 
@@ -61,7 +61,7 @@ export default {
     clipboardCursor: 'pointer',
     clipboardCheckMarginLeft: '-12px',
 
-    metaDataPadding: '0px 0px 0px 10px',
+    metaDataPadding: '0px 0px 0px 0px',
 
     arrayGroupMetaPadding: '0px 0px 0px 4px',
 

@@ -243,6 +243,7 @@ const getDefaultThemeStyling = theme => {
         },
         'icon-container': {
             display: 'inline-block',
+			verticalAlign: 'sub',
             width: constants.iconContainerWidth
         },
         tooltip: {
