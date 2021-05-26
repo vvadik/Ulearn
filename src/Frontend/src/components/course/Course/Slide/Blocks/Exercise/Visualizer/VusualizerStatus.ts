@@ -1,5 +1,6 @@
 export enum VisualizerStatus {
-	Ok ,
+	Ready,
+	Running ,
 	Error,
 	Return,
 	Loading,

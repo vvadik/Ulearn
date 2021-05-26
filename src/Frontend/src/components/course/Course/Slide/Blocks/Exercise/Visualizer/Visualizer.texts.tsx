@@ -1,7 +1,7 @@
 import { VisualizerStatus } from "./VusualizerStatus";
 
 const texts = {
-	visualizer: "Визуализатор",
+	visualizer: "Пошаговое выполнение",
 
 	stepsCounter: {
 		currentStepNumber: (currentStep: number, totalSteps: number) : string => {
@@ -11,7 +11,7 @@ const texts = {
 			return `Шаг ${ currentStep + 1 } из ${ totalSteps }`;
 		},
 		status: (status: VisualizerStatus) : string | null => {
-			if (status === VisualizerStatus.Ok) {
+			if (status === VisualizerStatus.Running) {
 				return null;
 			}
 			if (status === VisualizerStatus.Return) {
@@ -33,9 +33,10 @@ const texts = {
 	},
 
 	controls: {
-		run: "Запустить",
-		back: "Назад",
-		next: "Далее"
+		run: "Начать",
+		rerun: "Перезапустить",
+		back: "Шаг назад",
+		next: "Шаг вперёд"
 	},
 };
 

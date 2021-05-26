@@ -92,7 +92,7 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 			totalSteps: 0,
 			currentStep: 0,
 			trace: [],
-			status: VisualizerStatus.Ok,
+			status: VisualizerStatus.Ready,
 			variables: {}
 		};
 	}
@@ -109,7 +109,7 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 		this.setState({
 			trace: steps,
 			totalSteps: steps.length,
-			status: VisualizerStatus.Ok,
+			status: VisualizerStatus.Running,
 			currentStep: 0,
 			output: ''
 		}, () => this.showStep(0));
@@ -121,7 +121,7 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 		const event = currentStep.event;
 		let stdout = currentStep.stdout === undefined ? '' : currentStep.stdout;
 
-		let newStatus = VisualizerStatus.Ok;
+		let newStatus = VisualizerStatus.Running;
 		if (event === "exception" || event === "uncaught_exception") {
 			newStatus = VisualizerStatus.Error;
 			stdout += `\n========\n${ currentStep.exception_str }`
@@ -184,7 +184,7 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 					run={ this.getRuntimeData }
 					next={ this.showNextStep }
 					previous={ this.showPreviousStep }
-					movesBlocked={ this.state.status === VisualizerStatus.Blocked }
+					visualizerStatus={ this.state.status }
 					currentStep={ this.state.currentStep }
 					totalSteps={ this.state.totalSteps }
 				/>
