@@ -23,6 +23,7 @@ export const DataArea =
 					maxRows={ 5 }
 					autoResize
 					onValueChange={ updateInput }
+					width={ "100%" }
 				/>
 			</div>
 			<div className={ styles.textArea }>
@@ -33,6 +34,7 @@ export const DataArea =
 					maxRows={ 5 }
 					autoResize
 					readOnly={ true }
+					width={ "100%" }
 				/>
 			</div>
 		</div>

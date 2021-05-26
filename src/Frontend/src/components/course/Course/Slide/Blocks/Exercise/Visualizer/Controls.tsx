@@ -25,18 +25,21 @@ export const Controls =
 				onClick={ run }
 				text={ visualizerStatus === VisualizerStatus.Ready ?
 					texts.controls.run : texts.controls.rerun }
-				disabled={ false }
+				disabled={ visualizerStatus === VisualizerStatus.Loading }
 			/>
 			<ControlButton
 				use={ visualizerStatus === VisualizerStatus.Ready ? "default" : "primary" }
 				onClick={ previous }
-				disabled={ visualizerStatus === VisualizerStatus.Blocked || currentStep === 0 }
+				disabled={ visualizerStatus === VisualizerStatus.Blocked ||
+				visualizerStatus === VisualizerStatus.Loading || currentStep === 0 }
 				text={ texts.controls.back }
 			/>
 			<ControlButton
 				use={ visualizerStatus === VisualizerStatus.Ready ? "default" : "primary" }
 				onClick={ next }
-				disabled={ visualizerStatus === VisualizerStatus.Blocked || currentStep === totalSteps - 1 || totalSteps === 0 }
+				disabled={ visualizerStatus === VisualizerStatus.Blocked ||
+				visualizerStatus === VisualizerStatus.Loading ||
+				currentStep === totalSteps - 1 || totalSteps === 0 }
 				text={ texts.controls.next }
 			/>
 		</div>

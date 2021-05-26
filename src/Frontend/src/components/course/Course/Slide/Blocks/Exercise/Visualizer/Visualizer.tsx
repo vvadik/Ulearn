@@ -208,13 +208,11 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 
 							{ this.renderEditor() }
 
-							<div className={ "fields" }>
-								<DataArea
-									input={ this.state.input }
-									output={ this.state.output }
-									updateInput={ this.updateInput }
-								/>
-							</div>
+							<DataArea
+								input={ this.state.input }
+								output={ this.state.output }
+								updateInput={ this.updateInput }
+							/>
 						</Loader>
 					</Modal.Body>
 					<Modal.Footer>
