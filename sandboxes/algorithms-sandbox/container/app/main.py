@@ -24,9 +24,9 @@ def set_test_result_info(running_result,
                          student_output):
     running_result["TestResultInfo"] = {
         "TestNumber": test_number,
-        "Input": input,
-        "CorrectOutput": correct_output,
-        "StudentOutput": student_output
+        "Input": input.strip(),
+        "CorrectOutput": correct_output.strip(),
+        "StudentOutput": student_output.strip()
     }
     return running_result
 
