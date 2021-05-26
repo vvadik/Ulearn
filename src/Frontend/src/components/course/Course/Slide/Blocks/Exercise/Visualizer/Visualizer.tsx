@@ -52,6 +52,7 @@ interface State {
 
 	totalSteps: number;
 	currentStep: number;
+	activeLine: number | null;
 
 	trace: Array<VisualizerStep>;
 
@@ -91,6 +92,7 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 			output: "",
 			totalSteps: 0,
 			currentStep: 0,
+			activeLine: null,
 			trace: [],
 			status: VisualizerStatus.Ready,
 			variables: {}
@@ -104,7 +106,7 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 		this.showStep(this.state.currentStep - 1);
 
 	run = (runData: RunData) : void => {
-		this.setArrow(0);
+		this.setActiveLine(0);
 		const steps = runData.message.trace;
 		this.setState({
 			trace: steps,
@@ -130,22 +132,28 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 			newStatus = VisualizerStatus.Return;
 		}
 
-		this.setArrow(lineNumber);
+		this.setActiveLine(lineNumber);
 		this.state.editor?.scrollIntoView({line: lineNumber - 1, ch: 0});
 		this.setState({
 			output: stdout,
 			variables: getVariables(currentStep),
 			currentStep: stepNumber,
 			status: newStatus,
+			activeLine: lineNumber,
 		});
 	}
 
-	setArrow = (lineNumber: number) : void => {
+	setActiveLine = (lineNumber: number) : void => {
 		this.state.editor?.clearGutter("arrow");
 		const arrow = document.createElement("div");
 		arrow.innerHTML = "→";
 		arrow.style.color = "#FF9E59";
 		this.state.editor?.setGutterMarker(lineNumber - 1, "arrow", arrow);
+
+		if (this.state.activeLine !== null) {
+			this.state.editor?.removeLineClass(this.state.activeLine - 1, "background", "active-line");
+		}
+		this.state.editor?.addLineClass(lineNumber - 1, "background", "active-line");
 	}
 
 	updateInput = (value: string) : void =>

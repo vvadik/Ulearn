@@ -17,3 +17,8 @@
 .CodeMirror-gutter {
 	width: 10px;
 }
+
+.active-line {
+	background-color: #214283;
+	opacity: 50%;
+}
