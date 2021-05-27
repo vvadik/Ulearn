@@ -11,6 +11,7 @@ interface ControlsProps {
 	run: MouseEventHandler;
 	next: MouseEventHandler;
 	previous: MouseEventHandler;
+	last: MouseEventHandler;
 
 	visualizerStatus: VisualizerStatus;
 
@@ -19,7 +20,7 @@ interface ControlsProps {
 }
 
 export const Controls =
-	({ run, next, previous, visualizerStatus, currentStep, totalSteps }: ControlsProps):
+	({ run, next, previous, last, visualizerStatus, currentStep, totalSteps }: ControlsProps):
 		React.ReactElement =>
 		(
 			<Gapped gap={ 16 }>
@@ -31,6 +32,7 @@ export const Controls =
 						texts.controls.run : texts.controls.rerun }
 					disabled={ visualizerStatus === VisualizerStatus.Loading }
 				/>
+
 				<Gapped gap={ 8 }>
 					<ControlButton
 						use={ visualizerStatus === VisualizerStatus.Ready ? "default" : "primary" }
@@ -48,5 +50,14 @@ export const Controls =
 						text={ texts.controls.next }
 					/>
 				</Gapped>
+
+				<ControlButton
+					use={ "default" }
+					onClick={ last }
+					disabled={ visualizerStatus === VisualizerStatus.Blocked ||
+					visualizerStatus === VisualizerStatus.Loading ||
+					currentStep === totalSteps - 1 || totalSteps === 0 }
+					text={ texts.controls.last }
+				/>
 			</Gapped>
 		);
