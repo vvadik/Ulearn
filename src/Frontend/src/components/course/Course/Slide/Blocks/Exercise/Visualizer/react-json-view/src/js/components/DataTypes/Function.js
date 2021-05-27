@@ -69,7 +69,7 @@ export default class extends React.PureComponent {
                         class="function-collapsed"
                         style={{ fontWeight: 'bold' }}
                     >
-                        <span {...Theme(props.theme, 'ellipsis')}>Показать</span>
+                        <span {...Theme(props.theme, 'ellipsis')}>показать</span>
                     </span>
                 </span>
             );

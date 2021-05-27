@@ -123,7 +123,7 @@ class RjvObject extends React.PureComponent {
                     class="node-ellipsis"
                     onClick={this.toggleCollapsed}
                 >
-                    Показать
+                    показать
                 </div>
             );
         }
