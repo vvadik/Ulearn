@@ -228,10 +228,12 @@ namespace uLearn.Web.Controllers
 			if (string.IsNullOrEmpty(errorUrl))
 				errorUrl = nextUrl;
 
+			var checking = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(id);
+			if (!groupsRepo.CanInstructorViewStudent(User, checking.UserId))
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+
 			using (var transaction = db.Database.BeginTransaction())
 			{
-				var checking = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(id);
-
 				var course = courseManager.GetCourse(checking.CourseId);
 				var slide = (ExerciseSlide)course.GetSlideById(checking.SlideId, true);
 
