@@ -687,6 +687,7 @@
 					<xs:element name="hideSolutions" type="xs:boolean" minOccurs="1" maxOccurs="1" />
 					<xs:element name="checkForPlagiarism" type="xs:boolean" minOccurs="0" maxOccurs="1" />
 					<xs:element name="showTestDescription" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+					<xs:element name="pythonVisualizerEnabled" type="xs:boolean" minOccurs="0" maxOccurs="1" />
 				</xs:choice>
 			</xs:extension>
 		</xs:complexContent>

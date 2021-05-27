@@ -54,6 +54,9 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 		[NotNull]
 		[DataMember]
 		public ExerciseAttemptsStatistics AttemptsStatistics { get; set; }
+		
+		[DataMember]
+		public bool PythonVisualizerEnabled { get; set; }
 
 		public ExerciseBlockResponse(AbstractExerciseBlock exerciseBlock,
 			ExerciseSlideRendererContext context)
@@ -67,6 +70,7 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 				Languages = PolygonExerciseBlock.LanguagesInfo.Keys.ToArray();
 				LanguageInfo = PolygonExerciseBlock.LanguagesInfo;
 				DefaultLanguage = polygonExerciseBlock.DefaultLanguage;
+				PythonVisualizerEnabled = polygonExerciseBlock.PythonVisualizerEnabled;
 			}
 			else
 			{
