@@ -90,7 +90,7 @@ namespace uLearn.Web.Controllers
 
 			var slide = slideGuid == Guid.Empty
 				? GetInitialSlideForStartup(courseId, visibleUnits, isInstructor)
-				: course.FindSlideById(slideGuid, isInstructor);
+				: course.FindSlideById(slideGuid, isInstructor, visibleUnitIds);
 
 			if (slide == null)
 			{
@@ -162,7 +162,8 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("Index", "Home");
 
 			var course = courseManager.GetCourse(courseId);
-			var slide = course.GetSlideById(slideId, false);
+			var visibleUnitIds = unitsRepo.GetVisibleUnitIds(course);
+			var slide = course.GetSlideById(slideId, false, visibleUnitIds);
 
 			string userId;
 			var owinRequest = Request.GetOwinContext().Request;
@@ -372,7 +373,8 @@ namespace uLearn.Web.Controllers
 		{
 			var course = courseManager.GetCourse(courseId);
 			var isInstructor = User.HasAccessFor(course.Id, CourseRole.Instructor);
-			var slide = course.GetSlideById(slideId, isInstructor) as ExerciseSlide;
+			var visibleUnits = unitsRepo.GetVisibleUnitIds(course, User);
+			var slide = course.GetSlideById(slideId, isInstructor, visibleUnits) as ExerciseSlide;
 			if (slide == null)
 				return HttpNotFound();
 
@@ -431,7 +433,8 @@ namespace uLearn.Web.Controllers
 
 			var course = courseManager.GetCourse(courseId);
 			var isInstructor = User.HasAccessFor(course.Id, CourseRole.Instructor);
-			var slide = (ExerciseSlide)course.GetSlideById(slideId, isInstructor);
+			var visibleUnits = unitsRepo.GetVisibleUnitIds(course, User);
+			var slide = (ExerciseSlide)course.GetSlideById(slideId, isInstructor, visibleUnits);
 			var model = CreateAcceptedAlertModel(slide, course);
 			return View(model);
 		}
@@ -479,7 +482,7 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Tester)]
 		public async Task<ActionResult> ForgetAll(string courseId, Guid slideId)
 		{
-			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId, true);
+			var slide = courseManager.GetCourse(courseId).GetSlideByIdNotSafe(slideId);
 			var userId = User.Identity.GetUserId();
 			db.SolutionLikes.RemoveRange(db.SolutionLikes.Where(q => q.UserId == userId && q.Submission.SlideId == slideId));
 

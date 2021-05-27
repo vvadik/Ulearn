@@ -32,8 +32,8 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		public CommentsController(IWebCourseManager courseManager, UlearnDb db,
 			ICommentsRepo commentsRepo, ICommentLikesRepo commentLikesRepo, ICommentPoliciesRepo commentPoliciesRepo,
 			IUsersRepo usersRepo, ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo, INotificationsRepo notificationsRepo,
-			IGroupMembersRepo groupMembersRepo, IGroupAccessesRepo groupAccessesRepo, IVisitsRepo visitsRepo)
-			: base(courseManager, db, usersRepo, commentsRepo, commentLikesRepo, coursesRepo, courseRolesRepo, notificationsRepo, groupMembersRepo, groupAccessesRepo, visitsRepo)
+			IGroupMembersRepo groupMembersRepo, IGroupAccessesRepo groupAccessesRepo, IVisitsRepo visitsRepo, IUnitsRepo unitsRepo)
+			: base(courseManager, db, usersRepo, commentsRepo, commentLikesRepo, coursesRepo, courseRolesRepo, notificationsRepo, groupMembersRepo, groupAccessesRepo, visitsRepo, unitsRepo)
 		{
 			this.commentPoliciesRepo = commentPoliciesRepo;
 		}
@@ -46,9 +46,11 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		{
 			var courseId = parameters.CourseId;
 			var slideId = parameters.SlideId;
+			var course = await courseManager.GetCourseAsync(courseId);
 
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
-			var slide = await GetSlide(courseId, slideId, isInstructor);
+			var visibleUnits = await unitsRepo.GetVisibleUnitIds(course, UserId).ConfigureAwait(false);
+			var slide = await GetSlide(courseId, slideId, isInstructor, visibleUnits);
 			if (slide == null)
 				return StatusCode((int)HttpStatusCode.NotFound, $"No slide with id {slideId}");
 
@@ -62,13 +64,13 @@ namespace Ulearn.Web.Api.Controllers.Comments
 
 			var comments = await commentsRepo.GetSlideTopLevelCommentsAsync(courseId, slideId).ConfigureAwait(false);
 			comments = comments.Where(c => c.IsForInstructorsOnly == parameters.ForInstructors).ToList();
-			return await GetSlideCommentsResponseAsync(comments, courseId, parameters).ConfigureAwait(false);
+			return await GetSlideCommentsResponseAsync(comments, courseId, parameters, slide).ConfigureAwait(false);
 		}
 
-		private async Task<Slide> GetSlide(string courseId, Guid slideId, bool isInstructor)
+		private async Task<Slide> GetSlide(string courseId, Guid slideId, bool isInstructor, IEnumerable<Guid> visibleUnits)
 		{
 			var course = await courseManager.GetCourseAsync(courseId);
-			var slide = course.FindSlideById(slideId, isInstructor);
+			var slide = course.FindSlideById(slideId, isInstructor, visibleUnits);
 			if (slide == null)
 			{
 				var instructorNote = course.FindInstructorNoteById(slideId);
@@ -78,7 +80,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			return slide;
 		}
 
-		private async Task<ActionResult<CommentsListResponse>> GetSlideCommentsResponseAsync(List<Comment> comments, string courseId, SlideCommentsParameters parameters)
+		private async Task<ActionResult<CommentsListResponse>> GetSlideCommentsResponseAsync(List<Comment> comments, string courseId, SlideCommentsParameters parameters, Slide slide)
 		{
 			var canUserSeeNotApprovedComments = await CanUserSeeNotApprovedCommentsAsync(UserId, courseId).ConfigureAwait(false);
 			comments = FilterVisibleComments(comments, canUserSeeNotApprovedComments);
@@ -86,7 +88,6 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			var totalCount = comments.Count;
 			comments = comments.Skip(parameters.Offset).Take(parameters.Count).ToList();
 
-			var slide = (await courseManager.FindCourseAsync(parameters.CourseId))?.FindSlideById(parameters.SlideId, false);
 			var slideIsExercise = slide is ExerciseSlide;
 
 			var replies = await commentsRepo.GetRepliesAsync(comments.Select(c => c.Id)).ConfigureAwait(false);
@@ -128,8 +129,10 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			var slideId = parameters.SlideId;
 			parameters.Text.TrimEnd();
 
+			var course = await courseManager.GetCourseAsync(courseId);
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
-			var slide = await GetSlide(courseId, slideId, isInstructor);
+			var visibleUnits = await unitsRepo.GetVisibleUnitIds(course, UserId).ConfigureAwait(false);
+			var slide = await GetSlide(courseId, slideId, isInstructor, visibleUnits);
 			if (slide == null)
 				return StatusCode((int)HttpStatusCode.NotFound, $"No slide with id {slideId}");
 			var slideIsExercise = slide is ExerciseSlide;

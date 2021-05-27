@@ -73,7 +73,7 @@ namespace Ulearn.Web.Api.Controllers.Runner
 		private async Task<RunnerSubmission> ToRunnerSubmission(UserExerciseSubmission submission, IWebCourseManager courseManager)
 		{
 			log.Info($"Собираю для отправки в RunCsJob решение {submission.Id}");
-			var slide = (await courseManager.FindCourseAsync(submission.CourseId))?.FindSlideById(submission.SlideId, true);
+			var slide = (await courseManager.FindCourseAsync(submission.CourseId))?.FindSlideByIdNotSafe(submission.SlideId);
 
 			if (slide is ExerciseSlide exerciseSlide)
 			{

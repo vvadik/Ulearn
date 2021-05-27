@@ -9,7 +9,6 @@ using Microsoft.AspNet.Identity;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 using Ulearn.Core;
-using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 
 namespace uLearn.Web.Controllers
@@ -18,24 +17,24 @@ namespace uLearn.Web.Controllers
 	public class HintController : Controller
 	{
 		private readonly CourseManager courseManager;
+		private readonly UnitsRepo unitsRepo;
 		private readonly SlideHintRepo slideHintRepo;
 
 		public HintController()
-			: this(WebCourseManager.Instance, new SlideHintRepo(new ULearnDb()))
 		{
-		}
-
-		public HintController(CourseManager courseManager, SlideHintRepo slideHintRepo)
-		{
-			this.courseManager = courseManager;
-			this.slideHintRepo = slideHintRepo;
+			var db = new ULearnDb();
+			courseManager = WebCourseManager.Instance;
+			slideHintRepo = new SlideHintRepo(db);
+			unitsRepo =  new UnitsRepo(db);
 		}
 
 		[HttpPost]
 		public async Task<ActionResult> UseHint(string courseId, Guid slideId, bool isNeedNewHint)
 		{
 			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
-			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId, isInstructor);
+			var course = courseManager.GetCourse(courseId);
+			var visibleUnits = unitsRepo.GetVisibleUnitIds(course, User);
+			var slide = course.GetSlideById(slideId, isInstructor, visibleUnits);
 			if (!(slide is ExerciseSlide))
 				return Json(new { Text = "Для слайда нет подсказок" });
 			var exerciseSlide = (ExerciseSlide)slide;

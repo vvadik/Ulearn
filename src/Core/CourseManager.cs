@@ -614,7 +614,7 @@ namespace Ulearn.Core
 					unit.InstructorNote.File = (FileInfo)GetNewPathForFileAfterMoving(unit.InstructorNote.File, sourceDirectory, destinationDirectory);
 			}
 
-			foreach (var slide in course.GetSlides(true))
+			foreach (var slide in course.GetSlidesNotSafe())
 			{
 				slide.Info.SlideFile = (FileInfo)GetNewPathForFileAfterMoving(slide.Info.SlideFile, sourceDirectory, destinationDirectory);
 

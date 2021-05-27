@@ -33,7 +33,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 
 			patcher.PatchVerticals(
 				edxCourse,
-				ulearnCourse.GetSlides(false)
+				ulearnCourse.GetSlidesNotSafe()
 					.Where(s => !config.IgnoredUlearnSlides.Select(Guid.Parse).Contains(s.Id))
 					.Where(s => guids == null || guids.Contains(s.NormalizedGuid))
 					.Select(s => s.ToVerticals(

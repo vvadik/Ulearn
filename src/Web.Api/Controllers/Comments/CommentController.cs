@@ -32,8 +32,8 @@ namespace Ulearn.Web.Api.Controllers.Comments
 	{
 		public CommentController(IWebCourseManager courseManager, UlearnDb db,
 			IUsersRepo usersRepo, ICommentsRepo commentsRepo, ICommentLikesRepo commentLikesRepo, ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo,
-			INotificationsRepo notificationsRepo, IGroupMembersRepo groupMembersRepo, IGroupAccessesRepo groupAccessesRepo, IVisitsRepo visitsRepo)
-			: base(courseManager, db, usersRepo, commentsRepo, commentLikesRepo, coursesRepo, courseRolesRepo, notificationsRepo, groupMembersRepo, groupAccessesRepo, visitsRepo)
+			INotificationsRepo notificationsRepo, IGroupMembersRepo groupMembersRepo, IGroupAccessesRepo groupAccessesRepo, IVisitsRepo visitsRepo, IUnitsRepo unitsRepo)
+			: base(courseManager, db, usersRepo, commentsRepo, commentLikesRepo, coursesRepo, courseRolesRepo, notificationsRepo, groupMembersRepo, groupAccessesRepo, visitsRepo, unitsRepo)
 		{
 		}
 
@@ -86,7 +86,11 @@ namespace Ulearn.Web.Api.Controllers.Comments
 				return NotFound(new ErrorResponse($"Comment {commentId} not found"));
 			var canUserSeeNotApprovedComments = await CanUserSeeNotApprovedCommentsAsync(UserId, comment.CourseId).ConfigureAwait(false);
 
-			var slide = (await courseManager.FindCourseAsync(comment.CourseId))?.FindSlideById(comment.SlideId, false);
+			var course = await courseManager.FindCourseAsync(comment.CourseId);
+			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIds(course, UserId);
+			var slide = (await courseManager.FindCourseAsync(comment.CourseId))?.FindSlideById(comment.SlideId, false, visibleUnitsIds);
+			if (slide == null)
+				return NotFound(new ErrorResponse($"Slide with comment {commentId} not found"));
 			var slideIsExercise = slide is ExerciseSlide;
 
 			DefaultDictionary<int, int> likesCount;
@@ -171,8 +175,12 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			if (comment == null)
 				return NotFound(new ErrorResponse($"Comment {commentId} not found"));
 
-			var parentComment = comment.ParentCommentId == -1 ? null :  await commentsRepo.FindCommentByIdAsync(comment.ParentCommentId, includeDeleted: false).ConfigureAwait(false);
+			var parentComment = comment.ParentCommentId == -1 ? null : await commentsRepo.FindCommentByIdAsync(comment.ParentCommentId, includeDeleted: false).ConfigureAwait(false);
 			var parentCommentCourseId = parentComment?.CourseId;
+
+			var canEditOrDeleteComment = await CanEditOrDeleteCommentAsync(comment, UserId, parentCommentCourseId).ConfigureAwait(false);
+			if (!canEditOrDeleteComment)
+				return StatusCode((int)HttpStatusCode.Forbidden, "You can not delete this comment. Only author, course admin or user with special privileges can do it.");
 
 			if (comment.IsDeleted && await CanEditOrDeleteCommentAsync(comment, UserId, parentCommentCourseId).ConfigureAwait(false))
 				await commentsRepo.RestoreCommentAsync(commentId).ConfigureAwait(false);

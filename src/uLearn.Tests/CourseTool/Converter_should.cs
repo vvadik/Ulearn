@@ -97,7 +97,7 @@ namespace uLearn.CourseTool
 		public void convert_assign_SlideIds_to_EdxUrlNames()
 		{
 			var edxCourse = ConvertForTestsCourseToEdx();
-			var ulearnSlideIds = course.GetSlides(true).Select(x => x.NormalizedGuid);
+			var ulearnSlideIds = course.GetSlidesNotSafe().Select(x => x.NormalizedGuid);
 			var edxVerticals = edxCourse.CourseWithChapters.Chapters[0].Sequentials
 				.SelectMany(x => x.Verticals)
 				.ToList();
@@ -170,7 +170,7 @@ namespace uLearn.CourseTool
 			var olxPath = string.Format("{0}/{1}", testFolderName, course.Id);
 			edxCourse.Save(olxPath);
 
-			new OlxPatcher(olxPath).PatchVerticals(edxCourse, course.GetSlides(true)
+			new OlxPatcher(olxPath).PatchVerticals(edxCourse, course.GetSlidesNotSafe()
 				.Select(x => x.ToVerticals(
 					course.Id,
 					ulearnBaseUrl,

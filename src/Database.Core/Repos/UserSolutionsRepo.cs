@@ -466,10 +466,10 @@ namespace Database.Repos
 			var exerciseSlide = isWebRunner
 				? null
 				: (ExerciseSlide)(await courseManager.GetCourseAsync(checking.CourseId))
-				.GetSlideById(checking.SlideId, true);
-			
+				.GetSlideByIdNotSafe(checking.SlideId);
+
 			var withFullDescription = (exerciseSlide?.Exercise as PolygonExerciseBlock)?.ShowTestDescription ?? false;
-			
+
 			var compilationErrorHash = (await textsRepo.AddText(result.CompilationOutput)).Hash;
 			var output = result.GetOutput(withFullDescription).NormalizeEoln();
 			var outputHash = (await textsRepo.AddText(output)).Hash;

@@ -132,7 +132,7 @@ namespace Stepik.Api
 
 		public CourseExporter(string accessToken)
 			: this(
-				System.Configuration.ConfigurationManager.AppSettings["stepik.clientId"],
+				ConfigurationManager.AppSettings["stepik.clientId"],
 				ConfigurationManager.AppSettings["stepik.clientSecret"],
 				ConfigurationManager.AppSettings["ulearn.baseUrl"],
 				accessToken
@@ -289,7 +289,7 @@ namespace Stepik.Api
 			foreach (var slideUpdateOptions in updateOptions.SlidesUpdateOptions)
 			{
 				var slideId = slideUpdateOptions.SlideId;
-				var slide = course.FindSlideById(slideId, false);
+				var slide = course.FindSlideByIdNotSafe(slideId);
 				if (slide == null)
 				{
 					results.Error($"Unable to find slide {slideId}, continue without it");

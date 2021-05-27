@@ -16,8 +16,12 @@ namespace Ulearn.Core.Courses
 		List<Unit> GetUnits([NotNull]IEnumerable<Guid> visibleUnits);
 		List<Unit> GetUnitsNotSafe();
 
-		Slide FindSlideById(Guid slideId, bool withHidden);
-		Slide GetSlideById(Guid slideId, bool withHidden);
+		List<Slide> GetSlidesNotSafe();
+		List<Slide> GetSlides(bool withHidden, [CanBeNull]IEnumerable<Guid> visibleUnits);
+		Slide FindSlideById(Guid slideId, bool withHidden, [CanBeNull]IEnumerable<Guid> visibleUnits);
+		Slide FindSlideByIdNotSafe(Guid slideId);
+		Slide GetSlideById(Guid slideId, bool withHidden, [CanBeNull]IEnumerable<Guid> visibleUnits);
+		Slide GetSlideByIdNotSafe(Guid slideId);
 		Unit FindUnitById(Guid unitId, [NotNull] List<Guid> visibleUnits);
 		Unit GetUnitById(Guid unitId, [NotNull] List<Guid> visibleUnits);
 		Unit FindUnitByIdNotSafe(Guid unitId);

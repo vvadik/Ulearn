@@ -196,7 +196,7 @@ namespace Database
 					{
 						log.Error(ex);
 					}
-					if (course == null || course.GetSlides(true).Count == 0)
+					if (course == null || course.GetSlidesNotSafe().Count == 0)
 					{
 						TryReloadCourse(courseId);
 						var tempCoursesRepo = new TempCoursesRepo();

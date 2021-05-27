@@ -370,6 +370,13 @@ namespace Database.Models
 		{
 			return baseUrl + $"/Admin/Groups?courseId={course.Id.EscapeHtml()}";
 		}
+
+		protected static async Task<bool> IsSlideVisible(Guid slideId, Course course, IServiceProvider serviceProvider)
+		{
+			var unitsRepo = serviceProvider.GetService<IUnitsRepo>();
+			var slide = course.GetSlideByIdNotSafe(slideId);
+			return !slide.Hide && await unitsRepo.IsUnitVisibleForStudents(course, slide.Info.Unit.Id);
+		}
 	}
 
 	public static class NotificationExtensions
@@ -480,7 +487,7 @@ namespace Database.Models
 
 		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
-			var slide = course.FindSlideById(Comment.SlideId, true);
+			var slide = course.FindSlideByIdNotSafe(Comment.SlideId);
 			if (slide == null)
 				return null;
 
@@ -511,7 +518,7 @@ namespace Database.Models
 	{
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
-			var slide = course.FindSlideById(Comment.SlideId, true);
+			var slide = course.FindSlideByIdNotSafe(Comment.SlideId);
 			if (slide == null)
 				return null;
 
@@ -521,7 +528,7 @@ namespace Database.Models
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
-			var slide = course.FindSlideById(Comment.SlideId, true);
+			var slide = course.FindSlideByIdNotSafe(Comment.SlideId);
 			if (slide == null)
 				return null;
 
@@ -530,8 +537,7 @@ namespace Database.Models
 
 		public override async Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider, Course course)
 		{
-			var slide = course.GetSlideById(Comment.SlideId, true);
-			if (slide.Hide)
+			if (!await IsSlideVisible(Comment.SlideId, course, serviceProvider))
 			{
 				var courseRoleUsersFilter = serviceProvider.GetService<ICourseRolesRepo>();
 				return await courseRoleUsersFilter.GetListOfUsersWithCourseRole(CourseRoleType.Instructor, CourseId, includeHighRoles: true);
@@ -567,7 +573,7 @@ namespace Database.Models
 
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
-			var slide = course.FindSlideById(Comment.SlideId, true);
+			var slide = course.FindSlideByIdNotSafe(Comment.SlideId);
 			if (slide == null)
 				return null;
 
@@ -578,7 +584,7 @@ namespace Database.Models
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
-			var slide = course.FindSlideById(Comment.SlideId, true);
+			var slide = course.FindSlideByIdNotSafe(Comment.SlideId);
 			if (slide == null)
 				return null;
 
@@ -589,8 +595,7 @@ namespace Database.Models
 
 		public override async Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider, Course course)
 		{
-			var slide = course.GetSlideById(Comment.SlideId, true);
-			if (!slide.Hide)
+			if (await IsSlideVisible(Comment.SlideId, course, serviceProvider))
 				return new List<string> { ParentComment.AuthorId };
 			var courseRolesRepo = serviceProvider.GetService<ICourseRolesRepo>();
 			if (await courseRolesRepo.HasUserAccessToCourse(ParentComment.AuthorId, course.Id, CourseRoleType.Instructor))
@@ -604,7 +609,7 @@ namespace Database.Models
 	{
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
-			var slide = course.FindSlideById(Comment.SlideId, true);
+			var slide = course.FindSlideByIdNotSafe(Comment.SlideId);
 			if (slide == null)
 				return null;
 
@@ -614,7 +619,7 @@ namespace Database.Models
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
-			var slide = course.FindSlideById(Comment.SlideId, true);
+			var slide = course.FindSlideByIdNotSafe(Comment.SlideId);
 			if (slide == null)
 				return null;
 
@@ -651,7 +656,7 @@ namespace Database.Models
 
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
-			var slide = course.FindSlideById(Comment.SlideId, true);
+			var slide = course.FindSlideByIdNotSafe(Comment.SlideId);
 			if (slide == null)
 				return null;
 
@@ -661,7 +666,7 @@ namespace Database.Models
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
-			var slide = course.FindSlideById(Comment.SlideId, true);
+			var slide = course.FindSlideByIdNotSafe(Comment.SlideId);
 			if (slide == null)
 				return null;
 
@@ -671,8 +676,7 @@ namespace Database.Models
 
 		public override async Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider, Course course)
 		{
-			var slide = course.GetSlideById(Comment.SlideId, true);
-			if (!slide.Hide)
+			if (await IsSlideVisible(Comment.SlideId, course, serviceProvider))
 				return new List<string> { Comment.AuthorId };
 			var courseRolesRepo = serviceProvider.GetService<ICourseRolesRepo>();
 			if (await courseRolesRepo.HasUserAccessToCourse(Comment.AuthorId, course.Id, CourseRoleType.Instructor))
@@ -781,7 +785,7 @@ namespace Database.Models
 
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
-			var slide = course.FindSlideById(Checking.SlideId, true) as ExerciseSlide;
+			var slide = course.FindSlideByIdNotSafe(Checking.SlideId) as ExerciseSlide;
 			if (slide == null)
 				return null;
 
@@ -795,7 +799,7 @@ namespace Database.Models
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
-			var slide = course.FindSlideById(Checking.SlideId, true) as ExerciseSlide;
+			var slide = course.FindSlideByIdNotSafe(Checking.SlideId) as ExerciseSlide;
 			if (slide == null)
 				return null;
 
@@ -809,7 +813,7 @@ namespace Database.Models
 
 		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
-			var slide = course.FindSlideById(Checking.SlideId, true);
+			var slide = course.FindSlideByIdNotSafe(Checking.SlideId);
 			if (slide == null)
 				return null;
 
@@ -818,8 +822,7 @@ namespace Database.Models
 
 		public override async Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider, Course course)
 		{
-			var slide = course.GetSlideById(Checking.SlideId, true);
-			if (!slide.Hide)
+			if (await IsSlideVisible(Checking.SlideId, course, serviceProvider))
 				return new List<string> { Checking.UserId };
 			var courseRolesRepo = serviceProvider.GetService<ICourseRolesRepo>();
 			if (await courseRolesRepo.HasUserAccessToCourse(Checking.UserId, course.Id, CourseRoleType.Instructor))
@@ -843,7 +846,7 @@ namespace Database.Models
 
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
-			var slide = course.FindSlideById(Checking.SlideId, true);
+			var slide = course.FindSlideByIdNotSafe(Checking.SlideId);
 			if (slide == null)
 				return null;
 
@@ -853,7 +856,7 @@ namespace Database.Models
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
-			var slide = course.FindSlideById(Checking.SlideId, true);
+			var slide = course.FindSlideByIdNotSafe(Checking.SlideId);
 			if (slide == null)
 				return null;
 
@@ -863,7 +866,7 @@ namespace Database.Models
 
 		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
-			var slide = course.FindSlideById(Checking.SlideId, true);
+			var slide = course.FindSlideByIdNotSafe(Checking.SlideId);
 			if (slide == null)
 				return null;
 
@@ -872,8 +875,7 @@ namespace Database.Models
 
 		public override async Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider, Course course)
 		{
-			var slide = course.GetSlideById(Checking.SlideId, true);
-			if (!slide.Hide)
+			if (await IsSlideVisible(Checking.SlideId, course, serviceProvider))
 				return new List<string> { Checking.UserId };
 			var courseRolesRepo = serviceProvider.GetService<ICourseRolesRepo>();
 			if (await courseRolesRepo.HasUserAccessToCourse(Checking.UserId, course.Id, CourseRoleType.Instructor))
@@ -990,7 +992,7 @@ namespace Database.Models
 			if (checking == null)
 				return null;
 
-			var slide = course.FindSlideById(checking.SlideId, true);
+			var slide = course.FindSlideByIdNotSafe(checking.SlideId);
 			if (slide == null)
 				return null;
 
@@ -1018,7 +1020,7 @@ namespace Database.Models
 			if (checking == null)
 				return null;
 
-			var slide = course.FindSlideById(checking.SlideId, true);
+			var slide = course.FindSlideByIdNotSafe(checking.SlideId);
 			if (slide == null)
 				return null;
 
@@ -1041,7 +1043,7 @@ namespace Database.Models
 
 		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
-			var slide = course.FindSlideById(Comment?.Review?.ExerciseChecking?.SlideId ?? Guid.Empty, true);
+			var slide = course.FindSlideByIdNotSafe(Comment?.Review?.ExerciseChecking?.SlideId ?? Guid.Empty);
 			if (slide == null)
 				return null;
 
@@ -1064,8 +1066,7 @@ namespace Database.Models
 			authorsIds.Add(review.AuthorId);
 			authorsIds.Add(review.ExerciseChecking.UserId);
 
-			var slide = course.GetSlideById(review.ExerciseChecking.SlideId, true);
-			if (!slide.Hide)
+			if (await IsSlideVisible(review.ExerciseChecking.SlideId, course, serviceProvider))
 				return authorsIds.ToList();
 			var courseRolesRepo = serviceProvider.GetService<ICourseRolesRepo>();
 			var usersWithAccess = new List<string>();
@@ -1104,7 +1105,7 @@ namespace Database.Models
 
 		public string GetUrl(Course course, string baseUrl, string currentUserId)
 		{
-			var slide = course.FindSlideById(Comment?.Review?.ExerciseChecking?.SlideId ?? Guid.Empty, true);
+			var slide = course.FindSlideByIdNotSafe(Comment?.Review?.ExerciseChecking?.SlideId ?? Guid.Empty);
 			if (slide == null)
 				return null;
 
@@ -1339,7 +1340,7 @@ namespace Database.Models
 	{
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
 		{
-			var slide = course.FindSlideById(Comment.SlideId, true);
+			var slide = course.FindSlideByIdNotSafe(Comment.SlideId);
 			if (slide == null)
 				return null;
 
@@ -1349,7 +1350,7 @@ namespace Database.Models
 
 		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
 		{
-			var slide = course.FindSlideById(Comment.SlideId, true);
+			var slide = course.FindSlideByIdNotSafe(Comment.SlideId);
 			if (slide == null)
 				return null;
 

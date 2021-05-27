@@ -17,7 +17,7 @@ namespace uLearn.Web
 		{
 			var solutions = WebCourseManager.Instance
 				.GetCourses()
-				.SelectMany(course => course.GetSlides(true).OfType<ExerciseSlide>())
+				.SelectMany(course => course.GetSlidesNotSafe().OfType<ExerciseSlide>())
 				.Where(slide => slide.Exercise is SingleFileExerciseBlock)
 				.Select(slide => slide.Exercise)
 				.Cast<SingleFileExerciseBlock>()

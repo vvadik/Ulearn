@@ -32,11 +32,12 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
 		private readonly ILtiRequestsRepo ltiRequestsRepo;
 		private readonly ILtiConsumersRepo ltiConsumersRepo;
+		private readonly IUnitsRepo unitsRepo;
 
 		public UserProgressController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
 			IVisitsRepo visitsRepo, IUserQuizzesRepo userQuizzesRepo, IAdditionalScoresRepo additionalScoresRepo,
 			ICourseRolesRepo courseRolesRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo,
-			ISlideCheckingsRepo slideCheckingsRepo, ILtiRequestsRepo ltiRequestsRepo, ILtiConsumersRepo ltiConsumersRepo)
+			ISlideCheckingsRepo slideCheckingsRepo, ILtiRequestsRepo ltiRequestsRepo, ILtiConsumersRepo ltiConsumersRepo, IUnitsRepo unitsRepo)
 			: base(courseManager, db, usersRepo)
 		{
 			this.visitsRepo = visitsRepo;
@@ -48,6 +49,7 @@ namespace Ulearn.Web.Api.Controllers
 			this.slideCheckingsRepo = slideCheckingsRepo;
 			this.ltiRequestsRepo = ltiRequestsRepo;
 			this.ltiConsumersRepo = ltiConsumersRepo;
+			this.unitsRepo = unitsRepo;
 		}
 
 		/// <summary>
@@ -72,8 +74,19 @@ namespace Ulearn.Web.Api.Controllers
 					return NotFound(new ErrorResponse($"Users {userIdsStr} not found"));
 				}
 			}
-			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
-			var visibleSlides = course.GetSlides(isInstructor).Select(s => s.Id).ToHashSet();
+
+			HashSet<Guid> visibleSlides;
+			if (userIds.Count == 1 && userIds[0] == UserId)
+			{
+				var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
+				var visibleUnits = await unitsRepo.GetVisibleUnitIds(course, UserId);
+				visibleSlides = course.GetSlides(isInstructor, visibleUnits).Select(s => s.Id).ToHashSet();
+			}
+			else
+			{
+				var publishedUnits = await unitsRepo.GetPublishedUnitIds(course);
+				visibleSlides = course.GetSlides(false, publishedUnits).Select(s => s.Id).ToHashSet();
+			}
 
 			var scores = await visitsRepo.GetScoresForSlides(course.Id, userIds);
 			var visitsTimestamps = await visitsRepo.GetLastVisitsInCourse(course.Id, UserId);
@@ -161,7 +174,7 @@ namespace Ulearn.Web.Api.Controllers
 		public async Task<ActionResult<UsersProgressResponse>> Visit([FromRoute] Course course, [FromRoute] Guid slideId)
 		{
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, course.Id, CourseRoleType.Instructor).ConfigureAwait(false);
-			var slide = course.FindSlideById(slideId, isInstructor);
+			var slide = course.FindSlideByIdNotSafe(slideId);
 			if (slide == null)
 			{
 				var instructorNote = course.FindInstructorNoteById(slideId);

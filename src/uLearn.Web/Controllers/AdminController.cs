@@ -513,7 +513,7 @@ namespace uLearn.Web.Controllers
 				ModerationPolicy = commentsPolicy.ModerationPolicy,
 				OnlyInstructorsCanReply = commentsPolicy.OnlyInstructorsCanReply,
 				Comments = (from c in comments.Take(commentsCountLimit)
-					let slide = course.FindSlideById(c.SlideId, true)
+					let slide = course.FindSlideByIdNotSafe(c.SlideId)
 					where slide != null
 					select
 						new CommentViewModel
@@ -597,9 +597,9 @@ namespace uLearn.Web.Controllers
 			{
 				CourseId = courseId,
 				/* TODO (andgein): Merge FindSlideById() and following GetSlideById() calls */
-				Checkings = checkings.Take(maxShownQueueSize).Where(c => course.FindSlideById(c.SlideId, true) != null).Select(c =>
+				Checkings = checkings.Take(maxShownQueueSize).Where(c => course.FindSlideByIdNotSafe(c.SlideId) != null).Select(c =>
 				{
-					var slide = course.GetSlideById(c.SlideId, true);
+					var slide = course.GetSlideByIdNotSafe(c.SlideId);
 					return new ManualCheckingQueueItemViewModel
 					{
 						CheckingQueueItem = c,
@@ -632,12 +632,12 @@ namespace uLearn.Web.Controllers
 			filterOptions = GetManualCheckingFilterOptionsByGroup(course.Id, groupsIds);
 			filterOptions.OnlyChecked = null;
 			var allCheckingsSlidesIds = GetMergedCheckingQueueSlideIds(filterOptions);
-			var slideId2Index = course.GetSlides(true).Select((s, i) => (s.Id, i))
+			var slideId2Index = course.GetSlidesNotSafe().Select((s, i) => (s.Id, i))
 				.ToDictionary(p => p.Item1, p => p.Item2);
 
 			var emptySlideMock = new Slide { Info = new SlideInfo(null, null), Title = "", Id = Guid.Empty };
 			var allCheckingsSlides = allCheckingsSlidesIds
-				.Select(s => new KeyValuePair<Guid, Slide>(s, course.FindSlideById(s, true)))
+				.Select(s => new KeyValuePair<Guid, Slide>(s, course.FindSlideByIdNotSafe(s)))
 				.Where(kvp => kvp.Value != null)
 				.Union(new List<KeyValuePair<Guid, Slide>>
 				{
@@ -908,7 +908,7 @@ namespace uLearn.Web.Controllers
 			var courseDiff = new CourseDiff(course, version);
 			var schemaPath = Path.Combine(HttpRuntime.BinDirectory, "schema.xsd");
 			var validator = new XmlValidator(schemaPath);
-			var warnings = validator.ValidateSlidesFiles(version.GetSlides(true).Select(x => x.Info.SlideFile).ToList());
+			var warnings = validator.ValidateSlidesFiles(version.GetSlidesNotSafe().Select(x => x.Info.SlideFile).ToList());
 
 			return View(new DiagnosticsModel
 			{
@@ -1563,7 +1563,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> SetSuspicionLevels(string courseId, Guid slideId, Language language, string faintSuspicion = null, string strongSuspicion = null)
 		{
 			var course = courseManager.GetCourse(courseId);
-			if (course.GetSlides(true).All(s => s.Id != slideId))
+			if (course.FindSlideByIdNotSafe(slideId) != null)
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden, "Course does not contain a slide");
 
 			if (!TryParseNullableDouble(faintSuspicion, out var faintSuspicionParsed)
