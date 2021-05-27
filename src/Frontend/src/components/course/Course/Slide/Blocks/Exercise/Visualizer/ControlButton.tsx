@@ -13,9 +13,9 @@ interface ControlButtonProps {
 }
 
 export const ControlButton =
-	({ onClick, text, disabled, use }: ControlButtonProps): React.ReactElement =>
+	({ onClick, text, disabled, use, }: ControlButtonProps): React.ReactElement =>
 		(
-		<span className={ cn(styles.exerciseControls, styles.sendButton) }>
+			<span className={ cn(styles.exerciseControls, styles.sendButton) }>
 			<Button
 				use={ use }
 				onClick={ onClick }

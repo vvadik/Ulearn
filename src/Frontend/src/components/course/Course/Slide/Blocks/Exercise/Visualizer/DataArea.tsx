@@ -12,30 +12,31 @@ interface DataAreaProps {
 }
 
 export const DataArea =
-	({ input, updateInput, output } : DataAreaProps) : React.ReactElement =>
+	({ input, updateInput, output }: DataAreaProps): React.ReactElement =>
 		(
-		<div className={ styles.dataArea }>
-			<div className={ styles.textArea }>
-				<p>{ texts.dataArea.inputData }</p>
-				<Textarea
-					value={ input }
-					rows={ 5 }
-					maxRows={ 5 }
-					autoResize
-					onValueChange={ updateInput }
-					width={ "100%" }
-				/>
+			<div className={ styles.dataArea }>
+				<div className={ styles.textArea }>
+					<p>{ texts.dataArea.inputData }</p>
+					<Textarea
+						value={ input }
+						rows={ 5 }
+						maxRows={ 5 }
+						autoResize
+						onValueChange={ updateInput }
+						width={ "100%" }
+					/>
+				</div>
+				<div className={ styles.textArea }>
+					<p>{ texts.dataArea.outputData }</p>
+					<Textarea
+						disabled={ output.length === 0 }
+						value={ output }
+						rows={ 5 }
+						maxRows={ 5 }
+						autoResize
+						readOnly={ true }
+						width={ "100%" }
+					/>
+				</div>
 			</div>
-			<div className={ styles.textArea }>
-				<p>{ texts.dataArea.outputData }</p>
-				<Textarea
-					value={ output }
-					rows={ 5 }
-					maxRows={ 5 }
-					autoResize
-					readOnly={ true }
-					width={ "100%" }
-				/>
-			</div>
-		</div>
-	);
+		);

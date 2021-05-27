@@ -1,7 +1,11 @@
 import React, { MouseEventHandler } from "react";
+
 import { ControlButton } from "./ControlButton";
-import texts from './Visualizer.texts';
+import { Gapped } from "ui";
+
 import { VisualizerStatus } from "./VusualizerStatus";
+
+import texts from './Visualizer.texts';
 
 interface ControlsProps {
 	run: MouseEventHandler;
@@ -15,32 +19,34 @@ interface ControlsProps {
 }
 
 export const Controls =
-	({ run, next, previous, visualizerStatus, currentStep, totalSteps } : ControlsProps) :
+	({ run, next, previous, visualizerStatus, currentStep, totalSteps }: ControlsProps):
 		React.ReactElement =>
-	 (
-		<div>
-			<ControlButton
-				use={ visualizerStatus === VisualizerStatus.Ready ||
-				visualizerStatus === VisualizerStatus.Blocked ? "primary" : "default" }
-				onClick={ run }
-				text={ visualizerStatus === VisualizerStatus.Ready ?
-					texts.controls.run : texts.controls.rerun }
-				disabled={ visualizerStatus === VisualizerStatus.Loading }
-			/>
-			<ControlButton
-				use={ visualizerStatus === VisualizerStatus.Ready ? "default" : "primary" }
-				onClick={ previous }
-				disabled={ visualizerStatus === VisualizerStatus.Blocked ||
-				visualizerStatus === VisualizerStatus.Loading || currentStep === 0 }
-				text={ texts.controls.back }
-			/>
-			<ControlButton
-				use={ visualizerStatus === VisualizerStatus.Ready ? "default" : "primary" }
-				onClick={ next }
-				disabled={ visualizerStatus === VisualizerStatus.Blocked ||
-				visualizerStatus === VisualizerStatus.Loading ||
-				currentStep === totalSteps - 1 || totalSteps === 0 }
-				text={ texts.controls.next }
-			/>
-		</div>
-	);
+		(
+			<Gapped gap={ 16 }>
+				<ControlButton
+					use={ visualizerStatus === VisualizerStatus.Ready ||
+					visualizerStatus === VisualizerStatus.Blocked ? "primary" : "default" }
+					onClick={ run }
+					text={ visualizerStatus === VisualizerStatus.Ready ?
+						texts.controls.run : texts.controls.rerun }
+					disabled={ visualizerStatus === VisualizerStatus.Loading }
+				/>
+				<Gapped gap={ 8 }>
+					<ControlButton
+						use={ visualizerStatus === VisualizerStatus.Ready ? "default" : "primary" }
+						onClick={ previous }
+						disabled={ visualizerStatus === VisualizerStatus.Blocked ||
+						visualizerStatus === VisualizerStatus.Loading || currentStep === 0 }
+						text={ texts.controls.back }
+					/>
+					<ControlButton
+						use={ visualizerStatus === VisualizerStatus.Ready ? "default" : "primary" }
+						onClick={ next }
+						disabled={ visualizerStatus === VisualizerStatus.Blocked ||
+						visualizerStatus === VisualizerStatus.Loading ||
+						currentStep === totalSteps - 1 || totalSteps === 0 }
+						text={ texts.controls.next }
+					/>
+				</Gapped>
+			</Gapped>
+		);

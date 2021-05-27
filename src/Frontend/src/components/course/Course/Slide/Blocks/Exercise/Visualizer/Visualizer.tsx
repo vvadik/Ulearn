@@ -37,7 +37,8 @@ const codeMirrorOptions: EditorConfiguration = {
 
 interface VisualizerProps {
 	code: string;
-	input: string;
+	input?: string;
+	onModalClose: (code: string) => void;
 }
 
 interface State {
@@ -67,10 +68,12 @@ interface RunData {
 }
 
 class Visualizer extends React.Component<VisualizerProps, State> {
-	private getRuntimeData = () : void => {
-		this.setState({status: VisualizerStatus.Loading});
+	private visualizerApiUrl = 'https://python-visualizer-api.vercel.app/run';
 
-		fetch('https://python-visualizer-api.vercel.app/run',
+	private getRuntimeData = (): void => {
+		this.setState({ status: VisualizerStatus.Loading });
+
+		fetch(this.visualizerApiUrl,
 			{
 				method: "POST",
 				body: JSON.stringify({
@@ -81,14 +84,14 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 		)
 			.then(r => r.json())
 			.then(r => this.run(r));
-	}
+	};
 
 	constructor(props: VisualizerProps) {
 		super(props);
 		this.state = {
 			editor: null,
 			code: props.code,
-			input: props.input,
+			input: props.input || '',
 			output: "",
 			totalSteps: 0,
 			currentStep: 0,
@@ -99,14 +102,14 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 		};
 	}
 
-	showNextStep = () : void =>
+	showNextStep = (): void =>
 		this.showStep(this.state.currentStep + 1);
 
-	showPreviousStep = () : void =>
+	showPreviousStep = (): void =>
 		this.showStep(this.state.currentStep - 1);
 
-	run = (runData: RunData) : void => {
-		this.setActiveLine(0);
+	run = (runData: RunData): void => {
+		this.setActiveLine(1);
 		const steps = runData.message.trace;
 		this.setState({
 			trace: steps,
@@ -115,25 +118,28 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 			currentStep: 0,
 			output: ''
 		}, () => this.showStep(0));
-	}
+	};
 
-	showStep = (stepNumber: number) : void => {
+	showStep = (stepNumber: number): void => {
 		const currentStep = this.state.trace[stepNumber] as VisualizerStep;
 		const lineNumber = parseInt(currentStep.line);
 		const event = currentStep.event;
 		let stdout = currentStep.stdout === undefined ? '' : currentStep.stdout;
 
 		let newStatus = VisualizerStatus.Running;
-		if (event === "exception" || event === "uncaught_exception") {
+		if(event === "exception" || event === "uncaught_exception") {
 			newStatus = VisualizerStatus.Error;
-			stdout += `\n========\n${ currentStep.exception_str }`
-		}
-		else if (event === "return") {
+			stdout += `\n========\n${ currentStep.exception_str }`;
+		} else if(event === "return") {
 			newStatus = VisualizerStatus.Return;
 		}
 
 		this.setActiveLine(lineNumber);
-		this.state.editor?.scrollIntoView({line: lineNumber - 1, ch: 0});
+		if(lineNumber === 1) {
+			this.state.editor?.scrollIntoView({ line: 0, ch: 0 });
+		} else {
+			this.state.editor?.scrollIntoView({ line: Math.min(lineNumber, this.state.editor?.lineCount() - 1), ch: 0 });
+		}
 		this.setState({
 			output: stdout,
 			variables: getVariables(currentStep),
@@ -141,32 +147,35 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 			status: newStatus,
 			activeLine: lineNumber,
 		});
-	}
+	};
 
-	setActiveLine = (lineNumber: number) : void => {
-		this.state.editor?.clearGutter("arrow");
+	setActiveLine = (lineNumber: number): void => {
+		const { editor, activeLine, } = this.state;
+
+		editor?.clearGutter("arrow");
 		const arrow = document.createElement("div");
 		arrow.innerHTML = "→";
 		arrow.style.color = "#FF9E59";
-		this.state.editor?.setGutterMarker(lineNumber - 1, "arrow", arrow);
+		editor?.setGutterMarker(lineNumber - 1, "arrow", arrow);
 
-		if (this.state.activeLine !== null) {
-			this.state.editor?.removeLineClass(this.state.activeLine - 1, "background", "active-line");
+		if(activeLine !== null) {
+			editor?.removeLineClass(activeLine - 1, "background", "active-line");
 		}
-		this.state.editor?.addLineClass(lineNumber - 1, "background", "active-line");
-	}
+		editor?.addLineClass(lineNumber - 1, "background", "active-line");
+	};
 
-	updateInput = (value: string) : void =>
-		this.setState({input: value});
+	updateInput = (value: string): void =>
+		this.setState({ input: value });
 
 	updateCode = (editor: CodeMirror.Editor, data: codemirror.EditorChange,
-		value: string) : void =>
-		this.setState({ code: value, status: VisualizerStatus.Blocked});
+		value: string
+	): void =>
+		this.setState({ code: value, status: VisualizerStatus.Blocked });
 
-	setEditorToState = (editor: CodeMirror.Editor) : void =>
+	setEditorToState = (editor: CodeMirror.Editor): void =>
 		this.setState({ editor: editor });
 
-	renderEditor = () : React.ReactElement =>
+	renderEditor = (): React.ReactElement =>
 		(
 			<div className={ "main" }>
 				<div id={ "code-mirror" }>
@@ -179,31 +188,31 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 				</div>
 
 				<div className={ "variables" }>
-					<JSONView src={ this.state.variables } />
+					<JSONView src={ this.state.variables }/>
 				</div>
 			</div>
-	);
+		);
 
-	renderControls = () : React.ReactElement =>
+	renderControls = (): React.ReactElement =>
 		(
 			<div>
 				<div className={ "actions" }>
-				<Controls
-					run={ this.getRuntimeData }
-					next={ this.showNextStep }
-					previous={ this.showPreviousStep }
-					visualizerStatus={ this.state.status }
-					currentStep={ this.state.currentStep }
-					totalSteps={ this.state.totalSteps }
-				/>
+					<Controls
+						run={ this.getRuntimeData }
+						next={ this.showNextStep }
+						previous={ this.showPreviousStep }
+						visualizerStatus={ this.state.status }
+						currentStep={ this.state.currentStep }
+						totalSteps={ this.state.totalSteps }
+					/>
 				</div>
 			</div>
-	);
+		);
 
-	render() : React.ReactElement {
+	render(): React.ReactElement {
 		return (
 			<div>
-				<Modal width={ "90vw" }>
+				<Modal onClose={ this.onClose } width={ "90vw" }>
 					<Modal.Header sticky={ false }>{ texts.visualizer }</Modal.Header>
 					<Modal.Body>
 						<Loader active={ this.state.status === VisualizerStatus.Loading }>
@@ -230,6 +239,13 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 			</div>
 		);
 	}
+
+	onClose = (): void => {
+		const { onModalClose, } = this.props;
+		const { code, } = this.state;
+
+		onModalClose(code);
+	};
 }
 
 export { Visualizer, VisualizerProps };
