@@ -52,8 +52,8 @@ longCode.args = {
 	input: "",
 }
 
-export const scrollBetween = Template.bind({});
-scrollBetween.args = {
+export const scrollBetweenFarLines = Template.bind({});
+scrollBetweenFarLines.args = {
 	code: "print(1)\n \n \n \n \n \n " +
 		"\n \n \n \n \n \n \n " +
 		"\n \n \n \n \n \n \n " +
@@ -86,6 +86,18 @@ wideCode.args = {
 		"        print('Столица страны ' + country + ': ' + Capitals[country])\n" +
 		"    else:\n" +
 		"        print('В базе нет страны c названием ' + country)\n",
+	input: "",
+}
+
+export const infiniteRecursionLoop = Template.bind({});
+infiniteRecursionLoop.args = {
+	code: "def a(b):\n\ta(b)\n\na(6)",
+	input: "",
+}
+
+export const infiniteLoop = Template.bind({});
+infiniteLoop.args = {
+	code: "while True:\n\ta = 5",
 	input: "",
 }
 

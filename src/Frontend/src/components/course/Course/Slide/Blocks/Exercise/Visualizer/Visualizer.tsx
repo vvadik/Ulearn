@@ -113,11 +113,13 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 	showPreviousStep = (): void =>
 		this.showStep(this.state.currentStep - 1);
 
+	showLastStep = (): void =>
+		this.showStep(this.state.totalSteps - 1);
+
 	run = (runData: RunData | null): void => {
 		if (runData === null) {
 			this.setState({
-				status: VisualizerStatus.Error,
-				output: "Программа выполняется бесконечно.",
+				status: VisualizerStatus.InfiniteLoop,
 			});
 			return;
 		}
@@ -136,27 +138,35 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 
 	showStep = (stepNumber: number): void => {
 		const currentStep = this.state.trace[stepNumber] as VisualizerStep;
-		const lineNumber = parseInt(currentStep.line);
 		const event = currentStep.event;
-		let stdout = currentStep.stdout === undefined ? '' : currentStep.stdout;
+
+		if (event === "instruction_limit_reached") {
+			this.setState({
+				status: VisualizerStatus.InfiniteLoop,
+				activeLine: null,
+				currentStep: stepNumber,
+			});
+			return;
+		}
 
 		let newStatus = VisualizerStatus.Running;
+		let stdout = currentStep.stdout === undefined ? '' : currentStep.stdout;
+
 		if(event === "exception" || event === "uncaught_exception") {
 			newStatus = VisualizerStatus.Error;
 			stdout += `\n========\n${ currentStep.exception_str }`;
 		} else if(event === "return") {
 			newStatus = VisualizerStatus.Return;
 		}
-		else if (event === "instruction_limit_reached") {
-			newStatus = VisualizerStatus.InfiniteLoop;
-		}
 
+		const lineNumber = parseInt(currentStep.line);
 		this.setActiveLine(lineNumber);
 		if(lineNumber === 1) {
 			this.state.editor?.scrollIntoView({ line: 0, ch: 0 });
 		} else {
 			this.state.editor?.scrollIntoView({ line: Math.min(lineNumber, this.state.editor?.lineCount() - 1), ch: 0 });
 		}
+
 		this.setState({
 			output: stdout,
 			variables: getVariables(currentStep),
@@ -239,6 +249,7 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 						run={ this.getRuntimeData }
 						next={ this.showNextStep }
 						previous={ this.showPreviousStep }
+						last={ this.showLastStep }
 						visualizerStatus={ this.state.status }
 						currentStep={ this.state.currentStep }
 						totalSteps={ this.state.totalSteps }

@@ -1,6 +1,6 @@
 interface VisualizerStep {
 	line: string;
-	event: 'exception' | 'uncaught_exception' | 'return';
+	event: 'exception' | 'uncaught_exception' | 'return' | 'instruction_limit_reached';
 	stdout: string;
 	globals: any;
 	stack_locals: any;
