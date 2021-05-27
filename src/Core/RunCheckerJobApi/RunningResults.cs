@@ -158,11 +158,11 @@ namespace Ulearn.Core.RunCheckerJobApi
 		public string FormatTestDescription()
 		{
 			return $"Входные данные:\n" +
-					$"{Truncate(Input, 100)}\n" +
+					$"{Truncate(Input, 500)}\n" +
 					$"Ожидаемый результат:\n" +
-					$"{Truncate(CorrectOutput, 100)}\n" +
+					$"{Truncate(CorrectOutput, 500)}\n" +
 					$"Ваш результат:\n" +
-					$"{Truncate(StudentOutput, 100)}\n";
+					$"{Truncate(StudentOutput, 500)}\n";
 		}
 		
 		public string FormatTestNumber() 
