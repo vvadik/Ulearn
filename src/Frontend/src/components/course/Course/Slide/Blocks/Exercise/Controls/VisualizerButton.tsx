@@ -28,12 +28,12 @@ function VisualizerButton({
 			<ShowControlsTextContext.Consumer>
 			{
 				(showControlsTextContext) =>
-					<>
-					<span onClick={ openModal } className={ styles.exerciseControlsIcon }>
-						<PC/>
-					</span>
+					<span onClick={ openModal }>
+						<span className={ styles.exerciseControlsIcon }>
+							<PC/>
+						</span>
 						{ (showControlsTextContext || showControlsText) && texts.controls.visualizer.text }
-					</>
+					</span>
 			}
 			</ShowControlsTextContext.Consumer>
 			{ isModalVisible && <Visualizer code={ code } onModalClose={ closeModal }/> }
