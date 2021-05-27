@@ -82,7 +82,12 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 				})
 			}
 		)
-			.then(r => r.json())
+			.then(r =>  {
+				if (r.ok) {
+					return r.json();
+				}
+				return null;
+			})
 			.then(r => this.run(r));
 	};
 
@@ -108,7 +113,15 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 	showPreviousStep = (): void =>
 		this.showStep(this.state.currentStep - 1);
 
-	run = (runData: RunData): void => {
+	run = (runData: RunData | null): void => {
+		if (runData === null) {
+			this.setState({
+				status: VisualizerStatus.Error,
+				output: "Программа выполняется бесконечно.",
+			});
+			return;
+		}
+
 		const steps = runData.message.trace;
 		this.removeActiveLines();
 
@@ -133,6 +146,9 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 			stdout += `\n========\n${ currentStep.exception_str }`;
 		} else if(event === "return") {
 			newStatus = VisualizerStatus.Return;
+		}
+		else if (event === "instruction_limit_reached") {
+			newStatus = VisualizerStatus.InfiniteLoop;
 		}
 
 		this.setActiveLine(lineNumber);

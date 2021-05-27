@@ -23,6 +23,10 @@ const texts = {
 			if (status === VisualizerStatus.Blocked) {
 				return "Необходим перезапуск";
 			}
+			if (status === VisualizerStatus.InfiniteLoop) {
+				return "Бесконечный цикл";
+			}
+
 			return null;
 		}
 	},
