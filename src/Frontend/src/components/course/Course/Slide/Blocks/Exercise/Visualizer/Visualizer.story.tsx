@@ -52,6 +52,16 @@ longCode.args = {
 	input: "",
 }
 
+export const scrollBetween = Template.bind({});
+scrollBetween.args = {
+	code: "print(1)\n \n \n \n \n \n " +
+		"\n \n \n \n \n \n \n " +
+		"\n \n \n \n \n \n \n " +
+		"\n \n \n \n \n \n \n " +
+		"\n \n \n \nprint(1)",
+	input: "",
+}
+
 export const wideCode = Template.bind({});
 wideCode.args = {
 	code:
