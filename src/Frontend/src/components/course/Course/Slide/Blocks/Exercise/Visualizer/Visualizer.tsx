@@ -109,8 +109,9 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 		this.showStep(this.state.currentStep - 1);
 
 	run = (runData: RunData): void => {
-		this.setActiveLine(1);
 		const steps = runData.message.trace;
+		this.removeActiveLines();
+
 		this.setState({
 			trace: steps,
 			totalSteps: steps.length,
@@ -164,13 +165,34 @@ class Visualizer extends React.Component<VisualizerProps, State> {
 		editor?.addLineClass(lineNumber - 1, "background", "active-line");
 	};
 
-	updateInput = (value: string): void =>
+	removeActiveLines = (): void => {
+		const { editor, activeLine, } = this.state;
+
+		editor?.clearGutter("arrow");
+		if (activeLine !== null) {
+			this.setState({ activeLine: null });
+		}
+		editor?.eachLine((line) => {
+			editor?.removeLineClass(line, "background", "active-line");
+		});
+	};
+
+	updateInput = (value: string): void => {
+		if (this.state.status === VisualizerStatus.Running) {
+			this.setState({ status: VisualizerStatus.Blocked });
+		}
 		this.setState({ input: value });
+	}
 
 	updateCode = (editor: CodeMirror.Editor, data: codemirror.EditorChange,
 		value: string
-	): void =>
-		this.setState({ code: value, status: VisualizerStatus.Blocked });
+	): void => {
+		this.setState({ code: value });
+		if (this.state.status !== VisualizerStatus.Ready) {
+			this.setState({ status: VisualizerStatus.Blocked });
+		}
+		this.removeActiveLines();
+	}
 
 	setEditorToState = (editor: CodeMirror.Editor): void =>
 		this.setState({ editor: editor });
