@@ -24,9 +24,9 @@ def set_test_result_info(running_result,
                          student_output):
     running_result["TestResultInfo"] = {
         "TestNumber": test_number,
-        "Input": input,
-        "CorrectOutput": correct_output,
-        "StudentOutput": student_output
+        "Input": input.strip(),
+        "CorrectOutput": correct_output.strip(),
+        "StudentOutput": student_output.strip()
     }
     return running_result
 
@@ -81,8 +81,9 @@ class TaskCodeRunner:
             if b'PermissionError' in err[1]:
                 log.info('Студент пытался прочитать тесты из папки')
                 raise SecurityException()
-            log.info(f'Программа завершилась с ошибкой: {err[1].decode()}')
-            raise RuntimeException()
+            error_message = err[1].decode()
+            log.info(f'Программа завершилась с ошибкой: {error_message}')
+            raise RuntimeException(error_message)
 
     def run_test(self, code_filename: str, test_file: str):
         if self.__runnable_file is None:
@@ -121,13 +122,13 @@ def check(source_code_run_info, code_filename):
                 'Verdict': Verdict.CompilationError.name,
                 'CompilationOutput': e.message()
             }
-        except RuntimeException:
+        except RuntimeException as e:
             return set_test_result_info({
                 'Verdict': Verdict.RuntimeError.name
             }, test_number,
                 read_all(full_path_test),
                 read_all(full_path_test_answer),
-                read_all(full_path_student_answer)
+                e.message()
             )
         except TimeLimitException:
             return set_test_result_info({
