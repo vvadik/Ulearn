@@ -58,6 +58,9 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		[XmlElement("showTestDescription")]
 		public bool ShowTestDescription { get; set; }
 		
+		[XmlElement("pythonVisualizerEnabled")]
+		public bool PythonVisualizerEnabled { get; set; }
+		
 		public RunnerSubmission CreateSubmission(string submissionId, string code, Language language)
 		{
 			var submission = base.CreateSubmission(submissionId, code);

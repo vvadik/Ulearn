@@ -1,6 +1,6 @@
 import React from "react";
 import Navigation from "./Navigation";
-import { getModuleNavigationProps } from "./stroies.data";
+// import { getModuleNavigationProps } from "./stroies.data";
 
 const ModuleNavigation = (): React.ReactNode => (
 	<Navigation

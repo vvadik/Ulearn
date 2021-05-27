@@ -39,48 +39,49 @@ export enum BlockTypes {
 }
 
 interface Block<T extends BlockTypes> {
-	$type: T,
-	key: number,
-	hide: boolean,
+	$type: T;
+	key: number;
+	hide: boolean;
 }
 
 interface SpoilerBlock extends Block<BlockTypes.spoiler> {
-	blocks: Block<BlockTypes>[],
-	blocksId: string,
-	isPreviousBlockHidden: boolean,
-	renderedBlocks: ReactNode[],
+	blocks: Block<BlockTypes>[];
+	blocksId: string;
+	isPreviousBlockHidden: boolean;
+	renderedBlocks: ReactNode[];
 }
 
 interface TexBlock extends Block<BlockTypes.tex> {
-	content: string,
-	lines: string[],
+	content: string;
+	lines: string[];
 }
 
 interface VideoBlock extends Block<BlockTypes.video> {
-	autoplay: boolean,
-	openAnnotation: boolean,
-	annotationWithoutBottomPaddings: boolean,
+	autoplay: boolean;
+	openAnnotation: boolean;
+	annotationWithoutBottomPaddings: boolean;
 }
 
 interface ExerciseBlock extends Block<BlockTypes.exercise> {
-	slideId: string,
-	courseId: string,
-	forceInitialCode: boolean,
-	maxScore?: number,
+	slideId: string;
+	courseId: string;
+	forceInitialCode: boolean;
+	maxScore?: number;
 	submissions?: SubmissionInfo[],//we're moving this field to other state in redux reducer
-	isLti: boolean,
+	isLti: boolean;
 }
 
 interface ExerciseBlockProps {
-	languages: Language[],
-	languageInfo: EnumDictionary<Language, LanguageLaunchInfo> | null,
-	defaultLanguage: Language | null,
-	renderedHints: string[],
-	exerciseInitialCode: string,
-	hideSolutions: boolean,
-	expectedOutput: string,
-	submissions: SubmissionInfoRedux[],
-	attemptsStatistics: AttemptsStatistics | null,
+	languages: Language[];
+	languageInfo: EnumDictionary<Language, LanguageLaunchInfo> | null;
+	defaultLanguage: Language | null;
+	renderedHints: string[];
+	exerciseInitialCode: string;
+	hideSolutions: boolean;
+	expectedOutput: string;
+	submissions: SubmissionInfoRedux[];
+	attemptsStatistics: AttemptsStatistics | null;
+	pythonVisualizerEnabled?: boolean;
 }
 
 interface LanguageLaunchInfo {
