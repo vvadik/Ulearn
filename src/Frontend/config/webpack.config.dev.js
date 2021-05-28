@@ -8,6 +8,7 @@ const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeM
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
+const FixMessageFormatterPlugin = require("./HotFixFormtWebpackMessagesPlugin.ts");
 const pwaPlugins = require('./pwa.webpack.plugins.ts');
 
 const publicPath = '/';
@@ -172,6 +173,8 @@ module.exports = merge([base, {
 			resourceRegExp: /^\.\/locale$/,
 			contextRegExp: /moment$/,
 		}),
+		//fix from https://github.com/facebook/create-react-app/issues/9880, should be removed as issue closed
+		new FixMessageFormatterPlugin(),
 		...pwaPlugins,
 	],
 	performance: {
