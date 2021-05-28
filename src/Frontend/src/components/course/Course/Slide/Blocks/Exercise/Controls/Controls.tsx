@@ -15,6 +15,7 @@ import ShowControlsTextContext from "./ShowControlsTextContext";
 import styles from './Controls.less';
 import { RootState } from "src/models/reduxState";
 import { connect } from "react-redux";
+import VisualizerButton from "./VisualizerButton";
 
 interface Props {
 	children: React.ReactNode[] | React.ReactNode,
@@ -34,6 +35,7 @@ class Controls extends React.Component<Props, State> {
 	public static OutputButton = OutputButton;
 	public static StatisticsHint = StatisticsHint;
 	public static AcceptedSolutionsButton = AcceptedSolutionsButton;
+	public static VisualizerButton = VisualizerButton;
 
 	constructor(props: Props) {
 		super(props);
@@ -55,21 +57,24 @@ class Controls extends React.Component<Props, State> {
 
 	render = (): React.ReactNode => {
 		const { showControlsText, } = this.state;
-		const [submit, hint, reset, output, statistics, acceptedSolutions] = this.parseChildren();
+		const [submit, hint, reset, output, statistics, acceptedSolutions, visualizer,] = this.parseChildren();
 
 		return (
 			<div className={ styles.exerciseControlsContainer }>
 				<ShowControlsTextContext.Provider value={ showControlsText }>
 					<ThemeContext.Provider value={ darkFlat }>
 						{ submit }
-						<ThemeContext.Provider value={ defaultTheme }>
-							{ hint }
-						</ThemeContext.Provider>
-						{ reset }
-						{ output }
-						<ThemeContext.Provider value={ defaultTheme }>
-							{ acceptedSolutions }
-						</ThemeContext.Provider>
+						<span className={ styles.exerciseControlsButtonsContainer }>
+							<ThemeContext.Provider value={ defaultTheme }>
+								{ hint }
+							</ThemeContext.Provider>
+							{ reset }
+							{ output }
+							<ThemeContext.Provider value={ defaultTheme }>
+								{ acceptedSolutions }
+								{ visualizer }
+							</ThemeContext.Provider>
+						</span>
 						{ statistics }
 					</ThemeContext.Provider>
 				</ShowControlsTextContext.Provider>
@@ -83,7 +88,8 @@ class Controls extends React.Component<Props, State> {
 		typeof ResetButton?,
 		typeof OutputButton?,
 		typeof StatisticsHint?,
-		typeof AcceptedSolutionsButton?
+		typeof AcceptedSolutionsButton?,
+		typeof VisualizerButton?,
 	] => {
 		const childArray = Array.isArray(this.props.children) ? this.props.children : [this.props.children];
 		let submit: typeof SubmitButton | undefined = undefined;
@@ -92,6 +98,7 @@ class Controls extends React.Component<Props, State> {
 		let output: typeof OutputButton | undefined = undefined;
 		let stat: typeof StatisticsHint | undefined = undefined;
 		let solutions: typeof AcceptedSolutionsButton | undefined = undefined;
+		let visualizer: typeof VisualizerButton | undefined = undefined;
 
 		for (const child of childArray) {
 			const reactElement = child as ReactElement;
@@ -115,10 +122,13 @@ class Controls extends React.Component<Props, State> {
 					case AcceptedSolutionsButton:
 						solutions = child as typeof AcceptedSolutionsButton;
 						break;
+					case VisualizerButton:
+						visualizer = child as typeof VisualizerButton;
+						break;
 				}
 			}
 		}
-		return [submit, hint, reset, output, stat, solutions];
+		return [submit, hint, reset, output, stat, solutions, visualizer,];
 	};
 }
 

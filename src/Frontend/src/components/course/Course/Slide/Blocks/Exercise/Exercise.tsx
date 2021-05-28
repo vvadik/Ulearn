@@ -71,23 +71,23 @@ interface DispatchFunctionsProps {
 }
 
 interface FromSlideProps {
-	courseId: string,
-	slideId: string,
-	maxScore: number,
-	forceInitialCode: boolean,
+	courseId: string;
+	slideId: string;
+	maxScore: number;
+	forceInitialCode: boolean;
 }
 
 interface FromMapStateToProps {
-	isAuthenticated: boolean,
-	lastCheckingResponse: RunSolutionResponse | null,
-	userId?: string | null,
-	slideProgress: SlideUserProgress,
-	submissionError: string | null,
-	deviceType: DeviceType,
+	isAuthenticated: boolean;
+	lastCheckingResponse: RunSolutionResponse | null;
+	userId?: string | null;
+	slideProgress: SlideUserProgress;
+	submissionError: string | null;
+	deviceType: DeviceType;
 }
 
 interface Props extends ExerciseBlockProps, DispatchFunctionsProps, FromSlideProps, FromMapStateToProps {
-	className?: string,
+	className?: string;
 }
 
 enum ModalType {
@@ -98,49 +98,49 @@ enum ModalType {
 }
 
 interface ModalData<T extends ModalType> {
-	type: T,
+	type: T;
 }
 
 interface CongratsModalData extends ModalData<ModalType.congrats> {
-	score: number | null,
-	waitingForManualChecking: boolean | null,
+	score: number | null;
+	waitingForManualChecking: boolean | null;
 }
 
 interface SelfCheckup {
-	text: string,
-	checked: boolean,
-	onClick: () => void,
+	text: string;
+	checked: boolean;
+	onClick: () => void;
 }
 
 interface State {
-	value: string,
-	valueChanged: boolean,
+	value: string;
+	valueChanged: boolean;
 
-	isEditable: boolean,
+	isEditable: boolean;
 
-	language: Language,
+	language: Language;
 
-	modalData: ModalData<ModalType> | null,
+	modalData: ModalData<ModalType> | null;
 
-	submissionLoading: boolean,
-	isAllHintsShowed: boolean,
-	visibleCheckingResponse?: RunSolutionResponse, // Не null только если только что сделанная посылка не содержит submission
-	currentSubmission: null | SubmissionInfoRedux,
-	currentReviews: ReviewInfoWithMarker[],
-	selectedReviewId: number,
-	showOutput: boolean,
+	submissionLoading: boolean;
+	isAllHintsShowed: boolean;
+	visibleCheckingResponse?: RunSolutionResponse; // Не null только если только что сделанная посылка не содержит submission
+	currentSubmission: null | SubmissionInfoRedux;
+	currentReviews: ReviewInfoWithMarker[];
+	selectedReviewId: number;
+	showOutput: boolean;
 
-	editor: null | Editor,
-	exerciseCodeDoc: null | Doc,
-	savedPositionOfExercise: DOMRect | undefined,
+	editor: null | Editor;
+	exerciseCodeDoc: null | Doc;
+	savedPositionOfExercise: DOMRect | undefined;
 
-	selfChecks: SelfCheckup[],
+	selfChecks: SelfCheckup[];
 }
 
 interface ExerciseCode {
-	value: string,
-	time: string,
-	language: Language,
+	value: string;
+	time: string;
+	language: Language;
 }
 
 function saveExerciseCodeToCache(id: string, value: string, time: string, language: Language): void {
@@ -390,7 +390,7 @@ class Exercise extends React.Component<Props, State> {
 			expectedOutput, submissions, userId,
 			slideProgress, maxScore, languages,
 			courseId, slideId, hideSolutions, renderedHints,
-			attemptsStatistics, isAuthenticated
+			attemptsStatistics, isAuthenticated,
 		} = this.props;
 		const {
 			value, currentSubmission,
@@ -480,6 +480,11 @@ class Exercise extends React.Component<Props, State> {
 						onVisitAcceptedSolutions={ this.openAcceptedSolutionsModal }
 						isShowAcceptedSolutionsAvailable={ isAcceptedSolutionsWillNotDiscardScore }
 					/> }
+					{ this.isVisualizerEnabled() &&
+					<Controls.VisualizerButton
+						code={ value }
+						onModalClose={ this.copyCodeFromVisualizer }/>
+					}
 				</Controls>
 				}
 				{ showOutput && HasOutput(outputMessage, automaticChecking, expectedOutput) &&
@@ -493,6 +498,21 @@ class Exercise extends React.Component<Props, State> {
 				}
 			</React.Fragment>
 		);
+	};
+
+	isVisualizerEnabled = (): boolean => {
+		const { pythonVisualizerEnabled, } = this.props;
+		const { language, isEditable, } = this.state;
+		return isEditable && pythonVisualizerEnabled && language === Language.python3 || false;
+	};
+
+	copyCodeFromVisualizer = (code: string): void => {
+		if(this.state.value !== code) {
+			this.setState({
+				value: code,
+				valueChanged: true,
+			});
+		}
 	};
 
 	onAllHintsShowed = (): void => {

@@ -48,7 +48,7 @@ namespace Ulearn.Core
 		private static readonly CourseLoader loader = new CourseLoader(new UnitLoader(new XmlSlideLoader()));
 		private static readonly ErrorsBot errorsBot = new ErrorsBot();
 
-		private static readonly ConcurrentBag<string> brokenCoursesLowercase = new ConcurrentBag<string>();
+		private static readonly ConcurrentDictionary<string, bool> courseIdToIsBroken = new ConcurrentDictionary<string, bool>(StringComparer.InvariantCultureIgnoreCase);
 
 		public CourseManager(DirectoryInfo baseDirectory)
 			: this(
@@ -116,7 +116,12 @@ namespace Ulearn.Core
 
 		protected bool CourseIsBroken(string courseId)
 		{
-			return brokenCoursesLowercase.Contains(courseId.ToLower());
+			return courseIdToIsBroken.TryGetValue(courseId, out var val) ? val : false;
+		}
+
+		protected void RemoveCourseFromBroken(string courseId)
+		{
+			courseIdToIsBroken.TryRemove(courseId, out _);
 		}
 
 		///
@@ -212,7 +217,7 @@ namespace Ulearn.Core
 
 		public bool TryReloadCourse(string courseId)
 		{
-			if (brokenCoursesLowercase.Contains(courseId.ToLower()))
+			if (CourseIsBroken(courseId))
 				return false;
 			try
 			{
@@ -222,7 +227,7 @@ namespace Ulearn.Core
 			catch (Exception e)
 			{
 				log.Error(e, $"Не могу загрузить курс {courseId}");
-				brokenCoursesLowercase.Add(courseId.ToLower());
+				courseIdToIsBroken.AddOrUpdate(courseId, _ => true, (_, _) => true);
 			}
 			return false;
 		}
@@ -365,7 +370,7 @@ namespace Ulearn.Core
 			catch (Exception ex)
 			{
 				log.Error(ex, $"Error on create course {courseId}");
-				brokenCoursesLowercase.Add(courseId.ToLower());
+				courseIdToIsBroken.AddOrUpdate(courseId, _ => true, (_, _) => true);
 				return false;
 			}
 		}
@@ -398,7 +403,7 @@ namespace Ulearn.Core
 			catch (Exception ex)
 			{
 				log.Error(ex, $"Error on create temp course {courseId}");
-				brokenCoursesLowercase.Add(courseId.ToLower());
+				courseIdToIsBroken.AddOrUpdate(courseId.ToLower(), _ => true, (_, _) => true);
 				return false;
 			}
 		}

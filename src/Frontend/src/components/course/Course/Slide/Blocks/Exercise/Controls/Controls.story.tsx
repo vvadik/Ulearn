@@ -55,6 +55,7 @@ const ListTemplate: Story<{ items: { props: typeof defaultProps, header: string 
 					/>
 					{ props.hints.length !== 0 &&
 					<Controls.ShowHintButton
+						showedHintsCountOnStart={ props.showedHintsCount }
 						onAllHintsShowed={ mockFunc }
 						renderedHints={ props.hints }
 					/> }
@@ -69,6 +70,10 @@ const ListTemplate: Story<{ items: { props: typeof defaultProps, header: string 
 						acceptedSolutionsUrl={ '' }
 						onVisitAcceptedSolutions={ props.onVisitAcceptedSolutions }
 						isShowAcceptedSolutionsAvailable={ props.isShowAcceptedSolutionsAvailable }
+					/> }
+					{ props.isEditable && <Controls.VisualizerButton
+						code={ 'print(\'sample code\')' }
+						onModalClose={ mockFunc }
 					/> }
 				</Controls>
 			</div>
@@ -127,7 +132,7 @@ export const OpenedHints = () => {
 	);
 };
 
-export const OpenedStatistics= () => {
+export const OpenedStatistics = () => {
 	return (
 		<Gapped vertical gap={ 200 }>
 			<Controls>

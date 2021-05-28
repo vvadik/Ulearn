@@ -111,19 +111,22 @@ namespace Ulearn.Core.RunCheckerJobApi
 				case Verdict.Ok:
 					return output;
 				case Verdict.TimeLimit:
-					return output + $"\n{TestResultInfo.FormatTestNumber()}" 
+					return output + (TestResultInfo != null ? $"\n{TestResultInfo.FormatTestNumber()}" : "")
 								  + "\nВаше решение не успело пройти" 
-								  + (TestResultInfo.TestNumber == null ? " все тесты" : " тест") 
+								  + (TestResultInfo?.TestNumber == null ? " все тесты" : " тест") 
 								  + (timeLimit == null ? null : $" за {timeLimit} " + timeLimit.Value.SelectPluralWordInRussian(RussianPluralizationOptions.Seconds))
-								  + (withFullDescription ? $"\n{TestResultInfo.FormatTestDescription()}" : "");;
+								  + (withFullDescription && TestResultInfo != null ? $"\n{TestResultInfo.FormatTestDescription()}" : "");;
 				case Verdict.WrongAnswer:
-					return output + $"\n{TestResultInfo.FormatTestNumber()}\nНеправильный ответ\n" 
-								  + (withFullDescription ? $"\n{TestResultInfo.FormatTestDescription()}" : "");
+					return output + (TestResultInfo != null ? $"\n{TestResultInfo.FormatTestNumber()}" : "") 
+								  + $"\nНеправильный ответ\n" 
+								  + (withFullDescription && TestResultInfo != null ? $"\n{TestResultInfo.FormatTestDescription()}" : "");
 				case Verdict.RuntimeError:
-					return output + $"\n{TestResultInfo.FormatTestNumber()}\nПрограмма завершилась с ошибкой"
-								  + (withFullDescription ? $"\n{TestResultInfo.FormatTestDescription()}" : "");
+					return output + (TestResultInfo != null ? $"\n{TestResultInfo.FormatTestNumber()}" : "")
+					              +$"\nПрограмма завершилась с ошибкой"
+								  + (withFullDescription  && TestResultInfo != null ? $"\n{TestResultInfo.FormatTestDescription()}" : "");
 				default:
-					return output + $"\n{TestResultInfo.FormatTestNumber()}\n{Verdict}";
+					return output + (TestResultInfo != null ? $"\n{TestResultInfo.FormatTestNumber()}" : "") 
+					              + $"\n{Verdict}";
 			}
 		}
 
@@ -158,11 +161,11 @@ namespace Ulearn.Core.RunCheckerJobApi
 		public string FormatTestDescription()
 		{
 			return $"Входные данные:\n" +
-					$"{Truncate(Input, 100)}\n" +
+					$"{Truncate(Input, 500)}\n" +
 					$"Ожидаемый результат:\n" +
-					$"{Truncate(CorrectOutput, 100)}\n" +
+					$"{Truncate(CorrectOutput, 500)}\n" +
 					$"Ваш результат:\n" +
-					$"{Truncate(StudentOutput, 100)}\n";
+					$"{Truncate(StudentOutput, 500)}\n";
 		}
 		
 		public string FormatTestNumber() 
