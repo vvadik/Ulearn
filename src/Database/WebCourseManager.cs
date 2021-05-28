@@ -59,7 +59,7 @@ namespace Database
 					throw;
 			}
 
-			if (IsCourseVersionWasUpdatedRecent(courseId) || CourseIsBroken(courseId))
+			if (IsCourseVersionWasUpdatedRecent(courseId) || CourseIsBroken(courseId) || IsTempCourse(courseId))
 				return course ?? throw new KeyNotFoundException($"Key {courseId} not found");
 
 			courseVersionFetchTime[courseId] = DateTime.Now;
@@ -140,8 +140,6 @@ namespace Database
 		{
 			try
 			{
-				if (CourseIsBroken(courseId))
-					return;
 				if (IsTempCourseUpdatedRecent(courseId))
 					return;
 
@@ -158,14 +156,22 @@ namespace Database
 				{
 					log.Error(ex);
 				}
+
+				if (tempCourse.LastUpdateTime < tempCourse.LoadingTime)
+					RemoveCourseFromBroken(courseId);
+				if (CourseIsBroken(courseId))
+				{
+					tempCourseUpdateTime[courseId] = DateTime.Now;
+					return;
+				}
 				if (course == null || tempCourse.LastUpdateTime < tempCourse.LoadingTime)
 				{
 					TryReloadCourse(courseId);
 					var tempCoursesRepo = new TempCoursesRepo();
 					tempCoursesRepo.UpdateTempCourseLastUpdateTime(courseId);
-					courseVersionFetchTime[courseId] = DateTime.Now;
+					tempCourseUpdateTime[courseId] = DateTime.Now;
 				} else if (tempCourse.LastUpdateTime > tempCourse.LoadingTime)
-					courseVersionFetchTime[courseId] = DateTime.Now;
+					tempCourseUpdateTime[courseId] = DateTime.Now;
 			}
 			catch (Exception ex)
 			{
@@ -201,9 +207,9 @@ namespace Database
 						TryReloadCourse(courseId);
 						var tempCoursesRepo = new TempCoursesRepo();
 						tempCoursesRepo.UpdateTempCourseLastUpdateTime(courseId);
-						courseVersionFetchTime[courseId] = DateTime.Now;
+						tempCourseUpdateTime[courseId] = DateTime.Now;
 					} else if (tempCourse.LastUpdateTime > tempCourse.LoadingTime)
-						courseVersionFetchTime[courseId] = DateTime.Now;
+						tempCourseUpdateTime[courseId] = DateTime.Now;
 				}
 			}
 			catch (Exception ex)
@@ -228,6 +234,11 @@ namespace Database
 			if (tempCourseUpdateTime.TryGetValue(courseId, out var lastFetchTime))
 				return lastFetchTime > DateTime.Now.Subtract(tempCourseUpdateEvery);
 			return false;
+		}
+
+		public bool IsTempCourse(string courseId)
+		{
+			return GetTempCoursesWithCache().Any(c => string.Equals(c.CourseId, courseId, StringComparison.OrdinalIgnoreCase));
 		}
 	}
 }
