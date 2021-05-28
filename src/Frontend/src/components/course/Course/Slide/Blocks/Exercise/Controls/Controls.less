@@ -2,11 +2,18 @@
 
 @hintsLeftPadding: 16px;
 @maxHintsWrapperWidthMultiplier: 0.66;
+@controlsMargin: 12px;
 
 .exerciseControlsContainer {
   display: inline-flex;
   align-items: baseline;
   width: 100%;
+}
+
+.exerciseControlsButtonsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: -@controlsMargin;
 }
 
 .exerciseControls {
@@ -16,6 +23,7 @@
   user-select: none;
 
   margin-right: 24px;
+  margin-bottom: @controlsMargin;
 }
 
 .exerciseControls:hover {
@@ -77,6 +85,7 @@
   margin-right: 0;
   margin-left: auto;
   order: 1;
+  flex-shrink: 0;
 }
 
 @media (min-width: @minTabletWidth) {

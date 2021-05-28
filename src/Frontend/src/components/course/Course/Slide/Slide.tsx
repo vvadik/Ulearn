@@ -55,14 +55,14 @@ const fullSizeBlockTypes: { [T in BlockTypes]: boolean } = {
 };
 
 interface Props {
-	courseId: string,
-	slideId: string,
-	slideBlocks?: Block<BlockTypes>[],
-	slideLoading: boolean,
-	loadSlide: (courseId: string, slideId: string,) => void,
-	showHiddenBlocks: boolean,
-	slideInfo: ShortSlideInfo,
-	isLti: boolean,
+	courseId: string;
+	slideId: string;
+	slideBlocks?: Block<BlockTypes>[];
+	slideLoading: boolean;
+	loadSlide: (courseId: string, slideId: string,) => void;
+	showHiddenBlocks: boolean;
+	slideInfo: ShortSlideInfo;
+	isLti: boolean;
 }
 
 class Slide extends React.Component<Props> {

@@ -201,14 +201,6 @@ namespace Database.Models
 		[IsEnabledByDefault(true)]
 		RevokedAccessToGroup = 103,
 
-		/*
-		 * Not used more. Use GroupMembersHaveBeenRemoved instead.
-		[Display(Name = @"Преподаватель удалил студента из вашей группы", GroupName = @"Преподаватель удалил студентов из ваших групп")]
-		[MinCourseRole(CourseRole.Instructor)]
-		[IsEnabledByDefault(true)]
-		GroupMemberHasBeenRemoved = 104,
-		*/
-
 		[Display(Name = @"Преподаватель удалил студентов из вашей группы", GroupName = @"Преподаватель удалил студентов из ваших групп")]
 		[MinCourseRole(CourseRoleType.Instructor)]
 		[IsEnabledByDefault(true)]
@@ -905,7 +897,7 @@ namespace Database.Models
 
 		private static string GetCertificateUrl(Certificate certificate, string baseUrl)
 		{
-			return baseUrl + $"/Certificates/{certificate.Id}";
+			return baseUrl + $"/Certificate/{certificate.Id}";
 		}
 
 		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
@@ -1229,46 +1221,6 @@ namespace Database.Models
 		public override bool IsActual()
 		{
 			return Access != null && !Access.IsEnabled;
-		}
-	}
-
-	[Obsolete("Use GroupMembersHaveBeenRemovedNotification instead")]
-	public class GroupMemberHasBeenRemovedNotification : Notification
-	{
-		public string UserId { get; set; }
-
-		public virtual ApplicationUser User { get; set; }
-
-		[Required]
-		public int GroupId { get; set; }
-
-		public virtual Group Group { get; set; }
-
-		public override string GetHtmlMessageForDelivery(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
-		{
-			return $"<b>{InitiatedBy.VisibleName.EscapeHtml()}</b> удалил{InitiatedBy.Gender.ChooseEnding()} студента <b>{User.VisibleName.EscapeHtml()}</b> из группы <b>«{Group.Name.EscapeHtml()}»</b> (курс «{course.Title.EscapeHtml()}»).";
-		}
-
-		public override string GetTextMessageForDelivery(NotificationTransport transport, NotificationDelivery notificationDelivery, Course course, string baseUrl)
-		{
-			return $"{InitiatedBy.VisibleName} удалил{InitiatedBy.Gender.ChooseEnding()} студента {User.VisibleName} из группы «{Group.Name}» (курс «{course.Title}»).";
-		}
-
-		public override NotificationButton GetNotificationButton(NotificationTransport transport, NotificationDelivery delivery, Course course, string baseUrl)
-		{
-			return new NotificationButton("Перейти к группам", GetGroupsUrl(course, baseUrl));
-		}
-
-		public override async Task<List<string>> GetRecipientsIdsAsync(IServiceProvider serviceProvider, Course course)
-		{
-			var groupAccessesRepo = serviceProvider.GetService<IGroupAccessesRepo>();
-			var accesses = await groupAccessesRepo.GetGroupAccessesAsync(GroupId).ConfigureAwait(false);
-			return accesses.Select(a => a.UserId).Concat(new[] { Group.OwnerId }).ToList();
-		}
-
-		public override bool IsActual()
-		{
-			return User != null && !Group.IsDeleted;
 		}
 	}
 

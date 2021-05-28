@@ -55,6 +55,12 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public override string[] PathsToExcludeForChecker => new[] { "statements", "statements-sections" };
 		public Language? DefaultLanguage { get; set; }
 		
+		[XmlElement("showTestDescription")]
+		public bool ShowTestDescription { get; set; }
+		
+		[XmlElement("pythonVisualizerEnabled")]
+		public bool PythonVisualizerEnabled { get; set; }
+		
 		public RunnerSubmission CreateSubmission(string submissionId, string code, Language language)
 		{
 			var submission = base.CreateSubmission(submissionId, code);

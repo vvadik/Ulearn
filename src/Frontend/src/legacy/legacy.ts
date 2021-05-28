@@ -47,6 +47,7 @@ import { antiplagiarism, antiplagiarismChart } from './scripts/antiplagiarism.js
 import styleErrorsSettings from './scripts/style-errors-settings.js'; // стилевые ошибки c#
 import studentSubmissions from './scripts/student-submissions.js'; // поиск решений студентов
 import reactRenderer from './scripts/react-renderer.js'; // рендер реакта для бэка
+import smoothScroll from './scripts/smoothScroll.js'; //скролл к фильтрам + показ/скрытие
 
 //scripts used in cshtml by backend renderer
 import likeSolution from './scripts/slide-solutions-like.js'; // лайк для чужих решений
@@ -105,6 +106,7 @@ const documentReadyFunctions = [
 	antiplagiarismChart,
 	styleErrorsSettings,
 	studentSubmissions,
+	smoothScroll,
 	reactRenderer,
 ];
 

@@ -110,17 +110,22 @@ namespace Database
 			modelBuilder.Entity<NewCommentFromYourGroupStudentNotification>().Property(n => n.CommentId).HasColumnName("CommentId1");
 			modelBuilder.Entity<RepliedToYourCommentNotification>().Property(n => n.CommentId).HasColumnName("CommentId1");
 			modelBuilder.Entity<LikedYourCommentNotification>().Property(n => n.CommentId).HasColumnName("CommentId1");
-			modelBuilder.Entity<CreatedGroupNotification>().Property(n => n.GroupId).HasColumnName("GroupId");
+			modelBuilder.Entity<CreatedGroupNotification>().Property(n => n.GroupId).HasColumnName("GroupId1");
 			modelBuilder.Entity<SystemMessageNotification>().Property(n => n.Text).HasColumnName("Text");
-			modelBuilder.Entity<InstructorMessageNotification>().Property(n => n.Text).HasColumnName("Text");
-
+			modelBuilder.Entity<InstructorMessageNotification>().Property(n => n.Text).HasColumnName("Text1");
 			modelBuilder.Entity<GroupMembersHaveBeenRemovedNotification>().Property(n => n.GroupId).HasColumnName("GroupId");
 			modelBuilder.Entity<GroupMembersHaveBeenRemovedNotification>().Property(n => n.UserDescriptions).HasColumnName("UserDescriptions");
 			modelBuilder.Entity<GroupMembersHaveBeenRemovedNotification>().Property(n => n.UserIds).HasColumnName("UserIds");
-
 			modelBuilder.Entity<GroupMembersHaveBeenAddedNotification>().Property(n => n.GroupId).HasColumnName("GroupId");
 			modelBuilder.Entity<GroupMembersHaveBeenAddedNotification>().Property(n => n.UserDescriptions).HasColumnName("UserDescriptions");
 			modelBuilder.Entity<GroupMembersHaveBeenAddedNotification>().Property(n => n.UserIds).HasColumnName("UserIds");
+			modelBuilder.Entity<PassedManualQuizCheckingNotification>().Property(n => n.CheckingId).HasColumnName("PassedManualQuizCheckingNotification_CheckingId");
+			modelBuilder.Entity<JoinedToYourGroupNotification>().Property(n => n.GroupId).HasColumnName("JoinedToYourGroupNotification_GroupId");
+			modelBuilder.Entity<RevokedAccessToGroupNotification>().Property(n => n.AccessId).HasColumnName("RevokedAccessToGroupNotification_AccessId");
+			modelBuilder.Entity<GroupIsArchivedNotification>().Property(n => n.GroupId).HasColumnName("GroupIsArchivedNotification_GroupId");
+			modelBuilder.Entity<UploadedPackageNotification>().Property(n => n.CourseVersionId).HasColumnName("UploadedPackageNotification_CourseVersionId");
+			modelBuilder.Entity<NotUploadedPackageNotification>().Property(n => n.CommitHash).HasColumnName("NotUploadedPackageNotification_CommitHash");
+			modelBuilder.Entity<NotUploadedPackageNotification>().Property(n => n.RepoUrl).HasColumnName("NotUploadedPackageNotification_RepoUrl");
 
 			modelBuilder.Entity<CommentLike>()
 				.HasOne(x => x.Comment)
@@ -180,8 +185,6 @@ namespace Database
 			SetDeleteBehavior<JoinedToYourGroupNotification, Group>(modelBuilder, c => c.Group, c => c.GroupId);
 			SetDeleteBehavior<GrantedAccessToGroupNotification, GroupAccess>(modelBuilder, c => c.Access, c => c.AccessId);
 			SetDeleteBehavior<RevokedAccessToGroupNotification, GroupAccess>(modelBuilder, c => c.Access, c => c.AccessId);
-			SetDeleteBehavior<GroupMemberHasBeenRemovedNotification, Group>(modelBuilder, c => c.Group, c => c.GroupId);
-			SetDeleteBehavior<GroupMemberHasBeenRemovedNotification, ApplicationUser>(modelBuilder, c => c.User, c => c.UserId);
 			SetDeleteBehavior<CreatedGroupNotification, Group>(modelBuilder, c => c.Group, c => c.GroupId);
 			SetDeleteBehavior<PassedManualExerciseCheckingNotification, ManualExerciseChecking>(modelBuilder, c => c.Checking, c => c.CheckingId);
 			SetDeleteBehavior<PassedManualQuizCheckingNotification, ManualQuizChecking>(modelBuilder, c => c.Checking, c => c.CheckingId);

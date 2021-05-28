@@ -2403,10 +2403,9 @@ namespace Database.Migrations
 
                     b.Property<int>("GroupId")
                         .HasColumnType("integer")
-                        .HasColumnName("GroupId");
+                        .HasColumnName("GroupId1");
 
-                    b.HasIndex("GroupId")
-                        .HasDatabaseName("IX_Notifications_GroupId3");
+                    b.HasIndex("GroupId");
 
                     b.HasDiscriminator().HasValue("CreatedGroupNotification");
                 });
@@ -2436,24 +2435,6 @@ namespace Database.Migrations
                     b.HasDiscriminator().HasValue("GroupIsArchivedNotification");
                 });
 
-            modelBuilder.Entity("Database.Models.GroupMemberHasBeenRemovedNotification", b =>
-                {
-                    b.HasBaseType("Database.Models.Notification");
-
-                    b.Property<int>("GroupId")
-                        .HasColumnType("integer")
-                        .HasColumnName("GroupMemberHasBeenRemovedNotification_GroupId");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("character varying(64)");
-
-                    b.HasIndex("GroupId");
-
-                    b.HasIndex("UserId");
-
-                    b.HasDiscriminator().HasValue("GroupMemberHasBeenRemovedNotification");
-                });
-
             modelBuilder.Entity("Database.Models.GroupMembersHaveBeenAddedNotification", b =>
                 {
                     b.HasBaseType("Database.Models.Notification");
@@ -2473,8 +2454,7 @@ namespace Database.Migrations
                         .HasColumnType("text")
                         .HasColumnName("UserIds");
 
-                    b.HasIndex("GroupId")
-                        .HasDatabaseName("IX_Notifications_GroupId2");
+                    b.HasIndex("GroupId");
 
                     b.HasDiscriminator().HasValue("GroupMembersHaveBeenAddedNotification");
                 });
@@ -2498,8 +2478,7 @@ namespace Database.Migrations
                         .HasColumnType("text")
                         .HasColumnName("UserIds");
 
-                    b.HasIndex("GroupId")
-                        .HasDatabaseName("IX_Notifications_GroupId1");
+                    b.HasIndex("GroupId");
 
                     b.HasDiscriminator().HasValue("GroupMembersHaveBeenRemovedNotification");
                 });
@@ -2510,9 +2489,8 @@ namespace Database.Migrations
 
                     b.Property<string>("Text")
                         .IsRequired()
-                        .ValueGeneratedOnUpdateSometimes()
                         .HasColumnType("text")
-                        .HasColumnName("Text");
+                        .HasColumnName("Text1");
 
                     b.HasDiscriminator().HasValue("InstructorMessageNotification");
                 });
@@ -2650,7 +2628,6 @@ namespace Database.Migrations
 
                     b.Property<string>("Text")
                         .IsRequired()
-                        .ValueGeneratedOnUpdateSometimes()
                         .HasColumnType("text")
                         .HasColumnName("Text");
 
@@ -3523,7 +3500,6 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.Group", "Group")
                         .WithMany()
                         .HasForeignKey("GroupId")
-                        .HasConstraintName("FK_Notifications_Groups_GroupId3")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -3552,30 +3528,11 @@ namespace Database.Migrations
                     b.Navigation("Group");
                 });
 
-            modelBuilder.Entity("Database.Models.GroupMemberHasBeenRemovedNotification", b =>
-                {
-                    b.HasOne("Database.Models.Group", "Group")
-                        .WithMany()
-                        .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Database.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Group");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Database.Models.GroupMembersHaveBeenAddedNotification", b =>
                 {
                     b.HasOne("Database.Models.Group", "Group")
                         .WithMany()
                         .HasForeignKey("GroupId")
-                        .HasConstraintName("FK_Notifications_Groups_GroupId2")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -3587,7 +3544,6 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.Group", "Group")
                         .WithMany()
                         .HasForeignKey("GroupId")
-                        .HasConstraintName("FK_Notifications_Groups_GroupId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
