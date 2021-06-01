@@ -115,5 +115,45 @@ namespace Ulearn.Common
 				}
 			}
 		}
+
+		public static Stream GetZipWithFileWithNameInRoot(string inputZipFileName, string fileNameInRoot)
+		{
+			using (var zip = ZipFile.Read(inputZipFileName, new ReadOptions { Encoding = Cp866 }))
+			{
+				var rootFiles = zip.SelectEntries(fileNameInRoot);
+				if (rootFiles.Count <= 1 && rootFiles.All(x => x.FileName == fileNameInRoot) )
+					return new FileStream(inputZipFileName, FileMode.Open, FileAccess.Read);
+
+				var rootFile = rootFiles.First();
+				var rootFileDirectory = Path.GetDirectoryName(rootFile.FileName);
+				var entries = zip.SelectEntries(rootFileDirectory + "/*").Where(e => !e.IsDirectory);
+				using var newZip = new ZipFile(Encoding.UTF8)
+				{
+					CompressionLevel = zip.CompressionLevel,
+					CompressionMethod = zip.CompressionMethod
+				};
+				var toDispose = new List<MemoryStream>();
+				try
+				{
+					foreach (var entry in entries)
+					{
+						var newName = entry.FileName.Remove(0, rootFileDirectory.Length + 1);
+						var ms = StaticRecyclableMemoryStreamManager.Manager.GetStream();
+						toDispose.Add(ms);
+						entry.Extract(ms);
+						ms.Position = 0;
+						newZip.AddEntry(newName, ms);
+					}
+					var result = StaticRecyclableMemoryStreamManager.Manager.GetStream();
+					newZip.Save(result);
+					result.Position = 0;
+					return result;
+				}
+				finally
+				{
+					toDispose.ForEach(s => s.Dispose());
+				}
+			}
+		}
 	}
 }

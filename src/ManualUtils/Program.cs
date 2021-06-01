@@ -93,7 +93,9 @@ namespace ManualUtils
 			//TextBlobsWithZeroByte(db);
 			//UpdateCertificateArchives(db);
 			//GetVKByEmail(serviceProvider);
-			TestStagingZipsEncodings();
+			//TestStagingZipsEncodings();
+			ConvertZipsToCourseXmlInRoot();
+			//await UploadStagingToDb(serviceProvider);
 		}
 
 		private static void GenerateUpdateSequences()
@@ -380,6 +382,80 @@ namespace ManualUtils
 						if (!charactersRegex.IsMatch(name))
 							Console.WriteLine($"{file.Name} {name}");
 					}
+				}
+			}
+		}
+
+		private static void ConvertZipsToCourseXmlInRoot()
+		{
+			var mainDirectory = CourseManager.GetCoursesDirectory();
+			var stagingDirectory = mainDirectory.GetSubdirectory("Courses.Staging");
+			var versionsDirectory = mainDirectory.GetSubdirectory("Courses.Versions");
+
+			var newMainDirectory = mainDirectory.Parent.CreateSubdirectory("сourses.new");
+			newMainDirectory.EnsureExists();
+			newMainDirectory.ClearDirectory();
+			var newStagingDirectory = newMainDirectory.GetSubdirectory("Courses.Staging");
+			newStagingDirectory.EnsureExists();
+			var newVersionsDirectory = newMainDirectory.GetSubdirectory("Courses.Versions");
+			newVersionsDirectory.EnsureExists();
+			var newCoursesDirectory = newMainDirectory.GetSubdirectory("Courses");
+			newCoursesDirectory.EnsureExists();
+
+			ProcessZips(stagingDirectory, newStagingDirectory);
+			ProcessZips(versionsDirectory, newVersionsDirectory);
+
+			foreach (var file in newStagingDirectory.GetFiles("*.zip"))
+			{
+				using (var zip = ZipFile.Read(file.FullName, new ReadOptions { Encoding = ZipUtils.Cp866 }))
+				{
+					zip.ExtractAll(Path.Combine(newCoursesDirectory.FullName, file.Name.Replace(".zip", "")), ExtractExistingFileAction.OverwriteSilently);
+				}
+			}
+		}
+
+		private static void ProcessZips(DirectoryInfo oldDirectory, DirectoryInfo newDirectory)
+		{
+			foreach (var file in oldDirectory.GetFiles("*.zip"))
+			{
+				try
+				{
+					Console.WriteLine($"Start process {file.Name}");
+					using (var stream = ZipUtils.GetZipWithFileWithNameInRoot(file.FullName, "course.xml"))
+						using (var fileStream = File.Create(Path.Combine(newDirectory.FullName, file.Name)))
+							stream.CopyTo(fileStream);
+				}
+				catch (Exception ex)
+				{
+					Console.WriteLine($"Error on {file.Name} " + ex.Message);
+				}
+			}
+		}
+
+		private static async Task UploadStagingToDb(IServiceProvider serviceProvider)
+		{
+			var mainDirectory = CourseManager.GetCoursesDirectory();
+			var stagingDirectory = mainDirectory.GetSubdirectory("Courses.Staging");
+
+			var db = serviceProvider.GetService<UlearnDb>();
+			var coursesRepo = serviceProvider.GetService<ICoursesRepo>();
+
+			var courseFiles = await coursesRepo.GetCourseFiles(Array.Empty<string>());
+
+			foreach (var fileInDb in courseFiles)
+			{
+				var zip = stagingDirectory.GetFile($"{fileInDb.CourseId}.zip");
+				if (!zip.Exists)
+				{
+					Console.WriteLine($"{fileInDb.CourseId}.zip does not exist");
+					return;
+				}
+				var content = await zip.ReadAllContentAsync();
+				if (fileInDb.File.Length != content.Length)
+				{
+					Console.WriteLine($"Upload course {fileInDb.CourseId}.zip does not exist");
+					fileInDb.File = content;
+					db.SaveChanges();
 				}
 			}
 		}

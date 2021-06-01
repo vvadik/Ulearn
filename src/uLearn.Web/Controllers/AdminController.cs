@@ -259,7 +259,7 @@ namespace uLearn.Web.Controllers
 
 			Guid versionId;
 			Exception error;
-			using(var inputStream = GetZipWithCourseXmlInRoot(tmpFileName)) {
+			using(var inputStream = ZipUtils.GetZipWithFileWithNameInRoot(tmpFileName, "course.xml")) {
 				(versionId, error) = await UploadCourse(courseId, inputStream, User.Identity.GetUserId()).ConfigureAwait(false);
 			}
 
@@ -278,46 +278,6 @@ namespace uLearn.Web.Controllers
 			}
 
 			return RedirectToAction("Diagnostics", new { courseId, versionId });
-		}
-
-		private Stream GetZipWithCourseXmlInRoot(string inputZipFileName)
-		{
-			using (var zip = ZipFile.Read(inputZipFileName, new ReadOptions { Encoding = ZipUtils.Cp866 }))
-			{
-				var courseXmls = zip.SelectEntries("course.xml");
-				if (courseXmls.Count == 1 && courseXmls.All(x => x.FileName == "course.xml") )
-					return new FileStream(inputZipFileName, FileMode.Open, FileAccess.Read);
-
-				var courseXml = courseXmls.First();
-				var courseXmlDirectory = Path.GetDirectoryName(courseXml.FileName);
-				var entries = zip.SelectEntries(courseXmlDirectory + "/*").Where(e => !e.IsDirectory);
-				using var newZip = new ZipFile(Encoding.UTF8)
-				{
-					CompressionLevel = zip.CompressionLevel,
-					CompressionMethod = zip.CompressionMethod
-				};
-				var toDispose = new List<MemoryStream>();
-				try
-				{
-					foreach (var entry in entries)
-					{
-						var newName = entry.FileName.Remove(0, courseXmlDirectory.Length + 1);
-						var ms = StaticRecyclableMemoryStreamManager.Manager.GetStream();
-						toDispose.Add(ms);
-						entry.Extract(ms);
-						ms.Position = 0;
-						newZip.AddEntry(newName, ms);
-					}
-					var result = StaticRecyclableMemoryStreamManager.Manager.GetStream();
-					newZip.Save(result);
-					result.Position = 0;
-					return result;
-				}
-				finally
-				{
-					toDispose.ForEach(s => s.Dispose());
-				}
-			}
 		}
 
 		public async Task UploadCoursesWithGit(string repoUrl, string branch)
