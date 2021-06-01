@@ -64,11 +64,10 @@ for (let i = 0; i < 5; i++) {
 	});
 }
 
-const commentPolicy : CommentPolicy = {
+const commentPolicy : CommentPolicy= {
 	areCommentsEnabled: true,
 	moderationPolicy: "postmoderation",
 	onlyInstructorsCanReply: false,
-	status: ResponseStatus.ok,
 };
 
 const comment :CommentType= {

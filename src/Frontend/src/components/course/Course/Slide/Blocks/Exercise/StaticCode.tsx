@@ -12,7 +12,7 @@ import "codemirror/lib/codemirror.css";
 import { loadLanguageStyles } from "./ExerciseUtils";
 
 import styles from './Exercise.less';
-import texts from "src/components/course/Course/Slide/Blocks/Exercise/Exercise.texts";
+import texts from "../Exercise/Exercise.texts";
 
 
 export interface Props {

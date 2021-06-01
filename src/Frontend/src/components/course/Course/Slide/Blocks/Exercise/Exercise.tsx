@@ -448,7 +448,7 @@ class Exercise extends React.Component<Props, State> {
 					<Review
 						userId={ userId }
 						addReviewComment={ this.addReviewComment }
-						deleteReviewComment={ this.deleteReviewComment }
+						deleteReviewOrComment={ this.deleteReviewComment }
 						selectedReviewId={ selectedReviewId }
 						onSelectComment={ this.selectComment }
 						reviews={ getReviewsWithoutDeleted(currentReviews) }
@@ -899,7 +899,7 @@ class Exercise extends React.Component<Props, State> {
 	clearAllTextMarkers = (): void => {
 		const { currentReviews, } = this.state;
 
-		currentReviews.forEach(({ marker }) => marker.clear());
+		currentReviews.forEach(({ markers }) => markers.forEach(m => m.clear()));
 
 		this.setState({
 			selectedReviewId: -1,
@@ -947,12 +947,12 @@ class Exercise extends React.Component<Props, State> {
 		}
 	};
 
-	deleteReviewComment = (reviewId: number, commentId: number,): void => {
+	deleteReviewComment = (reviewId: number, commentId?: number,): void => {
 		const { deleteReviewComment, courseId, slideId, } = this.props;
 		const { currentSubmission, } = this.state;
 
 		if(currentSubmission) {
-			deleteReviewComment(courseId, slideId, currentSubmission.id, reviewId, commentId,);
+			deleteReviewComment(courseId, slideId, currentSubmission.id, reviewId, commentId!,);
 		}
 	};
 

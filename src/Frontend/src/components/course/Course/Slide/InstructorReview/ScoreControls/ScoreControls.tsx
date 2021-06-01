@@ -11,6 +11,7 @@ export interface Props {
 	scores?: string[];
 	exerciseTitle: string;
 	prevReviewScore?: number | 0 | 25 | 50 | 75 | 100;
+	curReviewScore?: number | 0 | 25 | 50 | 75 | 100;
 	toggleChecked?: boolean;
 
 	onSubmit: (score: number) => void;
@@ -28,10 +29,12 @@ function ScoreControls({
 	exerciseTitle,
 	onSubmit,
 	onToggleChange,
+	curReviewScore,
 	prevReviewScore,
 	toggleChecked,
 }: Props): React.ReactElement {
-	const [state, setState] = useState<State>({ scoreSaved: false, toggleChecked: !!toggleChecked });
+	const [state, setState] = useState<State>(
+		{ score: curReviewScore, scoreSaved: false, toggleChecked: !!toggleChecked });
 
 	return (
 		<Gapped gap={ 24 } vertical>
@@ -65,7 +68,7 @@ function ScoreControls({
 			<Gapped gap={ 24 } vertical={ false } className={ styles.controlsWrapper }>
 				{ renderSwitcherWithLastReviewMarker(scores, score, prevReviewScore,) }
 				<Button
-					size={ 'large' }
+					size={ 'medium' }
 					disabled={ score === undefined }
 					use={ 'primary' }
 					onClick={ onSubmitClick }

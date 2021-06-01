@@ -8,7 +8,7 @@ import { MarkdownDescription, MarkdownOperation } from "src/consts/comments";
 
 import styles from "./MarkdownEditor.less";
 
-const markupByOperation: MarkdownDescription = {
+const markupByOperationDefault: MarkdownDescription = {
 	bold: {
 		markup: "**",
 		description: "жирный",
@@ -43,13 +43,15 @@ const markupByOperation: MarkdownDescription = {
 
 interface Props {
 	text: string;
+	markupByOperation?: MarkdownDescription;
+	rows?: number;
+	maxRows?: number;
+	className?: string;
 
 	hasError: boolean;
-	isShowFocus: {
-		inSendForm?: boolean;
-		inEditForm?: boolean;
-		inReplyForm?: boolean;
-	};
+	isShowFocus: boolean;
+	hideDescription?: boolean;
+	hidePlaceholder?: boolean;
 
 	handleChange: (text: string, callback?: () => void) => void;
 	handleSubmit: (event: React.KeyboardEvent) => void;
@@ -86,17 +88,15 @@ class MarkdownEditor extends Component<Props> {
 	private textarea = React.createRef<Textarea>();
 
 	componentDidMount(): void {
-		const { inSendForm, inEditForm, inReplyForm } = this.props.isShowFocus;
-		if(inSendForm || inEditForm || inReplyForm) {
+		const { isShowFocus, } = this.props;
+		if(isShowFocus) {
 			this.textarea.current?.focus();
 		}
 	}
 
 	componentDidUpdate(prevProps: Readonly<Props>): void {
-		const { inSendForm, inEditForm, inReplyForm } = this.props.isShowFocus;
 		const { isShowFocus, } = prevProps;
-		const shouldFocus = (inSendForm || inEditForm || inReplyForm)
-			&& !(isShowFocus.inSendForm || isShowFocus.inEditForm || isShowFocus.inReplyForm);
+		const shouldFocus = this.props.isShowFocus && !isShowFocus;
 		if(shouldFocus) {
 			this.textarea.current?.focus();
 		}
@@ -104,26 +104,38 @@ class MarkdownEditor extends Component<Props> {
 
 
 	render(): React.ReactElement {
-		const { hasError, text, children, } = this.props;
+		const {
+			hasError,
+			text,
+			children,
+			markupByOperation = markupByOperationDefault,
+			hideDescription,
+			rows = 4,
+			maxRows = 15,
+			hidePlaceholder,
+			className,
+		} = this.props;
 
 		return (
 			<>
 				<Textarea
+					className={ className }
 					disableAnimations={ false }
 					extraRow={ false }
 					ref={ this.textarea }
 					value={ text }
 					width={ "100%" }
 					error={ hasError }
-					maxRows={ 15 }
-					rows={ 4 }
+					maxRows={ maxRows }
+					rows={ rows }
 					onValueChange={ this.handleChange }
 					onKeyDown={ this.handleKeyDown }
 					autoResize
-					placeholder={ "Комментарий" }/>
+					placeholder={ hidePlaceholder ? undefined : "Комментарий" }/>
 				<div className={ styles.formFooter }>
 					{ children }
 					<MarkdownButtons
+						hideDescription={ hideDescription }
 						markupByOperation={ markupByOperation }
 						onClick={ this.handleClick }/>
 				</div>
@@ -138,6 +150,7 @@ class MarkdownEditor extends Component<Props> {
 	};
 
 	handleKeyDown = (e: React.KeyboardEvent): void => {
+		const { markupByOperation = markupByOperationDefault } = this.props;
 		for (const operation of Object.values(markupByOperation)) {
 			if(this.isKeyFromMarkdownOperation(e, operation)) {
 				this.transformTextToMarkdown(operation);

@@ -1,6 +1,6 @@
 import {
 	AutomaticExerciseCheckingResult,
-	AutomaticExerciseCheckingResult as CheckingResult,
+	AutomaticExerciseCheckingResult as CheckingResult, ReviewInfo,
 	SolutionRunStatus,
 	SubmissionInfo
 } from "src/models/exercise";
@@ -16,7 +16,7 @@ enum SubmissionColor {
 }
 
 interface ReviewInfoWithMarker extends ReviewInfoRedux {
-	marker: TextMarker,
+	markers: TextMarker[],
 }
 
 function getSubmissionColor(
@@ -49,12 +49,12 @@ function getSubmissionColor(
 		: SubmissionColor.Message;
 }
 
-function IsSuccessSubmission(submission: SubmissionInfo | null): boolean {
+function isSuccessSubmission(submission: SubmissionInfo | null): boolean {
 	return !!submission && (submission.automaticChecking == null || submission.automaticChecking.result === CheckingResult.RightAnswer);
 }
 
 function hasSuccessSubmission(submissions: SubmissionInfo[]): boolean {
-	return submissions.some(IsSuccessSubmission);
+	return submissions.some(isSuccessSubmission);
 }
 
 function submissionIsLast(submissions: SubmissionInfo[], submission: SubmissionInfo | null): boolean {
@@ -62,7 +62,7 @@ function submissionIsLast(submissions: SubmissionInfo[], submission: SubmissionI
 }
 
 function getLastSuccessSubmission(submissions: SubmissionInfo[]): SubmissionInfo | null {
-	const successSubmissions = submissions.filter(IsSuccessSubmission);
+	const successSubmissions = submissions.filter(isSuccessSubmission);
 	if(successSubmissions.length > 0) {
 		return successSubmissions[0];
 	}
@@ -70,7 +70,7 @@ function getLastSuccessSubmission(submissions: SubmissionInfo[]): SubmissionInfo
 }
 
 function isFirstRightAnswer(submissions: SubmissionInfo[], successSubmission: SubmissionInfo): boolean {
-	const successSubmissions = submissions.filter(IsSuccessSubmission);
+	const successSubmissions = submissions.filter(isSuccessSubmission);
 	return successSubmissions.length > 0 && successSubmissions[successSubmissions.length - 1] === successSubmission;
 }
 
@@ -112,7 +112,7 @@ function createTextMarker(
 function getReviewsWithTextMarkers(
 	submission: SubmissionInfoRedux,
 	exerciseCodeDoc: Doc,
-	markerClassName: string
+	markerClassName: string,
 ): ReviewInfoWithMarker[] {
 	const reviews = getAllReviewsFromSubmission(submission);
 
@@ -125,12 +125,89 @@ function getReviewsWithTextMarkers(
 			exerciseCodeDoc);
 
 		reviewsWithTextMarkers.push({
-			marker: textMarker,
+			markers: [textMarker],
 			...review
 		});
 	}
 
 	return reviewsWithTextMarkers;
+}
+
+export function addTextMarkerToReviews(
+	reviews: ReviewInfo[],
+	exerciseCodeDoc: Doc,
+	markerClassName: string,
+	escapeLines?: Set<number>,
+): ReviewInfoWithMarker[] {
+	const reviewsWithTextMarkers: ReviewInfoWithMarker[] = [];
+
+	for (const review of reviews) {
+		const {
+			finishLine,
+			finishPosition,
+			startLine,
+			startPosition,
+		} = review;
+
+		let positions = [
+			{
+				start: {
+					line: startLine,
+					position: startPosition,
+				},
+				finish: {
+					line: finishLine,
+					position: finishPosition,
+				},
+			}
+		];
+
+		if(escapeLines) {
+			const selectedLines = buildRange(finishLine - startLine + 1, startLine + 1);
+			positions = selectedLines
+				.filter(l => !escapeLines.has(l))
+				.reduce((pv: {
+					start: { line: number, position: number, },
+					finish: { line: number, position: number },
+				}[], cv) => {
+					const line = cv - 1;
+
+					if(pv.length === 0 || line - pv[pv.length - 1].finish.line !== 1) {
+						pv.push({
+							start: { line, position: pv.length === 0 ? startPosition : 0, },
+							finish: { line, position: finishPosition, },
+						});
+						return pv;
+					}
+					pv[pv.length - 1].finish.line = line;
+
+					return pv;
+				}, []);
+		}
+
+		const markers = positions
+			.map(({ start, finish }) => (
+				createTextMarker(
+					finish.line,
+					finish.position,
+					start.line,
+					start.position,
+					markerClassName,
+					exerciseCodeDoc,
+				))
+			);
+
+		reviewsWithTextMarkers.push({
+			markers,
+			...review
+		});
+	}
+
+	return reviewsWithTextMarkers;
+}
+
+export function buildRange(size: number, startAt = 0): number[] {
+	return [...Array(size).keys()].map(i => i + startAt);
 }
 
 function getSelectedReviewIdByCursor(
@@ -239,10 +316,12 @@ function replaceReviewMarker(
 	if(reviewId >= 0) {
 		const review = newCurrentReviews.find(r => r.id === reviewId);
 		if(review) {
-			const { from, to, } = review.marker.find() as MarkerRange;
-			review.marker.clear();
-			review.marker =
-				createTextMarker(to.line, to.ch, from.line, from.ch, defaultMarkerClass, doc);
+			for (const [index, marker,] of review.markers.entries()) {
+				const { from, to, } = marker.find() as MarkerRange;
+				marker.clear();
+				review.markers[index] =
+					createTextMarker(to.line, to.ch, from.line, from.ch, defaultMarkerClass, doc);
+			}
 		}
 	}
 
@@ -250,16 +329,31 @@ function replaceReviewMarker(
 	if(newReviewId >= 0) {
 		const review = newCurrentReviews.find(r => r.id === newReviewId);
 		if(review) {
-			const { from, to, } = review.marker.find() as MarkerRange;
-			review.marker.clear();
-			review.marker =
-				createTextMarker(to.line, to.ch, from.line, from.ch, selectedMarkerClass, doc);
-
-			line = from.line;
+			for (const [index, marker,] of review.markers.entries()) {
+				const { from, to, } = marker.find() as MarkerRange;
+				marker.clear();
+				review.markers[index] =
+					createTextMarker(to.line, to.ch, from.line, from.ch, selectedMarkerClass, doc);
+				line = from.line;
+			}
 		}
 	}
 
 	return { reviews: newCurrentReviews, selectedReviewLine: line, };
+}
+
+//first submission should be newer
+export function getPreviousManualCheckingInfo(
+	orderedSubmissionsByTheTime: SubmissionInfo[],
+	lastReviewIndex: number,
+): { submission: SubmissionInfo, index: number } | null {
+	for (let i = lastReviewIndex + 1; i < orderedSubmissionsByTheTime.length; i++) {
+		const submission = orderedSubmissionsByTheTime[i];
+		if(orderedSubmissionsByTheTime[i].manualCheckingPassed) {
+			return { submission, index: i };
+		}
+	}
+	return null;
 }
 
 export {

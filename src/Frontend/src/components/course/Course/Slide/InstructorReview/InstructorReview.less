@@ -1,0 +1,195 @@
+@import "src/variables";
+
+@selectionColor: @lightGrey;
+@activeSelectionColor: @blueSmoke;
+@gutterPadding: 8px;
+
+.separator {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-bottom: 1px solid @geinsboro;
+  margin-bottom: 33px;
+}
+
+.reviewHeader {
+  display: flex;
+  justify-content: space-between;
+}
+
+.reviewStudentName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.positionWrapper {
+  position: relative;
+}
+
+.wrapper {
+  display: flex;
+
+  margin-bottom: 40px;
+
+  border: 1px solid @lightGrey;
+  border-top-left-radius: 9px;
+  border-bottom-left-radius: @defaultBorderRadius;
+  border-bottom-right-radius: @defaultBorderRadius;
+
+  overflow: hidden;
+}
+
+.topControlsWrapper {
+  display: inline-flex;
+  width: 100%;
+  align-items: baseline;
+}
+
+.submissionsSelect {
+  width: fit-content;
+  margin-bottom: 8px;
+  margin-right: 24px;
+}
+
+.diffAddedLinesTextColor {
+  color: @successColor;
+}
+
+.diffRemovedLinesTextColor {
+  color: @negativeColor;
+}
+
+.addedLinesCodeMirror {
+  background: @lightSuccessGreen;
+}
+
+.removedLinesCodeMirror {
+  background: @lightError;
+}
+
+.beforeLineSymbol {
+  font-size: 10px;
+  line-height: 20px;
+  font-family: @monoFonts;
+  color: @additionalColor;
+  padding-left: 0.5px;
+}
+
+.addedLinesCodeMirror:before {
+  content: '\002B';
+  .beforeLineSymbol;
+}
+
+.removedLinesCodeMirror:before {
+  content: '\002D';
+  .beforeLineSymbol;
+}
+
+.gutter {
+  mix-blend-mode: multiply;
+}
+
+.addedLinesCodeMirrorGutter {
+  .gutter;
+  background: @lightSuccessGreen;
+}
+
+.removedLinesCodeMirrorGutter {
+  .gutter;
+  background: @lightError;
+}
+
+.leaveCommentGuideText {
+  margin-left: auto;
+
+  font-family: @defaultFonts;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px;
+
+  color: @additionalColor;
+}
+
+.editor {
+  z-index: 1;
+  height: auto;
+  width: auto;
+
+  flex: 2;
+
+  border-radius: @defaultBorderRadius;
+  background-color: @white;
+
+  font-family: monospace;
+  font-size: 10px;
+  line-height: 14px;
+
+  overflow: hidden;
+
+  border-right: 1px solid @lightGrey;
+
+  :global {
+    .CodeMirror-linenumber {
+      padding: 0 11px;
+      width: 17px !important;
+      min-width: unset;
+    }
+
+    .CodeMirror-gutters {
+      background-color: @whiteSmoke;
+      color: @additionalColor;
+    }
+
+    .CodeMirror-wrap pre.CodeMirror-line {
+      padding-left: @gutterPadding;
+    }
+
+    .CodeMirror-selected { //we're using selection addon, which adding selectionMarker to selected text
+      display: none;
+    }
+
+    .CodeMirror-lines {
+      padding: 0;
+    }
+
+    .CodeMirror-gutter-wrapper:local(.removedLinesCodeMirrorGutter),
+    .CodeMirror-gutter-wrapper:local(.addedLinesCodeMirrorGutter) {
+      mix-blend-mode: unset;
+      background: unset;
+    }
+  }
+}
+
+.marker {
+  display: inline-block;
+}
+
+.defaultMarker {
+  .marker;
+  background: @lightYellow;
+}
+
+.selectedMarker {
+  .marker;
+  background: @accentColor;
+}
+
+.selectionMarker {
+  .marker;
+  background: @activeSelectionColor !important;
+  color: @white !important;
+}
+
+.selectionToReviewMarker {
+  .marker;
+  background: @selectionColor;
+  color: inherit;
+}
+
+@media (min-width: @minTabletWidth) {
+  .editor {
+    font-size: 14px;
+    line-height: 20px;
+  }
+}

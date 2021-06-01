@@ -10,7 +10,9 @@ import { LanguageLaunchInfo } from "src/models/slide";
 const texts = {
 	submissions: {
 		newTry: 'Новая версия',
-		getSubmissionCaption: (submission: SubmissionInfo, selectedSubmissionIsLastSuccess: boolean,
+		getSubmissionCaption: (
+			submission: SubmissionInfo,
+			selectedSubmissionIsLastSuccess: boolean,
 			waitingForManualChecking: boolean
 		): string => {
 			const { timestamp, manualCheckingPassed } = submission;
@@ -131,7 +133,7 @@ const texts = {
 
 		statistics: {
 			buildShortText: (usersWithRightAnswerCount: number): React.ReactNode =>
-				<React.Fragment>Решило: { usersWithRightAnswerCount }</React.Fragment>,
+				<span>Решило: { usersWithRightAnswerCount }</span>,
 			buildStatistics: (attemptedUsersCount: number, usersWithRightAnswerCount: number,
 				lastSuccessAttemptDate?: string
 			): React.ReactNode =>
