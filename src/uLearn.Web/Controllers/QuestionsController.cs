@@ -45,7 +45,7 @@ namespace uLearn.Web.Controllers
 				{
 					var cs =
 						from c in courseManager.GetCourses()
-						from s in c.GetSlides(true)
+						from s in c.GetSlidesNotSafe()
 						where s.Title == slideTitle
 						select new { c, s };
 					var course_slide = cs.FirstOrDefault();
@@ -77,7 +77,7 @@ namespace uLearn.Web.Controllers
 				.Select(q => new QuestionViewModel
 				{
 					Question = q,
-					Slide = courseManager.GetCourse(q.CourseId).FindSlideById(q.SlideId, true)
+					Slide = courseManager.GetCourse(q.CourseId).FindSlideByIdNotSafe(q.SlideId)
 				})
 				.Where(m => m.Slide != null)
 				.ToList();

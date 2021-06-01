@@ -23,7 +23,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 			var sw = Stopwatch.StartNew();
 			var course = new CourseLoader().Load(ulearnDir);
 			Console.WriteLine(sw.ElapsedMilliseconds + " ms");
-			var slides = course.GetSlides(true);
+			var slides = course.GetSlidesNotSafe();
 			if (SlideId != null)
 			{
 				slides = slides.Where(s => s.Id == Guid.Parse(SlideId)).ToList();

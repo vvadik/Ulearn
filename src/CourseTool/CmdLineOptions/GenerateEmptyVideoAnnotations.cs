@@ -20,13 +20,13 @@ namespace uLearn.CourseTool.CmdLineOptions
 		public override void DoExecute()
 		{
 			var course = new CourseLoader().Load(new DirectoryInfo(Path.Combine(Dir, Config.ULearnCourseId)));
-			Console.WriteLine($"{course.GetSlides(true).Count} slide(s) have been loaded from {Config.ULearnCourseId}");
+			Console.WriteLine($"{course.GetSlidesNotSafe().Count} slide(s) have been loaded from {Config.ULearnCourseId}");
 
 			var resultHtmlFilename = $"{Config.ULearnCourseId}.annotations.html";
 			using (var writer = new StreamWriter(resultHtmlFilename))
 			{
 				writer.WriteLine($"<html><head><title>{course.Title}</title><style>.videoId {{ color: #999; font-size: 12px; }}</style></head><body>");
-				foreach (var slide in course.GetSlides(false)) // Для скрытых слайдов или блоков не генерируются аннотации
+				foreach (var slide in course.GetSlidesNotSafe())
 				{
 					var videoBlocks = slide.Blocks.OfType<YoutubeBlock>().Where(b => !b.Hide);
 					foreach (var videoBlock in videoBlocks)

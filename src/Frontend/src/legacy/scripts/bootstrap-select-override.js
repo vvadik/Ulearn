@@ -8,24 +8,23 @@ export default function () {
 	picker.on('rendered.bs.select', function () {
 		$(this).removeClass('form-control');
 	});
-
-	picker.on('changed.bs.select', function (e, index, newValue, oldValue) {
+	picker.on('changed.bs.select', function (e, index, isSelected, previousValue) {
 		const $self = $(this);
+		const $selectedOption = $($self.find('option')[index])[0];
 
-		const $selectedOption = $($self.find('option')[index]);
-		if($selectedOption.data['exclusive'] && newValue) {
+		if($selectedOption && $selectedOption.dataset.exclusive && isSelected) {
 			$self.selectpicker('deselectAll');
-			$self.val($selectedOption.val());
-			$self.selectpicker('render');
+			$self.val($selectedOption.value);
+			$self.selectpicker('refresh');
 			/* Close menu */
 			$self.trigger('click');
 		}
 
-		if(!$selectedOption.data['exclusive'] && newValue) {
+		if((!$selectedOption || !$selectedOption.dataset.exclusive) && isSelected) {
 			if($self.find('option[data-exclusive="true"]:selected').length) {
 				$self.selectpicker('deselectAll');
-				$self.val($selectedOption.val());
-				$self.selectpicker('render');
+				$self.val($selectedOption.value);
+				$self.selectpicker('refresh');
 			}
 		}
 	});

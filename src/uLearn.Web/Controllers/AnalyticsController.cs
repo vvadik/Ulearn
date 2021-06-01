@@ -638,7 +638,7 @@ namespace uLearn.Web.Controllers
 				.Select(v => new { v.UserId, v.SlideId, v.Score })
 				.AsEnumerable()
 				.Where(v => slides.Contains(v.SlideId))
-				.GroupBy(v => Tuple.Create(v.UserId, unitBySlide[v.SlideId], course.FindSlideById(v.SlideId, true)?.ScoringGroup))
+				.GroupBy(v => Tuple.Create(v.UserId, unitBySlide[v.SlideId], course.FindSlideByIdNotSafe(v.SlideId)?.ScoringGroup))
 				.ToDictionary(g => g.Key, g => g.Sum(v => v.Score))
 				.ToDefaultDictionary();
 		}
@@ -708,7 +708,8 @@ namespace uLearn.Web.Controllers
 			if (course == null)
 				return HttpNotFound();
 			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
-			var slide = course.FindSlideById(slideId, isInstructor);
+			var visibleUnits = unitsRepo.GetVisibleUnitIds(course, User);
+			var slide = course.FindSlideById(slideId, isInstructor, visibleUnits);
 			var exerciseBlock = slide?.Blocks.OfType<AbstractExerciseBlock>().FirstOrDefault();
 			if (exerciseBlock == null)
 				return HttpNotFound();
@@ -888,7 +889,9 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 
 			var course = courseManager.GetCourse(courseId);
-			var slide = course.FindSlideById(slideId, true) as ExerciseSlide;
+			var visibleUnits = unitsRepo.GetVisibleUnitIds(course, User);
+			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
+			var slide = course.FindSlideById(slideId, isInstructor, visibleUnits) as ExerciseSlide;
 			if (slide == null)
 				return RedirectToAction("CourseInfo", "Account", new { userId = userId, courseId });
 

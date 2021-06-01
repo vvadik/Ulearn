@@ -23,12 +23,13 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		protected readonly IUserQuizzesRepo userQuizzesRepo;
 		protected readonly IVisitsRepo visitsRepo;
 		protected readonly IGroupsRepo groupsRepo;
+		protected readonly IUnitsRepo unitsRepo;
 		protected readonly SlideRenderer slideRenderer;
 		protected readonly WebApiConfiguration configuration;
 
 		public SlidesController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo,
 			IUserSolutionsRepo solutionsRepo, IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo,
-			SlideRenderer slideRenderer, ICoursesRepo coursesRepo, IOptions<WebApiConfiguration> configuration)
+			SlideRenderer slideRenderer, ICoursesRepo coursesRepo, IUnitsRepo unitsRepo, IOptions<WebApiConfiguration> configuration)
 			: base(courseManager, db, usersRepo)
 		{
 			this.coursesRepo = coursesRepo;
@@ -38,6 +39,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			this.visitsRepo = visitsRepo;
 			this.groupsRepo = groupsRepo;
 			this.slideRenderer = slideRenderer;
+			this.unitsRepo = unitsRepo;
 			this.configuration = configuration.Value;
 		}
 
@@ -50,8 +52,9 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			if (course == null)
 				return NotFound(new { status = "error", message = "Course not found" });
 
-			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(User.GetUserId(), course.Id, CourseRoleType.Instructor).ConfigureAwait(false);
-			var slide = course.FindSlideById(slideId, isInstructor);
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(User.GetUserId(), course.Id, CourseRoleType.Instructor);
+			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIds(course, UserId);
+			var slide = course.FindSlideById(slideId, isInstructor, visibleUnitsIds);
 			if (slide == null)
 			{
 				var instructorNote = course.FindInstructorNoteByIdNotSafe(slideId);

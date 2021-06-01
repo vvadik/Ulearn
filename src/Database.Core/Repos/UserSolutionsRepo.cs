@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -462,18 +462,22 @@ namespace Database.Repos
 
 		private async Task<AutomaticExerciseChecking> UpdateAutomaticExerciseChecking(AutomaticExerciseChecking checking, RunningResults result)
 		{
+			var isWebRunner = checking.CourseId == "web" && checking.SlideId == Guid.Empty;
+			var exerciseSlide = isWebRunner
+				? null
+				: (ExerciseSlide)(await courseManager.GetCourseAsync(checking.CourseId))
+				.GetSlideByIdNotSafe(checking.SlideId);
+
+			var withFullDescription = (exerciseSlide?.Exercise as PolygonExerciseBlock)?.ShowTestDescription ?? false;
+
 			var compilationErrorHash = (await textsRepo.AddText(result.CompilationOutput)).Hash;
-			var output = result.GetOutput().NormalizeEoln();
+			var output = result.GetOutput(withFullDescription).NormalizeEoln();
 			var outputHash = (await textsRepo.AddText(output)).Hash;
 			
 			var logs = result.GetLogs().NormalizeEoln();
 			var logsHash = (await textsRepo.AddText(logs)).Hash;
 
-			var isWebRunner = checking.CourseId == "web" && checking.SlideId == Guid.Empty;
-			var exerciseSlide = isWebRunner
-				? null
-				: (ExerciseSlide)(await courseManager.GetCourseAsync(checking.CourseId))
-					.GetSlideById(checking.SlideId, true);
+			
 
 			var isRightAnswer = IsRightAnswer(result, output, exerciseSlide?.Exercise);
 

@@ -13,17 +13,19 @@ namespace Database.Repos.Groups
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
 		private readonly IVisitsRepo visitsRepo;
 		private readonly IUserQuizzesRepo userQuizzesRepo;
+		private readonly IUnitsRepo unitsRepo;
 		private readonly IWebCourseManager courseManager;
 		private static ILog log => LogProvider.Get().ForContext(typeof(ManualCheckingsForOldSolutionsAdder));
 
 		public ManualCheckingsForOldSolutionsAdder(
 			IUserSolutionsRepo userSolutionsRepo, ISlideCheckingsRepo slideCheckingsRepo, IVisitsRepo visitsRepo, IUserQuizzesRepo userQuizzesRepo,
-			IWebCourseManager courseManager)
+			IUnitsRepo unitsRepo, IWebCourseManager courseManager)
 		{
 			this.userSolutionsRepo = userSolutionsRepo;
 			this.slideCheckingsRepo = slideCheckingsRepo;
 			this.visitsRepo = visitsRepo;
 			this.userQuizzesRepo = userQuizzesRepo;
+			this.unitsRepo = unitsRepo;
 			this.courseManager = courseManager;
 		}
 
@@ -38,6 +40,7 @@ namespace Database.Repos.Groups
 			log.Info($"Создаю ручные проверки для всех решения пользователя {userId} в курсе {courseId}");
 
 			var course = await courseManager.GetCourseAsync(courseId);
+			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIds(course, userId);
 
 			/* For exercises */
 			var acceptedSubmissionsBySlide = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, userId)
@@ -52,7 +55,7 @@ namespace Database.Repos.Groups
 					var lastSubmission = acceptedSubmissionsForSlide.OrderByDescending(s => s.Timestamp).First();
 
 					var slideId = lastSubmission.SlideId;
-					var slide = course.FindSlideById(slideId, false) as ExerciseSlide;
+					var slide = course.FindSlideById(slideId, false, visibleUnitsIds) as ExerciseSlide;
 					if (slide == null || !slide.Scoring.RequireReview)
 						continue;
 
@@ -65,7 +68,7 @@ namespace Database.Repos.Groups
 			var passedQuizzesIds = await userQuizzesRepo.GetPassedSlideIdsAsync(courseId, userId).ConfigureAwait(false);
 			foreach (var quizSlideId in passedQuizzesIds)
 			{
-				var slide = course.FindSlideById(quizSlideId, false) as QuizSlide;
+				var slide = course.FindSlideById(quizSlideId, false, visibleUnitsIds) as QuizSlide;
 				if (slide == null || !slide.ManualChecking)
 					continue;
 				if (!await userQuizzesRepo.IsWaitingForManualCheckAsync(courseId, quizSlideId, userId).ConfigureAwait(false))

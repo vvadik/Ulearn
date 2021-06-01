@@ -30,29 +30,50 @@ namespace Ulearn.Core.Courses
 			get { return slidesCache ??= units.SelectMany(u => u.GetSlides(true)).ToList(); }
 		}
 
-		private List<Slide> notHiddenSlidesCache { get; set; }
-		private List<Slide> NotHiddenSlides
+		private IEnumerable<Slide> GetNotHiddenSlides(IEnumerable<Guid> visibleUnits)
 		{
-			get { return notHiddenSlidesCache ??= units.SelectMany(u => u.GetSlides(false)).ToList(); }
+			return GetUnits(visibleUnits).SelectMany(u => u.GetSlides(false));
 		}
 
-		public List<Slide> GetSlides(bool withHidden)
+		public List<Slide> GetSlidesNotSafe()
+		{
+			return Slides;
+		}
+
+		// visibleUnits может быть null, если withHidden true
+		public List<Slide> GetSlides(bool withHidden, [CanBeNull]IEnumerable<Guid> visibleUnits)
 		{
 			if (withHidden)
 				return Slides;
-			return NotHiddenSlides;
+			if (!withHidden && visibleUnits == null)
+				throw new Exception($"{nameof(GetSlides)} !withHidden && visibleUnits == null");
+			return GetNotHiddenSlides(visibleUnits).ToList();
 		}
 
+		public Slide FindSlideByIdNotSafe(Guid slideId)
+		{
+			return FindSlideById(slideId, true, null);
+		}
+
+		// visibleUnits может быть null, если withHidden true
 		[CanBeNull]
-		public Slide FindSlideById(Guid slideId, bool withHidden)
+		public Slide FindSlideById(Guid slideId, bool withHidden, [CanBeNull]IEnumerable<Guid> visibleUnits)
 		{
-			return (withHidden ? Slides : NotHiddenSlides).FirstOrDefault(x => x.Id == slideId);
+			if (!withHidden && visibleUnits == null)
+				throw new Exception($"{nameof(FindSlideById)} !withHidden && visibleUnits == null");
+			return (withHidden ? Slides : GetNotHiddenSlides(visibleUnits)).FirstOrDefault(x => x.Id == slideId);
 		}
 
-		[NotNull]
-		public Slide GetSlideById(Guid slideId, bool withHidden)
+		public Slide GetSlideByIdNotSafe(Guid slideId)
 		{
-			var slide = FindSlideById(slideId, withHidden);
+			return GetSlideById(slideId, true, null);
+		}
+
+		// visibleUnits может быть null, если withHidden true
+		[NotNull]
+		public Slide GetSlideById(Guid slideId, bool withHidden, IEnumerable<Guid> visibleUnits)
+		{
+			var slide = FindSlideById(slideId, withHidden, visibleUnits);
 			if (slide == null)
 				throw new NotFoundException($"No slide with id {slideId}");
 			return slide;

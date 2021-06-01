@@ -30,10 +30,11 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly IGroupsRepo groupsRepo;
 		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IUserQuizzesRepo userQuizzesRepo;
+		private readonly IUnitsRepo unitsRepo;
 
 		public ExportController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
 			IGroupMembersRepo groupMembersRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo, IUserQuizzesRepo userQuizzesRepo,
-			ICourseRolesRepo courseRolesRepo)
+			ICourseRolesRepo courseRolesRepo, IUnitsRepo unitsRepo)
 			: base(courseManager, db, usersRepo)
 		{
 			this.groupMembersRepo = groupMembersRepo;
@@ -41,6 +42,7 @@ namespace Ulearn.Web.Api.Controllers
 			this.groupsRepo = groupsRepo;
 			this.userQuizzesRepo = userQuizzesRepo;
 			this.courseRolesRepo = courseRolesRepo;
+			this.unitsRepo = unitsRepo;
 		}
 
 		[HttpGet("users-info-and-results")]
@@ -63,9 +65,10 @@ namespace Ulearn.Web.Api.Controllers
 			List<string> questions = null;
 			var courseId = group.CourseId;
 			var course = await courseManager.GetCourseAsync(courseId);
+			var visibleUnits = await unitsRepo.GetPublishedUnitIds(course);
 			if (quizSlideId != null)
 			{
-				var slide = course.FindSlideById(quizSlideId.Value, false);
+				var slide = course.FindSlideById(quizSlideId.Value, false, visibleUnits);
 				if (slide == null)
 					return StatusCode((int)HttpStatusCode.NotFound, $"Slide not found in course {courseId}");
 
@@ -77,7 +80,7 @@ namespace Ulearn.Web.Api.Controllers
 				extendedUserInfo = extendedUserInfo.Zip(answers, (u, a) => { u.Answers = a; return u; }).ToList();
 			}
 
-			var slides = course.GetSlides(false).Where(s => s.ShouldBeSolved).Select(s => s.Id).ToList();
+			var slides = course.GetSlides(false, visibleUnits).Where(s => s.ShouldBeSolved).Select(s => s.Id).ToList();
 			var scores = GetScoresByScoringGroups(users.Select(u => u.Id).ToList(), slides, course);
 			var scoringGroupsWithScores = scores.Select(kvp => kvp.Key.ScoringGroup).ToHashSet();
 			var scoringGroups = course.Settings.Scoring.Groups.Values.Where(sg => scoringGroupsWithScores.Contains(sg.Id)).ToList();
@@ -169,7 +172,7 @@ namespace Ulearn.Web.Api.Controllers
 				.Select(v => new { v.UserId, v.SlideId, v.Score })
 				.AsEnumerable()
 				.Where(v => slides.Contains(v.SlideId))
-				.GroupBy(v => (v.UserId, course.FindSlideById(v.SlideId, false)?.ScoringGroup))
+				.GroupBy(v => (v.UserId, course.FindSlideByIdNotSafe(v.SlideId)?.ScoringGroup))
 				.ToDictionary(g => g.Key, g => g.Sum(v => v.Score));
 		}
 

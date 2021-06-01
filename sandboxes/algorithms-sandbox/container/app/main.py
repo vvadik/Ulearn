@@ -13,6 +13,23 @@ TEMPORARY_FILENAME = 'Program'
 SUFFIX_ANSWER_FILENAME = '.a'
 STUDENT_USER = 'student'
 
+def read_all(filename):
+    with open(filename, 'r') as f:
+        return f.read()
+
+def set_test_result_info(running_result,
+                         test_number,
+                         input,
+                         correct_output,
+                         student_output):
+    running_result["TestResultInfo"] = {
+        "TestNumber": test_number,
+        "Input": input.strip(),
+        "CorrectOutput": correct_output.strip(),
+        "StudentOutput": student_output.strip()
+    }
+    return running_result
+
 class Logger:
     def __init__(self):
         self.__data = []
@@ -64,8 +81,9 @@ class TaskCodeRunner:
             if b'PermissionError' in err[1]:
                 log.info('Студент пытался прочитать тесты из папки')
                 raise SecurityException()
-            log.info(f'Программа завершилась с ошибкой: {err[1].decode()}')
-            raise RuntimeException()
+            error_message = err[1].decode()
+            log.info(f'Программа завершилась с ошибкой: {error_message}')
+            raise RuntimeException(error_message)
 
     def run_test(self, code_filename: str, test_file: str):
         if self.__runnable_file is None:
@@ -88,12 +106,12 @@ def check(source_code_run_info, code_filename):
     runner = TaskCodeRunner(source_code_run_info)
     for test_number, test_filename in enumerate(sorted(filter(is_test_file, listdir(TEST_DIRECTORY))), 1):
         log.info(f'check - Номер теста: {test_number}; Имя файла: {test_filename}')
+        full_path_test = path_join(TEST_DIRECTORY, test_filename)
+        full_path_student_answer = f'{path_join(TEST_DIRECTORY, test_filename)}.o'
+        full_path_test_answer = path_join(TEST_DIRECTORY, f'{test_filename}{SUFFIX_ANSWER_FILENAME}')
         try:
             runner.run_test(code_filename, path_join(TEST_DIRECTORY, test_filename))
-            check_command = [path_join('.', 'check'),
-                             path_join(TEST_DIRECTORY, test_filename),
-                             f'{path_join(TEST_DIRECTORY, test_filename)}.o',
-                             path_join(TEST_DIRECTORY, f'{test_filename}{SUFFIX_ANSWER_FILENAME}')]
+            check_command = [path_join('.', 'check'), full_path_test, full_path_student_answer, full_path_test_answer]
             process = Popen(check_command, stdout=DEVNULL, stderr=PIPE)
             _, err = process.communicate()
             log.info(f'Вердикт чеккера: {err.decode()}')
@@ -104,21 +122,30 @@ def check(source_code_run_info, code_filename):
                 'Verdict': Verdict.CompilationError.name,
                 'CompilationOutput': e.message()
             }
-        except RuntimeException:
-            return {
-                'Verdict': Verdict.RuntimeError.name,
-                'TestNumber': test_number
-            }
+        except RuntimeException as e:
+            return set_test_result_info({
+                'Verdict': Verdict.RuntimeError.name
+            }, test_number,
+                read_all(full_path_test),
+                read_all(full_path_test_answer),
+                e.message()
+            )
         except TimeLimitException:
-            return {
-                'Verdict': Verdict.TimeLimit.name,
-                'TestNumber': test_number
-            }
+            return set_test_result_info({
+                'Verdict': Verdict.TimeLimit.name
+            }, test_number,
+                read_all(full_path_test),
+                read_all(full_path_test_answer),
+                ""
+            )
         except WrongAnswerException:
-            return {
-                'Verdict': Verdict.WrongAnswer.name,
-                'TestNumber': test_number
-            }
+            return set_test_result_info({
+                'Verdict': Verdict.WrongAnswer.name
+            },  test_number,
+                read_all(full_path_test),
+                read_all(full_path_test_answer),
+                read_all(full_path_student_answer)
+            )
         except SecurityException:
             return {
                 'Verdict': Verdict.SecurityException.name

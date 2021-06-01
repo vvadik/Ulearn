@@ -125,6 +125,10 @@ const texts = {
 			onCopy: 'Код скопирован в буфер обмена',
 		},
 
+		visualizer: {
+			text: 'Выполнить пошагово',
+		},
+
 		statistics: {
 			buildShortText: (usersWithRightAnswerCount: number): React.ReactNode =>
 				<React.Fragment>Решило: { usersWithRightAnswerCount }</React.Fragment>,

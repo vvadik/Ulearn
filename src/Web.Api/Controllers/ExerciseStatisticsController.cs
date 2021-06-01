@@ -27,10 +27,11 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly IVisitsRepo visitsRepo;
 		private readonly IGroupsRepo groupsRepo;
 		private readonly SlideRenderer slideRenderer;
+		private readonly IUnitsRepo unitsRepo;
 
 		public ExerciseStatisticsController(IWebCourseManager courseManager, IUserSolutionsRepo userSolutionsRepo, UlearnDb db, IUsersRepo usersRepo,
 			IUserSolutionsRepo solutionsRepo, IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo,
-			SlideRenderer slideRenderer, ICourseRolesRepo courseRolesRepo, ICoursesRepo coursesRepo)
+			SlideRenderer slideRenderer, ICourseRolesRepo courseRolesRepo, ICoursesRepo coursesRepo, IUnitsRepo unitsRepo)
 			: base(courseManager, db, usersRepo)
 		{
 			this.coursesRepo = coursesRepo;
@@ -41,6 +42,7 @@ namespace Ulearn.Web.Api.Controllers
 			this.visitsRepo = visitsRepo;
 			this.groupsRepo = groupsRepo;
 			this.slideRenderer = slideRenderer;
+			this.unitsRepo = unitsRepo;
 		}
 
 		/// <summary>
@@ -62,8 +64,8 @@ namespace Ulearn.Web.Api.Controllers
 			count = Math.Min(count, 10000);
 
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, course.Id, CourseRoleType.Instructor).ConfigureAwait(false);
-
-			var exerciseSlides = course.GetSlides(isInstructor).OfType<ExerciseSlide>().ToList();
+			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIds(course, UserId);
+			var exerciseSlides = course.GetSlides(isInstructor, visibleUnitsIds).OfType<ExerciseSlide>().ToList();
 			/* TODO (andgein): I can't select all submissions because ApplicationUserId column doesn't exist in database (ApplicationUser_Id exists).
 			   We should remove this column after EF Core 2.1 release (and remove tuples here)
 			*/

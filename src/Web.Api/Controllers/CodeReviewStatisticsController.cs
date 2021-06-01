@@ -60,7 +60,7 @@ namespace Ulearn.Web.Api.Controllers
 			var instructorIds = await courseRolesRepo.GetListOfUsersWithCourseRole(CourseRoleType.Instructor, course.Id, false).ConfigureAwait(false);
 			var instructors = await usersRepo.GetUsersByIds(instructorIds).ConfigureAwait(false);
 
-			var exerciseSlides = course.GetSlides(true).OfType<ExerciseSlide>().ToList();
+			var exerciseSlides = course.GetSlidesNotSafe().OfType<ExerciseSlide>().ToList();
 
 			var allSlideCheckings = (await slideCheckingsRepo.GetManualCheckingQueue<ManualExerciseChecking>(new ManualCheckingQueueFilterOptions
 			{

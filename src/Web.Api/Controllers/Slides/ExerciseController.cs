@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Database;
@@ -40,6 +39,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
 		private readonly IGroupsRepo groupsRepo;
 		private readonly IStyleErrorsRepo styleErrorsRepo;
+		private readonly IUnitsRepo unitsRepo;
 		private readonly MetricSender metricSender;
 		private readonly IServiceScopeFactory serviceScopeFactory;
 		private readonly StyleErrorsResultObserver styleErrorsResultObserver;
@@ -49,7 +49,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		public ExerciseController(IWebCourseManager courseManager, UlearnDb db, MetricSender metricSender,
 			IUsersRepo usersRepo, IUserSolutionsRepo userSolutionsRepo, ICourseRolesRepo courseRolesRepo, IVisitsRepo visitsRepo,
 			ISlideCheckingsRepo slideCheckingsRepo, IGroupsRepo groupsRepo, StyleErrorsResultObserver styleErrorsResultObserver,
-			IStyleErrorsRepo styleErrorsRepo, IServiceScopeFactory serviceScopeFactory)
+			IStyleErrorsRepo styleErrorsRepo, IUnitsRepo unitsRepo, IServiceScopeFactory serviceScopeFactory)
 			: base(courseManager, db, usersRepo)
 		{
 			this.metricSender = metricSender;
@@ -59,6 +59,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			this.slideCheckingsRepo = slideCheckingsRepo;
 			this.groupsRepo = groupsRepo;
 			this.styleErrorsRepo = styleErrorsRepo;
+			this.unitsRepo = unitsRepo;
 			this.styleErrorsResultObserver = styleErrorsResultObserver;
 			this.serviceScopeFactory = serviceScopeFactory;
 		}
@@ -94,7 +95,8 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			}
 
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.Instructor);
-			var exerciseSlide = (await courseManager.FindCourseAsync(courseId))?.FindSlideById(slideId, isInstructor) as ExerciseSlide;
+			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIds(course, UserId);
+			var exerciseSlide = (await courseManager.FindCourseAsync(courseId))?.FindSlideById(slideId, isInstructor, visibleUnitsIds) as ExerciseSlide;
 			if (exerciseSlide == null)
 				return NotFound(new ErrorResponse("Slide not found"));
 
@@ -265,8 +267,10 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		[Authorize(AuthenticationSchemes = "Bearer,Identity.Application")]
 		public async Task<ActionResult<RunSolutionResponse>> GetStudentZip([FromRoute] string courseId, [FromRoute] Guid slideId, [FromRoute] string studentZipName)
 		{
+			var course = await courseManager.GetCourseAsync(courseId);
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.Instructor);
-			var slide = (await courseManager.FindCourseAsync(courseId))?.FindSlideById(slideId, isInstructor);
+			var visibleUnits = await unitsRepo.GetVisibleUnitIds(course, UserId);
+			var slide = (await courseManager.FindCourseAsync(courseId))?.FindSlideById(slideId, isInstructor, visibleUnits);
 			if (slide is not ExerciseSlide exerciseSlide)
 				return NotFound();
 

@@ -135,7 +135,7 @@ namespace ManualUtils
 				try
 				{
 					var course = courseManager.GetCourse(ltiRequest.CourseId);
-					var slide = course.GetSlideById(ltiRequest.SlideId, true);
+					var slide = course.GetSlideByIdNotSafe(ltiRequest.SlideId);
 					var score = await visitsRepo.GetScore(ltiRequest.CourseId, ltiRequest.SlideId, ltiRequest.UserId);
 					await LtiUtils.SubmitScore(slide, ltiRequest.UserId, score, ltiRequest.Request, ltiConsumersRepo);
 					Console.WriteLine($"{i} requestId {ltiRequest.RequestId} score {score}");
@@ -153,7 +153,7 @@ namespace ManualUtils
 			var course = courseManager.GetCourse(courseId);
 			var slideCheckingsRepo = new SlideCheckingsRepo(db, null);
 			var visitsRepo = new VisitsRepo(db, slideCheckingsRepo);
-			var slides = course.GetSlides(true).OfType<ExerciseSlide>().ToList();
+			var slides = course.GetSlidesNotSafe().OfType<ExerciseSlide>().ToList();
 			foreach (var slide in slides)
 			{
 				var slideVisits = db.Visits.Where(v => v.CourseId == courseId && v.SlideId == slide.Id && v.IsPassed).ToList();
