@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ using Database;
 using Database.Di;
 using Database.Models;
 using Database.Repos;
+using Ionic.Zip;
 using ManualUtils.AntiPlagiarism;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +34,7 @@ namespace ManualUtils
 	{
 		public static async Task Main(string[] args)
 		{
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 			LoggerSetup.Setup(configuration.HostLog, configuration.GraphiteServiceName);
 			try
@@ -89,6 +92,7 @@ namespace ManualUtils
 			//TextBlobsWithZeroByte(db);
 			//UpdateCertificateArchives(db);
 			//GetVKByEmail(serviceProvider);
+			TestStagingZipsEncodings();
 		}
 
 		private static void GenerateUpdateSequences()
@@ -106,6 +110,7 @@ namespace ManualUtils
 					var id = match.Groups[2].Value;
 					parsed.Add(Tuple.Create(table, id, (string)null));
 				}
+
 				var sequenceMatch = sequenceIdRegex.Match(line);
 				if (sequenceMatch.Success)
 				{
@@ -117,7 +122,7 @@ namespace ManualUtils
 			var strings = parsed.Select(p => $@"SELECT setval('{p.Item3}', COALESCE((SELECT MAX({p.Item2})+1 FROM {p.Item1}), 1), false);" + "\n").ToList();
 			File.WriteAllLines(@"C:\git\Ulearn-postgres\tools\pgloader\files\update_sequences.sql", strings);
 		}
-		
+
 		private static async Task ResendLti(UlearnDb db)
 		{
 			var ltiConsumersRepo = new LtiConsumersRepo(db);
@@ -272,7 +277,7 @@ namespace ManualUtils
 				.ToDictionary(p => p.Key, p => p.Select(t => t.Column).ToHashSet());
 			foreach (var table in sqlserver.Keys)
 			{
-				if(!postgres.ContainsKey(table))
+				if (!postgres.ContainsKey(table))
 					continue;
 				postgres[table].SymmetricExceptWith(sqlserver[table]);
 				if (postgres[table].Count > 0)
@@ -293,6 +298,7 @@ namespace ManualUtils
 					i++;
 				}
 			}
+
 			i = 0;
 			foreach (var hash in hashes)
 			{
@@ -300,7 +306,7 @@ namespace ManualUtils
 				temp.Text = temp.Text.Replace("\0", "");
 				Console.WriteLine("s" + i);
 				i++;
-				db.SaveChanges(); 
+				db.SaveChanges();
 			}
 		}
 
@@ -328,6 +334,7 @@ namespace ManualUtils
 					});
 					db.SaveChanges();
 				}
+
 				Console.WriteLine(guid);
 			}
 		}
@@ -349,7 +356,30 @@ namespace ManualUtils
 						vk = $"https://vk.com/id{vkLogin.ProviderKey}";
 					}
 				}
+
 				Console.WriteLine($"{email}\t{vk}");
+			}
+		}
+
+		// Результат, дял всех архивов подходит использовать 866 в ReadOptions. Кажется, применяется utf-8, где нужно.
+		// А вот AlternateEncoding заставляет использовать 866 везде.
+		private static void TestStagingZipsEncodings()
+		{
+			var charactersRegex = new Regex(@"^[\\\/\w\s\d\--_\.#№'+\(\),=]*$");
+			var files = new DirectoryInfo(@"C:\Users\vorkulsky\Desktop\Courses.Staging").GetFiles();
+			var encoding = Encoding.GetEncoding(866);
+			foreach (var file in files)
+			{
+				using (var zip = ZipFile.Read(file.FullName, new ReadOptions { Encoding = encoding }))
+				{
+					//zip.AlternateEncoding = encoding;
+					var names = zip.Entries.Select(e => e.FileName).ToList();
+					foreach (var name in names)
+					{
+						if (!charactersRegex.IsMatch(name))
+							Console.WriteLine($"{file.Name} {name}");
+					}
+				}
 			}
 		}
 	}
