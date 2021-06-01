@@ -154,7 +154,7 @@ namespace uLearn.Web.Controllers
 			else
 			{
 				var path = courseManager.GetExtractedCourseDirectory(courseId);
-				stream = ZipUtils.CreateZipFromDirectory(new List<string> { path.FullName }, null, null, Encoding.UTF8);
+				stream = ZipUtils.CreateZipFromDirectory(new List<string> { path.FullName }, null, null);
 			}
 			return File(stream, "application/zip", packageName);
 		}
@@ -282,7 +282,7 @@ namespace uLearn.Web.Controllers
 
 		private Stream GetZipWithCourseXmlInRoot(string inputZipFileName)
 		{
-			using (var zip = ZipFile.Read(inputZipFileName, new ReadOptions { Encoding = Encoding.GetEncoding(866) }))
+			using (var zip = ZipFile.Read(inputZipFileName, new ReadOptions { Encoding = ZipUtils.Cp866 }))
 			{
 				var courseXmls = zip.SelectEntries("course.xml");
 				if (courseXmls.Count == 1 && courseXmls.All(x => x.FileName == "course.xml") )
@@ -291,7 +291,7 @@ namespace uLearn.Web.Controllers
 				var courseXml = courseXmls.First();
 				var courseXmlDirectory = Path.GetDirectoryName(courseXml.FileName);
 				var entries = zip.SelectEntries(courseXmlDirectory + "/*").Where(e => !e.IsDirectory);
-				using var newZip = new ZipFile(Encoding.GetEncoding(866))
+				using var newZip = new ZipFile(Encoding.UTF8)
 				{
 					CompressionLevel = zip.CompressionLevel,
 					CompressionMethod = zip.CompressionMethod

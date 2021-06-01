@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Configuration;
@@ -367,7 +368,7 @@ namespace ManualUtils
 		{
 			var charactersRegex = new Regex(@"^[\\\/\w\s\d\--_\.#№'+\(\),=]*$");
 			var files = new DirectoryInfo(@"C:\Users\vorkulsky\Desktop\Courses.Staging").GetFiles();
-			var encoding = Encoding.GetEncoding(866);
+			var encoding = ZipUtils.Cp866;
 			foreach (var file in files)
 			{
 				using (var zip = ZipFile.Read(file.FullName, new ReadOptions { Encoding = encoding }))

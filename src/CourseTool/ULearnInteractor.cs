@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using Ionic.Zip;
+using Ulearn.Common;
 
 namespace uLearn.CourseTool
 {
@@ -55,7 +56,7 @@ namespace uLearn.CourseTool
 			Console.Out.WriteLine("Package downloaded to {0}", fileFullName);
 
 			var dir = new DirectoryInfo(baseDir);
-			using (var zip = ZipFile.Read(fileFullName, new ReadOptions { Encoding = Encoding.GetEncoding(866) }))
+			using (var zip = ZipFile.Read(fileFullName, new ReadOptions { Encoding = ZipUtils.Cp866 }))
 			{
 				var courseDir = dir.CreateSubdirectory(config.ULearnCourseId);
 				Directory.Delete(courseDir.FullName, force);
@@ -74,7 +75,7 @@ namespace uLearn.CourseTool
 
 			if (File.Exists(fileFullName))
 				File.Delete(fileFullName);
-			using (var zip = new ZipFile(fileFullName, Encoding.GetEncoding(866)))
+			using (var zip = new ZipFile(fileFullName, Encoding.UTF8))
 			{
 				zip.AddDirectory(courseDir);
 				zip.Save();

@@ -100,7 +100,7 @@ namespace GitCourseUpdater
 				if (courseXmlDirectory != null)
 					courseSubdirectoryInRepo = courseXmlDirectory.GetRelativePath(reposBaseDir.GetSubdirectory(repoDirName));
 			}
-			var zip = ZipUtils.CreateZipFromDirectory(new List<string> {courseSubdirectoryInRepo}, new List<string> {".git/"},  null, Encoding.UTF8);
+			var zip = ZipUtils.CreateZipFromDirectory(new List<string> {courseSubdirectoryInRepo}, new List<string> {".git/"},  null);
 			log.Info($"Successfully load '{repoDirName}' to zip");
 			return (zip, courseSubdirectoryInRepo);
 		}

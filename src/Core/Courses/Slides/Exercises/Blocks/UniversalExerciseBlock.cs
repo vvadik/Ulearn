@@ -241,7 +241,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 
 				var toUpdate = ReplaceWithInitialFiles(fp).ToList();
 
-				var zipMemoryStream = ZipUtils.CreateZipFromDirectory(new List<string> { fp.ExerciseDirectory.FullName }, excluded, toUpdate, Encoding.UTF8);
+				var zipMemoryStream = ZipUtils.CreateZipFromDirectory(new List<string> { fp.ExerciseDirectory.FullName }, excluded, toUpdate);
 
 				log.Info($"Собираю zip-архив для студента: zip-архив собран, {zipMemoryStream.Length} байтов");
 				return zipMemoryStream;
@@ -294,7 +294,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 					.Select(d => d.FullName);
 				var directoriesToInclude = toUpdateDirectories.Append(fp.ExerciseDirectory.FullName).ToList();
 
-				var ms = ZipUtils.CreateZipFromDirectory(directoriesToInclude, excluded, null, Encoding.UTF8);
+				var ms = ZipUtils.CreateZipFromDirectory(directoriesToInclude, excluded, null);
 				log.Info($"Собираю zip-архив для проверки: zip-архив собран, {ms.Length} байтов");
 				return ms;
 			}

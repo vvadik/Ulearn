@@ -11,13 +11,15 @@ namespace Ulearn.Common
 {
 	public static class ZipUtils
 	{
+		public static Encoding Cp866 => Encoding.GetEncoding(866);
+
 		public static MemoryStream CreateZipFromDirectory([NotNull]List<string> directoriesToInclude, [CanBeNull]List<string> excludeCriterias,
-			[CanBeNull]IEnumerable<FileContent> filesToUpdateOrCreate, [CanBeNull]Encoding encoding)
+			[CanBeNull]IEnumerable<FileContent> filesToUpdateOrCreate)
 		{
 			if (excludeCriterias == null)
 				excludeCriterias = excludeCriterias.EmptyIfNull().ToList();
 			var excludeRegexps = GetExcludeRegexps(excludeCriterias).ToList();
-			using (var zip = encoding != null ? new ZipFile(encoding) : new ZipFile())
+			using (var zip = new ZipFile())
 			{
 				foreach (var pathToDirectory in directoriesToInclude)
 				{

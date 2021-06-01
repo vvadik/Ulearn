@@ -28,7 +28,7 @@ namespace RunCheckerJob
 			var imageName = sandboxDir.Name;
 			var srcDirectory = new DirectoryInfo(Path.GetFullPath(Path.Combine(sandboxDir.FullName, "sample/src/")));
 			byte[] zipBytes;
-			using (var stream = ZipUtils.CreateZipFromDirectory(new List<string> { srcDirectory.FullName }, new List<string> { "node_modules", ".idea" }, null, Encoding.UTF8))
+			using (var stream = ZipUtils.CreateZipFromDirectory(new List<string> { srcDirectory.FullName }, new List<string> { "node_modules", ".idea" }, null))
 				zipBytes = stream.ToArray();
 			var submissionFile = new FileInfo(Path.GetFullPath(Path.Combine(sandboxDir.FullName, "sample/submission.json")));
 			var submission = JsonConvert.DeserializeObject<CommandRunnerSubmission>(File.ReadAllText(submissionFile.FullName));
