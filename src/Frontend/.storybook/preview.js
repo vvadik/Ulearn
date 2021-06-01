@@ -8,6 +8,10 @@ import 'src/common.less';
 import 'moment/locale/ru';
 import "moment-timezone";
 
+if(!$){
+	console.error("jQuery isn't imported");
+}
+
 import { ThemeContext } from "ui";
 
 const viewports = {
