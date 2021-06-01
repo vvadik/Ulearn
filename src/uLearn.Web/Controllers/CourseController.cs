@@ -118,12 +118,7 @@ namespace uLearn.Web.Controllers
 				if (slide is ExerciseSlide)
 					queueItem = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(checkQueueItemId.Value);
 
-				if (queueItem != null)
-				{
-					if (!groupsRepo.CanInstructorViewStudent(User, queueItem.UserId))
-						return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-				}
-				else
+				if (queueItem == null)
 				{
 					/* It's possible when checking has not been fully checked, lock has been released, but after it user re-send his solution and we removed old waiting checking */
 					var fakeQueueItem = slide is QuizSlide ? (AbstractManualSlideChecking)new ManualQuizChecking() : new ManualExerciseChecking();
