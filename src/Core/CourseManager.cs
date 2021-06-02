@@ -415,7 +415,7 @@ namespace Ulearn.Core
 
 		private static void CreateEmptyCourse(string courseId, string courseTitle, string path)
 		{
-			using (var zip = new ZipFile())
+			using (var zip = new ZipFile(Encoding.UTF8))
 			{
 				zip.AddEntry("course.xml",
 					"<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n" +
