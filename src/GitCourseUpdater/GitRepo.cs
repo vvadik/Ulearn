@@ -94,13 +94,17 @@ namespace GitCourseUpdater
 		{
 			log.Info($"Start load '{repoDirName}' to zip");
 			var repoDir = reposBaseDir.GetSubdirectory(repoDirName);
-			if (!new DirectoryInfo(Path.Combine(repoDir.FullName, courseSubdirectoryInRepo)).GetFile("course.xml").Exists)
+			var courseRepoDir = new DirectoryInfo(Path.Combine(repoDir.FullName, courseSubdirectoryInRepo));
+			if (!courseRepoDir.GetFile("course.xml").Exists)
 			{
-				var courseXmlDirectory = new DirectoryInfo(Path.Combine(repoDir.FullName, courseSubdirectoryInRepo)).GetFiles("course.xml", SearchOption.AllDirectories).FirstOrDefault()?.Directory;
+				var courseXmlDirectory = courseRepoDir.GetFiles("course.xml", SearchOption.AllDirectories).FirstOrDefault()?.Directory;
 				if (courseXmlDirectory != null)
-					courseSubdirectoryInRepo = courseXmlDirectory.GetRelativePath(reposBaseDir.GetSubdirectory(repoDirName));
+				{
+					courseRepoDir = courseXmlDirectory;
+					courseSubdirectoryInRepo = courseXmlDirectory.GetRelativePath(repoDir);
+				}
 			}
-			var zip = ZipUtils.CreateZipFromDirectory(new List<string> {courseSubdirectoryInRepo}, new List<string> {".git/"},  null);
+			var zip = ZipUtils.CreateZipFromDirectory(new List<string> { courseRepoDir.FullName }, new List<string> {".git/"},  null);
 			log.Info($"Successfully load '{repoDirName}' to zip");
 			return (zip, courseSubdirectoryInRepo);
 		}
