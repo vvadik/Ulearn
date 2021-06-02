@@ -591,10 +591,9 @@ namespace Ulearn.Core
 
 		public static DirectoryInfo GetCoursesDirectory()
 		{
-			// var coursesDirectory = ConfigurationManager.AppSettings["ulearn.coursesDirectory"];
 			var coursesDirectory = ApplicationConfiguration.Read<UlearnConfiguration>().CoursesDirectory;
-			if (string.IsNullOrEmpty(coursesDirectory))
-				coursesDirectory = Utils.GetAppPath() + @"\..\Courses\";
+			if (!Path.IsPathRooted(coursesDirectory))
+				coursesDirectory = Path.Combine(Utils.GetAppPath(), coursesDirectory);
 
 			return new DirectoryInfo(coursesDirectory);
 		}

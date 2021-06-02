@@ -121,8 +121,6 @@ namespace Ulearn.Web.Api
 
 		private static readonly Regex coursesStaticFilesPattern = new Regex("/courses/[^/]+/files", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-		
-
 		protected override IApplicationBuilder UseStaticFiles(IApplicationBuilder app)
 		{
 			var contentTypeProvider = new FileExtensionContentTypeProvider(CourseStaticFilesHelper.AllowedExtensions);
