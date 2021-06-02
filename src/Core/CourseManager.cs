@@ -436,7 +436,7 @@ namespace Ulearn.Core
 			nsResolver.AddNamespace("ulearn", "https://ulearn.me/schema/v2");
 			using (var zip = ZipFile.Read(path, new ReadOptions { Encoding = ZipUtils.Cp866 }))
 			{
-				var courseXml = zip.Entries.FirstOrDefault(e => Path.GetFileName(e.FileName) == "course.xml" && !e.IsDirectory);
+				var courseXml = zip.Entries.FirstOrDefault(e => Path.GetFileName(e.FileName).Equals("course.xml", StringComparison.OrdinalIgnoreCase) && !e.IsDirectory);
 				if (courseXml != null)
 					UpdateXmlAttribute(zip[courseXml.FileName], "//ulearn:course", "title", courseTitle, zip, nsResolver);
 			}

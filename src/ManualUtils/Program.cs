@@ -392,7 +392,7 @@ namespace ManualUtils
 			var stagingDirectory = mainDirectory.GetSubdirectory("Courses.Staging");
 			var versionsDirectory = mainDirectory.GetSubdirectory("Courses.Versions");
 
-			var newMainDirectory = mainDirectory.Parent.CreateSubdirectory("сourses.new");
+			var newMainDirectory = mainDirectory.Parent.CreateSubdirectory("courses.new");
 			newMainDirectory.EnsureExists();
 			newMainDirectory.ClearDirectory();
 			var newStagingDirectory = newMainDirectory.GetSubdirectory("Courses.Staging");
