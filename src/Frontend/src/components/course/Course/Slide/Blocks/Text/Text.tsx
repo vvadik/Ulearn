@@ -1,5 +1,5 @@
 import React, { createRef, RefObject, useEffect, useRef } from "react";
-
+import { useHistory } from 'react-router-dom';
 import classNames from "classnames";
 import translateCode from "src/codeTranslator/translateCode";
 import scrollToView from "src/utils/scrollToView";
@@ -17,6 +17,7 @@ interface Props {
 function Text(props: Props): React.ReactElement {
 	const textContainer: RefObject<HTMLDivElement> = createRef();
 	const prevProps = usePreviousProps(props);
+	const history = useHistory();
 
 	useEffect(() => {
 		const { disableTranslatingTex = true, disableAnchorsScrollHandlers = true, content, children, } = props;
@@ -55,6 +56,17 @@ function Text(props: Props): React.ReactElement {
 				e.stopPropagation();
 				e.preventDefault();
 				scrollToHashAnchor(hash);
+			});
+		}
+
+		const sameOriginLinks = anchors.filter(
+			a => a.origin === window.location.origin && a.pathname === window.location.pathname
+		);
+		for (const anchor of sameOriginLinks) {
+			anchor.addEventListener('click', (e) => {
+				e.stopPropagation();
+				e.preventDefault();
+				history.push(anchor.href);
 			});
 		}
 	}
