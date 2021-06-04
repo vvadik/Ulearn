@@ -19,7 +19,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 
 		public override void DoExecute()
 		{
-			var ulearnDir = CourseManager.GetCourseXmlDirectory(CourseDirectory);
+			var ulearnDir = CourseDirectory;
 			Console.Write("Loading Ulearn course from {0} ... ", ulearnDir.Name);
 			var sw = Stopwatch.StartNew();
 			var course = new CourseLoader().Load(ulearnDir);
