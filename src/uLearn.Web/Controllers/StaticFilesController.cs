@@ -11,7 +11,7 @@ using Web.Api.Client;
 
 namespace uLearn.Web.Controllers
 {
-	[Obsolete("Use api")]
+	[Obsolete("Use api")] // Для openedu и stepik
 	[AllowAnonymous]
 	public class StaticFilesController : Controller
 	{

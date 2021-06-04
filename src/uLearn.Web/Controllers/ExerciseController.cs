@@ -587,7 +587,7 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
-		[Obsolete("Use api")]
+		[Obsolete("Use api")] // Для openedu и stepik
 		[System.Web.Mvc.AllowAnonymous]
 		public async Task<ActionResult> StudentZip(string courseId, Guid slideId, string fileName)
 		{
