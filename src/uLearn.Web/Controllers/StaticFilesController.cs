@@ -13,6 +13,8 @@ namespace uLearn.Web.Controllers
 {
 	[Obsolete("Use api")] // Для openedu и stepik
 	[AllowAnonymous]
+	// Нельзя, чтобы в папке c web была подпапка Courses или ярлык на нее (как было раньше).
+	// Тогда пользователь будет видеть 500 и писаться ошибка 'Server cannot append header after HTTP headers have been sent' at System.Web.HttpResponse.AppendCookie(HttpCookie cookie)
 	public class StaticFilesController : Controller
 	{
 		private static readonly UlearnConfiguration config = ApplicationConfiguration.Read<UlearnConfiguration>();
