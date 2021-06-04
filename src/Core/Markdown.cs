@@ -123,6 +123,11 @@ namespace Ulearn.Core
 					else
 						tag.attributes["href"] = CourseUrlHelper.GetAbsoluteUrl(context.BaseUrlWeb, href);
 				}
+				else
+				{
+					if (IsUlearnUrl(href))
+						tag.attributes.Remove("target");
+				}
 			}
 
 			public override void OnPrepareImage(HtmlTag tag, bool TitledImage)
@@ -138,6 +143,12 @@ namespace Ulearn.Core
 			private bool IsAbsoluteUrl(string url)
 			{
 				return Uri.TryCreate(url, UriKind.Absolute, out _);
+			}
+
+			private bool IsUlearnUrl(string url)
+			{
+				return url.IndexOf(context.BaseUrlApi, StringComparison.OrdinalIgnoreCase) >= 0
+						|| url.IndexOf(context.BaseUrlWeb, StringComparison.OrdinalIgnoreCase) >= 0;
 			}
 
 			private readonly Regex fileLinkRegex = new Regex(@".*\.\w{1,5}$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
