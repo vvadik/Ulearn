@@ -419,9 +419,16 @@ const args: Props = {
 		const info: AntiplagiarismInfo = { suspicionCount, suspicionLevel };
 		return returnPromiseAfterDelay(2000, info);
 	},
-	deleteReviewComment: (submissionId, reviewId) => {
+	deleteReviewComment: (submissionId, reviewId, commentId) => {
 		const submission = args.studentSubmissions.find(s => s.id === submissionId);
 		if(submission) {
+			if(commentId !== undefined) {
+				const review = submission.manualCheckingReviews.find(c => c.id === reviewId)!;
+				review.comments = review.comments.filter(c => c !== commentId);
+				submission.manualCheckingReviews = [...submission.manualCheckingReviews.slice(0,
+					submission.manualCheckingReviews.length - 2), { ...review }];
+				return;
+			}
 			submission.manualCheckingReviews = submission.manualCheckingReviews.filter(c => c.id !== reviewId);
 		}
 	},

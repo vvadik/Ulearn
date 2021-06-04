@@ -10,6 +10,7 @@ import texts from './AddCommentForm.texts';
 import styles from './AddCommentForm.less';
 import { MarkdownDescription } from "src/consts/comments";
 import MarkdownEditor from "src/components/comments/CommentSendForm/MarkdownEditor/MarkdownEditor";
+import scrollToView from "../../../../../../utils/scrollToView";
 
 export interface ReviewComment {
 	id: number;
@@ -90,6 +91,7 @@ class AddCommentForm extends React.Component<Props, State> {
 	private maxRowCount = 7;
 	private maxCommentLineCount = 2;
 	private maxCommentHintWidth = 374;
+	private wrapper = React.createRef<HTMLDivElement>();
 
 	constructor(props: Props) {
 		super(props);
@@ -126,6 +128,15 @@ class AddCommentForm extends React.Component<Props, State> {
 				favouriteComments: overextendedFavouriteComments,
 			});
 		}
+		if(this.wrapper.current) {
+			const rect = this.wrapper.current.getBoundingClientRect();
+			if(
+				rect.top <= 0 ||
+				rect.bottom >= (window.innerHeight || document.documentElement.clientHeight)
+			) {
+				this.wrapper.current.scrollIntoView();
+			}
+		}
 	}
 
 	markOverextendedComments = (comments: ReviewCommentWithStyles[]): ReviewCommentWithStyles[] | null => {
@@ -157,7 +168,7 @@ class AddCommentForm extends React.Component<Props, State> {
 		};
 
 		return (
-			<div className={ styles.wrapper } style={ style }>
+			<div ref={ this.wrapper } className={ styles.wrapper } style={ style }>
 				<Delete className={ styles.closeFormButton } onClick={ onClose }/>
 				{ this.renderTextareaSection(value, canBeAddedToFavourite,) }
 				<div className={ styles.divider }/>

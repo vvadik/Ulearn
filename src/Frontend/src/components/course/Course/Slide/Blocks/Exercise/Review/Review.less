@@ -50,12 +50,17 @@
   cursor: pointer;
 }
 
+.outdatedComment {
+  opacity: 0.75;
+}
+
 .commentMounted {
-  will-change: margin-top, margin-left;
-  transition: margin-top .2s ease-in-out, margin-left .3s ease-in-out;
+  will-change: margin-top, margin-left, opacity;
+  transition: margin-top .2s ease-in-out, margin-left .3s ease-in-out, opacity .2s ease-in-out;
 }
 
 .selectedReviewCommentWrapper {
+  opacity: 1;
   margin-left: 2px;
 }
 
@@ -145,7 +150,7 @@
   margin-bottom: 0;
 }
 
-.commentReply:hover {
+.authorWrapper:hover {
   .innerCommentDeleteButton {
     color: @progressBarRed;
   }

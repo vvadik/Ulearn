@@ -19,9 +19,13 @@ interface CommentReplies {
 	[id: number]: string;
 }
 
+export interface InstructorReviewInfo extends ReviewInfo {
+	outdated?: boolean;
+}
+
 interface StateComment {
 	margin: number;
-	review: ReviewInfo;
+	review: InstructorReviewInfo;
 	ref: React.RefObject<HTMLLIElement>;
 }
 
@@ -33,11 +37,12 @@ interface ReviewState {
 
 interface ReviewProps {
 	editor: Editor | null;
-	reviews: ReviewInfo[];
+	reviews: InstructorReviewInfo[];
 	selectedReviewId: number;
 	userId?: string | null;
 
 	reviewBackgroundColor?: 'orange' | 'gray';
+	disableLineNumbers?: boolean;
 
 	onSelectComment: (e: React.MouseEvent | React.FocusEvent, id: number,) => void;
 	addReviewComment: (reviewId: number, comment: string) => void;
@@ -86,7 +91,7 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 
 	componentDidMount(): void {
 		//add margins in a moment after mounting, so code could resize correctly to calculate correct topAnchor
-		this.setState({}, () => this.addMarginsToComments());
+		this.setState({}, this.addMarginsToComments);
 	}
 
 	componentDidUpdate(prevProps: ReviewProps): void {
@@ -209,11 +214,15 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 	};
 
 	renderTopLevelComment = ({ review, margin, ref, }: StateComment, i: number,): React.ReactNode => {
-		const { id, comments } = review;
+		const { id, comments, } = review;
 		const { selectedReviewId, onSelectComment, } = this.props;
 		const { commentsReplies, marginsAdded, } = this.state;
-		const className = classNames(styles.comment, { [styles.commentMounted]: marginsAdded },
-			{ [styles.selectedReviewCommentWrapper]: selectedReviewId === id },);
+		const className = classNames(
+			styles.comment,
+			{ [styles.outdatedComment]: review.outdated },
+			{ [styles.commentMounted]: marginsAdded },
+			{ [styles.selectedReviewCommentWrapper]: selectedReviewId === id },
+		);
 
 		const authorToRender = review.author ?? botUser;
 
@@ -244,7 +253,7 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 		);
 	};
 
-	renderComment(review: ReviewInfo): React.ReactNode;
+	renderComment(review: InstructorReviewInfo): React.ReactNode;
 	renderComment(reviewComment: ReviewCommentResponse, reviewId: number): React.ReactNode;
 	renderComment({
 			id,
@@ -255,10 +264,10 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 			publishTime,
 			renderedText,
 			renderedComment,
-		}: ReviewInfo & ReviewCommentResponse,
+		}: InstructorReviewInfo & ReviewCommentResponse,
 		reviewId: number | null = null
 	): React.ReactNode {
-		const { userId, } = this.props;
+		const { userId, disableLineNumbers, } = this.props;
 		const authorToRender = author ?? botUser;
 
 		const time = addingTime || publishTime;
@@ -272,7 +281,7 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 							<span className={ styles.authorName }>
 								{ authorToRender.visibleName }
 							</span>
-							{ startLine >= 0 &&
+							{ !disableLineNumbers && startLine >= 0 &&
 							<span className={ styles.commentLineNumber }>
 								{ texts.getLineCapture(startLine, finishLine) }
 							</span>
@@ -281,25 +290,11 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 								authorToRender.id === userId &&
 								<Trash
 									data-id={ id }
-									data-reviewid={ reviewId }
+									data-reviewId={ reviewId }
 									className={ styles.innerCommentDeleteButton }
 									onClick={ this.deleteReviewOrComment }
 									size={ 12 }
 								/>
-
-								/* TODO Not included in release
-																(reviewId
-																		? <Trash
-																			className={ styles.innerCommentDeleteButton }
-																			onClick={ () => deleteReviewComment(reviewId, id) }
-																			size={ 12 }
-																		/>
-																		: <Delete
-																			className={ styles.commentDeleteButton }
-																			onClick={ () => deleteReviewComment(reviewId, id) }
-																			size={ 14 }
-																		/>
-																)*/
 							}
 						</span>
 						{ time &&
@@ -321,6 +316,8 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 		const data = (event.currentTarget as HTMLElement).dataset;
 		if(data.reviewid) {
 			deleteReviewOrComment(parseInt(data.reviewid), data.id ? parseInt(data.id) : undefined);
+		} else {
+			deleteReviewOrComment(parseInt(data.id!));
 		}
 	};
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 
 import styles from './AntiplagiarismHeader.less';
@@ -6,8 +6,10 @@ import texts from './AntiplagiarismHeader.texts';
 import { Button } from "ui";
 import cn from "classnames";
 
+type SuspicionLevel = 'notChecking' | 'accepted' | 'warning' | 'strongWarning' | 'running';
+
 export interface AntiplagiarismInfo {
-	suspicionLevel: 'notChecking' | 'accepted' | 'warning' | 'strongWarning' | 'running';
+	suspicionLevel: SuspicionLevel;
 	suspicionCount: number;
 }
 
@@ -32,6 +34,24 @@ function AntiplagiarismHeader({
 			suspicionCount: 0,
 			loadingInfo: false,
 		});
+
+	const ref = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				if(entry.isIntersecting) {
+					ref.current?.classList.toggle(styles.sticky);
+				}
+			},
+			{
+				threshold: 0.1
+			}
+		);
+		if(ref.current) {
+			observer.observe(ref.current);
+		}
+	}, [ref]);
 
 	if(shouldCheck && !state.loadingInfo && state.suspicionLevel === 'running') {
 		setState({ ...state, loadingInfo: true });
@@ -68,11 +88,10 @@ function AntiplagiarismHeader({
 		}
 	}
 
-
 	return (
-		<div className={ cn(styles.header, color) }>
+		<div ref={ ref } className={ cn(styles.header, color) }>
 			<span className={ styles.text }>{ text }</span>
-			{ (state.suspicionLevel === 'warning' || state.suspicionLevel === 'strongWarning') && <>
+			{ (shouldShowWarning(state.suspicionLevel)) && <>
 				<Link className={ cn(styles.seeDetailsLink, styles.text) } to={ '' }>
 					{ texts.buildLinkToAntiplagiarismText }
 				</Link>
@@ -85,6 +104,10 @@ function AntiplagiarismHeader({
 			</> }
 		</div>
 	);
+
+	function shouldShowWarning(suspicionLevel: SuspicionLevel) {
+		return suspicionLevel === 'warning' || suspicionLevel === 'strongWarning';
+	}
 }
 
 export default AntiplagiarismHeader;

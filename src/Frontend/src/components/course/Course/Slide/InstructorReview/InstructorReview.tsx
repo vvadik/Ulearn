@@ -25,7 +25,7 @@ import { Language } from "src/consts/languages";
 import { ReviewInfo, SubmissionInfo } from "src/models/exercise";
 import { ShortUserInfo } from "src/models/users";
 import { ShortGroupInfo } from "src/models/comments";
-import CodeMirror, { Editor, EditorConfiguration, } from "codemirror";
+import CodeMirror, { Editor, EditorConfiguration, TextMarker, } from "codemirror";
 
 import texts from "./InstructorReview.texts";
 
@@ -285,6 +285,7 @@ class InstructorReview extends React.Component<Props, State> {
 			<div className={ styles.positionWrapper }>
 				<div className={ styles.wrapper }>
 					<Controlled
+						//controlled component refreshes more wisely, but it need onChange function, so we mocking it
 						onBeforeChange={ this.mock }
 						onSelection={ this.onSelectionChange }
 						editorDidMount={ this.onEditorMount }
@@ -298,6 +299,7 @@ class InstructorReview extends React.Component<Props, State> {
 					/>
 					{ reviewsWithTextMarkers.length > 0 &&
 					<Review
+						disableLineNumbers={ diffInfo && showDiff }
 						reviewBackgroundColor={ 'gray' }
 						editor={ editor }
 						userId={ user.id }
@@ -365,11 +367,13 @@ class InstructorReview extends React.Component<Props, State> {
 		const { studentSubmissions, } = this.props;
 
 		const items = [...studentSubmissions.map(
-			(submission, index,) => ([submission.id,
+			(submission, index,) => ([
+				submission.id,
 				texts.getSubmissionCaption(
 					submission,
 					index === 0,
-					index === 0)]))
+					index === 0)
+			]))
 		];
 
 		return (
@@ -399,7 +403,7 @@ class InstructorReview extends React.Component<Props, State> {
 		const { studentSubmissions, } = this.props;
 		const { reviewsWithTextMarkers, } = this.state;
 
-		reviewsWithTextMarkers.forEach(r => r.markers.forEach(m => m.clear()));
+		reviewsWithTextMarkers.forEach(r => r.markers.forEach((m: TextMarker) => m.clear()));
 
 		const currentSubmissionIndex = studentSubmissions.findIndex(s => s.id === id);
 		const currentSubmission = studentSubmissions[currentSubmissionIndex];
@@ -425,7 +429,7 @@ class InstructorReview extends React.Component<Props, State> {
 		}
 		const doc = editor.getDoc();
 		let newReviews = getAllReviewsFromSubmission(currentSubmission);
-		let reviewsWithTextMarkers = [];
+		let reviewsWithTextMarkers: ReviewInfoWithMarker[] = [];
 
 		if(showDiff && diffInfo) {
 			newReviews = newReviews.map(r => ({
@@ -443,6 +447,7 @@ class InstructorReview extends React.Component<Props, State> {
 			const oldReviews = getAllReviewsFromSubmission(diffInfo.prevReviewedSubmission,)
 				.map(r => ({
 					...r,
+					outdated: true,
 					startLine: diffInfo.oldCodeNewLineIndex[r.startLine],
 					finishLine: diffInfo.oldCodeNewLineIndex[r.finishLine],
 				}));
@@ -461,26 +466,32 @@ class InstructorReview extends React.Component<Props, State> {
 		}
 
 		if(showDiff && diffInfo) {
+			//addding a line class via addLineClass triggers rerender on each method call, it cause perfomance issues
+			//instead of it we can add class directly to line wrappers
+			const linesWrapper = editor.getWrapperElement().getElementsByClassName('CodeMirror-code')[0];
 			for (let i = 0; i < diffInfo.diffByBlocks.length; i++) {
 				const { type, } = diffInfo.diffByBlocks[i];
-
 				if(type) {
+					const lineWrapper = linesWrapper.children[i];
+					const lineNumberWrapper = document.createElement('div');
+
+					lineWrapper.prepend(lineNumberWrapper);
+
 					switch (type) {
 						case "added": {
-							editor.addLineClass(i, 'background', styles.addedLinesCodeMirror,);
-							editor.addLineClass(i, 'gutter', styles.addedLinesCodeMirrorGutter);
+							lineWrapper.classList.add(styles.addedLinesCodeMirror);
+							lineNumberWrapper.classList.add(styles.addedLinesGutter);
 							break;
 						}
 						case "removed": {
-							editor.addLineClass(i, 'background', styles.removedLinesCodeMirror,);
-							editor.addLineClass(i, 'gutter', styles.removedLinesCodeMirrorGutter);
+							lineWrapper.classList.add(styles.removedLinesCodeMirror);
+							lineNumberWrapper.classList.add(styles.removedLinesGutter);
 							break;
 						}
 					}
 				}
 			}
 		}
-
 		this.setState({
 			reviewsWithTextMarkers,
 		});
@@ -677,7 +688,6 @@ class InstructorReview extends React.Component<Props, State> {
 
 				return pv;
 			}, []);
-
 		if(newRanges.length === 0) {
 			data.update([{ head: end, anchor: end }]);
 		} else {

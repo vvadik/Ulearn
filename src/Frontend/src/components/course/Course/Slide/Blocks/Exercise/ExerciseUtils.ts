@@ -169,18 +169,32 @@ export function addTextMarkerToReviews(
 				.reduce((pv: {
 					start: { line: number, position: number, },
 					finish: { line: number, position: number },
-				}[], cv) => {
+				}[], cv, index, arr,) => {
 					const line = cv - 1;
 
 					if(pv.length === 0 || line - pv[pv.length - 1].finish.line !== 1) {
 						pv.push({
-							start: { line, position: pv.length === 0 ? startPosition : 0, },
-							finish: { line, position: finishPosition, },
+							start: {
+								line,
+								position: pv.length === 0
+									? startPosition
+									: 0,
+							},
+							finish: {
+								line,
+								position: index === arr.length - 1
+									? finishPosition
+									: 1000,
+							},
 						});
 						return pv;
 					}
-					pv[pv.length - 1].finish.line = line;
-
+					pv[pv.length - 1].finish = {
+						line,
+						position: index === arr.length - 1
+							? finishPosition
+							: 1000,
+					};
 					return pv;
 				}, []);
 		}
