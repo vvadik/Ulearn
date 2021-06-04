@@ -88,14 +88,14 @@ namespace Ulearn.Web.Api.Controllers.Comments
 
 			var course = await courseManager.FindCourseAsync(comment.CourseId);
 			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIds(course, UserId);
-			var slide = (await courseManager.FindCourseAsync(comment.CourseId))?.FindSlideById(comment.SlideId, false, visibleUnitsIds);
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(User.GetUserId(), comment.CourseId, CourseRoleType.Instructor).ConfigureAwait(false);
+			var slide = course.FindSlideById(comment.SlideId, isInstructor, visibleUnitsIds);
 			if (slide == null)
 				return NotFound(new ErrorResponse($"Slide with comment {commentId} not found"));
 			var slideIsExercise = slide is ExerciseSlide;
 
 			DefaultDictionary<int, int> likesCount;
 			var likedByUserCommentsIds = (await commentLikesRepo.GetCommentsLikedByUserAsync(comment.CourseId, comment.SlideId, UserId).ConfigureAwait(false)).ToHashSet();
-			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(User.GetUserId(), comment.CourseId, CourseRoleType.Instructor).ConfigureAwait(false);
 			var canViewAllGroupMembers = false;
 			HashSet<int> userAvailableGroupsIds = null;
 			if (isInstructor)
