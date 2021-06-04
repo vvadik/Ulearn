@@ -121,7 +121,7 @@ namespace Ulearn.Common
 			using (var zip = ZipFile.Read(inputZipFileName, new ReadOptions { Encoding = Cp866 }))
 			{
 				var rootFiles = zip.SelectEntries(fileNameInRoot);
-				if (rootFiles.Count <= 1 && rootFiles.All(x => x.FileName.Equals(fileNameInRoot, StringComparison.OrdinalIgnoreCase)) )
+				if (rootFiles.Count == 0 || rootFiles.Any(x => x.FileName.Equals(fileNameInRoot, StringComparison.OrdinalIgnoreCase)))
 					return new FileStream(inputZipFileName, FileMode.Open, FileAccess.Read);
 
 				var rootFile = rootFiles.First();
