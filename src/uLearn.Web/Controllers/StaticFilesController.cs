@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Ulearn.Common.Api;
@@ -10,6 +11,8 @@ using Web.Api.Client;
 
 namespace uLearn.Web.Controllers
 {
+	[Obsolete("Use api")]
+	[AllowAnonymous]
 	public class StaticFilesController : Controller
 	{
 		private static readonly UlearnConfiguration config = ApplicationConfiguration.Read<UlearnConfiguration>();
