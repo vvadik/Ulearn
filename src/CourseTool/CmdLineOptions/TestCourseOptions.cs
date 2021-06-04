@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using CommandLine;
-using Ulearn.Common.Extensions;
+using Ulearn.Core;
 using uLearn.CourseTool.Validating;
 using Ulearn.Core.Courses;
 
@@ -19,8 +19,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 
 		public override void DoExecute()
 		{
-			var ulearnDir = new DirectoryInfo($"{Dir}/{Config.ULearnCourseId}");
-			ulearnDir = GetCourseXmlDirectory(ulearnDir);
+			var ulearnDir = CourseManager.GetCourseXmlDirectory(CourseDirectory);
 			Console.Write("Loading Ulearn course from {0} ... ", ulearnDir.Name);
 			var sw = Stopwatch.StartNew();
 			var course = new CourseLoader().Load(ulearnDir);
@@ -67,17 +66,6 @@ namespace uLearn.CourseTool.CmdLineOptions
 			Console.WriteLine("Exit code " + Environment.ExitCode);
 			Console.ReadLine();
 			Environment.Exit(Environment.ExitCode);
-		}
-
-		private static DirectoryInfo GetCourseXmlDirectory(DirectoryInfo directory)
-		{
-			if (!directory.GetFile("course.xml").Exists)
-			{
-				var courseXmlDirectory = directory.GetFiles("course.xml", SearchOption.AllDirectories).FirstOrDefault()?.Directory;
-				if (courseXmlDirectory != null)
-					directory = courseXmlDirectory;
-			}
-			return directory;
 		}
 
 		private string GenerateHtmlReport(Course course, List<string> errors)

@@ -602,5 +602,16 @@ namespace Ulearn.Core
 		{
 			return exerciseStudentZipsCache.GenerateOrFindZip(courseId, slide, GetExtractedCourseDirectory(courseId).FullName);
 		}
+
+		public static DirectoryInfo GetCourseXmlDirectory(DirectoryInfo directory)
+		{
+			if (!directory.GetFile("course.xml").Exists)
+			{
+				var courseXmlDirectory = directory.GetFiles("course.xml", SearchOption.AllDirectories).FirstOrDefault()?.Directory;
+				if (courseXmlDirectory != null)
+					directory = courseXmlDirectory;
+			}
+			return directory;
+		}
 	}
 }
