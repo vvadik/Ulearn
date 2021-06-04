@@ -18,7 +18,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 		private string profile;
 
 		[Option('d', "dir", HelpText = "Working directory for the project")]
-		public string Dir
+		public string WorkingDirectory
 		{
 			get => dir ?? Directory.GetCurrentDirectory();
 			set => dir = value;
@@ -31,17 +31,17 @@ namespace uLearn.CourseTool.CmdLineOptions
 			set => profile = value;
 		}
 
-		public string ConfigFile => Dir + "/config.xml";
+		public string ConfigFile => WorkingDirectory + "/config.xml";
 
 		public Config Config => config.Value;
 		private readonly Lazy<Config> config;
 
-		public DirectoryInfo CourseDirectory => CourseManager.GetCourseXmlDirectory(new DirectoryInfo(Path.Combine(Dir, Config.ULearnCoursePackageRoot)));
+		public DirectoryInfo CourseDirectory => CourseManager.GetCourseXmlDirectory(new DirectoryInfo(Path.Combine(WorkingDirectory, Config.ULearnCoursePackageRoot)));
 
 		public void InitializeDirectoryIfNotYet()
 		{
-			if (!Directory.Exists(Dir))
-				Directory.CreateDirectory(Dir);
+			if (!Directory.Exists(WorkingDirectory))
+				Directory.CreateDirectory(WorkingDirectory);
 			var configTemplateFile = Path.Combine(Utils.GetRootDirectory(), "templates/config.xml");
 			File.Copy(configTemplateFile, ConfigFile);
 			Process.Start("notepad", ConfigFile);

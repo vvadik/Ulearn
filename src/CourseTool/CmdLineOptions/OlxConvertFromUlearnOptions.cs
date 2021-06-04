@@ -23,12 +23,12 @@ namespace uLearn.CourseTool.CmdLineOptions
 
 			Console.WriteLine("Please, download course from Edx (tar.gz from Tools - Export menu) and save it in working directory");
 
-			var tarGzPath = Dir.GetSingleFile(CourseTarGz ?? "*.tar.gz");
+			var tarGzPath = WorkingDirectory.GetSingleFile(CourseTarGz ?? "*.tar.gz");
 
-			EdxInteraction.ExtractEdxCourseArchive(Dir, tarGzPath, true);
+			EdxInteraction.ExtractEdxCourseArchive(WorkingDirectory, tarGzPath, true);
 
 			Console.WriteLine("Loading edx course...");
-			var edxCourse = EdxCourse.Load(Dir + "/olx");
+			var edxCourse = EdxCourse.Load(WorkingDirectory + "/olx");
 			if (edxCourse.CourseWithChapters.Chapters.Length != 0)
 			{
 				Console.WriteLine("List of chapters to be removed or replaced:");
@@ -46,7 +46,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 			}
 
 			var video = LoadVideoInfo();
-			VideoHistory.UpdateHistory(Dir, video);
+			VideoHistory.UpdateHistory(WorkingDirectory, video);
 
 			Console.WriteLine($"Loading ulearn course from {Config.ULearnCourseId}");
 			var course = new CourseLoader().Load(CourseDirectory);
@@ -57,16 +57,16 @@ namespace uLearn.CourseTool.CmdLineOptions
 				Config,
 				profile.UlearnBaseUrlApi,
 				profile.UlearnBaseUrlWeb,
-				video.Records.ToDictionary(x => x.Data.Id, x => x.Guid.GetNormalizedGuid()), CourseDirectory).Save(Dir + "/olx");
+				video.Records.ToDictionary(x => x.Data.Id, x => x.Guid.GetNormalizedGuid()), CourseDirectory).Save(WorkingDirectory + "/olx");
 
-			EdxInteraction.CreateEdxCourseArchive(Dir, course.Id);
+			EdxInteraction.CreateEdxCourseArchive(WorkingDirectory, course.Id);
 
 			Console.WriteLine($"Now you can upload {course.Id}.tar.gz to edx via Tools - Import menu");
 		}
 
 		private Video LoadVideoInfo()
 		{
-			var videoFile = $"{Dir}/{Config.Video}";
+			var videoFile = $"{WorkingDirectory}/{Config.Video}";
 			return File.Exists(videoFile)
 				? JsonConvert.DeserializeObject<Video>(File.ReadAllText(Config.Video))
 				: new Video { Records = new Record[0] };

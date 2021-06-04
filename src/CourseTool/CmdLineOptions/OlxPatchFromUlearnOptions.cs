@@ -19,11 +19,11 @@ namespace uLearn.CourseTool.CmdLineOptions
 			Console.WriteLine("Loading Ulearn course from {0}", CourseDirectory.Name);
 			var ulearnCourse = new CourseLoader().Load(CourseDirectory);
 			Console.WriteLine("Patching");
-			var videoJson = string.Format("{0}/{1}", Dir, config.Video);
+			var videoJson = string.Format("{0}/{1}", WorkingDirectory, config.Video);
 			var video = File.Exists(videoJson)
 				? JsonConvert.DeserializeObject<Video>(File.ReadAllText(videoJson))
 				: new Video { Records = new Record[0] };
-			var videoHistory = VideoHistory.UpdateHistory(Dir, video);
+			var videoHistory = VideoHistory.UpdateHistory(WorkingDirectory, video);
 			var videoGuids = videoHistory.Records
 				.SelectMany(x => x.Data.Select(y => Tuple.Create(y.Id, x.Guid.GetNormalizedGuid())))
 				.ToDictionary(x => x.Item1, x => x.Item2);
