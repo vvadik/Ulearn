@@ -4176,6 +4176,17 @@ footer:hover {
 .legacy-page .jumbotron-logo {
 	float: left;
 	margin: -20px 30px 0;
+	width: 200px;
+	height: 207px;
+	transition: background-image 0.1s ease-in-out;
+	background: url('../images/logo.png') no-repeat;
+	background-size: 200px 207px;
+}
+
+.legacy-page .jumbotron-logo:hover {
+	background-size: 200px 207px;
+	background-position: center;
+	background-image: url('../images/newLogo.png');
 }
 
 .legacy-page .terms-container .container,
