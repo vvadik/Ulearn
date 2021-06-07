@@ -1,15 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Text.RegularExpressions;
-using System.Xml.Linq;
 using CommandLine;
-using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
-using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Blocks;
 
 namespace uLearn.CourseTool.CmdLineOptions
@@ -19,14 +13,14 @@ namespace uLearn.CourseTool.CmdLineOptions
 	{
 		public override void DoExecute()
 		{
-			var course = new CourseLoader().Load(new DirectoryInfo(Path.Combine(Dir, Config.ULearnCourseId)));
-			Console.WriteLine($"{course.GetSlides(true).Count} slide(s) have been loaded from {Config.ULearnCourseId}");
+			var course = new CourseLoader().Load(CourseDirectory);
+			Console.WriteLine($"{course.GetSlidesNotSafe().Count} slide(s) have been loaded from {Config.ULearnCourseId}");
 
 			var resultHtmlFilename = $"{Config.ULearnCourseId}.annotations.html";
 			using (var writer = new StreamWriter(resultHtmlFilename))
 			{
 				writer.WriteLine($"<html><head><title>{course.Title}</title><style>.videoId {{ color: #999; font-size: 12px; }}</style></head><body>");
-				foreach (var slide in course.GetSlides(false)) // Для скрытых слайдов или блоков не генерируются аннотации
+				foreach (var slide in course.GetSlidesNotSafe())
 				{
 					var videoBlocks = slide.Blocks.OfType<YoutubeBlock>().Where(b => !b.Hide);
 					foreach (var videoBlock in videoBlocks)

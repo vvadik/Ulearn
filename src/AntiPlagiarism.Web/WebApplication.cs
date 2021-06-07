@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Filters;
 using Ulearn.Common.Api;
 using Ulearn.Core.Configuration;
+using Vostok.Applications.AspNetCore.Builders;
 using Vostok.Hosting.Abstractions;
 
 namespace AntiPlagiarism.Web
@@ -64,10 +65,14 @@ namespace AntiPlagiarism.Web
 			services.AddScoped<SnippetsExtractor>();
 			services.AddScoped<SubmissionSnippetsExtractor>();
 			services.AddScoped<NewSubmissionHandler>();
-			services.AddSingleton<AddNewSubmissionWorker>();
-			services.AddSingleton<UpdateOldSubmissionsFromStatisticsWorker>();
 			services.AddSingleton<TokensExtractor>();
 			services.AddSingleton<CodeUnitsExtractor>();
+		}
+
+		protected override void ConfigureBackgroundWorkers(IVostokAspNetCoreApplicationBuilder builder)
+		{
+			builder.AddHostedServiceFromApplication<AddNewSubmissionWorker>();
+			builder.AddHostedServiceFromApplication<UpdateOldSubmissionsFromStatisticsWorker>();
 		}
 	}
 }

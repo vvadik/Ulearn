@@ -27,14 +27,14 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 
 		public override void BuildUp(SlideLoadingContext context)
 		{
-			var statementsPath = Path.Combine(context.Unit.Directory.FullName, PolygonPath, "statements");
+			var statementsPath = Path.Combine(context.UnitDirectory.FullName, PolygonPath, "statements");
 			Blocks = GetBlocksProblem(statementsPath, context.CourseId, Id)
 				.Concat(Blocks.Where(block => !(block is MarkdownBlock)))
 				.ToArray();
 
 			var polygonExercise = Blocks.Single(block => block is PolygonExerciseBlock) as PolygonExerciseBlock;
 			polygonExercise!.ExerciseDirPath = Path.Combine(PolygonPath);
-			var problem = GetProblem(Path.Combine(context.Unit.Directory.FullName, PolygonPath, "problem.xml"), context.CourseSettings.DefaultLanguage);
+			var problem = GetProblem(Path.Combine(context.UnitDirectory.FullName, PolygonPath, "problem.xml"), context.CourseSettings.DefaultLanguage);
 			polygonExercise.TimeLimitPerTest = problem.TimeLimit;
 			polygonExercise.TimeLimit = (int)Math.Ceiling(problem.TimeLimit * problem.TestCount);
 			polygonExercise.UserCodeFilePath = problem.PathAuthorSolution;
@@ -42,7 +42,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises
 			polygonExercise.DefaultLanguage = context.CourseSettings.DefaultLanguage;
 			polygonExercise.RunCommand = $"python3.8 main.py {polygonExercise.Language} {polygonExercise.TimeLimitPerTest} {polygonExercise.UserCodeFilePath.Split('/', '\\')[1]}";
 			Title = problem.Title;
-			PrepareSolution(Path.Combine(context.Unit.Directory.FullName, PolygonPath, polygonExercise.UserCodeFilePath));
+			PrepareSolution(Path.Combine(context.UnitDirectory.FullName, PolygonPath, polygonExercise.UserCodeFilePath));
 
 			base.BuildUp(context);
 		}

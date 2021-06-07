@@ -66,11 +66,11 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 			yield return this;
 		}
 
-		public override Component ToEdxComponent(string displayName, string courseId, Slide slide, int componentIndex, string ulearnBaseUrl, DirectoryInfo coursePackageRoot)
+		public override Component ToEdxComponent(EdxComponentBuilderContext context)
 		{
-			var urlName = slide.NormalizedGuid + componentIndex;
+			var urlName = context.Slide.NormalizedGuid + context.ComponentIndex;
 			Debug.Assert(Language != null, nameof(Language) + " != null");
-			return new CodeComponent(urlName, displayName, urlName, Language.Value, Code);
+			return new CodeComponent(urlName, context.DisplayName, urlName, Language.Value, Code);
 		}
 
 		public override string ToString()

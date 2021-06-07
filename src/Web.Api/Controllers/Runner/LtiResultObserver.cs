@@ -34,7 +34,7 @@ namespace Ulearn.Web.Api.Controllers.Runner
 			{
 				try
 				{
-					var exerciseSlide = (await courseManager.FindCourseAsync(submission.CourseId)).FindSlideById(submission.SlideId, true) as ExerciseSlide;
+					var exerciseSlide = (await courseManager.FindCourseAsync(submission.CourseId)).FindSlideByIdNotSafe(submission.SlideId) as ExerciseSlide;
 					var score = await visitsRepo.GetScore(submission.CourseId, submission.SlideId, submission.UserId);
 					await LtiUtils.SubmitScore(exerciseSlide, submission.UserId, score, ltiRequestJson, ltiConsumersRepo);
 				}

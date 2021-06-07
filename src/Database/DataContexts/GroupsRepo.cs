@@ -11,7 +11,6 @@ using Vostok.Logging.Abstractions;
 using Microsoft.AspNet.Identity;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
-using Ulearn.Core;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Quizzes;
@@ -29,6 +28,7 @@ namespace Database.DataContexts
 		private readonly UserQuizzesRepo userQuizzesRepo;
 		private readonly VisitsRepo visitsRepo;
 		private readonly UserRolesRepo userRolesRepo;
+		private readonly UnitsRepo unitsRepo;
 
 		private readonly WebCourseManager courseManager;
 
@@ -41,6 +41,7 @@ namespace Database.DataContexts
 			userQuizzesRepo = new UserQuizzesRepo(db);
 			visitsRepo = new VisitsRepo(db);
 			userRolesRepo = new UserRolesRepo(db);
+			unitsRepo = new UnitsRepo(db);
 		}
 
 		public bool CanUserSeeAllCourseGroups(IPrincipal user, string courseId)
@@ -244,6 +245,7 @@ namespace Database.DataContexts
 			log.Info($"Создаю ручные проверки для всех решения пользователя {userId} в курсе {courseId}");
 
 			var course = courseManager.GetCourse(courseId);
+			var visibleUnitsIds = unitsRepo.GetVisibleUnitIds(course);
 
 			/* For exercises */
 			var acceptedSubmissionsBySlide = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, userId)
@@ -258,7 +260,7 @@ namespace Database.DataContexts
 					var lastSubmission = acceptedSubmissionsForSlide.OrderByDescending(s => s.Timestamp).First();
 
 					var slideId = lastSubmission.SlideId;
-					var slide = course.FindSlideById(slideId, false) as ExerciseSlide;
+					var slide = course.FindSlideById(slideId, false, visibleUnitsIds) as ExerciseSlide;
 					if (slide == null || !slide.Scoring.RequireReview)
 						continue;
 
@@ -271,7 +273,7 @@ namespace Database.DataContexts
 			var passedQuizzesIds = userQuizzesRepo.GetPassedSlideIds(courseId, userId);
 			foreach (var quizSlideId in passedQuizzesIds)
 			{
-				var slide = course.FindSlideById(quizSlideId, false) as QuizSlide;
+				var slide = course.FindSlideById(quizSlideId, false, visibleUnitsIds) as QuizSlide;
 				if (slide == null || !slide.ManualChecking)
 					continue;
 				if (!userQuizzesRepo.IsWaitingForManualCheck(courseId, quizSlideId, userId))

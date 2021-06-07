@@ -11,7 +11,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 
 		public override void DoExecute()
 		{
-			EdxInteraction.ExtractEdxCourseArchive(Dir, Dir.GetSingleFile(CourseArchiveFile ?? "*.tar.gz"), gzipped: true);
+			EdxInteraction.ExtractEdxCourseArchive(WorkingDirectory, WorkingDirectory.GetSingleFile(CourseArchiveFile ?? "*.tar.gz"), gzipped: true);
 		}
 	}
 
@@ -23,7 +23,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 
 		public override void DoExecute()
 		{
-			EdxInteraction.ExtractEdxCourseArchive(Dir, Dir.GetSingleFile(CourseArchiveFile ?? "*.tar"));
+			EdxInteraction.ExtractEdxCourseArchive(WorkingDirectory, WorkingDirectory.GetSingleFile(CourseArchiveFile ?? "*.tar"));
 		}
 	}
 }

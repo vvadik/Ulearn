@@ -66,6 +66,11 @@ namespace uLearn.Web
 				url: "Certificate/{certificateId}/{*path}",
 				defaults: new { controller = "Certificates", action = "CertificateFile" }
 			);
+			routes.MapRoute(
+				name: "CourseStaticFile",
+				url: "Courses/{CourseId}/{*path}",
+				defaults: new { controller = "StaticFiles", action = "CourseFile" }
+			);
 
 			/* For react application which is not able to proxy root url (/) in webpack devserver */
 			routes.MapRoute(
@@ -81,7 +86,7 @@ namespace uLearn.Web
 				name: "Default",
 				url: "{controller}/{action}",
 				defaults: new { controller = "Home", action = "Index" },
-				constraints: new { controller = @"^(Account|Admin|Analytics|AntiPlagiarism|Certificates|Comments|Course|Errors|Exercise|Feed|Grader|Hint|Home|Login|Notifications|Questions|Quiz|RestorePassword|Runner|Sandbox|SlideNavigation|Stepik|Telegram|Visits)$" }
+				constraints: new { controller = @"^(Account|Admin|Analytics|AntiPlagiarism|Certificates|Comments|Course|Errors|Exercise|Feed|Grader|Hint|Home|Login|Notifications|Questions|Quiz|RestorePassword|Runner|Sandbox|SlideNavigation|Stepik|Telegram|Visits|StaticFiles)$" }
 			);
 
 			/* After all your routes */

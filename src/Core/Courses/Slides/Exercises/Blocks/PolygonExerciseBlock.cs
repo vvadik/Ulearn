@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Xml.Serialization;
 using Ulearn.Common;
 using Ulearn.Core.RunCheckerJobApi;
@@ -54,24 +53,24 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 		public double TimeLimitPerTest { get; set; }
 		public override string[] PathsToExcludeForChecker => new[] { "statements", "statements-sections" };
 		public Language? DefaultLanguage { get; set; }
-		
+
 		[XmlElement("showTestDescription")]
 		public bool ShowTestDescription { get; set; }
 		
 		[XmlElement("pythonVisualizerEnabled")]
 		public bool PythonVisualizerEnabled { get; set; }
 		
-		public RunnerSubmission CreateSubmission(string submissionId, string code, Language language)
+		public RunnerSubmission CreateSubmission(string submissionId, string code, Language language, string courseDirectory)
 		{
-			var submission = base.CreateSubmission(submissionId, code);
+			var submission = base.CreateSubmission(submissionId, code, courseDirectory);
 			if (!(submission is CommandRunnerSubmission commandRunnerSubmission))
 				return submission;
-			
+
 			commandRunnerSubmission.RunCommand = RunCommandWithArguments(language);
-			
+
 			return commandRunnerSubmission;
 		}
-		
+
 		private string RunCommandWithArguments(Language language)
 		{
 			return $"python3.8 main.py {language} {TimeLimitPerTest} {UserCodeFilePath.Split('/', '\\')[1]}";

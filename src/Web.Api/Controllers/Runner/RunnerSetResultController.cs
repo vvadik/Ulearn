@@ -101,7 +101,7 @@ namespace Ulearn.Web.Api.Controllers.Runner
 			var userId = submissionNoTracking.UserId;
 			var courseId = submissionNoTracking.CourseId;
 			var course = await courseManager.GetCourseAsync(courseId);
-			var exerciseSlide = course.FindSlideById(submissionNoTracking.SlideId, true) as ExerciseSlide; // SlideId проверен в вызывающем методе 
+			var exerciseSlide = course.FindSlideByIdNotSafe(submissionNoTracking.SlideId) as ExerciseSlide; // SlideId проверен в вызывающем методе 
 			if (exerciseSlide == null)
 				return false;
 			var exerciseMetricId = GetExerciseMetricId(courseId, exerciseSlide);

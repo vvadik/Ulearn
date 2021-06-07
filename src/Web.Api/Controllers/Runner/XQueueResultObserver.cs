@@ -49,7 +49,7 @@ namespace Ulearn.Web.Api.Controllers.Runner
 		{
 			var checking = submission.Submission.AutomaticChecking;
 
-			var slide = (await courseManager.FindCourseAsync(checking.CourseId))?.FindSlideById(checking.SlideId, true) as ExerciseSlide;
+			var slide = (await courseManager.FindCourseAsync(checking.CourseId))?.FindSlideByIdNotSafe(checking.SlideId) as ExerciseSlide;
 			if (slide == null)
 			{
 				log.Warn($"Can't find exercise slide {checking.SlideId} in course {checking.CourseId}. Exit");

@@ -10,7 +10,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 		public override void DoExecute()
 		{
 			Console.WriteLine("squashing");
-			new OlxSquasher().SquashCourse(Path.Combine(Dir, "olx"));
+			new OlxSquasher().SquashCourse(Path.Combine(WorkingDirectory, "olx"));
 			Console.WriteLine("Now you can edit all sequentials (subchapters) in olx/chapters folder... After editing run olx-desquash-chapters command");
 		}
 	}

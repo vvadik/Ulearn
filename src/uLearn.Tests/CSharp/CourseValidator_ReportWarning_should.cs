@@ -6,7 +6,6 @@ using Microsoft.VisualBasic.FileIO;
 using NUnit.Framework;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
-using Ulearn.Core;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
@@ -18,32 +17,33 @@ namespace uLearn.CSharp
 	[TestFixture]
 	public class CourseValidator_ReportWarning_should
 	{
-		private static readonly string tempSlideFolderPath = Path.Combine(
-			TestsHelper.TestDirectory,
-			"ReportWarningTests_Temp_SlideFolder"
-		);
+		private static readonly string courseDirectory = TestsHelper.TestDirectory;
+		private static readonly string unitDirectoryPathRelativeToCourse = "ReportWarningTests_Temp_SlideFolder";
+		private static readonly string unitDirectoryAbsolutePath = Path.Combine(courseDirectory, unitDirectoryPathRelativeToCourse);
 
-		private static readonly DirectoryInfo tempSlideFolder = new DirectoryInfo(tempSlideFolderPath);
-
-		private static readonly CsProjectExerciseBlock exerciseBlock = new CsProjectExerciseBlock
-		{
-			StartupObject = "test.Program",
-			UserCodeFilePath = TestsHelper.UserCodeFileName,
-			SlideFolderPath = tempSlideFolder,
-			CsProjFilePath = TestsHelper.CsProjFilePath
-		};
+		private static CsProjectExerciseBlock exerciseBlock;
+		private static CsProjectExerciseBlock.FilesProvider fp;
 
 		[OneTimeSetUp]
 		public void OneTimeSetUp()
 		{
-			TestsHelper.RecreateDirectory(tempSlideFolderPath);
-			FileSystem.CopyDirectory(TestsHelper.ProjSlideFolderPath, tempSlideFolderPath);
+			TestsHelper.RecreateDirectory(unitDirectoryAbsolutePath);
+			FileSystem.CopyDirectory(TestsHelper.ProjSlideFolderPath, unitDirectoryAbsolutePath);
 
-			string studentZipFilepath = Path.Combine(tempSlideFolderPath, "ProjDir.exercise.zip");
+			exerciseBlock = new CsProjectExerciseBlock
+			{
+				StartupObject = "test.Program",
+				UserCodeFilePath = TestsHelper.UserCodeFileName,
+				UnitDirectoryPathRelativeToCourse = unitDirectoryPathRelativeToCourse,
+				CsProjFilePath = TestsHelper.CsProjFilePath
+			};
+			fp = new CsProjectExerciseBlock.FilesProvider(exerciseBlock, courseDirectory);
+
+			var studentZipFilepath = Path.Combine(unitDirectoryAbsolutePath, "ProjDir.exercise.zip");
 			if (File.Exists(studentZipFilepath))
 				File.Delete(studentZipFilepath);
 
-			var ctx = new SlideBuildingContext("Test", new Unit(null, exerciseBlock.SlideFolderPath), CourseSettings.DefaultSettings, exerciseBlock.SlideFolderPath, null);
+			var ctx = new SlideBuildingContext("Test", new Unit(null, unitDirectoryPathRelativeToCourse), CourseSettings.DefaultSettings, new DirectoryInfo(courseDirectory), new DirectoryInfo(unitDirectoryAbsolutePath), null);
 			// ReSharper disable once ReturnValueOfPureMethodIsNotUsed
 			exerciseBlock.BuildUp(ctx, ImmutableHashSet<string>.Empty).ToList();
 		}
@@ -51,18 +51,18 @@ namespace uLearn.CSharp
 		[SetUp]
 		public void SetUp()
 		{
-			FileSystem.CopyDirectory(TestsHelper.ProjSlideFolderPath, tempSlideFolderPath, true);
+			FileSystem.CopyDirectory(TestsHelper.ProjSlideFolderPath, unitDirectoryAbsolutePath, true);
 		}
 
 		[Test]
 		public void ReportWarning_If_ExerciseFolder_DoesntContain_SolutionFile()
 		{
-			FileSystem.DeleteFile(exerciseBlock.CorrectSolutionFile.FullName);
+			FileSystem.DeleteFile(fp.CorrectSolutionFile.FullName);
 
 			var validatorOut = TestsHelper.ValidateBlock(exerciseBlock);
 
 			validatorOut
-				.Should().Contain($"Exercise directory doesn't contain {exerciseBlock.CorrectSolutionFileName}");
+				.Should().Contain($"Exercise directory doesn't contain {fp.CorrectSolutionFile.Name}");
 		}
 
 		[Test]
@@ -93,8 +93,9 @@ namespace uLearn.CSharp
 				Preludes = new[] { new PreludeFile(Language.CSharp, TestsHelper.ProjSlideFolder.GetFile("Prelude.cs").FullName) }
 			};
 
-			var unit = new Unit(UnitSettings.CreateByTitle("Unit title", courseSettings), TestsHelper.ProjSlideFolder);
-			var slideLoadingContext = new SlideLoadingContext("Test", unit, courseSettings, TestsHelper.ProjSlideFolder, exerciseXmlFile);
+			var unitDirectoryPathRelativeToCourse = TestsHelper.ProjSlideFolder.GetRelativePath(TestsHelper.TestDirectory);
+			var unit = new Unit(UnitSettings.CreateByTitle("Unit title", courseSettings), unitDirectoryPathRelativeToCourse);
+			var slideLoadingContext = new SlideLoadingContext("Test", unit, courseSettings, new DirectoryInfo(courseDirectory), exerciseXmlFile);
 			var exerciseSlide = (ExerciseSlide)new XmlSlideLoader().Load(slideLoadingContext);
 
 			var validatorOut = TestsHelper.ValidateExerciseSlide(exerciseSlide);

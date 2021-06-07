@@ -1,20 +1,21 @@
 ﻿using System;
-using System.Threading;
+using System.Threading.Tasks;
 using AntiPlagiarism.Web.Configuration;
 using AntiPlagiarism.Web.Database.Repos;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Vostok.Applications.Scheduled;
+using Vostok.Hosting.Abstractions;
 using Vostok.Logging.Abstractions;
 
 namespace AntiPlagiarism.Web.Workers
 {
-	public class UpdateOldSubmissionsFromStatisticsWorker
+	public class UpdateOldSubmissionsFromStatisticsWorker : VostokScheduledApplication
 	{
 		private readonly IServiceScopeFactory serviceScopeFactory;
 		private readonly AntiPlagiarismConfiguration configuration;
 		private static ILog log => LogProvider.Get().ForContext(typeof(UpdateOldSubmissionsFromStatisticsWorker));
 // ReSharper disable once NotAccessedField.Local
-		private readonly Timer timer;
 
 		public UpdateOldSubmissionsFromStatisticsWorker(
 			IOptions<AntiPlagiarismConfiguration> configuration,
@@ -22,24 +23,25 @@ namespace AntiPlagiarism.Web.Workers
 		{
 			this.serviceScopeFactory = serviceScopeFactory;
 			this.configuration = configuration.Value;
-			timer = CreateWorkerTimer();
 		}
 
-		private Timer CreateWorkerTimer()
+		public override void Setup(IScheduledActionsBuilder builder, IVostokHostingEnvironment environment)
+		{
+			RunUpdateOldSubmissionsFromStatisticsWorker(builder);
+		}
+
+		private void RunUpdateOldSubmissionsFromStatisticsWorker(IScheduledActionsBuilder builder)
 		{
 			var startTime = configuration.AntiPlagiarism.Actions.UpdateOldSubmissionsFromStatistics.StartTime;
-			if (startTime == null)
-				return null;
-			var now = DateTime.Now;
-			var startDateTime = new DateTime(now.Year, now.Month, now.Day, startTime.Value.Hour, startTime.Value.Minute, startTime.Value.Second);
-			if (startDateTime < now)
-				startDateTime = startDateTime.Add(TimeSpan.FromDays(1));
-			var diffFromNowToStart = startDateTime - DateTime.Now;
-			return new Timer(ThreadFunc, null, diffFromNowToStart, TimeSpan.FromDays(1));
+			if (string.IsNullOrEmpty(startTime))
+				return;
+			var scheduler = Scheduler.Crontab(startTime);
+			builder.Schedule("UpdateOldSubmissionsFromStatisticsWorker", scheduler, Task);
 		}
 
-		private void ThreadFunc(object stateInfo)
+		private async Task Task(object stateInfo)
 		{
+			log.Info("Start UpdateOldSubmissionsFromStatisticsWorker");
 			using (var scope = serviceScopeFactory.CreateScope())
 			{
 				var snippetsRepo = scope.ServiceProvider.GetService<ISnippetsRepo>();
@@ -47,17 +49,18 @@ namespace AntiPlagiarism.Web.Workers
 				{
 					var now = DateTime.Now;
 					var submissionInfluenceLimitInMonths = configuration.AntiPlagiarism.SubmissionInfluenceLimitInMonths;
-					var border = snippetsRepo.GetOldSubmissionsInfluenceBorderAsync().Result;
+					var border = await snippetsRepo.GetOldSubmissionsInfluenceBorderAsync();
 					var from = border?.Date ?? new DateTime(2000, 1, 1);
 					var to = now.AddMonths(-submissionInfluenceLimitInMonths);
-					snippetsRepo.UpdateOldSnippetsStatisticsAsync(from, to).Wait();
-					snippetsRepo.SetOldSubmissionsInfluenceBorderAsync(to).Wait();
+					await snippetsRepo.UpdateOldSnippetsStatisticsAsync(from, to);
+					await snippetsRepo.SetOldSubmissionsInfluenceBorderAsync(to);
 				}
 				catch (Exception ex)
 				{
 					log.Error(ex, "Exception during UpdateOldSubmissionsFromStatistics");
 				}
 			}
+			log.Info("End UpdateOldSubmissionsFromStatisticsWorker");
 		}
 	}
 }

@@ -45,7 +45,7 @@ namespace Ulearn.Core.Helpers
 			return CourseManager.GetCoursesDirectory().GetSubdirectory("ExerciseCheckerZips");
 		}
 
-		public static MemoryStream GetZip(IExerciseCheckerZipBuilder zipBuilder, string userCodeFilePath, byte[] userCodeFileContent)
+		public static MemoryStream GetZip(IExerciseCheckerZipBuilder zipBuilder, string userCodeFilePathRelativeToUnit, byte[] userCodeFileContent, string courseDirectory)
 		{
 			var courseId = zipBuilder.CourseId;
 			var slide = zipBuilder.Slide;
@@ -58,9 +58,9 @@ namespace Ulearn.Core.Helpers
 				{
 					WithLock(courseId, () =>
 					{
-						var courseDirectory = cacheDirectory.GetSubdirectory(courseId);
-						courseDirectory.EnsureExists();
-						var zipFile = courseDirectory.GetFile($"{slide.Id}.zip");
+						var cacheCourseDirectory = cacheDirectory.GetSubdirectory(courseId);
+						cacheCourseDirectory.EnsureExists();
+						var zipFile = cacheCourseDirectory.GetFile($"{slide.Id}.zip");
 						if (!zipFile.Exists)
 						{
 							ms = zipBuilder.GetZipForChecker();
@@ -81,7 +81,7 @@ namespace Ulearn.Core.Helpers
 				}
 			}
 			using (ms)
-				return AddUserCodeToZip(ms, userCodeFilePath, userCodeFileContent, courseId, slide);
+				return AddUserCodeToZip(ms, userCodeFilePathRelativeToUnit, userCodeFileContent, courseId, slide);
 		}
 
 		private static void SaveFileOnDisk(FileInfo zipFile, MemoryStream ms)

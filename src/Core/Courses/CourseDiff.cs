@@ -33,21 +33,21 @@ namespace Ulearn.Core.Courses
 
 		private void FindDifferences()
 		{
-			var originalSlidesIds = OriginalCourse.GetSlides(true).Select(s => s.Id).ToImmutableHashSet();
-			var changedSlidesIds = ChangedCourse.GetSlides(true).Select(s => s.Id).ToImmutableHashSet();
-			foreach (var slide in OriginalCourse.GetSlides(true))
+			var originalSlidesIds = OriginalCourse.GetSlidesNotSafe().Select(s => s.Id).ToImmutableHashSet();
+			var changedSlidesIds = ChangedCourse.GetSlidesNotSafe().Select(s => s.Id).ToImmutableHashSet();
+			foreach (var slide in OriginalCourse.GetSlidesNotSafe())
 			{
 				if (!changedSlidesIds.Contains(slide.Id))
 					RemovedSlides.Add(slide);
 				else
 				{
-					var slideDiff = new SlideDiff(slide, ChangedCourse.GetSlideById(slide.Id, true));
+					var slideDiff = new SlideDiff(slide, ChangedCourse.GetSlideByIdNotSafe(slide.Id));
 					if (!slideDiff.IsEmptyChangeset)
 						SlideDiffs.Add(slideDiff);
 				}
 			}
 
-			InsertedSlides.AddRange(ChangedCourse.GetSlides(true).Where(slide => !originalSlidesIds.Contains(slide.Id)));
+			InsertedSlides.AddRange(ChangedCourse.GetSlidesNotSafe().Where(slide => !originalSlidesIds.Contains(slide.Id)));
 		}
 
 		public bool IsTitleChanged => OriginalCourse.Title != ChangedCourse.Title;

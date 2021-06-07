@@ -17,6 +17,7 @@ using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 using Ulearn.Common;
+using Ulearn.Common.Api;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Configuration;
@@ -24,41 +25,46 @@ using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
-using Ulearn.Core.Helpers;
 using Ulearn.Core.Metrics;
+using Vostok.Clusterclient.Core.Model;
 using Vostok.Logging.Abstractions;
+using Web.Api.Client;
+using Web.Api.Configuration;
 
 namespace uLearn.Web.Controllers
 {
 	[ULearnAuthorize]
 	public class ExerciseController : JsonDataContractController
 	{
-		protected readonly ULearnDb db;
-		protected readonly CourseManager courseManager;
-		protected readonly MetricSender metricSender;
-		private readonly ExerciseStudentZipsCache exerciseStudentZipsCache;
+		private readonly ULearnDb db;
+		private readonly CourseManager courseManager;
+		private readonly MetricSender metricSender;
 
-		protected readonly UserSolutionsRepo userSolutionsRepo;
-		protected readonly SlideCheckingsRepo slideCheckingsRepo;
-		protected readonly GroupsRepo groupsRepo;
-		protected readonly VisitsRepo visitsRepo;
-		protected readonly NotificationsRepo notificationsRepo;
-		protected readonly UsersRepo usersRepo;
-		protected readonly UnitsRepo unitsRepo;
+		private readonly UserSolutionsRepo userSolutionsRepo;
+		private readonly SlideCheckingsRepo slideCheckingsRepo;
+		private readonly GroupsRepo groupsRepo;
+		private readonly VisitsRepo visitsRepo;
+		private readonly NotificationsRepo notificationsRepo;
+		private readonly UsersRepo usersRepo;
+		private readonly UnitsRepo unitsRepo;
+
+		private readonly string baseUrlApi;
+		private readonly string authCookieName;
 
 		private static ILog log => LogProvider.Get().ForContext(typeof(ExerciseController));
 
 		public ExerciseController()
-			: this(new ULearnDb(), WebCourseManager.Instance, new MetricSender(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName))
+			: this(new ULearnDb(), WebCourseManager.Instance, new MetricSender(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName), ApplicationConfiguration.Read<WebApiConfiguration>())
 		{
 		}
 
-		public ExerciseController(ULearnDb db, WebCourseManager courseManager, MetricSender metricSender)
+		public ExerciseController(ULearnDb db, WebCourseManager courseManager, MetricSender metricSender, WebApiConfiguration configuration)
 		{
-			exerciseStudentZipsCache = new ExerciseStudentZipsCache();
 			this.db = db;
 			this.courseManager = courseManager;
 			this.metricSender = metricSender;
+			baseUrlApi = configuration.BaseUrlApi;
+			authCookieName = configuration.Web.CookieName;
 
 			userSolutionsRepo = new UserSolutionsRepo(db);
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
@@ -139,7 +145,7 @@ namespace uLearn.Web.Controllers
 		[ValidateInput(false)]
 		public async Task<ActionResult> HideFromTopCodeReviewComments(string courseId, Guid slideId, string comment)
 		{
-			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId, true) as ExerciseSlide;
+			var slide = courseManager.FindCourse(courseId)?.FindSlideByIdNotSafe(slideId) as ExerciseSlide;
 			if (slide == null)
 				return HttpNotFound();
 
@@ -185,7 +191,7 @@ namespace uLearn.Web.Controllers
 			{
 				var course = courseManager.FindCourse(submissionCourseId);
 				var slideId = review.ExerciseChecking.SlideId;
-				var unit = course?.FindUnitBySlideId(slideId, isInstructor);
+				var unit = course?.FindUnitBySlideIdNotSafe(slideId, isInstructor);
 				if (unit != null && unitsRepo.IsUnitVisibleForStudents(course, unit.Id))
 					await NotifyAboutCodeReviewComment(comment).ConfigureAwait(false);
 			}
@@ -235,7 +241,7 @@ namespace uLearn.Web.Controllers
 			using (var transaction = db.Database.BeginTransaction())
 			{
 				var course = courseManager.GetCourse(checking.CourseId);
-				var slide = (ExerciseSlide)course.GetSlideById(checking.SlideId, true);
+				var slide = (ExerciseSlide)course.FindSlideByIdNotSafe(checking.SlideId);
 
 				/* Invalid form: percent isn't integer */
 				if (!int.TryParse(exercisePercent, out var percent))
@@ -254,7 +260,7 @@ namespace uLearn.Web.Controllers
 					await slideCheckingsRepo.DisableProhibitFurtherManualCheckings(checking.CourseId, checking.UserId, checking.SlideId).ConfigureAwait(false);
 				await visitsRepo.UpdateScoreForVisit(checking.CourseId, slide, checking.UserId).ConfigureAwait(false);
 
-				var unit = course.FindUnitBySlideId(checking.SlideId, true);
+				var unit = course.FindUnitBySlideIdNotSafe(checking.SlideId, true);
 				if (unit != null && unitsRepo.IsUnitVisibleForStudents(course, unit.Id))
 					await NotifyAboutManualExerciseChecking(checking).ConfigureAwait(false);
 
@@ -287,7 +293,7 @@ namespace uLearn.Web.Controllers
 			if (!User.HasAccessFor(courseId, CourseRole.Instructor))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
-			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId, true) as ExerciseSlide;
+			var slide = courseManager.FindCourse(courseId)?.FindSlideByIdNotSafe(slideId) as ExerciseSlide;
 			if (slide == null)
 				return new HttpStatusCodeResult(HttpStatusCode.NotFound);
 
@@ -313,6 +319,10 @@ namespace uLearn.Web.Controllers
 				checking = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(updateCheckingId.Value);
 			else
 				checking = await slideCheckingsRepo.AddManualExerciseChecking(courseId, slideId, userId, submission).ConfigureAwait(false);
+
+			if (!groupsRepo.CanInstructorViewStudent(User, checking.UserId))
+				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
+
 			await slideCheckingsRepo.LockManualChecking(checking, User.Identity.GetUserId()).ConfigureAwait(false);
 			await slideCheckingsRepo.MarkManualExerciseCheckingAsChecked(checking, exercisePercent).ConfigureAwait(false);
 			/* 100%-score sets ProhibitFurtherChecking to true */
@@ -341,7 +351,9 @@ namespace uLearn.Web.Controllers
 			if (userId == "")
 				userId = User.Identity.GetUserId();
 
-			var slide = courseManager.GetCourse(courseId).FindSlideById(slideId, isInstructor);
+			var course = courseManager.GetCourse(courseId);
+			var visibleUnits = unitsRepo.GetVisibleUnitIds(course, User);
+			var slide = course.FindSlideById(slideId, isInstructor, visibleUnits);
 			var submissions = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).ToList();
 
 			return PartialView(new ExerciseSubmissionsPanelModel(courseId, slide)
@@ -403,10 +415,6 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult Submission(string courseId, Guid slideId, string userId = null, int? submissionId = null, int? manualCheckingId = null, bool isLti = false, bool showOutput = false, bool instructorView = false, bool onlyAccepted = true)
 		{
-			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
-			if (!isInstructor)
-				instructorView = false;
-
 			var currentUserId = userId ?? (User.Identity.IsAuthenticated ? User.Identity.GetUserId() : "");
 			UserExerciseSubmission submission = null;
 			if (submissionId.HasValue && submissionId.Value > 0)
@@ -427,7 +435,7 @@ namespace uLearn.Web.Controllers
 			}
 
 			var course = courseManager.GetCourse(courseId);
-			var slide = course.FindSlideById(slideId, isInstructor);
+			var slide = course.FindSlideByIdNotSafe(slideId);
 			if (slide == null)
 				return HttpNotFound();
 
@@ -518,7 +526,7 @@ namespace uLearn.Web.Controllers
 			const int maxUsersCount = 30;
 
 			var course = courseManager.GetCourse(courseId);
-			var slide = course.GetSlideById(slideId, true) as ExerciseSlide;
+			var slide = course.GetSlideByIdNotSafe(slideId) as ExerciseSlide;
 
 			if (slide == null)
 				throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -579,11 +587,15 @@ namespace uLearn.Web.Controllers
 			};
 		}
 
+		[Obsolete("Use api")] // Для openedu и stepik
 		[System.Web.Mvc.AllowAnonymous]
-		public ActionResult StudentZip(string courseId, Guid slideId)
+		public async Task<ActionResult> StudentZip(string courseId, Guid slideId, string fileName)
 		{
+			log.Warn("StudentZip request {courseId} {slideId}");
 			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
-			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId, isInstructor);
+			var course = courseManager.GetCourse(courseId);
+			var visibleUnits = unitsRepo.GetVisibleUnitIds(course, User);
+			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId, isInstructor, visibleUnits);
 			if (!(slide is ExerciseSlide))
 				return HttpNotFound();
 
@@ -593,11 +605,23 @@ namespace uLearn.Web.Controllers
 			if ((exerciseSlide.Exercise as UniversalExerciseBlock)?.NoStudentZip ?? false)
 				return HttpNotFound();
 
-			var zipFile = exerciseStudentZipsCache.GenerateOrFindZip(courseId, exerciseSlide);
+			var studentZipName = !string.IsNullOrEmpty(fileName)
+				? fileName
+				: ((exerciseSlide.Exercise as CsProjectExerciseBlock)?.CsprojFileName ?? new DirectoryInfo((exerciseSlide.Exercise as UniversalExerciseBlock).ExerciseDirPath).Name) + ".zip";
 
-			var block = exerciseSlide.Exercise;
-			var fileName = (block as CsProjectExerciseBlock)?.CsprojFile.Name ?? new DirectoryInfo((block as UniversalExerciseBlock).ExerciseDirPath).Name;
-			return File(zipFile.FullName, "application/zip", fileName + ".zip");
+			var cookie = Request.Headers.Get("Cookie");
+			IWebApiClient webApiClient = new WebApiClient(new ApiClientSettings(baseUrlApi));
+			var response = await webApiClient.GetStudentZipFile(courseId, slideId, studentZipName, cookie == null ? null : new Header("Cookie", cookie));
+
+			if (response == null)
+				return new HttpStatusCodeResult(500);
+			if (response.Code != ResponseCode.Ok)
+				return new HttpStatusCodeResult((int)response.Code);
+			if (response.HasStream)
+				return new FileStreamResult(response.Stream, "application/zip");
+			if (response.HasContent)
+				return new FileContentResult(response.Content.ToArray(), "application/zip");
+			return new HttpStatusCodeResult(500);
 		}
 	}
 

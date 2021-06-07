@@ -1,32 +1,26 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
-using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
-using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Units;
 
 namespace Ulearn.Core.Courses
 {
 	public class Course : ICourse
 	{
-		public Course(string id, List<Unit> units, [NotNull]CourseSettings settings, DirectoryInfo courseDirectory, DirectoryInfo courseXmlDirectory)
+		public Course(string id, List<Unit> units, [NotNull]CourseSettings settings)
 		{
 			Id = id;
 			this.units = units;
 			Settings = settings;
-			CourseXmlDirectory = courseXmlDirectory;
-			CourseDirectory = courseDirectory;
 		}
 
 		public string Id { get; set; }
 		public string Title => Settings.Title;
 		[NotNull]
 		public CourseSettings Settings { get; private set; }
-		public DirectoryInfo CourseXmlDirectory { get; set; }
-		public DirectoryInfo CourseDirectory { get; set; }
+
 		private List<Unit> units;
 
 		private List<Slide> slidesCache { get; set; }
@@ -36,36 +30,57 @@ namespace Ulearn.Core.Courses
 			get { return slidesCache ??= units.SelectMany(u => u.GetSlides(true)).ToList(); }
 		}
 
-		private List<Slide> notHiddenSlidesCache { get; set; }
-		private List<Slide> NotHiddenSlides
+		private IEnumerable<Slide> GetNotHiddenSlides(IEnumerable<Guid> visibleUnits)
 		{
-			get { return notHiddenSlidesCache ??= units.SelectMany(u => u.GetSlides(false)).ToList(); }
+			return GetUnits(visibleUnits).SelectMany(u => u.GetSlides(false));
 		}
 
-		public List<Slide> GetSlides(bool withHidden)
+		public List<Slide> GetSlidesNotSafe()
+		{
+			return Slides;
+		}
+
+		// visibleUnits может быть null, если withHidden true
+		public List<Slide> GetSlides(bool withHidden, [CanBeNull]IEnumerable<Guid> visibleUnits)
 		{
 			if (withHidden)
 				return Slides;
-			return NotHiddenSlides;
+			if (!withHidden && visibleUnits == null)
+				throw new Exception($"{nameof(GetSlides)} !withHidden && visibleUnits == null");
+			return GetNotHiddenSlides(visibleUnits).ToList();
 		}
 
+		public Slide FindSlideByIdNotSafe(Guid slideId)
+		{
+			return FindSlideById(slideId, true, null);
+		}
+
+		// visibleUnits может быть null, если withHidden true
 		[CanBeNull]
-		public Slide FindSlideById(Guid slideId, bool withHidden)
+		public Slide FindSlideById(Guid slideId, bool withHidden, [CanBeNull]IEnumerable<Guid> visibleUnits)
 		{
-			return (withHidden ? Slides : NotHiddenSlides).FirstOrDefault(x => x.Id == slideId);
+			if (!withHidden && visibleUnits == null)
+				throw new Exception($"{nameof(FindSlideById)} !withHidden && visibleUnits == null");
+			return (withHidden ? Slides : GetNotHiddenSlides(visibleUnits)).FirstOrDefault(x => x.Id == slideId);
 		}
 
-		[NotNull]
-		public Slide GetSlideById(Guid slideId, bool withHidden)
+		public Slide GetSlideByIdNotSafe(Guid slideId)
 		{
-			var slide = FindSlideById(slideId, withHidden);
+			return GetSlideById(slideId, true, null);
+		}
+
+		// visibleUnits может быть null, если withHidden true
+		[NotNull]
+		public Slide GetSlideById(Guid slideId, bool withHidden, IEnumerable<Guid> visibleUnits)
+		{
+			var slide = FindSlideById(slideId, withHidden, visibleUnits);
 			if (slide == null)
 				throw new NotFoundException($"No slide with id {slideId}");
 			return slide;
 		}
 
 		[CanBeNull]
-		public InstructorNote FindInstructorNoteById(Guid slideId)
+		public Slide FindInstructorNoteByIdNotSafe(Guid slideId)
 		{
 			var unitWithId = FindUnitByIdNotSafe(slideId);
 			return unitWithId?.InstructorNote;
@@ -118,7 +133,7 @@ namespace Ulearn.Core.Courses
 		}
 
 		[CanBeNull]
-		public Unit FindUnitBySlideId(Guid slideId, bool withHiddenSlides)
+		public Unit FindUnitBySlideIdNotSafe(Guid slideId, bool withHiddenSlides) // не проверяет, что unit опубликован
 		{
 			return units.FirstOrDefault(u => u.GetSlides(withHiddenSlides).Any(s => s.Id == slideId));
 		}
@@ -127,34 +142,5 @@ namespace Ulearn.Core.Courses
 		{
 			return $"Course(Id: {Id}, Title: {Title})";
 		}
-	}
-
-	public class InstructorNote
-	{
-		public InstructorNote(string markdown, Unit unit, FileInfo file, CourseLoadingContext courseLoadingContext)
-		{
-			Markdown = markdown;
-			Unit = unit;
-			File = file;
-			Slide = new Slide(new MarkdownBlock(Markdown) { Hide = true })
-			{
-				Id = Unit.Id,
-				Title = "Заметки преподавателю",
-				Hide = true
-			};
-			var slideLoadingContext = new SlideLoadingContext(courseLoadingContext, unit, file);
-			Slide.BuildUp(slideLoadingContext);
-			Slide.Validate(slideLoadingContext);
-		}
-
-		public static InstructorNote Load(CourseLoadingContext context, FileInfo file, Unit unit)
-		{
-			return new InstructorNote(file.ContentAsUtf8(), unit, file, context);
-		}
-
-		public string Markdown;
-		public Unit Unit;
-		public FileInfo File;
-		public Slide Slide;
 	}
 }

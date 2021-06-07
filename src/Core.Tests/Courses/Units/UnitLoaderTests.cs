@@ -35,7 +35,7 @@ namespace Ulearn.Core.Tests.Courses.Units
 		private Unit LoadUnitFromDirectory(string directory)
 		{
 			var unitFile = new DirectoryInfo(testDataDirectory).GetSubdirectory(directory).GetFile("unit.xml");
-			var courseLoadingContext = new CourseLoadingContext("CourseId", courseSettings, new DirectoryInfo("."), new FileInfo("course.xml"));
+			var courseLoadingContext = new CourseLoadingContext("CourseId", courseSettings, new DirectoryInfo(testDataDirectory));
 			return loader.Load(unitFile, courseLoadingContext);
 		}
 

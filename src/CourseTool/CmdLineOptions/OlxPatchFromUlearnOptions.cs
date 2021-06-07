@@ -16,15 +16,14 @@ namespace uLearn.CourseTool.CmdLineOptions
 	{
 		public override void Patch(OlxPatcher patcher, Config config, Profile profile, EdxCourse edxCourse)
 		{
-			var ulearnDir = new DirectoryInfo(string.Format("{0}/{1}", Dir, config.ULearnCourseId));
-			Console.WriteLine("Loading Ulearn course from {0}", ulearnDir.Name);
-			var ulearnCourse = new CourseLoader().Load(ulearnDir);
+			Console.WriteLine("Loading Ulearn course from {0}", CourseDirectory.Name);
+			var ulearnCourse = new CourseLoader().Load(CourseDirectory);
 			Console.WriteLine("Patching");
-			var videoJson = string.Format("{0}/{1}", Dir, config.Video);
+			var videoJson = string.Format("{0}/{1}", WorkingDirectory, config.Video);
 			var video = File.Exists(videoJson)
 				? JsonConvert.DeserializeObject<Video>(File.ReadAllText(videoJson))
 				: new Video { Records = new Record[0] };
-			var videoHistory = VideoHistory.UpdateHistory(Dir, video);
+			var videoHistory = VideoHistory.UpdateHistory(WorkingDirectory, video);
 			var videoGuids = videoHistory.Records
 				.SelectMany(x => x.Data.Select(y => Tuple.Create(y.Id, x.Guid.GetNormalizedGuid())))
 				.ToDictionary(x => x.Item1, x => x.Item2);
@@ -33,15 +32,16 @@ namespace uLearn.CourseTool.CmdLineOptions
 
 			patcher.PatchVerticals(
 				edxCourse,
-				ulearnCourse.GetSlides(false)
+				ulearnCourse.GetSlidesNotSafe()
 					.Where(s => !config.IgnoredUlearnSlides.Select(Guid.Parse).Contains(s.Id))
 					.Where(s => guids == null || guids.Contains(s.NormalizedGuid))
 					.Select(s => s.ToVerticals(
 						ulearnCourse.Id,
-						profile.UlearnUrl,
+						profile.UlearnBaseUrlApi,
+						profile.UlearnBaseUrlWeb,
 						videoGuids,
 						config.LtiId,
-						CoursePackageRoot
+						CourseDirectory
 					).ToArray()),
 				guids != null || !SkipExistingGuids
 			);
@@ -67,7 +67,8 @@ namespace uLearn.CourseTool.CmdLineOptions
 				var sequentialNote = new Sequential(sequentialId, displayName,
 					new[]
 					{
-						new Vertical(verticalId, displayName, new[] { new MarkdownBlock(chapterNote.Markdown).ToEdxComponent(mdBlockId, displayName, chapterUnit.Directory.FullName) })
+						new Vertical(verticalId, displayName,
+							new[] { chapterNote.Blocks.OfType<MarkdownBlock>().First().ToEdxComponent(mdBlockId, displayName, CourseDirectory.FullName, chapterUnit.UnitDirectoryRelativeToCourse) })
 					}) { VisibleToStaffOnly = true };
 				if (!File.Exists($"{olxPath}/sequential/{sequentialNote.UrlName}.xml"))
 				{

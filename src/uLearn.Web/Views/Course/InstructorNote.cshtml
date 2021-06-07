@@ -1,5 +1,4 @@
-﻿@using Ulearn.Core
-@model IntructorNoteModel
+﻿@model InstructorNoteModel
 
 @{
 	ViewBag.Title = "Заметки преподавателю";
@@ -18,11 +17,11 @@
 								<span class="glyphicon glyphicon-pencil"></span>
 							</a>
 						}
-						@Model.Note.Unit.Title
+						@Model.UnitTitle
 					</small>
 				</h1>
 				<hr/>
-				@Html.Raw(Model.Note.Markdown.RenderMarkdown(Model.Note.File))
+				@Html.Raw(Model.RenderedMarkdownRaw)
 			</div>
 		</div>
 	</div>

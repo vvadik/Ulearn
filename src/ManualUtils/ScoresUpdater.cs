@@ -22,7 +22,7 @@ namespace ManualUtils
 			var course = courseManager.GetCourse(courseId);
 			var slideCheckingsRepo = new SlideCheckingsRepo(db, null);
 			var visitsRepo = new VisitsRepo(db, slideCheckingsRepo);
-			var tests = course.GetSlides(true).OfType<QuizSlide>().ToList();
+			var tests = course.GetSlidesNotSafe().OfType<QuizSlide>().ToList();
 			foreach (var test in tests)
 			{
 				var testVisits = db.Visits.Where(v => v.CourseId == courseId && v.SlideId == test.Id && v.IsPassed && v.Score == 0).ToList();

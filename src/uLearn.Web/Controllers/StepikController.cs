@@ -14,6 +14,7 @@ using Microsoft.AspNet.Identity;
 using Stepik.Api;
 using uLearn.Web.FilterAttributes;
 using Ulearn.Core;
+using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
 
 namespace uLearn.Web.Controllers
@@ -31,6 +32,9 @@ namespace uLearn.Web.Controllers
 		private readonly string stepikClientId;
 		private readonly string stepikClientSecret;
 		private readonly string defaultXQueueName;
+
+		private readonly string ulearnWebBaseUrl;
+		private readonly string ulearnApiBaseUrl;
 
 		public StepikController()
 			: this(new ULearnDb(), WebCourseManager.Instance)
@@ -51,6 +55,9 @@ namespace uLearn.Web.Controllers
 			stepikClientId = WebConfigurationManager.AppSettings["stepik.clientId"];
 			stepikClientSecret = WebConfigurationManager.AppSettings["stepik.clientSecret"];
 			defaultXQueueName = WebConfigurationManager.AppSettings["stepik.defaultXQueueName"];
+			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
+			ulearnWebBaseUrl = configuration.BaseUrl;
+			ulearnApiBaseUrl = configuration.BaseUrlApi;
 		}
 
 		public Task<ActionResult> ExportCourse(string courseId)
@@ -79,7 +86,7 @@ namespace uLearn.Web.Controllers
 			if (client == null)
 				return Redirect(oauthAuthorizationUrl);
 
-			var exporter = new CourseExporter(client.AccessToken);
+			var exporter = new CourseExporter(stepikClientId, stepikClientSecret, ulearnApiBaseUrl, ulearnWebBaseUrl, client.AccessToken);
 			var course = courseManager.GetCourse(courseId);
 
 			var exportOptions = new CourseInitialExportOptions(stepikCourseId, xQueueName, ConvertStringToGuidList(newLessonsSlidesIds).ToList())
@@ -95,7 +102,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> UpdateOptions(string courseId, int stepikCourseId)
 		{
 			var course = courseManager.GetCourse(courseId);
-			var slides = course.GetSlides(true);
+			var slides = course.GetSlidesNotSafe();
 			var slidesXmls = slides.ToDictionary(s => s.Id, s => stepikRepo.GetSlideXmlIndicatedChanges(s));
 
 			/* TODO (andgein): following 5 lines are copy-paste*/
@@ -147,7 +154,7 @@ namespace uLearn.Web.Controllers
 			if (client == null)
 				return Redirect(oauthAuthorizationUrl);
 
-			var exporter = new CourseExporter(client.AccessToken);
+			var exporter = new CourseExporter(stepikClientId, stepikClientSecret, ulearnApiBaseUrl, ulearnWebBaseUrl, client.AccessToken);
 			var course = courseManager.GetCourse(courseId);
 
 			var updateSlidesGuids = ConvertStringToGuidList(updateSlidesIds).ToList();
@@ -225,7 +232,7 @@ namespace uLearn.Web.Controllers
 			foreach (var kvp in exportResults.SlideIdToStepsIdsMap)
 			{
 				var slideId = kvp.Key;
-				var slide = course.FindSlideById(slideId, true);
+				var slide = course.FindSlideByIdNotSafe(slideId);
 				var stepsIds = kvp.Value;
 				await stepikRepo.SetMapInfoAboutExportedSlide(course.Id, exportResults.StepikCourseId, slide, stepsIds);
 			}

@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Xml.Serialization;
 using Ulearn.Core.Courses.Slides.Blocks;
@@ -75,7 +73,7 @@ namespace Ulearn.Core.Courses.Slides.Flashcards
 			{
 				if (!AllowedBlockTypes.Any(type => type.IsInstanceOfType(block)))
 					throw new CourseLoadingException(
-						$"Недопустимый тип блока в слайде {Info.SlideFile.FullName}: <{block.GetType().GetXmlType()}>. " +
+						$"Недопустимый тип блока в слайде {SlideFilePathRelativeToCourse}: <{block.GetType().GetXmlType()}>. " +
 						$"В этом слайде разрешены только следующие блоки: {string.Join(", ", AllowedBlockTypes.Select(t => $"<{t.GetXmlType()}>"))}"
 					);
 			}

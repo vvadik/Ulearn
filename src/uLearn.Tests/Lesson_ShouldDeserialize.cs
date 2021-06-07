@@ -6,7 +6,6 @@ using FluentAssertions;
 using NUnit.Framework;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
-using Ulearn.Core;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Blocks;
@@ -96,7 +95,7 @@ namespace uLearn
 
 		private static SlideBlock[] DeserializeBlocks(string blocksXml)
 		{
-			var buildUpContext = new SlideBuildingContext("Test", new Unit(null, new DirectoryInfo(".")), CourseSettings.DefaultSettings, new DirectoryInfo("."), null);
+			var buildUpContext = new SlideBuildingContext("Test", new Unit(null, "."), CourseSettings.DefaultSettings, new DirectoryInfo("."), new DirectoryInfo("Unit1"), null);
 			var blocks = DeserializeLesson(blocksXml).Blocks;
 			return blocks.SelectMany(b => b.BuildUp(buildUpContext, ImmutableHashSet<string>.Empty)).ToArray();
 		}

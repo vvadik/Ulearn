@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net472;net5.0</TargetFrameworks>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Common.Api\Common.Api.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Models\Parameters" />
+      <Folder Include="Models\Results" />
+    </ItemGroup>
+
+</Project>

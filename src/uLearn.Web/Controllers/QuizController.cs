@@ -49,9 +49,15 @@ namespace uLearn.Web.Controllers
 		private readonly NotificationsRepo notificationsRepo;
 		private readonly UnitsRepo unitsRepo;
 
+		private readonly string baseUrlWeb;
+		private readonly string baseUrlApi;
+
 		public QuizController()
 		{
-			metricSender = new MetricSender(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName);
+			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
+			baseUrlWeb = configuration.BaseUrl;
+			baseUrlApi = configuration.BaseUrlApi;
+			metricSender = new MetricSender(configuration.GraphiteServiceName);
 
 			userQuizzesRepo = new UserQuizzesRepo(db);
 			visitsRepo = new VisitsRepo(db);
@@ -154,6 +160,8 @@ namespace uLearn.Web.Controllers
 			{
 				Course = course,
 				Slide = slide,
+				BaseUrlWeb = baseUrlWeb,
+				BaseUrlApi = baseUrlApi,
 				QuizState = state,
 				MaxAttemptsCount = maxAttemptsCount,
 				UserScores = userScores,
@@ -193,7 +201,8 @@ namespace uLearn.Web.Controllers
 
 			var course = courseManager.GetCourse(courseId);
 			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
-			var slide = course.FindSlideById(slideId, isInstructor) as QuizSlide;
+			var visibleUnits = unitsRepo.GetVisibleUnitIds(course, User);
+			var slide = course.FindSlideById(slideId, isInstructor, visibleUnits) as QuizSlide;
 			if (slide == null)
 				return new HttpNotFoundResult();
 
@@ -318,15 +327,15 @@ namespace uLearn.Web.Controllers
 			using (var transaction = db.Database.BeginTransaction())
 			{
 				var course = courseManager.GetCourse(checking.CourseId);
-				var unit = course.FindUnitBySlideId(checking.SlideId, true);
-				var slide = course.GetSlideById(checking.SlideId, true);
+				var unit = course.FindUnitBySlideIdNotSafe(checking.SlideId, true);
+				var slide = course.GetSlideByIdNotSafe(checking.SlideId);
 
 				metricSender.SendCount($"quiz.manual_score.{checking.CourseId}");
 				metricSender.SendCount($"quiz.manual_score.{checking.CourseId}.{checking.SlideId}");
 
 				var totalScore = 0;
 
-				var quiz = course.FindSlideById(checking.SlideId, true);
+				var quiz = course.FindSlideByIdNotSafe(checking.SlideId);
 				if (quiz == null)
 					return Redirect(errorUrl + "Этого теста больше нет в курсе");
 
@@ -532,7 +541,9 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> RestartQuiz(string courseId, Guid slideId, bool isLti)
 		{
 			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
-			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId, isInstructor);
+			var course = courseManager.GetCourse(courseId);
+			var visibleUnits = unitsRepo.GetVisibleUnitIds(course, User);
+			var slide = course.GetSlideById(slideId, isInstructor, visibleUnits);
 			if (slide is QuizSlide)
 			{
 				var userId = User.Identity.GetUserId();
@@ -559,6 +570,8 @@ namespace uLearn.Web.Controllers
 			{
 				Course = course,
 				Slide = slide,
+				BaseUrlWeb = baseUrlWeb,
+				BaseUrlApi = baseUrlApi,
 				IsGuest = true,
 				QuizState = new QuizState(QuizStatus.ReadyToSend, 0, 0, slide.MaxScore),
 			};

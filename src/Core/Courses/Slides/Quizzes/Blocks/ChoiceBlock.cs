@@ -38,7 +38,7 @@ namespace Ulearn.Core.Courses.Slides.Quizzes.Blocks
 				throw new FormatException("'Maybe' items are not allowed for for non-multiple choice. BlockId=" + Id);
 		}
 
-		public override Component ToEdxComponent(string displayName, string courseId, Slide slide, int componentIndex, string ulearnBaseUrl, DirectoryInfo coursePackageRoot)
+		public override Component ToEdxComponent(EdxComponentBuilderContext context)
 		{
 			var items = Items.Select(x => new Choice
 			{
@@ -59,7 +59,7 @@ namespace Ulearn.Core.Courses.Slides.Quizzes.Blocks
 
 			return new MultipleChoiceComponent
 			{
-				UrlName = slide.NormalizedGuid + componentIndex,
+				UrlName = context.Slide.NormalizedGuid + context.ComponentIndex,
 				ChoiceResponse = cr,
 				Title = EdxTexReplacer.ReplaceTex(Text)
 			};

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using CommandLine;
+using Ulearn.Core;
 using uLearn.CourseTool.Validating;
 using Ulearn.Core.Courses;
 
@@ -18,19 +19,19 @@ namespace uLearn.CourseTool.CmdLineOptions
 
 		public override void DoExecute()
 		{
-			var ulearnDir = new DirectoryInfo($"{Dir}/{Config.ULearnCourseId}");
+			var ulearnDir = CourseDirectory;
 			Console.Write("Loading Ulearn course from {0} ... ", ulearnDir.Name);
 			var sw = Stopwatch.StartNew();
 			var course = new CourseLoader().Load(ulearnDir);
 			Console.WriteLine(sw.ElapsedMilliseconds + " ms");
-			var slides = course.GetSlides(true);
+			var slides = course.GetSlidesNotSafe();
 			if (SlideId != null)
 			{
 				slides = slides.Where(s => s.Id == Guid.Parse(SlideId)).ToList();
 				Console.WriteLine("Only slide " + SlideId);
 			}
 
-			var validator = new CourseValidator(slides);
+			var validator = new CourseValidator(slides, ulearnDir.FullName);
 			validator.InfoMessage += m => Write(ConsoleColor.Gray, m);
 			var errors = new List<string>();
 			validator.Error += m =>
@@ -43,7 +44,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 				Write(ConsoleColor.DarkYellow, m);
 				errors.Add(m);
 			};
-			validator.ValidateSpelling(course);
+			validator.ValidateSpelling(course, ulearnDir.Name);
 			validator.ValidateExercises();
 			validator.ValidateVideos();
 			validator.ValidateFlashcardSlides();

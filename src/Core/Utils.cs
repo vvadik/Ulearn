@@ -92,7 +92,9 @@ namespace Ulearn.Core
 
 		public static string GetAppPath()
 		{
-			return WebApplicationPhysicalPath ?? @"..\";
+			if (WebApplicationPhysicalPath != null)
+				return WebApplicationPhysicalPath;
+			return Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
 		}
 
 		public static string WebApplicationPhysicalPath { get; set; }

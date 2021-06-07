@@ -94,6 +94,9 @@ namespace Ulearn.Core.Configuration
 		[CanBeNull]
 		public string BaseUrl { get; set; }
 
+		[CanBeNull]
+		public string BaseUrlApi { get; set; }
+
 		public string CoursesDirectory { get; set; }
 
 		public string ExerciseStudentZipsDirectory { get; set; }

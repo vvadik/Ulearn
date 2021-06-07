@@ -1,9 +1,10 @@
 ﻿using System.IO;
-using Vostok.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses.Slides;
+using Vostok.Logging.Abstractions;
 
 namespace Ulearn.Core.Helpers
 {
@@ -13,38 +14,32 @@ namespace Ulearn.Core.Helpers
 
 		private readonly DirectoryInfo cacheDirectory;
 		private readonly ExerciseStudentZipBuilder builder;
-		private static readonly UlearnConfiguration configuration;
 
-		static ExerciseStudentZipsCache()
+		public ExerciseStudentZipsCache(IOptions<UlearnConfiguration> options)
 		{
-			configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
-		}
-
-		public ExerciseStudentZipsCache()
-		{
-			cacheDirectory = GetCacheDirectory();
+			var exerciseStudentZipsDirectory = options.Value.ExerciseStudentZipsDirectory;
+			cacheDirectory = GetCacheDirectory(exerciseStudentZipsDirectory);
 			cacheDirectory.EnsureExists();
 			builder = new ExerciseStudentZipBuilder();
 		}
 
-		private static DirectoryInfo GetCacheDirectory()
+		private static DirectoryInfo GetCacheDirectory(string exerciseStudentZipsDirectory)
 		{
-			var directory = configuration.ExerciseStudentZipsDirectory;
-			if (!string.IsNullOrEmpty(directory))
-				return new DirectoryInfo(directory);
+			if (!string.IsNullOrEmpty(exerciseStudentZipsDirectory))
+				return new DirectoryInfo(exerciseStudentZipsDirectory);
 
 			return CourseManager.GetCoursesDirectory().GetSubdirectory("ExerciseStudentZips");
 		}
 
-		public FileInfo GenerateOrFindZip(string courseId, Slide slide)
+		public FileInfo GenerateOrFindZip(string courseId, Slide slide, string courseDirectory)
 		{
-			var courseDirectory = cacheDirectory.GetSubdirectory(courseId);
-			var zipFile = courseDirectory.GetFile($"{slide.Id}.zip");
+			var cacheCourseDirectory = cacheDirectory.GetSubdirectory(courseId);
+			var zipFile = cacheCourseDirectory.GetFile($"{slide.Id}.zip");
 			if (!zipFile.Exists)
 			{
-				courseDirectory.EnsureExists();
+				cacheCourseDirectory.EnsureExists();
 				log.Info($"Собираю zip-архив с упражнением: курс {courseId}, слайд «{slide.Title}» ({slide.Id}), файл {zipFile.FullName}");
-				builder.BuildStudentZip(slide, zipFile);
+				builder.BuildStudentZip(slide, zipFile, courseDirectory);
 			}
 
 			return zipFile;

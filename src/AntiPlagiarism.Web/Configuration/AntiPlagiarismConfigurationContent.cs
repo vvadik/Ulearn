@@ -96,6 +96,6 @@ namespace AntiPlagiarism.Web.Configuration
 
 	public class UpdateOldSubmissionsFromStatisticsWorkerConfiguration
 	{
-		public DateTime? StartTime { get; set; }
+		public string StartTime { get; set; } // https://github.com/atifaziz/NCrontab
 	}
 }

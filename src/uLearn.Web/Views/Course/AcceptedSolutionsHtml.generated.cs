@@ -58,12 +58,6 @@ WriteLiteralTo(__razor_helper_writer, "\"");
 
 WriteLiteralTo(__razor_helper_writer, "></div>\r\n");
 
-WriteLiteralTo(__razor_helper_writer, "\t<p>");
-
-WriteTo(__razor_helper_writer, MvcHtmlString.Create(model.Slide.Exercise.CommentAfterExerciseIsSolved.RenderMarkdown(model.Slide.Info.SlideFile)));
-
-WriteLiteralTo(__razor_helper_writer, "</p>\r\n");
-
 	foreach (var solution in model.AcceptedSolutions)
 	{
 		var id = "solution_" + solution.Id;
@@ -71,26 +65,26 @@ WriteLiteralTo(__razor_helper_writer, "</p>\r\n");
 
 WriteLiteralTo(__razor_helper_writer, "\t\t<div");
 
-WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\"", 612), Tuple.Create("\"", 620)
-, Tuple.Create(Tuple.Create("", 617), Tuple.Create<System.Object, System.Int32>(id
-, 617), false)
+WriteAttributeTo(__razor_helper_writer, "id", Tuple.Create(" id=\"", 487), Tuple.Create("\"", 495)
+, Tuple.Create(Tuple.Create("", 492), Tuple.Create<System.Object, System.Int32>(id
+, 492), false)
 );
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t<button");
 
-WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 634), Tuple.Create("\"", 734)
-, Tuple.Create(Tuple.Create("", 642), Tuple.Create("like-left-location", 642), true)
-, Tuple.Create(Tuple.Create(" ", 660), Tuple.Create("btn", 661), true)
-, Tuple.Create(Tuple.Create(" ", 664), Tuple.Create<System.Object, System.Int32>( solution.LikedAlready ? "btn-primary" : "btn-default"
-, 665), false)
-, Tuple.Create(Tuple.Create(" ", 722), Tuple.Create("like-button", 723), true)
+WriteAttributeTo(__razor_helper_writer, "class", Tuple.Create(" class=\"", 509), Tuple.Create("\"", 609)
+, Tuple.Create(Tuple.Create("", 517), Tuple.Create("like-left-location", 517), true)
+, Tuple.Create(Tuple.Create(" ", 535), Tuple.Create("btn", 536), true)
+, Tuple.Create(Tuple.Create(" ", 539), Tuple.Create<System.Object, System.Int32>( solution.LikedAlready ? "btn-primary" : "btn-default"
+, 540), false)
+, Tuple.Create(Tuple.Create(" ", 597), Tuple.Create("like-button", 598), true)
 );
 
-WriteAttributeTo(__razor_helper_writer, "onclick", Tuple.Create(" onclick=\"", 735), Tuple.Create("\"", 785)
-, Tuple.Create(Tuple.Create("", 745), Tuple.Create("window.legacy.likeSolution(", 745), true)
-                                                                              , Tuple.Create(Tuple.Create("", 772), Tuple.Create<System.Object, System.Int32>(solution.Id
-, 772), false)
-, Tuple.Create(Tuple.Create("", 784), Tuple.Create(")", 784), true)
+WriteAttributeTo(__razor_helper_writer, "onclick", Tuple.Create(" onclick=\"", 610), Tuple.Create("\"", 660)
+, Tuple.Create(Tuple.Create("", 620), Tuple.Create("window.legacy.likeSolution(", 620), true)
+                                                                              , Tuple.Create(Tuple.Create("", 647), Tuple.Create<System.Object, System.Int32>(solution.Id
+, 647), false)
+, Tuple.Create(Tuple.Create("", 659), Tuple.Create(")", 659), true)
 );
 
 WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t\t<i");

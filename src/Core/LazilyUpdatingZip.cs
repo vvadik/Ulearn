@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Ionic.Zip;
 using Ionic.Zlib;
 using NUnit.Framework;
@@ -33,7 +34,7 @@ namespace Ulearn.Core
 		{
 			if (IsActual())
 				return;
-			using (var zip = new ZipFile())
+			using (var zip = new ZipFile(Encoding.UTF8))
 			{
 				zip.CompressionLevel = CompressionLevel.BestSpeed;
 				foreach (var f in EnumerateFiles())

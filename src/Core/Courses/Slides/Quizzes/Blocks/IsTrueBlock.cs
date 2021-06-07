@@ -1,6 +1,4 @@
-using System.IO;
 using System.Xml.Serialization;
-using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Model.Edx.EdxComponents;
 
 namespace Ulearn.Core.Courses.Slides.Quizzes.Blocks
@@ -23,7 +21,7 @@ namespace Ulearn.Core.Courses.Slides.Quizzes.Blocks
 		{
 		}
 
-		public override Component ToEdxComponent(string displayName, string courseId, Slide slide, int componentIndex, string ulearnBaseUrl, DirectoryInfo coursePackageRoot)
+		public override Component ToEdxComponent(EdxComponentBuilderContext context)
 		{
 			var items = new[]
 			{
@@ -33,7 +31,7 @@ namespace Ulearn.Core.Courses.Slides.Quizzes.Blocks
 			var cg = new MultipleChoiceGroup { Label = Text, Type = "MultipleChoice", Choices = items };
 			return new MultipleChoiceComponent
 			{
-				UrlName = slide.NormalizedGuid + componentIndex,
+				UrlName = context.Slide.NormalizedGuid + context.ComponentIndex,
 				ChoiceResponse = new MultipleChoiceResponse { ChoiceGroup = cg },
 				Title = EdxTexReplacer.ReplaceTex(Text),
 				Solution = new Solution(Explanation)

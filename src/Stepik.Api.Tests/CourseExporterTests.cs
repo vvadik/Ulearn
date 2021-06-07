@@ -23,7 +23,7 @@ namespace Stepik.Api.Tests
 
 			await InitializeClient();
 
-			courseExporter = new CourseExporter(client.AccessToken);
+			courseExporter = new CourseExporter(null, null, "", "", client.AccessToken);
 		}
 
 		[Test]

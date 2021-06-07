@@ -1,22 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading;
+using System.Threading.Tasks;
 using AntiPlagiarism.Web.CodeAnalyzing;
 using AntiPlagiarism.Web.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Vostok.Applications.Scheduled;
+using Vostok.Hosting.Abstractions;
 using Vostok.Logging.Abstractions;
 
 namespace AntiPlagiarism.Web.Workers
 {
-	public class AddNewSubmissionWorker
+	public class AddNewSubmissionWorker : VostokScheduledApplication
 	{
+		private readonly TimeSpan sleep = TimeSpan.FromSeconds(5);
+
 		private readonly IServiceScopeFactory serviceScopeFactory;
 		private readonly IOptions<AntiPlagiarismConfiguration> configuration;
-		private static ILog log => LogProvider.Get().ForContext(typeof(AddNewSubmissionWorker));
 
-		private readonly List<Thread> threads = new List<Thread>();
-		private readonly TimeSpan sleep = TimeSpan.FromSeconds(5);
+		private static ILog log => LogProvider.Get().ForContext(typeof(AddNewSubmissionWorker));
 
 		public AddNewSubmissionWorker(
 			IOptions<AntiPlagiarismConfiguration> configuration,
@@ -24,11 +25,14 @@ namespace AntiPlagiarism.Web.Workers
 		{
 			this.serviceScopeFactory = serviceScopeFactory;
 			this.configuration = configuration;
-
-			RunHandleNewSubmissionWorkerThreads();
 		}
-		
-		private void RunHandleNewSubmissionWorkerThreads()
+
+		public override void Setup(IScheduledActionsBuilder builder, IVostokHostingEnvironment environment)
+		{
+			RunNewSubmissionWorkers(builder);
+		}
+
+		private void RunNewSubmissionWorkers(IScheduledActionsBuilder builder)
 		{
 			var threadsCount = configuration.Value.AntiPlagiarism.ThreadsCount;
 			if (threadsCount < 1)
@@ -40,39 +44,31 @@ namespace AntiPlagiarism.Web.Workers
 			log.Info($"Запускаю AddNewSubmissionWorker в {threadsCount} потока(ов)");
 			for (var i = 0; i < threadsCount; i++)
 			{
-				threads.Add(new Thread(WorkerThread)
-				{
-					Name = $"AddNewSubmissionWorker #{i}",
-					IsBackground = true
-				});
+				var scheduler = Scheduler.PeriodicalWithConstantPause(sleep);
+				builder.Schedule($"AddNewSubmissionWorker #{i}", scheduler, Task);
 			}
-
-			threads.ForEach(t => t.Start());
 		}
 
-		private void WorkerThread()
+		private async Task Task()
 		{
-			log.Info($"Поток {Thread.CurrentThread.Name} запускается");
-
 			while (true)
 			{
-				bool newSubmissionHandled = false;
+				var newSubmissionHandled = false;
 				using (var scope = serviceScopeFactory.CreateScope())
 				{
 					var newSubmissionHandler = scope.ServiceProvider.GetService<NewSubmissionHandler>();
 					try
 					{
-						newSubmissionHandled = newSubmissionHandler.HandleNewSubmission().Result;
+						newSubmissionHandled = await newSubmissionHandler.HandleNewSubmission();
 					}
 					catch (Exception ex)
 					{
 						log.Error(ex, "Exception during HandleNewSubmission");
 					}
 				}
-				if(!newSubmissionHandled)
-					Thread.Sleep(sleep);
+				if (!newSubmissionHandled)
+					return;
 			}
-			// ReSharper disable once FunctionNeverReturns
 		}
 	}
 }

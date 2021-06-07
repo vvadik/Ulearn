@@ -235,7 +235,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			var tmpCourseId = GetTmpCourseId(baseCourse.Object.Id, TestUsers.User.Id); 
 			var courseContent = GetDirectoryContent(workingCourseDirectory.FullName).ToList();
-			var secondUploadFiles = new List<string> { "\\Slides\\U99_Presentation" };
+			var secondUploadFiles = new List<string> { "\\U99_Presentation" };
 			var firstUploadFiles = courseContent.Except(secondUploadFiles);
 			var firstZip = AddToZip(firstUploadFiles);
 			var secondZip = AddToZip(secondUploadFiles);
@@ -292,7 +292,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 			var baseCourse = await CreateAndConfigureBaseCourseForUser("partiallyUpload_response_courseError");
 			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			await SendFullCourseWithPartiallyUpload(baseCourse);
-			var filesToDelete = new List<string> { Path.Combine("Slides", "Prelude.cs") };
+			var filesToDelete = new List<string> { "Prelude.cs" };
 			var zipWithDelete = GetZipWithDelete(filesToDelete);
 			var file = GetFormFileFromZip(zipWithDelete);
 			var response = tempCourseController.UploadCourse(baseCourse.Object.Id, new List<IFormFile>() { file });
@@ -306,7 +306,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 			await tempCourseController.CreateCourse(baseCourse.Object.Id).ConfigureAwait(false);
 			var tmpCourseId = GetTmpCourseId(baseCourse.Object.Id, TestUsers.User.Id); 
 			await SendFullCourseWithPartiallyUpload(baseCourse);
-			var filesToDelete = new List<string> { Path.Combine("Slides", "Prelude.cs") };
+			var filesToDelete = new List<string> { "Prelude.cs" };
 			var zipWithDelete = GetZipWithDelete(filesToDelete);
 			var file = GetFormFileFromZip(zipWithDelete);
 			await tempCourseController.UploadCourse(baseCourse.Object.Id, new List<IFormFile>() { file });
@@ -361,7 +361,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 
 		private void BreakCourse()
 		{
-			File.Delete(Path.Combine(workingCourseDirectory.FullName, "Slides", "Prelude.cs"));
+			File.Delete(Path.Combine(workingCourseDirectory.FullName, "Prelude.cs"));
 		}
 
 		private static IEnumerable<string> GetDirectoriesDiff(string path1, string path2)
@@ -372,7 +372,6 @@ namespace Web.Api.Tests.Controllers.TempCourses
 				.Except(secondDirFiles)
 				.Concat(secondDirFiles.Except(firstDirFiles))
 				.Except(new List<string> { "course.xml" }) // после создания курса в папке курса на сервере создается course.xml
-				// поимимо того, который лежит в /Slides
 				.Except(new List<string> { "deleted.txt" }) 
 				.ToList();
 			return diffs;

@@ -41,7 +41,7 @@ namespace Ulearn.Web.Api.Controllers.Runner
 				return;
 
 			var exerciseSlide = (await courseManager.FindCourseAsync(submission.CourseId))
-				?.FindSlideById(submission.SlideId, true) as ExerciseSlide;
+				?.FindSlideByIdNotSafe(submission.SlideId) as ExerciseSlide;
 			if (exerciseSlide == null)
 				return;
 

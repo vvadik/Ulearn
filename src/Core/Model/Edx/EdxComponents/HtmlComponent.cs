@@ -12,7 +12,10 @@ namespace Ulearn.Core.Model.Edx.EdxComponents
 		public string Source;
 
 		[XmlIgnore]
-		public string LocalFolder;
+		public string CourseDirectory;
+
+		[XmlIgnore]
+		public string UnitDirectoryRelativeToCourse;
 
 		[XmlIgnore]
 		public List<string> LocalFiles;
@@ -41,13 +44,14 @@ namespace Ulearn.Core.Model.Edx.EdxComponents
 			Source = source;
 		}
 
-		public HtmlComponent(string urlName, string displayName, string filename, string source, string localFolder, List<string> localFiles)
+		public HtmlComponent(string urlName, string displayName, string filename, string source, string courseDirectory, string unitDirectoryRelativeToCourse, List<string> localFiles)
 		{
 			UrlName = urlName;
 			DisplayName = displayName;
 			Filename = filename;
 			Source = source;
-			LocalFolder = localFolder;
+			CourseDirectory = courseDirectory;
+			UnitDirectoryRelativeToCourse = unitDirectoryRelativeToCourse;
 			LocalFiles = localFiles;
 		}
 
@@ -66,7 +70,7 @@ namespace Ulearn.Core.Model.Edx.EdxComponents
 			{
 				foreach (var localFile in LocalFiles ?? new List<string>())
 					File.Copy(
-						Path.Combine(LocalFolder, localFile),
+						Path.Combine(CourseDirectory, UnitDirectoryRelativeToCourse, localFile),
 						string.Format("{0}/static/{1}_{2}", folderName, UrlName, localFile.Replace("/", "_")),
 						overwrite: true);
 			}

@@ -208,7 +208,7 @@ namespace Ulearn.Web.Api.Controllers
 		{
 			var slides = unit.GetSlides(isInstructor).Select(slide => slideRenderer.BuildShortSlideInfo(courseId, slide, getSlideMaxScoreFunc, getGitEditLinkFunc, Url));
 			if (isInstructor && unit.InstructorNote != null)
-				slides = slides.Concat(new List<ShortSlideInfo> { slideRenderer.BuildShortSlideInfo(courseId, unit.InstructorNote.Slide, getSlideMaxScoreFunc, getGitEditLinkFunc, Url) });
+				slides = slides.Concat(new List<ShortSlideInfo> { slideRenderer.BuildShortSlideInfo(courseId, unit.InstructorNote, getSlideMaxScoreFunc, getGitEditLinkFunc, Url) });
 			return BuildUnitInfo(unit, isNotPublished, publicationDate, slides);
 		}
 

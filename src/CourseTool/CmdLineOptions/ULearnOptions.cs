@@ -25,12 +25,12 @@ namespace uLearn.CourseTool.CmdLineOptions
 
 			Console.Out.WriteLine("Profile: {0}", Profile);
 			var profile = Config.GetProfile(Profile);
-			var credentials = Credentials.GetCredentials(Dir, Profile, "uLearn");
+			var credentials = Credentials.GetCredentials(WorkingDirectory, Profile, "uLearn");
 
 			if (Download)
-				ULearnInteractor.Download(Dir, Force, Config, profile.UlearnUrl, credentials);
+				ULearnInteractor.Download(WorkingDirectory, Force, Config, profile.UlearnBaseUrlWeb, credentials);
 			if (Upload)
-				ULearnInteractor.Upload(Dir, Config, profile.UlearnUrl, credentials);
+				ULearnInteractor.Upload(WorkingDirectory, Config, profile.UlearnBaseUrlWeb, credentials);
 		}
 	}
 }

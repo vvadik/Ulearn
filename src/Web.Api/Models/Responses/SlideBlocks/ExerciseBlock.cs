@@ -79,7 +79,7 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 				DefaultLanguage = null;
 			}
 
-			RenderedHints = exerciseBlock.Hints.Select(h => RenderHtmlWithHint(h, context.SlideFile)).ToArray();
+			RenderedHints = exerciseBlock.Hints.Select(h => RenderHtmlWithHint(h, context.markdownRenderContext)).ToArray();
 			ExerciseInitialCode = exerciseBlock.ExerciseInitialCode.RemoveEmptyLinesFromStart().TrimEnd().EnsureEnoughLines(4);
 			HideSolutions = exerciseBlock.HideShowSolutionsButton;
 			ExpectedOutput = exerciseBlock.HideExpectedOutputOnError ? null : exerciseBlock.ExpectedOutput?.NormalizeEoln();
@@ -90,9 +90,9 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 				.ToList();
 		}
 
-		private string RenderHtmlWithHint(string hintMd, FileInfo slideFile)
+		private string RenderHtmlWithHint(string hintMd, MarkdownRenderContext markdownRenderContext)
 		{
-			return hintMd.RenderMarkdown(slideFile);
+			return hintMd.RenderMarkdown(markdownRenderContext);
 		}
 	}
 }

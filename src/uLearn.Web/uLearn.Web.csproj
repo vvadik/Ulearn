@@ -61,7 +61,7 @@
         </ObjectGroup>
       </Objects>
     </PublishDatabaseSettings>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -71,7 +71,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PublishDatabases>false</PublishDatabases>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AjaxMin, Version=5.14.5506.26196, Culture=neutral, PublicKeyToken=21ef50ce11b5d80f, processorArchitecture=MSIL">
@@ -820,6 +820,7 @@
     <Compile Include="Controllers\JsonDataContractHelpers.cs" />
     <Compile Include="Controllers\NotificationsController.cs" />
     <Compile Include="Controllers\SpaController.cs" />
+    <Compile Include="Controllers\StaticFilesController.cs" />
     <Compile Include="Controllers\StepikController.cs" />
     <Compile Include="Controllers\TelegramController.cs" />
     <Compile Include="Controllers\BaseUserController.cs" />
@@ -882,7 +883,6 @@
     <Compile Include="Controllers\AnalyticsController.cs" />
     <Compile Include="Controllers\QuizController.cs" />
     <Compile Include="Controllers\ExerciseController.cs" />
-    <Compile Include="Controllers\HintController.cs" />
     <Compile Include="Controllers\VisitsController.cs" />
     <Compile Include="FilterAttributes\ULearnAuthorizeAttribute.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
@@ -1025,11 +1025,6 @@
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Course\Slide.cshtml" />
     <Content Include="Views\Course\AcceptedSolutions.cshtml" />
-    <Content Include="Views\Shared\DisplayTemplates\CodeBlock.cshtml" />
-    <Content Include="Views\Shared\DisplayTemplates\MdBlock.cshtml" />
-    <Content Include="Views\Shared\DisplayTemplates\YoutubeBlock.cshtml" />
-    <Content Include="Views\Shared\DisplayTemplates\HintWithLikeButton.cshtml" />
-    <Content Include="Views\Hint\UseHint.cshtml" />
     <Content Include="Views\Account\List.cshtml" />
     <Content Include="Views\Admin\Units.cshtml" />
     <Content Include="Views\Analytics\UnitSheet.cshtml" />
@@ -1038,11 +1033,9 @@
     <Content Include="Views\Analytics\UsersProgress.cshtml" />
     <Content Include="Views\Analytics\UserSolutions.cshtml" />
     <Content Include="Views\Account\ChangeDetailsPartial.cshtml" />
-    <Content Include="Views\Shared\DisplayTemplates\TexBlock.cshtml" />
     <Content Include="Views\Quiz\Quiz.cshtml" />
     <Content Include="Views\Account\Info.cshtml" />
     <Content Include="Views\Account\CourseInfo.cshtml" />
-    <Content Include="Views\Shared\DisplayTemplates\ImageGaleryBlock.cshtml" />
     <Content Include="Views\Course\SlideHtml.cshtml">
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>SlideHtml.generated.cs</LastGenOutput>
@@ -1126,9 +1119,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Courses.Staging\" />
-    <Folder Include="Courses.Versions\" />
-    <Folder Include="Courses\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Microsoft.Owin.Security.VK\Resources.resx" />
@@ -1165,6 +1155,10 @@
     <ProjectReference Include="..\VideoAnnotations.Api\VideoAnnotations.Api.csproj">
       <Project>{8dbf67fc-f88e-4f33-bf81-8033ff597c91}</Project>
       <Name>VideoAnnotations.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Web.Api.Client\Web.Api.Client.csproj">
+      <Project>{bea02a48-3d9e-47ce-a005-f96601d07bbb}</Project>
+      <Name>Web.Api.Client</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

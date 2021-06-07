@@ -14,6 +14,7 @@
 		<PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="6.1.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="6.0.7" />
 		<PackageReference Include="Vostok.Applications.AspNetCore" Version="0.2.9" />
+		<PackageReference Include="Vostok.Applications.Scheduled" Version="0.2.7" />
 		<PackageReference Include="Vostok.Configuration" Version="0.1.24" />
 		<PackageReference Include="Vostok.Datacenters.Kontur" Version="1.0.36" />
 		<PackageReference Include="Vostok.Hosting" Version="0.3.15" />
