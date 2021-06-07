@@ -193,9 +193,17 @@ namespace Database.DataContexts
 			return db.CourseFiles.FirstOrDefault(f => f.CourseId.Equals(courseId, StringComparison.OrdinalIgnoreCase));
 		}
 
-		public List<CourseFile> GetCourseFiles(IEnumerable<string> existingOnDiskCourseIds)
+		// Итерирование выполняется лениво и должно быть закончено до выполнения любых других методов
+		// AsNoTracking делает запрос ленивым
+		// Запрос всего списка сразу приведет к переполнению памяти в базе.
+		//public IQueryable<CourseFile> GetCourseFilesLazyNotSafe(IEnumerable<string> existingOnDiskCourseIds)
+		//{
+		//	return db.CourseFiles.Where(a => !existingOnDiskCourseIds.Contains(a.CourseId)).AsNoTracking();
+		//}
+
+		public List<string> GetCourseIdsFromCourseFiles()
 		{
-			return db.CourseFiles.Where(a => !existingOnDiskCourseIds.Contains(a.CourseId)).ToList();
+			return db.CourseFiles.Select(cf => cf.CourseId).ToList();
 		}
 
 		[CanBeNull]

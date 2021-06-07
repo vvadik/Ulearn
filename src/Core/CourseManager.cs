@@ -261,7 +261,7 @@ namespace Ulearn.Core
 			return course;
 		}
 
-		private void UnzipFile(FileInfo zipFile, DirectoryInfo unpackDirectory)
+		protected void UnzipFile(FileInfo zipFile, DirectoryInfo unpackDirectory)
 		{
 			using (var zip = ZipFile.Read(zipFile.FullName, new ReadOptions { Encoding = ZipUtils.Cp866 })) // Использует UTF8, где нужно
 			{

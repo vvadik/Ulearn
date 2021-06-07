@@ -94,8 +94,9 @@ namespace ManualUtils
 			//UpdateCertificateArchives(db);
 			//GetVKByEmail(serviceProvider);
 			//TestStagingZipsEncodings();
-			//ConvertZipsToCourseXmlInRoot();
-			await UploadStagingToDb(serviceProvider);
+			ConvertZipsToCourseXmlInRoot();
+			//await UploadStagingToDb(serviceProvider);
+			//await UploadStagingFromDbAndExtractToCourses(serviceProvider);
 		}
 
 		private static void GenerateUpdateSequences()
@@ -440,10 +441,11 @@ namespace ManualUtils
 			var db = serviceProvider.GetService<UlearnDb>();
 			var coursesRepo = serviceProvider.GetService<ICoursesRepo>();
 
-			var courseFiles = await coursesRepo.GetCourseFiles(Array.Empty<string>());
+			var courseIdsFromCourseFiles = await coursesRepo.GetCourseIdsFromCourseFiles();
 
-			foreach (var fileInDb in courseFiles)
+			foreach (var courseId in courseIdsFromCourseFiles)
 			{
+				var fileInDb = await coursesRepo.GetCourseFile(courseId);
 				var zip = stagingDirectory.GetFile($"{fileInDb.CourseId}.zip");
 				if (!zip.Exists)
 				{
@@ -456,6 +458,28 @@ namespace ManualUtils
 					Console.WriteLine($"Upload course {fileInDb.CourseId}.zip uploaded");
 					fileInDb.File = content;
 					db.SaveChanges();
+				}
+			}
+		}
+
+		private static async Task UploadStagingFromDbAndExtractToCourses(IServiceProvider serviceProvider)
+		{
+			var courseManager = new CourseManager(CourseManager.GetCoursesDirectory());
+			var db = serviceProvider.GetService<UlearnDb>();
+
+			foreach (var courseFile in db.CourseFiles.AsNoTracking())
+			{
+				var stagingCourseFile = courseManager.GetStagingCourseFile(courseFile.CourseId);
+				await File.WriteAllBytesAsync(stagingCourseFile.FullName, courseFile.File);
+				var versionCourseFile = courseManager.GetCourseVersionFile(courseFile.CourseVersionId);
+				if (!versionCourseFile.Exists)
+					await File.WriteAllBytesAsync(versionCourseFile.FullName, courseFile.File);
+				var unpackDirectory = courseManager.GetExtractedCourseDirectory(courseFile.CourseId);
+				using (var zip = ZipFile.Read(stagingCourseFile.FullName, new ReadOptions { Encoding = ZipUtils.Cp866 }))
+				{
+					zip.ExtractAll(unpackDirectory.FullName, ExtractExistingFileAction.OverwriteSilently);
+					foreach (var f in unpackDirectory.GetFiles("*", SearchOption.AllDirectories).Cast<FileSystemInfo>().Concat(unpackDirectory.GetDirectories("*", SearchOption.AllDirectories)))
+						f.Attributes &= ~FileAttributes.ReadOnly;
 				}
 			}
 		}

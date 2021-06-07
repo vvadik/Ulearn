@@ -102,22 +102,24 @@ namespace Database
 
 		protected override void LoadCourseZipsToDiskFromExternalStorage(IEnumerable<string> existingOnDiskCourseIds)
 		{
-			log.Info($"Загружаю курсы из БД");
+			log.Info("Загружаю курсы из БД");
 			var coursesRepo = new CoursesRepo();
-			var files = coursesRepo.GetCourseFiles(existingOnDiskCourseIds);
-			foreach (var zipFile in files)
+			var coursesWithCourseFiles = coursesRepo.GetCourseIdsFromCourseFiles().Where(c => !existingOnDiskCourseIds.Contains(c));
+			foreach (var courseId in coursesWithCourseFiles)
 			{
+				var fileInDb = coursesRepo.GetCourseFile(courseId);
 				try
 				{
-					var stagingCourseFile = GetStagingCourseFile(zipFile.CourseId);
-					File.WriteAllBytes(stagingCourseFile.FullName, zipFile.File);
-					var versionCourseFile = GetCourseVersionFile(zipFile.CourseVersionId);
+					var stagingCourseFile = GetStagingCourseFile(fileInDb.CourseId);
+					File.WriteAllBytes(stagingCourseFile.FullName, fileInDb.File);
+					var versionCourseFile = GetCourseVersionFile(fileInDb.CourseVersionId);
 					if (!versionCourseFile.Exists)
-						File.WriteAllBytes(versionCourseFile.FullName, zipFile.File);
+						File.WriteAllBytes(versionCourseFile.FullName, fileInDb.File);
+					UnzipFile(stagingCourseFile, GetExtractedCourseDirectory(fileInDb.CourseId));
 				}
 				catch (Exception ex)
 				{
-					log.Error(ex, $"Не смог загрузить {zipFile.CourseId} из базы данных");
+					log.Error(ex, $"Не смог загрузить {fileInDb.CourseId} из базы данных");
 				}
 			}
 		}

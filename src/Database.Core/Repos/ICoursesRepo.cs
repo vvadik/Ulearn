@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Principal;
+using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 using JetBrains.Annotations;
@@ -31,6 +31,7 @@ namespace Database.Repos
 		Task<List<string>> GetCoursesUserHasAccessTo(string userId, CourseAccessType accessType);
 		Task AddCourseFile(string courseId, Guid versionId, byte[] content);
 		Task<CourseFile> GetCourseFile(string courseId);
-		Task<List<CourseFile>> GetCourseFiles(IEnumerable<string> exceptCourseIds);
+		Task<List<string>> GetCourseIdsFromCourseFiles();
+		IQueryable<CourseFile> GetCourseFilesLazyNotSafe(IEnumerable<string> exceptCourseIds);
 	}
 }
