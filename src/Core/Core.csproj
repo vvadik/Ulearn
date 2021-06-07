@@ -31,7 +31,6 @@
 		<PackageReference Include="StatsdClient" Version="2.0.68" />
 		<PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
 		<PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
-		<PackageReference Include="System.Text.Encoding.CodePages" Version="5.0.0" />
 		<PackageReference Include="Telegram.Bot" Version="15.7.1" />
 		<PackageReference Include="Vostok.Logging.Console" Version="1.0.5" />
 		<PackageReference Include="Vostok.Logging.File" Version="1.0.12" />

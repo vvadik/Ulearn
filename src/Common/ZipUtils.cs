@@ -11,6 +11,11 @@ namespace Ulearn.Common
 {
 	public static class ZipUtils
 	{
+		static ZipUtils()
+		{
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+		}
+
 		public static Encoding Cp866 => Encoding.GetEncoding(866);
 
 		public static MemoryStream CreateZipFromDirectory([NotNull]List<string> directoriesToInclude, [CanBeNull]List<string> excludeCriterias,
