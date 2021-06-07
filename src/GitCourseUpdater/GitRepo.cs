@@ -92,6 +92,8 @@ namespace GitCourseUpdater
 
 		public (MemoryStream zip, string courseXmlSubdirectoryInRepo) GetCurrentStateAsZip(string courseSubdirectoryInRepo = "")
 		{
+			if (courseSubdirectoryInRepo == null)
+				courseSubdirectoryInRepo = "";
 			log.Info($"Start load '{repoDirName}' to zip");
 			var repoDir = reposBaseDir.GetSubdirectory(repoDirName);
 			var courseRepoDir = new DirectoryInfo(Path.Combine(repoDir.FullName, courseSubdirectoryInRepo));

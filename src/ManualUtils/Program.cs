@@ -94,8 +94,8 @@ namespace ManualUtils
 			//UpdateCertificateArchives(db);
 			//GetVKByEmail(serviceProvider);
 			//TestStagingZipsEncodings();
-			ConvertZipsToCourseXmlInRoot();
-			//await UploadStagingToDb(serviceProvider);
+			//ConvertZipsToCourseXmlInRoot();
+			await UploadStagingToDb(serviceProvider);
 		}
 
 		private static void GenerateUpdateSequences()
@@ -453,7 +453,7 @@ namespace ManualUtils
 				var content = await zip.ReadAllContentAsync();
 				if (fileInDb.File.Length != content.Length)
 				{
-					Console.WriteLine($"Upload course {fileInDb.CourseId}.zip does not exist");
+					Console.WriteLine($"Upload course {fileInDb.CourseId}.zip uploaded");
 					fileInDb.File = content;
 					db.SaveChanges();
 				}
