@@ -290,7 +290,7 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 								authorToRender.id === userId &&
 								<Trash
 									data-id={ id }
-									data-reviewId={ reviewId }
+									data-reviewid={ reviewId }
 									className={ styles.innerCommentDeleteButton }
 									onClick={ this.deleteReviewOrComment }
 									size={ 12 }

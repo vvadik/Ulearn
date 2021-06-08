@@ -245,7 +245,7 @@ class InstructorReview extends React.Component<Props, State> {
 
 		onScoreSubmit(0);
 		onProhibitFurtherReviewToggleChange(false);
-		addReview(currentSubmission.id, this.shameComment, 0, 0, 0, 0);
+		addReview(currentSubmission.id, this.shameComment, 0, 0, 0, 1);
 	};
 
 	renderTopControls(): React.ReactElement {
