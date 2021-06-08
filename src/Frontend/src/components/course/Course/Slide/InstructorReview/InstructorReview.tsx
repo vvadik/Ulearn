@@ -767,8 +767,12 @@ class InstructorReview extends React.Component<Props, State> {
 		let newCodeLineCounter = 1;
 		let oldCodeLineCounter = 1;
 
-		for (const [type, code] of diff) {
-			const lines = code.split('\n').filter(l => l.length > 0);
+		for (const [index, [type, code]] of diff.entries()) {
+			const splitedLines = code.split('\n');
+			const lines = index === diff.length - 1
+			|| (index === diff.length - 2 && type === -1)
+				? splitedLines
+				: splitedLines.slice(0, -1);
 
 			switch (type) {
 				case -1: {//removed

@@ -70,7 +70,8 @@ const args: Props = {
 \t\t\treturn false;
 \t\t}
 \t}
-}`,
+}
+`,
 			language: Language.cSharp,
 			timestamp: '2020-04-06',
 			manualCheckingPassed: false,
