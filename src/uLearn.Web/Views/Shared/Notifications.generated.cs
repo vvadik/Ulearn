@@ -2003,6 +2003,72 @@ WriteLiteralTo(__razor_helper_writer, "</div>\r\n\t\t</div>\r\n\t</div>\r\n");
 #line default
 #line hidden
 
+#line default
+#line hidden
+public static System.Web.WebPages.HelperResult Notification(GroupIsArchivedNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+{
+#line default
+#line hidden
+return new System.Web.WebPages.HelperResult(__razor_helper_writer => {
+ 
+
+WriteLiteralTo(__razor_helper_writer, "\t<div");
+
+WriteLiteralTo(__razor_helper_writer, " class=\"notifications__group-is-archived-notification media\"");
+
+WriteLiteralTo(__razor_helper_writer, " data-href=\"");
+
+                                                  WriteTo(__razor_helper_writer, Url.Action("Groups", "Admin", new { courseId = notification.CourseId }));
+
+WriteLiteralTo(__razor_helper_writer, "\"");
+
+WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t<div");
+
+WriteLiteralTo(__razor_helper_writer, " class=\"media-left\"");
+
+WriteLiteralTo(__razor_helper_writer, ">\r\n");
+
+WriteLiteralTo(__razor_helper_writer, "\t\t\t");
+
+WriteTo(__razor_helper_writer, UserAvatar.Avatar(notification.InitiatedBy));
+
+WriteLiteralTo(__razor_helper_writer, "\r\n\t\t</div>\r\n\t\t<div");
+
+WriteLiteralTo(__razor_helper_writer, " class=\"media-body\"");
+
+WriteLiteralTo(__razor_helper_writer, ">\r\n\t\t\t<div");
+
+WriteLiteralTo(__razor_helper_writer, " class=\"notifications__notification__header\"");
+
+WriteLiteralTo(__razor_helper_writer, ">Ваша группа <b>«");
+
+                                               WriteTo(__razor_helper_writer, notification.Group.Name.MakeNestedQuotes());
+
+WriteLiteralTo(__razor_helper_writer, "»</b> архивирована. Чтобы восстановить, используйте вкладку Архивные на странице " +
+"групп.</div>\r\n\t\t\t<div");
+
+WriteLiteralTo(__razor_helper_writer, " class=\"notifications__notification__footer\"");
+
+WriteAttributeTo(__razor_helper_writer, "title", Tuple.Create(" title=\"", 24082), Tuple.Create("\"", 24131)
+, Tuple.Create(Tuple.Create("", 24090), Tuple.Create<System.Object, System.Int32>(notification.CreateTime.ToPrettyString()
+, 24090), false)
+);
+
+WriteLiteralTo(__razor_helper_writer, ">");
+
+                                                                                 WriteTo(__razor_helper_writer, notification.CreateTime.ToAgoPrettyString());
+
+WriteLiteralTo(__razor_helper_writer, "</div>\r\n\t\t</div>\r\n\t</div>\r\n");
+
+
+});
+
+#line default
+#line hidden
+}
+#line default
+#line hidden
+
     }
 }
 #pragma warning restore 1591

@@ -407,3 +407,16 @@
 		</div>
 	</div>
 }
+
+@helper Notification(GroupIsArchivedNotification notification, Course course, HtmlHelper Html, UrlHelper Url, bool collapse = true)
+{
+	<div class="notifications__group-is-archived-notification media" data-href="@Url.Action("Groups", "Admin", new { courseId = notification.CourseId })">
+		<div class="media-left">
+			@UserAvatar.Avatar(notification.InitiatedBy)
+		</div>
+		<div class="media-body">
+			<div class="notifications__notification__header">Ваша группа <b>«@notification.Group.Name.MakeNestedQuotes()»</b> архивирована. Чтобы восстановить, используйте вкладку Архивные на странице групп.</div>
+			<div class="notifications__notification__footer" title="@notification.CreateTime.ToPrettyString()">@notification.CreateTime.ToAgoPrettyString()</div>
+		</div>
+	</div>
+}
