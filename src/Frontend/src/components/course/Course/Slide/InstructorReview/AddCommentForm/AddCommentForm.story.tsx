@@ -2,9 +2,16 @@ import React from "react";
 import AddCommentForm, { Props } from "./AddCommentForm";
 import type { Story } from "@storybook/react";
 import { mockFunc, returnPromiseAfterDelay } from "src/utils/storyMock";
+import { useArgs } from '@storybook/client-api';
 
-export const Default: Story<Props> = (args: Props) =>
-	<AddCommentForm  { ...args }/>;
+const Template: Story<Props> = (args: Props) => {
+	const [, updateArgs] = useArgs();
+
+	const onValueChange = (value: string) => {
+		updateArgs({ ...args, value });
+	};
+	return (<AddCommentForm  { ...args } onValueChange={ onValueChange }/>);
+};
 
 const comments = [
 	{
@@ -48,14 +55,19 @@ function toggleCommentFavourite(commentId: number) {
 	return returnPromiseAfterDelay(100);
 }
 
-Default.args = {
+const args = {
 	comments,
 	addCommentToFavourite,
 	addComment,
 	toggleCommentFavourite,
 	onClose: mockFunc,
 	coordinates: { left: 0, top: 0, bottom: 0 },
+	value: '',
 };
+
+export const Default = Template.bind(args);
+Default.args = args;
+
 
 export default {
 	title: 'Exercise/InstructorReview/AddCommentForm',
