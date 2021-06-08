@@ -3,6 +3,7 @@
 @selectionColor: @lightGrey;
 @activeSelectionColor: @blueSmoke;
 @gutterPadding: 8px;
+@wrapperMargin: 40px;
 
 .separator {
   position: absolute;
@@ -29,7 +30,7 @@
 .wrapper {
   display: flex;
 
-  margin-bottom: 40px;
+  margin-bottom: @wrapperMargin;
 
   border: 1px solid @lightGrey;
   border-top-left-radius: 9px;
@@ -37,6 +38,11 @@
   border-bottom-right-radius: @defaultBorderRadius;
 
   overflow: hidden;
+}
+
+.wrapperStickerStopper {
+  margin-top: -@wrapperMargin;
+  padding-bottom: @wrapperMargin;
 }
 
 .topControlsWrapper {

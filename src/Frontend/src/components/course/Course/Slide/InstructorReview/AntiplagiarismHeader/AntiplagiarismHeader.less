@@ -1,9 +1,6 @@
 @import "src/variables";
 
 .header {
-  position: sticky;
-  top: 0;
-  z-index: 1;
   display: inline-flex;
   width: 100%;
 
@@ -22,9 +19,9 @@
 }
 
 .sticky {
-  z-index: 5;
-  border-radius: 0;
-  box-shadow: #F2F2F2;
+  padding: 8px 16px;
+  border-radius: 0 0 8px 8px;
+  border-bottom: 1px solid @lightGrey;
 }
 
 .text {
