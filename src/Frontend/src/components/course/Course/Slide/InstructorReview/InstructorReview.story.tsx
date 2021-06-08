@@ -10,6 +10,7 @@ import {
 import { ShortUserInfo } from "src/models/users";
 import { returnPromiseAfterDelay } from "src/utils/storyMock";
 import { AntiplagiarismInfo } from "./AntiplagiarismHeader/AntiplagiarismHeader";
+import { useArgs } from "@storybook/client-api";
 
 
 const user: ShortUserInfo = {
@@ -22,7 +23,133 @@ const user: ShortUserInfo = {
 	login: 'Administrator of everything on ulearn.me',
 };
 
-export const Default: Story<Props> = (args: Props) => <InstructorReview { ...args }/>;
+const Template: Story<Props> = (args: Props) => {
+	const [, updateArgs] = useArgs();
+	const onAddComment = (commentText: string) => {
+		const comment = {
+			id: args.comments.length,
+			renderedText: renderMd(commentText),
+			text: commentText,
+			useCount: 1,
+			isFavourite: true
+		};
+		const existingCommentIndex = args.comments.findIndex(c => c.text === commentText);
+		if(existingCommentIndex < 0) {
+			args.comments.push(comment);
+			return returnPromiseAfterDelay(300, comment);
+		} else {
+			args.comments[existingCommentIndex].useCount++;
+			return returnPromiseAfterDelay(300, args.comments[existingCommentIndex]);
+		}
+	};
+	const onAddCommentToFavourite = (commentText: string) => {
+		const comment = {
+			id: args.comments.length,
+			renderedText: renderMd(commentText),
+			text: commentText,
+			useCount: 1,
+			isFavourite: true
+		};
+		args.comments.push(comment);
+		return returnPromiseAfterDelay(200, comment);
+	};
+	const onToggleCommentFavourite = (commentId: number) => {
+		const comment = args.comments[commentId];
+		comment.isFavourite = !comment.isFavourite;
+	};
+	const onProhibitFurtherReviewToggleChange = (value: boolean) => {
+		args.prohibitFurtherManualChecking = value;
+		updateArgs({ ...args });
+	};
+	const onScoreSubmit = (score: number) => {
+		args.currentScore = score;
+		updateArgs({ ...args });
+	};
+	const getAntiPlagiarismStatus = () => {
+		const rnd = Math.random();
+		let suspicionLevel: AntiplagiarismInfo['suspicionLevel'] = 'accepted';
+		let suspicionCount = 0;
+
+		if(extra.suspicionLevel === 1) {
+			suspicionCount = Math.ceil(rnd * 10);
+			suspicionLevel = 'warning';
+		}
+		if(extra.suspicionLevel === 2) {
+			suspicionCount = Math.ceil(rnd * 50);
+			suspicionLevel = "strongWarning";
+		}
+		extra.suspicionLevel++;
+		extra.suspicionLevel %= 3;
+		const info: AntiplagiarismInfo = { suspicionCount, suspicionLevel };
+		return returnPromiseAfterDelay(2000, info);
+	};
+	const deleteReviewComment = (submissionId: number, reviewId: number, commentId?: number,) => {
+		const submission = args.studentSubmissions.find(s => s.id === submissionId);
+		if(submission) {
+			if(commentId !== undefined) {
+				const review = submission.manualCheckingReviews.find(c => c.id === reviewId)!;
+				review.comments = review.comments.filter(c => c.id !== commentId);
+				submission.manualCheckingReviews = [...submission.manualCheckingReviews.slice(0,
+					submission.manualCheckingReviews.length - 2), { ...review }];
+				updateArgs({ ...args });
+				return;
+			}
+			submission.manualCheckingReviews = submission.manualCheckingReviews.filter(c => c.id !== reviewId);
+			updateArgs({ ...args });
+		}
+	};
+	const addReview = (
+		submissionId: number,
+		comment: string,
+		startLine: number,
+		startPosition: number,
+		finishLine: number,
+		finishPosition: number
+	) => {
+		const submission = args.studentSubmissions.find(s => s.id === submissionId)!;
+		const review: ReviewInfo = {
+			id: extra.reviewId++,
+			author: args.user,
+			startLine,
+			startPosition,
+			finishLine,
+			finishPosition,
+			comment,
+			renderedComment: renderMd(comment),
+			addingTime: new Date().toDateString(),
+			comments: [],
+		};
+		submission.manualCheckingReviews.push(review);
+		updateArgs({ ...args });
+		return returnPromiseAfterDelay(300, review);
+	};
+	const addReviewComment = (submissionId: number, reviewId: number, commentText: string) => {
+		const submission = args.studentSubmissions.find(s => s.id === submissionId)!;
+		const review = submission.manualCheckingReviews.find(r => r.id === reviewId)!;
+		const comment = {
+			id: review.comments.length,
+			text: commentText,
+			renderedText: renderMd(commentText),
+			publishTime: new Date().toDateString(),
+			author: args.user,
+		};
+		review.comments.push(comment);
+	};
+
+	return (
+		<InstructorReview
+			{ ...args }
+			addReview={ addReview }
+			addReviewComment={ addReviewComment }
+			deleteReviewComment={ deleteReviewComment }
+			onAddComment={ onAddComment }
+			onAddCommentToFavourite={ onAddCommentToFavourite }
+			onToggleCommentFavourite={ onToggleCommentFavourite }
+			onProhibitFurtherReviewToggleChange={ onProhibitFurtherReviewToggleChange }
+			onScoreSubmit={ onScoreSubmit }
+			getAntiPlagiarismStatus={ getAntiPlagiarismStatus }
+		/>);
+};
 
 function renderMd(text: string) {
 	const regexBold = /\*\*(\S(.*?\S)?)\*\*/gm;
@@ -43,7 +170,7 @@ const addIdToReview = (review: any): ReviewInfo => ({
 	...review, id: extra.reviewId++,
 });
 
-const args: Props = {
+const args: Partial<Props> = {
 	studentSubmissions: [
 		{
 			code: `\t\t\t\tif (course == null || tempCourse.LastUpdateTime < tempCourse.LoadingTime)
@@ -311,32 +438,13 @@ const args: Props = {
 			: null,
 		manualCheckingReviews: c.manualCheckingReviews.map(addIdToReview)
 	})),
-	comments: [
-		{ isFavourite: true, useCount: 5, text: 'комментарий', renderedText: 'комментарий' },
-		{
-			isFavourite: true,
-			useCount: 10,
-			text: '**bold** __italic__ ```code```',
-		},
-		{
-			isFavourite: false,
-			useCount: 100,
-			text: 'Ой! Наш робот нашёл решения других студентов, подозрительно похожие на ваше. ' +
-				'Так может быть, если вы позаимствовали части программы, взяли их из открытых источников либо сами поделились своим кодом. ' +
-				'Выполняйте задания самостоятельно.',
-		},
-		{
-			isFavourite: false,
-			useCount: 122,
-			text: 'Так делать не стоит из-за сложности в O(N^3). Есть более оптимизированные алгоритмы',
-		},
-	].map((c, i) => ({ ...c, renderedText: renderMd(c.text), id: i })),
 	authorSolution: {
 		language: Language.cSharp,
 		code: 'void Main()\n{\n\tConsole.WriteLine("Coding is awesome");\n}',
 	},
 	formulation:
 		<p>Вам надо сделать кое-что, сами гадайте что и как, но сделайте обязательно</p>,
+
 	student: {
 		visibleName: 'Студент Студентовичниковогоропараболладвойкавкоде',
 		lastName: 'Студентовичниковогоропараболладвойкавкоде',
@@ -362,117 +470,36 @@ const args: Props = {
 		email: "user@email.com",
 		login: 'Administrator of everything on ulearn.me',
 	},
+
+	currentScore: undefined,
 	prevReviewScore: 25,
 	exerciseTitle: 'Angry Birds',
-	onAddComment: (commentText: string) => {
-		const comment = {
-			id: args.comments.length,
-			renderedText: renderMd(commentText),
-			text: commentText,
-			useCount: 1,
-			isFavourite: true
-		};
-		const existingCommentIndex = args.comments.findIndex(c => c.text === commentText);
-		if(existingCommentIndex < 0) {
-			args.comments.push(comment);
-			return returnPromiseAfterDelay(300, comment);
-		} else {
-			args.comments[existingCommentIndex].useCount++;
-			return returnPromiseAfterDelay(300, args.comments[existingCommentIndex]);
-		}
-	},
-	onAddCommentToFavourite: (commentText: string) => {
-		const comment = {
-			id: args.comments.length,
-			renderedText: renderMd(commentText),
-			text: commentText,
-			useCount: 1,
-			isFavourite: true
-		};
-		args.comments.push(comment);
-		return returnPromiseAfterDelay(200, comment);
-	},
-	onToggleCommentFavourite: (commentId) => {
-		const comment = args.comments[commentId];
-		comment.isFavourite = !comment.isFavourite;
-	},
-	prohibitFurtherManualChecking: true,
-	onProhibitFurtherReviewToggleChange: (value: boolean) => args.prohibitFurtherManualChecking = value,
-	onScoreSubmit: (score: number) => {
-		args.currentScore = score;
-	},
 	antiplagiarismStatus: undefined,
-	getAntiPlagiarismStatus: () => {
-		const rnd = Math.random();
-		let suspicionLevel: AntiplagiarismInfo['suspicionLevel'] = 'accepted';
-		let suspicionCount = 0;
+	comments: [
+		{ isFavourite: true, useCount: 5, text: 'комментарий', renderedText: 'комментарий' },
+		{
+			isFavourite: true,
+			useCount: 10,
+			text: '**bold** __italic__ ```code```',
+		},
+		{
+			isFavourite: false,
+			useCount: 100,
+			text: 'Ой! Наш робот нашёл решения других студентов, подозрительно похожие на ваше. ' +
+				'Так может быть, если вы позаимствовали части программы, взяли их из открытых источников либо сами поделились своим кодом. ' +
+				'Выполняйте задания самостоятельно.',
+		},
+		{
+			isFavourite: false,
+			useCount: 122,
+			text: 'Так делать не стоит из-за сложности в O(N^3). Есть более оптимизированные алгоритмы',
+		},
+	].map((c, i) => ({ ...c, renderedText: renderMd(c.text), id: i })),
 
-		if(extra.suspicionLevel === 1) {
-			suspicionCount = Math.ceil(rnd * 10);
-			suspicionLevel = 'warning';
-		}
-		if(extra.suspicionLevel === 2) {
-			suspicionCount = Math.ceil(rnd * 50);
-			suspicionLevel = "strongWarning";
-		}
-		extra.suspicionLevel++;
-		extra.suspicionLevel %= 3;
-		const info: AntiplagiarismInfo = { suspicionCount, suspicionLevel };
-		return returnPromiseAfterDelay(2000, info);
-	},
-	deleteReviewComment: (submissionId, reviewId, commentId) => {
-		const submission = args.studentSubmissions.find(s => s.id === submissionId);
-		if(submission) {
-			if(commentId !== undefined) {
-				const review = submission.manualCheckingReviews.find(c => c.id === reviewId)!;
-				review.comments = review.comments.filter(c => c !== commentId);
-				submission.manualCheckingReviews = [...submission.manualCheckingReviews.slice(0,
-					submission.manualCheckingReviews.length - 2), { ...review }];
-				return;
-			}
-			submission.manualCheckingReviews = submission.manualCheckingReviews.filter(c => c.id !== reviewId);
-		}
-	},
-	addReview: (
-		submissionId: number,
-		comment: string,
-		startLine: number,
-		startPosition: number,
-		finishLine: number,
-		finishPosition: number
-	) => {
-		const submission = args.studentSubmissions.find(s => s.id === submissionId)!;
-		const review: ReviewInfo = {
-			id: extra.reviewId++,
-			author: args.user,
-			startLine,
-			startPosition,
-			finishLine,
-			finishPosition,
-			comment,
-			renderedComment: renderMd(comment),
-			addingTime: new Date().toDateString(),
-			comments: [],
-		};
-		submission.manualCheckingReviews.push(review);
-
-		return returnPromiseAfterDelay(300, review);
-	},
-	addReviewComment: (submissionId, reviewId, commentText) => {
-		const submission = args.studentSubmissions.find(s => s.id === submissionId)!;
-		const review = submission.manualCheckingReviews.find(r => r.id === reviewId)!;
-		const comment = {
-			id: review.comments.length,
-			text: commentText,
-			renderedText: renderMd(commentText),
-			publishTime: new Date().toDateString(),
-			author: args.user,
-		};
-		review.comments.push(comment);
-	},
-	currentScore: undefined,
+	prohibitFurtherManualChecking: true,
 };
 
+export const Default = Template.bind({});
 Default.args = args;
 
 export default {
