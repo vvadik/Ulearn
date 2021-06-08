@@ -32,7 +32,7 @@ import texts from "./InstructorReview.texts";
 import styles from './InstructorReview.less';
 import AddCommentForm, { ReviewComment } from "./AddCommentForm/AddCommentForm";
 import AntiplagiarismHeader, { AntiplagiarismInfo } from "./AntiplagiarismHeader/AntiplagiarismHeader";
-import StickyWrapper  from "./AntiplagiarismHeader/StickyWrapper";
+import StickyWrapper from "./AntiplagiarismHeader/StickyWrapper";
 import { KeyboardEventCodes } from "@skbkontur/react-ui/lib/events/keyboard/KeyboardEventCodes";
 
 export interface Props {
@@ -211,8 +211,9 @@ class InstructorReview extends React.Component<Props, State> {
 				{ this.renderTopControls() }
 				<StickyWrapper
 					stickerClass={ styles.wrapperStickerStopper }
-					sticker={
+					sticker={ (fixed) =>
 						<AntiplagiarismHeader
+							fixed={ fixed }
 							shouldCheck={ true }
 							getAntiPlagiarismStatus={ getAntiPlagiarismStatus }
 							onZeroScoreButtonPressed={ this.onZeroScoreButtonPressed }

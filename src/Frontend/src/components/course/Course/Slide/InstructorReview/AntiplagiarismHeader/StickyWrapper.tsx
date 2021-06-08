@@ -4,7 +4,7 @@ import { Sticky } from "ui";
 interface StickyWrapper {
 	stickerClass: string;
 
-	sticker: React.ReactElement<StickerProps>;
+	sticker: (fixed: boolean) => React.ReactElement<StickerProps>;
 	content: React.ReactNode;
 }
 
@@ -18,7 +18,7 @@ export default function StickyWrapper({ sticker, stickerClass, content, }: Stick
 	return (
 		<>
 			<Sticky getStop={ getStopper } side={ "top" }>
-				{ fixed => React.cloneElement(sticker, { fixed }) }
+				{ fixed => sticker(fixed) }
 			</Sticky>
 			{ content }
 			<div ref={ ref } className={ stickerClass }/>

@@ -1,11 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 
 import styles from './AntiplagiarismHeader.less';
 import texts from './AntiplagiarismHeader.texts';
-import { Button, Sticky } from "ui";
+import { Button, } from "ui";
 import cn from "classnames";
-import { StickerProps } from "./StickyWrapper";
 
 type SuspicionLevel = 'notChecking' | 'accepted' | 'warning' | 'strongWarning' | 'running';
 
@@ -18,8 +17,10 @@ interface State extends AntiplagiarismInfo {
 	loadingInfo: boolean;
 }
 
-export interface Props extends StickerProps {
+export interface Props {
 	shouldCheck: boolean;
+	fixed: boolean;
+
 	getAntiPlagiarismStatus: () => Promise<AntiplagiarismInfo>;
 	onZeroScoreButtonPressed: () => void;
 }
