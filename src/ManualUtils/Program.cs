@@ -94,7 +94,7 @@ namespace ManualUtils
 			//UpdateCertificateArchives(db);
 			//GetVKByEmail(serviceProvider);
 			//TestStagingZipsEncodings();
-			ConvertZipsToCourseXmlInRoot();
+			//ConvertZipsToCourseXmlInRoot();
 			//await UploadStagingToDb(serviceProvider);
 			//await UploadStagingFromDbAndExtractToCourses(serviceProvider);
 		}

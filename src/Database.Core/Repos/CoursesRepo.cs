@@ -199,14 +199,14 @@ namespace Database.Repos
 				CourseVersionId = versionId,
 				File = content
 			};
-			db.CourseFiles.RemoveRange(db.CourseFiles.Where(f => f.CourseId.Equals(courseId, StringComparison.OrdinalIgnoreCase)));
+			db.CourseFiles.RemoveRange(db.CourseFiles.Where(f => f.CourseId == courseId));
 			db.CourseFiles.Add(file);
 			await db.SaveChangesAsync();
 		}
 
 		public async Task<CourseFile> GetCourseFile(string courseId)
 		{
-			return await db.CourseFiles.FirstOrDefaultAsync(f => f.CourseId.Equals(courseId, StringComparison.OrdinalIgnoreCase));
+			return await db.CourseFiles.FirstOrDefaultAsync(f => f.CourseId == courseId);
 		}
 
 		public async Task<List<string>> GetCourseIdsFromCourseFiles()

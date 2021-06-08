@@ -182,7 +182,7 @@ namespace Database.DataContexts
 				CourseVersionId = versionId,
 				File = content
 			};
-			db.CourseFiles.RemoveRange(db.CourseFiles.Where(f => f.CourseId.Equals(courseId, StringComparison.OrdinalIgnoreCase)));
+			db.CourseFiles.RemoveRange(db.CourseFiles.Where(f => f.CourseId == courseId));
 			db.CourseFiles.Add(file);
 			await db.SaveChangesAsync();
 		}
@@ -190,7 +190,7 @@ namespace Database.DataContexts
 		[CanBeNull]
 		public CourseFile GetCourseFile(string courseId)
 		{
-			return db.CourseFiles.FirstOrDefault(f => f.CourseId.Equals(courseId, StringComparison.OrdinalIgnoreCase));
+			return db.CourseFiles.FirstOrDefault(f => f.CourseId == courseId);
 		}
 
 		// Итерирование выполняется лениво и должно быть закончено до выполнения любых других методов
