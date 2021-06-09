@@ -8,6 +8,7 @@ using Database.Models;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
+using Ulearn.Core.Extensions;
 
 namespace Database.DataContexts
 {
@@ -129,24 +130,30 @@ namespace Database.DataContexts
 			return query;
 		}
 
-		public List<AcceptedSolutionInfo> GetBestTrendingAndNewAcceptedSolutions(string courseId, List<Guid> slidesIds)
+		public List<AcceptedSolutionInfo> GetBestTrendingAndNewAcceptedSolutions(string courseId, Guid slidesId)
 		{
-			var prepared = GetAllAcceptedSubmissions(courseId, slidesIds)
-				.GroupBy(x => x.CodeHash, (codeHash, ss) => new { codeHash, timestamp = ss.Min(s => s.Timestamp) })
-				.Join(
-					GetAllAcceptedSubmissions(courseId, slidesIds),
-					g => g,
-					s => new { codeHash = s.CodeHash, timestamp = s.Timestamp }, (k, s) => new { submission = s, k.timestamp })
-				.Select(x => new { x.submission.Id, likes = x.submission.Likes.Count, x.timestamp })
+			var ulearnBotId = db.Users.FirstOrDefault(u => u.UserName == UsersRepo.UlearnBotUsername).Id;
+			var prepared = db.UserExerciseSubmissions
+				.Where(x => x.CourseId == courseId && x.SlideId == slidesId && x.AutomaticCheckingIsRightAnswer)
+				.Where(x => x.Reviews.All(r => r.AuthorId != ulearnBotId))
+				.Select(x => new { x.Id, likes = x.Likes.Count, x.Timestamp, x.UserId, x.CodeHash })
 				.ToList();
 
 			var best = prepared
+				.GroupBy(x => x.CodeHash)
+				.Select(x => x.MaxBy(c => c.likes))
 				.OrderByDescending(x => x.likes);
 			var timeNow = DateTime.Now;
 			var trending = prepared
-				.OrderByDescending(x => (x.likes + 1) / timeNow.Subtract(x.timestamp).TotalMilliseconds);
+				.GroupBy(x => x.CodeHash)
+				.Select(x => x.MaxBy(c => (c.likes + 1) / timeNow.Subtract(c.Timestamp).TotalMilliseconds))
+				.OrderByDescending(x => (x.likes + 1) / timeNow.Subtract(x.Timestamp).TotalMilliseconds);
 			var newest = prepared
-				.OrderByDescending(x => x.timestamp);
+				.GroupBy(x => x.UserId)
+				.Select(x => x.MaxBy(c => c.Timestamp))
+				.GroupBy(x => x.CodeHash)
+				.Select(x => x.MaxBy(c => c.Timestamp))
+				.OrderByDescending(x => x.Timestamp);
 			var selectedSubmissionsIds = best.Take(3).Concat(trending.Take(3)).Concat(newest).Distinct().Take(10).Select(x => x.Id);
 
 			var selectedSubmissions = db.UserExerciseSubmissions
@@ -157,11 +164,6 @@ namespace Database.DataContexts
 				.Select(s => new AcceptedSolutionInfo(s.Code, s.Id, s.Likes))
 				.OrderByDescending(info => info.UsersWhoLike.Count)
 				.ToList();
-		}
-
-		public List<AcceptedSolutionInfo> GetBestTrendingAndNewAcceptedSolutions(string courseId, Guid slideId)
-		{
-			return GetBestTrendingAndNewAcceptedSolutions(courseId, new List<Guid> { slideId });
 		}
 
 		public int GetAcceptedSolutionsCount(string courseId, Guid slideId)
