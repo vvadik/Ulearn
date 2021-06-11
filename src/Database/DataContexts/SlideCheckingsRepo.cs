@@ -403,7 +403,7 @@ namespace Database.DataContexts
 				StartPosition = startPosition,
 				FinishLine = finishLine,
 				FinishPosition = finishPosition,
-				AddingTime = setAddingTime ? DateTime.Now : ExerciseCodeReview.NullAddingTime,
+				AddingTime = setAddingTime ? DateTime.Now : null
 			});
 
 			await db.SaveChangesAsync().ConfigureAwait(false);

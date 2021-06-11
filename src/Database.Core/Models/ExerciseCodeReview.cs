@@ -49,17 +49,11 @@ namespace Database.Models
 		[Required]
 		public bool HiddenFromTopComments { get; set; }
 
-		public DateTime AddingTime { get; set; }
+		public DateTime? AddingTime { get; set; }
 
 		public virtual IList<ExerciseCodeReviewComment> Comments { get; set; }
 
 		[NotMapped]
 		public List<ExerciseCodeReviewComment> NotDeletedComments => Comments.Where(r => !r.IsDeleted).ToList();
-
-		[NotMapped]
-		public static DateTime NullAddingTime = new DateTime(1900, 1, 1);
-
-		[NotMapped]
-		public bool HasAddingTime => AddingTime.Year >= 2000;
 	}
 }
