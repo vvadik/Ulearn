@@ -127,22 +127,21 @@ class TestCasesClass extends React.Component<Props & TestCases, TestState> {
 	constructor(props: Props & TestCases) {
 		super(props);
 		const apiWithDelayedCommentsLoad = { ...fakeFullCommentsApi };
-
 		//adding timeouts in api calls with state update. it's looks like redux worker for inner component
 		if(props.commentsLoadTimeMs) {
 			apiWithDelayedCommentsLoad.getComments = (_, __, forInstructor) => {
 				if(forInstructor) {
 					return new Promise(resolve => setTimeout(() => {
-						resolve(this.props.instructorComments || []);
+						resolve(props.instructorComments || []);
 						this.setState({
-							instructorComments: this.props.instructorComments || [],
+							instructorComments: props.instructorComments || [],
 						});
 					}, props.commentsLoadTimeMs));
 				}
 				return new Promise(resolve => setTimeout(() => {
-					resolve(this.props.comments || []);
+					resolve(props.comments || []);
 					this.setState({
-						comments: this.props.comments || [],
+						comments: props.comments || [],
 					});
 				}, props.commentsLoadTimeMs));
 			};
@@ -199,7 +198,7 @@ const Template: Story<Props & TestCases> = args => {
 			{ ...args }
 			commentsCount={ comments.length }
 			instructorCommentsCount={ 0 }
-			instructorComments={ [] }
+			instructorComments={ args.instructorComments || [] }
 			deviceType={ DeviceType.desktop }
 			isSlideReady={ true }
 			slideType={ SlideType.Exercise }
@@ -255,12 +254,16 @@ UserIsSysadmin.args = {
 export const LongCommentsLoading = Template.bind({});
 LongCommentsLoading.args = {
 	user: sysAdmin,
+	comments,
+	instructorComments: comments.slice(0, comments.length - 1),
 	commentsLoadTimeMs: 2500,
 };
 
 export const UserFromStudentToInstructor = Template.bind({});
 UserFromStudentToInstructor.args = {
 	user: student,
+	comments,
+	instructorComments: comments.slice(0, comments.length - 1),
 	commentsLoadTimeMs: 2500,
 	switchUser: {
 		inMs: 1000,
@@ -271,6 +274,8 @@ UserFromStudentToInstructor.args = {
 export const UserFromInstructorToStudent = Template.bind({});
 UserFromInstructorToStudent.args = {
 	user: instructor,
+	comments,
+	instructorComments: comments.slice(0, comments.length - 1),
 	commentsLoadTimeMs: 2500,
 	switchUser: {
 		inMs: 1000,
