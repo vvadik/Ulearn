@@ -1,4 +1,38 @@
-import { Comment } from "src/models/comments";
+import { Comment, CommentPolicy } from "src/models/comments";
+
+export const config = {
+	commentHash: 'comment',
+};
+
+export interface CommentsApi {
+	addComment: (text: string, parentCommentId?: number) => Promise<Comment>;
+	deleteComment: (commentId: number,) => Promise<void>;
+
+	likeComment: (commentId: number) => Promise<unknown>;
+	dislikeComment: (commentId: number) => Promise<unknown>;
+
+	updateComment: (commentId: number,
+		updatedFields?: Pick<Partial<Comment>, 'text' | 'isApproved' | 'isCorrectAnswer' | 'isPinnedToTop'>
+	) => Promise<Comment>;
+}
+
+export interface FullCommentsApi {
+	getCommentPolicy: (courseId: string) => Promise<CommentPolicy>;
+	getComments: (courseId: string, slideId: string, forInstructor: boolean) => Promise<Comment[]>;
+
+	addComment: (courseId: string, slideId: string, text: string, forInstructor: boolean,
+		parentCommentId?: number
+	) => Promise<Comment>;
+	deleteComment: (courseId: string, slideId: string, commentId: number, forInstructor: boolean,
+	) => Promise<unknown>;
+
+	likeComment: (commentId: number) => Promise<unknown>;
+	dislikeComment: (commentId: number) => Promise<unknown>;
+
+	updateComment: (commentId: number,
+		updatedFields?: Pick<Partial<Comment>, 'text' | 'isApproved' | 'isCorrectAnswer' | 'isPinnedToTop'>
+	) => Promise<Comment>;
+}
 
 export const compareComments = (a: Comment, b: Comment, timeByAscending?: boolean): number => {
 	if(a.isPinnedToTop && !b.isPinnedToTop) {
@@ -57,7 +91,7 @@ export const getCommentsByCount = (count: number, comments: Comment[]): Comment[
 	return resultComments;
 };
 
-export const parseCommentIdFromHash = (hash: string, commentHash = 'comment'): number => {
+export const parseCommentIdFromHash = (hash: string, commentHash = config.commentHash): number => {
 	if(!hash.includes(commentHash)) {
 		return -1;
 	}

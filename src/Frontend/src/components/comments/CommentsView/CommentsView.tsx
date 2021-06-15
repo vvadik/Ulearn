@@ -12,10 +12,10 @@ import { Comment, CommentPolicy, } from "src/models/comments";
 import { DeviceType } from "src/consts/deviceType";
 
 import styles from "./CommentsView.less";
-import { parseCommentIdFromHash } from "../utils";
+import { FullCommentsApi, parseCommentIdFromHash } from "../utils";
 
 
-interface Props {
+export interface Props {
 	courseId: string;
 	slideId: string;
 	slideType: SlideType;
@@ -33,23 +33,7 @@ interface Props {
 	instructorComments?: Comment[];
 	instructorCommentsCount: number;
 
-	api: {
-		getCommentPolicy: (courseId: string) => Promise<CommentPolicy>;
-		getComments: (courseId: string, slideId: string, forInstructor: boolean) => Promise<Comment[]>;
-
-		addComment: (courseId: string, slideId: string, text: string, forInstructor: boolean,
-			parentCommentId?: number
-		) => Promise<Comment>;
-		deleteComment: (courseId: string, slideId: string, commentId: number, forInstructor: boolean,
-		) => Promise<unknown>;
-
-		likeComment: (commentId: number) => Promise<unknown>;
-		dislikeComment: (commentId: number) => Promise<unknown>;
-
-		updateComment: (commentId: number,
-			updatedFields?: Pick<Partial<Comment>, 'text' | 'isApproved' | 'isCorrectAnswer' | 'isPinnedToTop'>
-		) => Promise<Comment>;
-	}
+	api: FullCommentsApi;
 }
 
 interface State {

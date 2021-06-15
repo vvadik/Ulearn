@@ -12,7 +12,7 @@ import { ActionsType } from "../CommentsList/CommentsList";
 import styles from "./Thread.less";
 
 
-interface Props {
+export interface Props {
 	courseId: string;
 	slideId: string;
 	slideType: SlideType;

@@ -43,8 +43,6 @@ export interface Comment {
 	isLiked: boolean,
 	likesCount: number,
 	replies: Comment[],
-	courseId: string,
-	slideId: string,
 	parentCommentId?: number,
 	isPassed: boolean
 }

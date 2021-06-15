@@ -1,6 +1,9 @@
 import React from "react";
-import Thread from "./Thread";
-import { CommentPolicy, ResponseStatus, Comment as CommentType } from "src/models/comments";
+import Thread, { Props } from "./Thread";
+import { Comment as CommentType, CommentPolicy } from "src/models/comments";
+import { getMockedComment, sysAdmin } from "../storiesData";
+import { SlideType } from "src/models/slide";
+import type { Story } from "@storybook/react";
 
 const actions = {
 	handleLikeClick: () => console.log("likeComment"),
@@ -12,23 +15,6 @@ const actions = {
 	handleDeleteComment: () => console.log("deleteComment"),
 	handleShowEditForm: () => console.log("showEditForm"),
 	handleShowReplyForm: () => console.log("showReplyForm"),
-};
-
-const user = {
-	is_authenticated: true,
-	id: "11",
-	visibleName: "Pavel",
-	avatarUrl: null,
-};
-
-const userRoles = {
-	isSystemAdministrator: true,
-	courseRole: "Student",
-	courseAccesses: [
-		{
-			accesses: null,
-		},
-	],
 };
 
 const commentEditing = {
@@ -64,15 +50,14 @@ for (let i = 0; i < 5; i++) {
 	});
 }
 
-const commentPolicy : CommentPolicy = {
+const commentPolicy: CommentPolicy = {
 	areCommentsEnabled: true,
 	moderationPolicy: "postmoderation",
 	onlyInstructorsCanReply: false,
-	status: ResponseStatus.ok,
 };
 
-const comment :CommentType= {
-	id: '1',
+const comment: CommentType = getMockedComment({
+	id: 1,
 	text:
 		"Решать эти задачи **можно** прямо в браузере, а специальная проверяющая система тут же проверит ваше решение.",
 	renderedText:
@@ -80,10 +65,8 @@ const comment :CommentType= {
 	author: {
 		id: "11",
 		visibleName: "Louisa",
-		avatarUrl: null,
-		firstName:"Louisa",
-		gender:null,
-		lastName:'',
+		firstName: "Louisa",
+		lastName: '',
 	},
 	publishTime: "2019-01-18T14:12:41.947",
 	isApproved: false,
@@ -91,27 +74,29 @@ const comment :CommentType= {
 	isLiked: true,
 	likesCount: 10,
 	replies: replies,
-};
+});
 
-function getUserSolutionUrl(userId: string) {
-	return `https://dev.ulearn.me/Analytics/UserSolutions?courseId=BasicProgramming&slideId=90bcb61e-57f0-4baa-8bc9-10c9cfd27f58&userId=${ userId }`;
-}
+
+const Template: Story<Props> = (args) => (
+	<Thread { ...args }/>
+);
+
+export const CommentWithReplies = Template.bind({});
+CommentWithReplies.args = {
+	slideType: SlideType.Exercise,
+	slideId: 'slideId',
+	courseId: 'courseId',
+	isSlideReady: true,
+	animation: true,
+	commentPolicy: commentPolicy,
+	comment: comment,
+	user: sysAdmin,
+	commentEditing: commentEditing,
+	reply: reply,
+	actions: actions,
+};
 
 export default {
 	title: "Comments/Thread",
+	component: CommentWithReplies,
 };
-
-export const CommentWithReplies = () => (
-	<Thread
-		commentPolicy={ commentPolicy }
-		comment={ comment }
-		user={ user }
-		getUserSolutionsUrl={ getUserSolutionUrl }
-		userRoles={ userRoles }
-		commentEditing={ commentEditing }
-		reply={ reply }
-		actions={ actions }
-	/>
-);
-
-CommentWithReplies.storyName = "comment with replies";

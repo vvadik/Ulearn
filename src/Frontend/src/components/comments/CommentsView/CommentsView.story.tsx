@@ -1,7 +1,20 @@
 import React from "react";
-import CommentsView from "./CommentsView";
+import CommentsView, { Props } from "./CommentsView";
+import { Comment, CommentPolicy } from "src/models/comments";
+import { SlideType } from "src/models/slide";
+import { DeviceType } from "src/consts/deviceType";
+import {
+	accessesToSeeProfiles, courseAccessesToEditComments, courseAccessesToViewSubmissions, courseAdmin,
+	fakeFullCommentsApi,
+	getMockedComment,
+	instructor,
+	student,
+	sysAdmin,
+	unAuthUser
+} from "../storiesData";
+import type { Story } from "@storybook/react";
 
-const comments = [
+const comments: Comment[] = [
 	{
 		id: 1999,
 		text:
@@ -11,7 +24,6 @@ const comments = [
 		author: {
 			id: "11",
 			visibleName: "Louisa",
-			avatarUrl: null,
 		},
 		publishTime: "2019-01-18T14:12:41.947",
 		isApproved: false,
@@ -22,7 +34,7 @@ const comments = [
 			{
 				id: 2000,
 				author: {
-					id: "10",
+					id: "1",
 					visibleName: "Maria",
 					avatarUrl:
 						"https://staff.skbkontur.ru/content/images/default-user-woman.png",
@@ -66,60 +78,79 @@ const comments = [
 		author: {
 			id: "13",
 			visibleName: "Henry",
-			avatarUrl: null,
 		},
 		publishTime: "2019-01-18T14:12:41.947",
-		isApproved: false,
+		isApproved: true,
 		isPinnedToTop: false,
 		isLiked: true,
 		likesCount: 8,
 		replies: [],
 	},
-];
+].map(getMockedComment);
 
-const user = {
-	isAuthenticated: true,
-	id: "11",
-	visibleName: "Pavel",
-	avatarUrl: null,
-	systemAccesses: ["viewAllProfiles"],
-};
-
-const userRoles = {
-	isSystemAdministrator: true,
-	courseRole: "Instructor",
-	courseAccesses: ["editPinAndRemoveComments"],
-};
-
-const fakeCommentsApi = {
-	getComments: () => Promise.resolve({ topLevelComments: JSON.parse(JSON.stringify(comments)) }),
-	addComment: () => Promise.resolve(console.log("API: added comment")),
-	deleteComment: () => Promise.resolve(console.log("API: delete comment")),
-	updateComment: () => Promise.resolve(console.log("API: update comment")),
-	likeComment: () => Promise.resolve(console.log("API: like comment")),
-	dislikeComment: () => Promise.resolve(console.log("API: dislike comment")),
-	getCommentPolicy: () => Promise.resolve({
-		areCommentsEnabled: false,
-		moderationPolicy: "postmoderation",
-		onlyInstructorsCanReply: false,
-		status: "ok"
-	}),
+const commentPolicy: CommentPolicy = {
+	areCommentsEnabled: false,
+	moderationPolicy: "postmoderation",
+	onlyInstructorsCanReply: false,
 };
 
 export default {
 	title: "Comments/CommentsView",
 };
 
-export const Default = (): React.ReactNode => (
-	<CommentsView
-		slideType={ "exercise" }
-		user={ user }
-		userRoles={ userRoles }
-		slideId={ "90bcb61e-57f0-4baa-8bc9-10c9cfd27f58" }
-		courseId={ "BasicProgramming" }
-		commentsApi={ fakeCommentsApi }
-	/>
-);
+const Template: Story<Props> = args => <CommentsView
+	{ ...args }
+	commentsCount={ comments.length }
+	instructorCommentsCount={ 0 }
+	instructorComments={ [] }
+	deviceType={ DeviceType.desktop }
+	isSlideReady={ true }
+	slideType={ SlideType.Exercise }
+	comments={ comments }
+	slideId={ "90bcb61e-57f0-4baa-8bc9-10c9cfd27f58" }
+	courseId={ "BasicProgramming" }
+	api={ fakeFullCommentsApi }
+	commentPolicy={ commentPolicy }
+/>;
 
-Default.storyName = "default";
+export const UnauthorizedUser = Template.bind({});
+UnauthorizedUser.args = {
+	user: unAuthUser,
+};
+
+export const UserIsStudent = Template.bind({});
+UserIsStudent.args = {
+	user: student,
+};
+
+export const UserIsInstructor = Template.bind({});
+UserIsInstructor.args = {
+	user: instructor,
+};
+
+export const UserIsInstructorWithAccessesToSeeProfiles = Template.bind({});
+UserIsInstructorWithAccessesToSeeProfiles.args = {
+	user: { ...instructor, systemAccesses: accessesToSeeProfiles },
+};
+
+export const UserIsInstructorWithModerateAccesses = Template.bind({});
+UserIsInstructorWithModerateAccesses.args = {
+	user: { ...instructor, courseAccesses: courseAccessesToEditComments },
+};
+
+export const UserIsInstructorWithAccessesViewSubmission = Template.bind({});
+UserIsInstructorWithAccessesViewSubmission.args = {
+	user: { ...instructor, courseAccesses: courseAccessesToViewSubmissions },
+};
+
+export const UserIsCourseAdmin = Template.bind({});
+UserIsCourseAdmin.args = {
+	user: courseAdmin,
+};
+
+export const UserIsSysadmin = Template.bind({});
+UserIsSysadmin.args = {
+	user: sysAdmin,
+};
+
 
