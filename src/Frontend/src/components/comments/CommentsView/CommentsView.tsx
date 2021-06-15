@@ -60,10 +60,12 @@ class CommentsView extends Component<Props, State> {
 	}
 
 	componentDidUpdate(prevProps: Props, prevState: State,): void {
-		const { slideId, } = this.props;
+		const { slideId, user, } = this.props;
 		const { activeTab, } = this.state;
 
-		if(slideId !== prevProps.slideId && prevProps.slideId || activeTab !== prevState.activeTab) {
+		if(slideId !== prevProps.slideId && prevProps.slideId
+			|| activeTab !== prevState.activeTab
+			|| isInstructor(user) !== isInstructor(prevProps.user)) {
 			this.loadData();
 		}
 	}
@@ -99,26 +101,25 @@ class CommentsView extends Component<Props, State> {
 
 		const commentsInList = activeTab === TabsType.allComments ? comments : instructorComments;
 		const commentsInListCount = activeTab === TabsType.allComments ? commentsCount : instructorCommentsCount;
-		const commentsLoaded = isInstructor(user)
-			? commentPolicy && comments && instructorComments
-			: commentPolicy && comments;
+		const commentsLoaded = commentPolicy && comments
+			&& (isInstructor(user) && instructorComments || !isInstructor(user));
 
 		return (
 			<div className={ styles.wrapper }>
 				{ this.renderHeader() }
 				<div key={ activeTab }>
-					{ commentsLoaded
+					{ commentsLoaded && commentPolicy && commentsInList
 						? <CommentsList
 							slideType={ slideType }
 							handleTabChange={ this.handleTabChange }
 							isSlideContainsComment={ this.isSlideContainsComment }
 							headerRef={ this.headerRef }
-							commentPolicy={ commentPolicy! }
+							commentPolicy={ commentPolicy }
 							user={ user }
 							slideId={ slideId }
 							courseId={ courseId }
 							isSlideReady={ isSlideReady }
-							comments={ commentsInList! }
+							comments={ commentsInList }
 							commentsCount={ commentsInListCount }
 							api={ {
 								addComment: this.handleAddComment,

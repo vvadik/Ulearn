@@ -40,8 +40,3 @@ export const EmptyCommentsListForStudent = Template.bind({});
 EmptyCommentsListForStudent.args = {
 	user: student,
 };
-
-export const EmptyCommentsListForInstructor = Template.bind({});
-EmptyCommentsListForInstructor.args = {
-	user: instructor,
-};

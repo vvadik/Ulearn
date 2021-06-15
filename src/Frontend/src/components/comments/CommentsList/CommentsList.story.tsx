@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import CommentsList, { Props } from "./CommentsList";
 import { SlideType } from "src/models/slide";
 import {
@@ -92,14 +92,17 @@ const Template: Story<Omit<Props, 'headerRef' | 'api'>> = (args) => {
 	return (
 		<>
 			<div ref={ ref }/>
-			<CommentsList { ...args } headerRef={ ref } api={ fakeCommentsApi }/>
+			<CommentsList
+				{ ...args }
+				headerRef={ ref }
+				api={ fakeCommentsApi }
+			/>
 		</>
 	);
 };
 
 export const Default = Template.bind({});
 Default.args = {
-	isSlideReady: true,
 	handleTabChange: () => ({}),
 	isSlideContainsComment: (commentId) => comments.find(c => c.id === commentId) !== undefined,
 	slideType: SlideType.Exercise,

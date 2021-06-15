@@ -3,7 +3,6 @@ import { CourseAccessType, CourseRoleType, SystemAccessType, } from "src/consts/
 import { Comment, CommentPolicy, } from "src/models/comments";
 import { CommentsApi, FullCommentsApi } from "./utils";
 import { ShortUserInfo } from "src/models/users";
-import { UserIsInstructorWithAccessesToSeeProfiles } from "./CommentsView/CommentsView.story";
 
 interface CommentWithPartialAuthor extends Omit<Partial<Comment>, 'author' | 'replies'> {
 	author?: Partial<ShortUserInfo>;
