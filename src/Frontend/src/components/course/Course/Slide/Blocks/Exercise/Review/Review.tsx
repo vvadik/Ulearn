@@ -3,7 +3,7 @@ import classNames from "classnames";
 
 import Avatar from "src/components/common/Avatar/Avatar";
 import { Textarea, ThemeContext, } from "ui";
-import { Send3, Trash, Delete, } from "icons";
+import { Send3, Trash, MenuKebab, } from "icons";
 
 import { textareaHidden } from "src/uiTheme";
 
@@ -242,19 +242,19 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 					<ol className={ styles.commentRepliesList }>
 						{ comments.map((c, i) =>
 							<li className={ styles.commentReply } key={ i }>
-								{ this.renderComment(c, id) }
+								{ this.renderComment(c, id, review.outdated) }
 							</li>)
 						}
 					</ol>
 				}
-				{ selectedReviewId === id && (authorToRender.id !== botUser.id || comments.length > 0)
+				{ selectedReviewId === id && !review.outdated && (authorToRender.id !== botUser.id || comments.length > 0)
 				&& this.renderAddReviewComment(selectComment, commentsReplies[id]) }
 			</li>
 		);
 	};
 
 	renderComment(review: InstructorReviewInfo): React.ReactNode;
-	renderComment(reviewComment: ReviewCommentResponse, reviewId: number): React.ReactNode;
+	renderComment(reviewComment: ReviewCommentResponse, reviewId: number, reviewOutdated?: boolean): React.ReactNode;
 	renderComment({
 			id,
 			author,
@@ -264,10 +264,12 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 			publishTime,
 			renderedText,
 			renderedComment,
+			outdated,
 		}: InstructorReviewInfo & ReviewCommentResponse,
-		reviewId: number | null = null
+		reviewId: number | null = null,
+		reviewOutdated = false,
 	): React.ReactNode {
-		const { userId, disableLineNumbers, } = this.props;
+		const { userId, disableLineNumbers, selectedReviewId, } = this.props;
 		const authorToRender = author ?? botUser;
 
 		const time = addingTime || publishTime;
@@ -287,14 +289,23 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 							</span>
 							}
 							{
-								authorToRender.id === userId &&
-								<Trash
-									data-id={ id }
-									data-reviewid={ reviewId }
-									className={ styles.innerCommentDeleteButton }
-									onClick={ this.deleteReviewOrComment }
-									size={ 12 }
-								/>
+
+								authorToRender.id === userId && !outdated && !reviewOutdated && (
+									!reviewId
+										? <MenuKebab
+											data-id={ id }
+											className={ styles.kebabMenu }
+											//onClick={ this.deleteReviewOrComment }
+											size={ 16 }
+										/>
+										: <Trash
+											data-id={ id }
+											data-reviewid={ reviewId }
+											className={ styles.innerCommentDeleteButton }
+											onClick={ this.deleteReviewOrComment }
+											size={ 12 }
+										/>
+								)
 							}
 						</span>
 						{ time &&

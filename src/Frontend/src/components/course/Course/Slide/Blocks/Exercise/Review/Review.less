@@ -154,6 +154,10 @@
   .innerCommentDeleteButton {
     color: @progressBarRed;
   }
+
+  .kebabMenu {
+    color: @additionalColor;
+  }
 }
 
 .commentReplyTextArea {
@@ -212,6 +216,17 @@
   cursor: pointer;
   color: transparent;
   margin-left: 8px;
+}
+
+.kebabMenu {
+  margin-left: 8px;
+  cursor: pointer;
+  color: transparent;
+}
+
+.kebabMenu:hover {
+  background: @whiteSmoke;
+  border-radius: 4px;
 }
 
 @media (min-width: @minTabletWidth) {
