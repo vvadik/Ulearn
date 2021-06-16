@@ -7,9 +7,6 @@ using Microsoft.VisualBasic.FileIO;
 using RunCsJob;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
-using Ulearn.Core;
-using Ulearn.Core.Courses.Slides;
-using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.Helpers;
@@ -21,6 +18,7 @@ namespace uLearn.CourseTool.Validating
 	public class ProjectExerciseValidator : BaseValidator
 	{
 		private readonly CsProjectExerciseBlock ex;
+		private readonly CsProjectExerciseBlock.FilesProvider fp;
 		private readonly ExerciseSlide slide;
 		private readonly CsSandboxRunnerSettings settings;
 		private readonly ExerciseStudentZipBuilder exerciseStudentZipBuilder = new ExerciseStudentZipBuilder();
@@ -31,6 +29,7 @@ namespace uLearn.CourseTool.Validating
 			this.settings = settings;
 			this.slide = slide;
 			ex = exercise;
+			fp = new CsProjectExerciseBlock.FilesProvider(exercise, CourseDirectory);
 		}
 
 		public void ValidateExercises()
@@ -52,14 +51,14 @@ namespace uLearn.CourseTool.Validating
 		{
 			if (ExerciseDirectoryContainsSolutionFile())
 				return false;
-			ReportSlideWarning(slide, $"Exercise directory doesn't contain {ex.CorrectSolutionFileName}");
+			ReportSlideWarning(slide, $"Exercise directory doesn't contain {fp.CorrectSolutionFile.Name}");
 			return true;
 		}
 
 		private bool ReportErrorIfExerciseFolderMissesRequiredFiles()
 		{
-			var exerciseFilesRelativePaths = FileSystem.GetFiles(ex.ExerciseFolder.FullName, SearchOption.SearchAllSubDirectories)
-				.Select(path => new FileInfo(path).GetRelativePath(ex.ExerciseFolder.FullName))
+			var exerciseFilesRelativePaths = FileSystem.GetFiles(fp.ExerciseDirectory.FullName, SearchOption.SearchAllSubDirectories)
+				.Select(path => new FileInfo(path).GetRelativePath(fp.ExerciseDirectory.FullName))
 				.ToList();
 
 			return ReportErrorIfMissingCsproj() | ReportErrorIfMissingUserCodeFile();
@@ -71,25 +70,25 @@ namespace uLearn.CourseTool.Validating
 			{
 				if (exerciseFilesRelativePaths.Any(p => p.Equals(path, StringComparison.InvariantCultureIgnoreCase)))
 					return false;
-				ReportSlideError(slide, $"Exercise folder ({ex.ExerciseFolder.Name}) doesn't contain ({path})");
+				ReportSlideError(slide, $"Exercise folder ({fp.ExerciseDirectory.Name}) doesn't contain ({path})");
 				return true;
 			}
 		}
 
 		private bool ExerciseDirectoryContainsSolutionFile()
-			=> ex.UserCodeFileParentDirectory.GetFiles().Any(f => f.Name.Equals(ex.CorrectSolutionFileName, StringComparison.InvariantCultureIgnoreCase));
+			=> fp.UserCodeFileParentDirectory.GetFiles().Any(f => f.Name.Equals(fp.CorrectSolutionFile.Name, StringComparison.InvariantCultureIgnoreCase));
 
 		private void ReportErrorIfSolutionNotBuildingOrNotPassesTests()
 		{
-			var solutionCode = ex.CorrectSolutionFile.ContentAsUtf8();
-			var submission = ex.CreateSubmission(ex.CsprojFileName, solutionCode);
+			var solutionCode = fp.CorrectSolutionFile.ContentAsUtf8();
+			var submission = ex.CreateSubmission(ex.CsprojFileName, solutionCode, CourseDirectory);
 			var result = new CsSandboxRunnerClient().Run(submission);
 
 			if (!IsCompiledAndExecuted(result))
-				ReportSlideError(slide, $"Correct solution file {ex.CorrectSolutionFileName} verdict is not OK. RunResult = {result}");
+				ReportSlideError(slide, $"Correct solution file {fp.CorrectSolutionFile.Name} verdict is not OK. RunResult = {result}");
 
 			if (!ex.IsCorrectRunResult(result))
-				ReportSlideError(slide, $"Correct solution file {ex.CorrectSolutionFileName} is not solution. RunResult = {result}. " +
+				ReportSlideError(slide, $"Correct solution file {fp.CorrectSolutionFile.Name} is not solution. RunResult = {result}. " +
 										$"ExpectedOutput = {ex.ExpectedOutput.NormalizeEoln()} " +
 										$"RealOutput = {result.GetOutput().NormalizeEoln()}");
 			var buildResult = ex.BuildSolution(solutionCode);
@@ -97,19 +96,19 @@ namespace uLearn.CourseTool.Validating
 			if (buildResult.HasStyleErrors)
 			{
 				var errorMessage = string.Join("\n", buildResult.StyleErrors.Select(e => e.GetMessageWithPositions()));
-				ReportSlideWarning(slide, $"Correct solution file {ex.CorrectSolutionFileName} has style issues. {errorMessage}");
+				ReportSlideWarning(slide, $"Correct solution file {fp.CorrectSolutionFile.Name} has style issues. {errorMessage}");
 			}
 		}
 
 		private void ReportWarningIfWrongAnswersAreSolutionsOrNotOk()
 		{
-			var filesWithWrongAnswer = FileSystem.GetFiles(ex.ExerciseFolder.FullName, SearchOption.SearchAllSubDirectories)
+			var filesWithWrongAnswer = FileSystem.GetFiles(fp.ExerciseDirectory.FullName, SearchOption.SearchAllSubDirectories)
 				.Select(name => new FileInfo(name))
 				.Where(f => ex.IsWrongAnswer(f.Name));
 
 			foreach (var waFile in filesWithWrongAnswer)
 			{
-				var result = new CsSandboxRunnerClient().Run(ex.CreateSubmission(waFile.Name, waFile.ContentAsUtf8()));
+				var result = new CsSandboxRunnerClient().Run(ex.CreateSubmission(waFile.Name, waFile.ContentAsUtf8(), CourseDirectory));
 
 				ReportWarningIfWrongAnswerVerdictIsNotOk(waFile.Name, result);
 				ReportWarningIfWrongAnswerIsSolution(waFile.Name, result);
@@ -130,8 +129,8 @@ namespace uLearn.CourseTool.Validating
 
 		private void ReportErrorIfInitialCodeIsSolutionOrVerdictNotOk()
 		{
-			var initialCode = ex.UserCodeFile.ContentAsUtf8();
-			var submission = ex.CreateSubmission(ex.CsprojFileName, initialCode);
+			var initialCode = fp.UserCodeFile.ContentAsUtf8();
+			var submission = ex.CreateSubmission(ex.CsprojFileName, initialCode, CourseDirectory);
 			var result = new CsSandboxRunnerClient().Run(submission);
 
 			if (ex.StudentZipIsCompilable)
@@ -157,7 +156,7 @@ namespace uLearn.CourseTool.Validating
 			var tempExZipFilePath = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory).GetFile($"{slide.Id}.exercise.zip");
 			var tempExFolder = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ExerciseFolder_From_StudentZip"));
 
-			exerciseStudentZipBuilder.BuildStudentZip(slide, tempExZipFilePath);
+			exerciseStudentZipBuilder.BuildStudentZip(slide, tempExZipFilePath, CourseDirectory);
 			ZipUtils.UnpackZip(tempExZipFilePath.ReadAllContent(), tempExFolder.FullName);
 			try
 			{
@@ -178,7 +177,7 @@ namespace uLearn.CourseTool.Validating
 				if (!ex.StudentZipIsCompilable)
 					return;
 
-				var buildResult = MsBuildRunner.BuildProject(CsSandboxRunnerSettings.MsBuildSettings, ex.CsprojFile.Name, tempExFolder);
+				var buildResult = MsBuildRunner.BuildProject(CsSandboxRunnerSettings.MsBuildSettings, fp.CsprojFile.Name, tempExFolder);
 				ReportErrorIfStudentsZipNotBuilding(buildResult);
 			}
 			finally

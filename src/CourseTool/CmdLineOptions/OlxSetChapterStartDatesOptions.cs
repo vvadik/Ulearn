@@ -18,7 +18,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 		{
 			var prequelChapterIds = PrequelChapterIds.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
 			Console.WriteLine("Loading OLX");
-			string olxDir = Dir + "/olx";
+			string olxDir = WorkingDirectory + "/olx";
 			var edxCourse = EdxCourse.Load(olxDir);
 			Console.WriteLine("Setting dates OLX...");
 			var curDate = StartDate;

@@ -32,11 +32,11 @@ namespace Ulearn.Core.Courses.Slides.Quizzes.Blocks
 				throw new FormatException("Sample should match at least one regex. BlockId=" + Id);
 		}
 
-		public override Component ToEdxComponent(string displayName, string courseId, Slide slide, int componentIndex, string ulearnBaseUrl, DirectoryInfo coursePackageRoot)
+		public override Component ToEdxComponent(EdxComponentBuilderContext context)
 		{
 			return new TextInputComponent
 			{
-				UrlName = slide.NormalizedGuid + componentIndex,
+				UrlName = context.Slide.NormalizedGuid + context.ComponentIndex,
 				Title = EdxTexReplacer.ReplaceTex(Text),
 				StringResponse = new StringResponse
 				{

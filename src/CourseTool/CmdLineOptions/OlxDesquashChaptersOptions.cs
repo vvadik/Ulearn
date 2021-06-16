@@ -10,7 +10,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 		public override void DoExecute()
 		{
 			Console.WriteLine("desquashing");
-			new OlxSquasher().DesquashCourse(Path.Combine(Dir, "olx"));
+			new OlxSquasher().DesquashCourse(Path.Combine(WorkingDirectory, "olx"));
 			Console.WriteLine("Now you can create targz and upload course to edx");
 		}
 	}

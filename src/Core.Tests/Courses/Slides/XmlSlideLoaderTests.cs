@@ -31,7 +31,7 @@ namespace Ulearn.Core.Tests.Courses.Slides
 			loader = new XmlSlideLoader();
 			courseSettings = new CourseSettings(CourseSettings.DefaultSettings);
 			courseSettings.Scoring.Groups.Add("ScoringGroup1", new ScoringGroup { Id = "ScoringGroup1" });
-			unit = new Unit(UnitSettings.CreateByTitle("Unit title", courseSettings), new DirectoryInfo(testDataDirectory));
+			unit = new Unit(UnitSettings.CreateByTitle("Unit title", courseSettings), "");
 		}
 
 		private Slide LoadSlideFromXmlFile(string filename)

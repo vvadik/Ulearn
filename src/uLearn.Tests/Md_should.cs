@@ -1,4 +1,3 @@
-using MarkdownDeep;
 using NUnit.Framework;
 using Ulearn.Core;
 using Markdown = MarkdownDeep.Markdown;
@@ -8,13 +7,15 @@ namespace uLearn
 	[TestFixture]
 	public class Md_should
 	{
+		private static MarkdownRenderContext DefaultMdContext = new MarkdownRenderContext("https://api.ulearn.me", "https://ulearn.me", "BasicProgramming", "Unit1");
+
 		[Test]
 		public void qualify_urls()
 		{
-			Assert.That("[a](a.html)".RenderMarkdown("/Course"), Does.Contain("href=\"/Course/a.html\""));
-			Assert.That("[a](a.html)".RenderMarkdown("/Course/"), Does.Contain("href=\"/Course/a.html\""));
-			Assert.That("[a](a.html)".RenderMarkdown(), Does.Contain("href=\"a.html\""));
-			Assert.That("[a](/a.html)".RenderMarkdown(), Does.Contain("href=\"/a.html\""));
+			Assert.That("[a](a.html)".RenderMarkdown(DefaultMdContext), Does.Contain("href=\"https://api.ulearn.me/courses/BasicProgramming/files/Unit1/a.html\""));
+			Assert.That("[a](a.html)".RenderMarkdown(DefaultMdContext with { UnitDirectoryRelativeToCourse = "Unit1/" }), Does.Contain("href=\"https://api.ulearn.me/courses/BasicProgramming/files/Unit1/a.html\""));
+			Assert.That("[a](/a.html)".RenderMarkdown(DefaultMdContext), Does.Contain("href=\"https://ulearn.me/a.html\""));
+			Assert.That("[a](abc)".RenderMarkdown(DefaultMdContext), Does.Contain("href=\"https://ulearn.me/abc\""));
 		}
 
 		[Test]
@@ -38,7 +39,7 @@ namespace uLearn
 		{
 			Assert.AreEqual(
 				@"<p><span class=""tex"">noise_V, noise_{\omega}</span></p>",
-				@"<span class=""tex"">noise_V, noise_{\omega}</span>".RenderMarkdown("/").Trim());
+				@"<span class=""tex"">noise_V, noise_{\omega}</span>".RenderMarkdown(DefaultMdContext).Trim());
 		}
 
 		[Test]
@@ -46,7 +47,7 @@ namespace uLearn
 		{
 			Assert.AreEqual(
 				@"<p>a <span class='tex'>x</span> b</p>",
-				@"a $x$ b".RenderMarkdown("/").Trim());
+				@"a $x$ b".RenderMarkdown(DefaultMdContext).Trim());
 		}
 
 		[Test]
@@ -54,7 +55,7 @@ namespace uLearn
 		{
 			Assert.AreEqual(
 				@"<p><span class='tex'>x</span></p>",
-				@"$x$".RenderMarkdown("/").Trim());
+				@"$x$".RenderMarkdown(DefaultMdContext).Trim());
 		}
 
 		[Test]
@@ -62,7 +63,7 @@ namespace uLearn
 		{
 			Assert.AreEqual(
 				@"<p>1$=2$</p>",
-				@"1$=2$".RenderMarkdown("/").Trim());
+				@"1$=2$".RenderMarkdown(DefaultMdContext).Trim());
 		}
 
 		[Test]
@@ -70,7 +71,7 @@ namespace uLearn
 		{
 			Assert.AreEqual(
 				@"<p>1 <span class='tex'> = 2 </span></p>",
-				@"1 $ = 2 $".RenderMarkdown("/").Trim());
+				@"1 $ = 2 $".RenderMarkdown(DefaultMdContext).Trim());
 		}
 
 		[Test]
@@ -78,7 +79,7 @@ namespace uLearn
 		{
 			Assert.AreEqual(
 				@"<p><span class='tex'>a_1=b_2</span></p>",
-				@"$a_1=b_2$".RenderMarkdown("/").Trim());
+				@"$a_1=b_2$".RenderMarkdown(DefaultMdContext).Trim());
 		}
 
 		[Test]
@@ -86,7 +87,7 @@ namespace uLearn
 		{
 			Assert.AreEqual(
 				"<div>\n*ha*</div>",
-				@"<div markdown='false'>*ha*</div>".RenderMarkdown("/").Trim());
+				@"<div markdown='false'>*ha*</div>".RenderMarkdown(DefaultMdContext).Trim());
 		}
 
 		[Test]
@@ -94,7 +95,7 @@ namespace uLearn
 		{
 			Assert.AreEqual(
 				@"<p><span class='tex'>\rho\subset\Sigma^*\times\Sigma^*</span></p>",
-				@"$\rho\subset\Sigma^*\times\Sigma^*$".RenderMarkdown("/").Trim());
+				@"$\rho\subset\Sigma^*\times\Sigma^*$".RenderMarkdown(DefaultMdContext).Trim());
 		}
 
 		[Test]
@@ -102,7 +103,7 @@ namespace uLearn
 		{
 			Assert.AreEqual(
 				@"<div class='tex'>\displaystyle x_1=y_1</div>",
-				@"$$x_1=y_1$$".RenderMarkdown("/").Trim());
+				@"$$x_1=y_1$$".RenderMarkdown(DefaultMdContext).Trim());
 		}
 
 		[Test]
@@ -110,7 +111,7 @@ namespace uLearn
 		{
 			Assert.AreEqual(
 				@"<div class='tex'>\displaystyle x_1=y_1</div><p> <span class='tex'>1</span></p>",
-				@"$$x_1=y_1$$ $1$".RenderMarkdown("/").Trim());
+				@"$$x_1=y_1$$ $1$".RenderMarkdown(DefaultMdContext).Trim());
 		}
 
 		[Test]
@@ -119,7 +120,7 @@ namespace uLearn
 			Assert.AreEqual(
 				@"<div class='tex'>\displaystyle 1</div><div class='tex'>\displaystyle 2</div>",
 				@"$$1$$
-$$2$$".RenderMarkdown("/").Trim());
+$$2$$".RenderMarkdown(DefaultMdContext).Trim());
 		}
 
 		[Test]
@@ -129,7 +130,7 @@ $$2$$".RenderMarkdown("/").Trim());
 				@"<div class='tex'>\displaystyle 1</div><div class='tex'>\displaystyle 2</div><div class='tex'>\displaystyle 3</div>",
 				@"$$1$$
 $$2$$
-$$3$$".RenderMarkdown("/").Trim());
+$$3$$".RenderMarkdown(DefaultMdContext).Trim());
 		}
 
 		[Test]
@@ -137,7 +138,7 @@ $$3$$".RenderMarkdown("/").Trim());
 		{
 			Assert.AreEqual(
 				@"<div class='tex'>\displaystyle 1</div>",
-				@" $$1$$ ".RenderMarkdown("/").Trim());
+				@" $$1$$ ".RenderMarkdown(DefaultMdContext).Trim());
 		}
 
 		[Test]
@@ -145,7 +146,7 @@ $$3$$".RenderMarkdown("/").Trim());
 		{
 			Assert.AreEqual(
 				"<p><a href=\"https://ulearn.me/Link\">Hello world</a></p>\n",
-				@"[Hello world](/Link)".RenderMarkdown("https://ulearn.me/"));
+				@"[Hello world](/Link)".RenderMarkdown(DefaultMdContext));
 		}
 	}
 }

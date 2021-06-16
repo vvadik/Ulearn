@@ -19,6 +19,7 @@ using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using GitCourseUpdater;
+using Ionic.Zip;
 using Microsoft.VisualBasic.FileIO;
 using Ulearn.Common;
 using uLearn.Web.Extensions;
@@ -93,7 +94,7 @@ namespace uLearn.Web.Controllers
 		{
 			var course = courseManager.GetVersion(versionId);
 			courseManager.EnsureVersionIsExtracted(versionId);
-			return PartialView(course.SpellCheck());
+			return PartialView(course.SpellCheck(courseManager.GetExtractedCourseDirectory(course.Id).FullName));
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
@@ -153,7 +154,7 @@ namespace uLearn.Web.Controllers
 			else
 			{
 				var path = courseManager.GetExtractedCourseDirectory(courseId);
-				stream = ZipUtils.CreateZipFromDirectory(new List<string> { path.FullName }, null, null, Encoding.UTF8);
+				stream = ZipUtils.CreateZipFromDirectory(new List<string> { path.FullName }, null, null);
 			}
 			return File(stream, "application/zip", packageName);
 		}
@@ -252,7 +253,18 @@ namespace uLearn.Web.Controllers
 			if (fileName == null || !fileName.ToLower().EndsWith(".zip"))
 				return RedirectToAction("Packages", new { courseId });
 
-			var (versionId, error) = await UploadCourse(courseId, file.InputStream, User.Identity.GetUserId()).ConfigureAwait(false);
+			var tmpFileName = Path.GetTempFileName();
+			using (var tmpFile = new FileStream(tmpFileName, FileMode.Create, FileAccess.Write))
+				await file.InputStream.CopyToAsync(tmpFile);
+
+			Guid versionId;
+			Exception error;
+			using(var inputStream = ZipUtils.GetZipWithFileWithNameInRoot(tmpFileName, "course.xml")) {
+				(versionId, error) = await UploadCourse(courseId, inputStream, User.Identity.GetUserId()).ConfigureAwait(false);
+			}
+
+			new FileInfo(tmpFileName).Delete();
+
 			if (error != null)
 			{
 				var errorMessage = error.Message.ToLowerFirstLetter();
@@ -290,14 +302,14 @@ namespace uLearn.Web.Controllers
 					var commitInfo = git.GetCurrentCommitInfo();
 					foreach (var courseRepo in courses)
 					{
-						var zip = git.GetCurrentStateAsZip(courseRepo.PathToCourseXml);
+						var (zip, pathToCourseXml) = git.GetCurrentStateAsZip(courseRepo.PathToCourseXml);
 						var hasChanges = true;
 						if (courses.Count > 1)
 						{
 							var publishedVersion = coursesRepo.GetPublishedCourseVersion(courseRepo.CourseId);
 							if (publishedVersion?.CommitHash != null)
 							{
-								var changedFiles = git.GetChangedFiles(publishedVersion.CommitHash, commitInfo.Hash, courseRepo.PathToCourseXml);
+								var changedFiles = git.GetChangedFiles(publishedVersion.CommitHash, commitInfo.Hash, pathToCourseXml);
 								hasChanges = changedFiles?.Any() ?? true;
 							}
 						}
@@ -305,7 +317,7 @@ namespace uLearn.Web.Controllers
 						if (hasChanges)
 						{
 							log.Info($"Course '{courseRepo.CourseId}' has changes in '{repoUrl}'");
-							infoForUpload.Add((courseRepo.CourseId, zip, commitInfo, courseRepo.PathToCourseXml));
+							infoForUpload.Add((courseRepo.CourseId, zip, commitInfo, pathToCourseXml));
 						}
 						else
 						{
@@ -340,6 +352,7 @@ namespace uLearn.Web.Controllers
 
 			var publicKey = courseRepo.PublicKey; // у всех курсов одинаковый repoUrl и ключ
 			var privateKey = courseRepo.PrivateKey;
+			var pathToCourseXml = courseRepo.PathToCourseXml;
 
 			Exception error = null;
 			MemoryStream zip = null;
@@ -350,7 +363,7 @@ namespace uLearn.Web.Controllers
 				{
 					git.Checkout(courseRepo.Branch);
 					commitInfo = git.GetCurrentCommitInfo();
-					zip = git.GetCurrentStateAsZip(courseRepo.PathToCourseXml); 
+					(zip, pathToCourseXml) = git.GetCurrentStateAsZip(pathToCourseXml); 
 				}
 			}
 			catch (GitException ex)
@@ -367,7 +380,7 @@ namespace uLearn.Web.Controllers
 			var versionId = new Guid();
 			if (error == null)
 				using (zip)
-					(versionId, error) = await UploadCourse(courseId, zip, User.Identity.GetUserId(), courseRepo.RepoUrl, commitInfo, courseRepo.PathToCourseXml);
+					(versionId, error) = await UploadCourse(courseId, zip, User.Identity.GetUserId(), courseRepo.RepoUrl, commitInfo, pathToCourseXml);
 
 			if (error != null)
 			{
@@ -407,13 +420,6 @@ namespace uLearn.Web.Controllers
 			}
 
 			log.Info($"Successfully update course files '{courseId}'");
-			if (pathToCourseXmlInRepo == null && uploadedFromRepoUrl != null)
-			{
-				var extractedVersionDirectory = courseManager.GetExtractedVersionDirectory(versionId);
-				pathToCourseXmlInRepo = extractedVersionDirectory.FullName == updatedCourse.CourseXmlDirectory.FullName
-					? ""
-					: updatedCourse.CourseXmlDirectory.FullName.Substring(extractedVersionDirectory.FullName.Length + 1);
-			}
 
 			await coursesRepo.AddCourseVersion(courseId, versionId, userId,
 				pathToCourseXmlInRepo, uploadedFromRepoUrl, commitInfo?.Hash, commitInfo?.Message);
@@ -513,7 +519,7 @@ namespace uLearn.Web.Controllers
 				ModerationPolicy = commentsPolicy.ModerationPolicy,
 				OnlyInstructorsCanReply = commentsPolicy.OnlyInstructorsCanReply,
 				Comments = (from c in comments.Take(commentsCountLimit)
-					let slide = course.FindSlideById(c.SlideId, true)
+					let slide = course.FindSlideByIdNotSafe(c.SlideId)
 					where slide != null
 					select
 						new CommentViewModel
@@ -597,9 +603,9 @@ namespace uLearn.Web.Controllers
 			{
 				CourseId = courseId,
 				/* TODO (andgein): Merge FindSlideById() and following GetSlideById() calls */
-				Checkings = checkings.Take(maxShownQueueSize).Where(c => course.FindSlideById(c.SlideId, true) != null).Select(c =>
+				Checkings = checkings.Take(maxShownQueueSize).Where(c => course.FindSlideByIdNotSafe(c.SlideId) != null).Select(c =>
 				{
-					var slide = course.GetSlideById(c.SlideId, true);
+					var slide = course.GetSlideByIdNotSafe(c.SlideId);
 					return new ManualCheckingQueueItemViewModel
 					{
 						CheckingQueueItem = c,
@@ -632,12 +638,12 @@ namespace uLearn.Web.Controllers
 			filterOptions = GetManualCheckingFilterOptionsByGroup(course.Id, groupsIds);
 			filterOptions.OnlyChecked = null;
 			var allCheckingsSlidesIds = GetMergedCheckingQueueSlideIds(filterOptions);
-			var slideId2Index = course.GetSlides(true).Select((s, i) => (s.Id, i))
+			var slideId2Index = course.GetSlidesNotSafe().Select((s, i) => (s.Id, i))
 				.ToDictionary(p => p.Item1, p => p.Item2);
 
-			var emptySlideMock = new Slide { Info = new SlideInfo(null, null), Title = "", Id = Guid.Empty };
+			var emptySlideMock = new Slide { Title = "", Id = Guid.Empty };
 			var allCheckingsSlides = allCheckingsSlidesIds
-				.Select(s => new KeyValuePair<Guid, Slide>(s, course.FindSlideById(s, true)))
+				.Select(s => new KeyValuePair<Guid, Slide>(s, course.FindSlideByIdNotSafe(s)))
 				.Where(kvp => kvp.Value != null)
 				.Union(new List<KeyValuePair<Guid, Slide>>
 				{
@@ -908,7 +914,8 @@ namespace uLearn.Web.Controllers
 			var courseDiff = new CourseDiff(course, version);
 			var schemaPath = Path.Combine(HttpRuntime.BinDirectory, "schema.xsd");
 			var validator = new XmlValidator(schemaPath);
-			var warnings = validator.ValidateSlidesFiles(version.GetSlides(true).Select(x => x.Info.SlideFile).ToList());
+			var warnings = validator.ValidateSlidesFiles(version.GetSlidesNotSafe()
+				.Select(s => new FileInfo(Path.Combine(courseManager.GetExtractedVersionDirectory(versionIdGuid).FullName, s.SlideFilePathRelativeToCourse))).ToList());
 
 			return View(new DiagnosticsModel
 			{
@@ -1563,7 +1570,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> SetSuspicionLevels(string courseId, Guid slideId, Language language, string faintSuspicion = null, string strongSuspicion = null)
 		{
 			var course = courseManager.GetCourse(courseId);
-			if (course.GetSlides(true).All(s => s.Id != slideId))
+			if (course.FindSlideByIdNotSafe(slideId) != null)
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden, "Course does not contain a slide");
 
 			if (!TryParseNullableDouble(faintSuspicion, out var faintSuspicionParsed)

@@ -126,7 +126,6 @@ namespace Ulearn.Web.Api.Controllers.Groups
 				{
 					var notification = new GroupIsArchivedNotification { GroupId = groupId };
 					await notificationsRepo.AddNotification(group.CourseId, notification, UserId);
-					await ArchiveAllOldGroups();
 				}
 			}
 
@@ -134,19 +133,6 @@ namespace Ulearn.Web.Api.Controllers.Groups
 				await groupsRepo.EnableInviteLinkAsync(groupId, parameters.IsInviteLinkEnabled.Value).ConfigureAwait(false);
 
 			return BuildGroupInfo(await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false));
-		}
-
-		private async Task ArchiveAllOldGroups()
-		{
-			var groupsIdsToArchive = await groupsArchiver.GetOldGroupsToArchive();
-			var bot = await usersRepo.GetUlearnBotUser();
-			foreach (var groupId in groupsIdsToArchive)
-			{
-				var group = await groupsRepo.FindGroupByIdAsync(groupId);
-				await groupsRepo.ArchiveGroupAsync(groupId, true);
-				var notification = new GroupIsArchivedNotification { GroupId = groupId };
-				await notificationsRepo.AddNotification(group.CourseId, notification, bot.Id);
-			}
 		}
 
 		/// <summary>

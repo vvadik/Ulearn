@@ -508,12 +508,12 @@ export function antiplagiarism() {
 			/* See next line and try to concat it to matched block */
 			/* allowSuggests is parameter for preventing recursion stack overflow: We should not see previous line if now we are seeing the next line */
 			const nextLineId = lineId + 1;
-			if(nextLineId in bestMatchedLines && bestMatchedLines[nextLineId] === -1 && (allowSuggests === 'both' || allowSuggests === 'next'))
+			if(nextLineId in bestMatchedLines && bestMatchedLines[nextLineId] === -1 && (allowSuggests === 'both' || allowSuggests === 'next') && bestMatchedLine + 1 < plagiarismSubmissionLines.length)
 				suggestMatchedLineAroundBlock(nextLineId, bestMatchedLine + 1, 'next');
 
 			/* See previous line */
 			const previousLineId = lineId - 1;
-			if(previousLineId in bestMatchedLines && bestMatchedLines[previousLineId] === -1 && (allowSuggests === 'both' || allowSuggests === 'prev'))
+			if(previousLineId in bestMatchedLines && bestMatchedLines[previousLineId] === -1 && (allowSuggests === 'both' || allowSuggests === 'prev') && bestMatchedLine > 0)
 				suggestMatchedLineAroundBlock(previousLineId, bestMatchedLine - 1, 'prev');
 		}
 

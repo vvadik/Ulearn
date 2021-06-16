@@ -73,7 +73,7 @@ namespace ManualUtils.AntiPlagiarism
 			var dateTime = DateTime.Parse("2019-01-17 08:42:47.343");
 			var blackLabels = db.ExerciseCodeReviews
 				.Where(r => r.ExerciseChecking.CourseId == "basicprogramming" || r.ExerciseChecking.CourseId == "basicprogramming2")
-				.Where(r => r.AddingTime > dateTime)
+				.Where(r => r.Submission.Timestamp > dateTime)
 				.Where(r => r.Comment.StartsWith("Ой! Наш робот") && !r.IsDeleted)
 				.Select(r => new
 				{

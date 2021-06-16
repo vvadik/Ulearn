@@ -20,25 +20,27 @@ namespace Ulearn.Core.Helpers
 		public static bool IsAnyWrongAnswerOrAnySolution(string name) => anyWrongAnswerNameRegex.IsMatch(name) || anySolutionNameRegex.IsMatch(name);
 		public static bool IsAnySolution(string name) => anySolutionNameRegex.IsMatch(name);
 
-		public void BuildStudentZip(Slide slide, FileInfo zipFile)
+		public void BuildStudentZip(Slide slide, FileInfo zipFile, string courseDirectory)
 		{
 			switch ((slide as ExerciseSlide)?.Exercise)
 			{
 				case CsProjectExerciseBlock csBlock:
 				{
+					var fp = csBlock.GetFilesProvider(courseDirectory);
 					var zip = new LazilyUpdatingZip(
-						csBlock.ExerciseFolder,
+						fp.ExerciseDirectory,
 						new[] { "checking", "bin", "obj", ".idea", ".vs" },
-						file => NeedExcludeFromStudentZip(csBlock, file),
-						file => GetFileContentInStudentZip(csBlock, file),
-						ResolveCsprojLinks(csBlock),
+						file => NeedExcludeFromStudentZip(csBlock, file, fp),
+						file => GetFileContentInStudentZip(csBlock, file, fp),
+						ResolveCsprojLinks(csBlock, fp),
 						zipFile);
 					zip.UpdateZip();
 					return;
 				}
 				case UniversalExerciseBlock block:
 				{
-					using (var studentZipMemoryStream = block.GetZipMemoryStreamForStudent())
+					var zipBuilder = new UniversalExerciseBlock.ExerciseStudentZipBuilder(block, block.GetFilesProvider(courseDirectory));
+					using (var studentZipMemoryStream = zipBuilder.GetZipMemoryStreamForStudent())
 						using (var fs = zipFile.OpenWrite())
 							studentZipMemoryStream.CopyTo(fs);
 					return;
@@ -48,9 +50,9 @@ namespace Ulearn.Core.Helpers
 			}
 		}
 
-		private static bool NeedExcludeFromStudentZip(CsProjectExerciseBlock block, FileInfo file)
+		private static bool NeedExcludeFromStudentZip(CsProjectExerciseBlock block, FileInfo file, CsProjectExerciseBlock.FilesProvider fp)
 		{
-			var relativeFilePath = file.GetRelativePath(block.ExerciseFolder.FullName);
+			var relativeFilePath = file.GetRelativePath(fp.ExerciseDirectory.FullName);
 			return NeedExcludeFromStudentZip(block, relativeFilePath);
 		}
 
@@ -60,16 +62,16 @@ namespace Ulearn.Core.Helpers
 					block.PathsToExcludeForStudent != null && block.PathsToExcludeForStudent.Any(p => p == filepath);
 		}
 
-		private static MemoryStream GetFileContentInStudentZip(CsProjectExerciseBlock block, FileInfo file)
+		private static MemoryStream GetFileContentInStudentZip(CsProjectExerciseBlock block, FileInfo file, CsProjectExerciseBlock.FilesProvider fp)
 		{
 			if (!file.Name.Equals(block.CsprojFileName, StringComparison.InvariantCultureIgnoreCase))
 				return null;
-			return ProjModifier.ModifyCsproj(file, proj => ProjModifier.PrepareForStudentZip(proj, block));
+			return ProjModifier.ModifyCsproj(file, proj => ProjModifier.PrepareForStudentZip(proj, block, fp));
 		}
 
-		public static IEnumerable<FileContent> ResolveCsprojLinks(CsProjectExerciseBlock block)
+		public static IEnumerable<FileContent> ResolveCsprojLinks(CsProjectExerciseBlock block, CsProjectExerciseBlock.FilesProvider fp)
 		{
-			return ResolveCsprojLinks(block.CsprojFile, block.BuildEnvironmentOptions.ToolsVersion);
+			return ResolveCsprojLinks(fp.CsprojFile, block.BuildEnvironmentOptions.ToolsVersion);
 		}
 
 		public static IEnumerable<FileContent> ResolveCsprojLinks(FileInfo csprojFile, string toolsVersion)

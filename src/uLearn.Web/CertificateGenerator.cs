@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using Database;
 using Database.DataContexts;
 using Database.Models;
 using Vostok.Logging.Abstractions;
@@ -15,8 +14,6 @@ using Ulearn.Common.Extensions;
 using Ionic.Zip;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
-using Ulearn.Core.Courses.Slides;
-using Ulearn.Core.Courses.Slides.Exercises;
 
 namespace uLearn.Web
 {
@@ -26,6 +23,7 @@ namespace uLearn.Web
 		private readonly UserSolutionsRepo userSolutionsRepo;
 		private readonly SlideCheckingsRepo slideCheckingsRepo;
 		private readonly VisitsRepo visitsRepo;
+		private readonly UnitsRepo unitsRepo;
 
 		private static ILog log => LogProvider.Get().ForContext(typeof(CertificatesRepo));
 
@@ -49,19 +47,22 @@ namespace uLearn.Web
 			UserQuizzesRepo userQuizzesRepo,
 			UserSolutionsRepo userSolutionsRepo,
 			SlideCheckingsRepo slideCheckingsRepo,
-			VisitsRepo visitsRepo)
+			VisitsRepo visitsRepo,
+			UnitsRepo unitsRepo)
 		{
 			this.userQuizzesRepo = userQuizzesRepo;
 			this.userSolutionsRepo = userSolutionsRepo;
 			this.slideCheckingsRepo = slideCheckingsRepo;
 			this.visitsRepo = visitsRepo;
+			this.unitsRepo = unitsRepo;
 		}
 
 		public CertificateGenerator(ULearnDb db)
 			: this(new UserQuizzesRepo(db),
 				new UserSolutionsRepo(db),
 				new SlideCheckingsRepo(db),
-				new VisitsRepo(db))
+				new VisitsRepo(db),
+				new UnitsRepo(db))
 		{
 		}
 
@@ -230,7 +231,8 @@ namespace uLearn.Web
 			/* Replace %quizzes.*% */
 			content = ReplaceQuizzesBuiltinParameters(content, certificate, course);
 
-			var acceptedSolutionsCount = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(course.Id, course.GetSlides(false).Select(s => s.Id), certificate.UserId).Select(s => s.SlideId).Distinct().Count();
+			var visibleUnits = unitsRepo.GetVisibleUnitIds(course);
+			var acceptedSolutionsCount = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(course.Id, course.GetSlides(false, visibleUnits).Select(s => s.Id), certificate.UserId).Select(s => s.SlideId).Distinct().Count();
 			content = SubstituteOneParameter(content, "exercises.accepted", acceptedSolutionsCount.ToString());
 
 			return content;
@@ -274,7 +276,8 @@ namespace uLearn.Web
 
 		private string ReplaceCodeReviewsBuiltinParameters(string content, Certificate certificate, Course course)
 		{
-			var slideScoresAndPercents = slideCheckingsRepo.GetPassedManualExerciseCheckingsScoresAndPercents(course, certificate.UserId);
+			var visibleUnits = unitsRepo.GetVisibleUnitIds(course);
+			var slideScoresAndPercents = slideCheckingsRepo.GetPassedManualExerciseCheckingsScoresAndPercents(course, certificate.UserId, visibleUnits);
 			var codeReviewsCount = slideScoresAndPercents.Count;
 			var codeReviewsFullCount = slideScoresAndPercents.Count(s => s.Percent == 100);
 

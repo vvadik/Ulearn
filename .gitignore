@@ -181,6 +181,7 @@ FakesAssemblies/
 *.sln.ide
 *.Settings.cs
 /src/Courses/
+/src/courses.new/
 /src/Courses/Courses.Staging/*.zip
 /src/Courses/Courses.Versions/*.zip
 /src/uLearn.Web/Certificates/

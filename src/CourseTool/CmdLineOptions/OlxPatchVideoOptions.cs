@@ -14,13 +14,13 @@ namespace uLearn.CourseTool.CmdLineOptions
 	{
 		public override void Patch(OlxPatcher patcher, Config config, Profile profile, EdxCourse edxCourse)
 		{
-			var videoJson = Path.Combine(Dir, config.Video);
+			var videoJson = Path.Combine(WorkingDirectory, config.Video);
 			var video = File.Exists(videoJson)
 				? JsonConvert.DeserializeObject<Video>(File.ReadAllText(videoJson))
 				: new Video { Records = new Record[0] };
-			VideoHistory.UpdateHistory(Dir, video);
+			VideoHistory.UpdateHistory(WorkingDirectory, video);
 			var guids = Guids == null ? null : Guids.Split(',').Select(Utils.GetNormalizedGuid).ToList();
-			if (config.Video != null && File.Exists(Path.Combine(Dir, config.Video)))
+			if (config.Video != null && File.Exists(Path.Combine(WorkingDirectory, config.Video)))
 			{
 				var videoComponents = video
 					.Records

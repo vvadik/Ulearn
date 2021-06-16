@@ -1,18 +1,6 @@
 import React from "react";
 import CommentSendForm from "./CommentSendForm";
-
-const nameOnlyUser = {
-	id: "1",
-	visibleName: "lol",
-	avatarUrl: null,
-};
-
-const userWithAvatar = {
-	id: "11",
-	visibleName: "Vasiliy Terkin",
-	avatarUrl:
-		"https://staff.skbkontur.ru/content/images/default-user-woman.png",
-};
+import { avatarUrl, sysAdmin } from "../storiesData";
 
 interface State {
 	id: number,
@@ -33,10 +21,8 @@ class SendingCommentStory extends React.Component<Props, State> {
 		return (
 			<CommentSendForm
 				handleSubmit={ this.handleSubmit }
-				commentId={ this.state.id }
-				author={ nameOnlyUser }
+				author={ sysAdmin }
 				sending={ this.state.sending }
-				isForInstructors={ false }
 				isShowFocus={ { inSendForm: false, } }
 			/>
 		);
@@ -69,36 +55,32 @@ export const Default = (): React.ReactNode => (
 		<h2>Формы с разными кнопками отправки</h2>
 		<h3>Оставить комментарий</h3>
 		<CommentSendForm
-			isForInstructors={ false }
-			commentId={ 1 }
-			author={ nameOnlyUser }
+			handleSubmit={ () => ({}) }
+			author={ sysAdmin }
 			sending={ false }
 			isShowFocus={ { inSendForm: false, } }
 		/>
 		<h3>Отправить ответ на комментарий</h3>
 		<CommentSendForm
+			handleSubmit={ () => ({}) }
 			submitTitle={ "Отправить" }
-			isForInstructors={ false }
-			commentId={ 1 }
-			author={ nameOnlyUser }
+			author={ sysAdmin }
 			sending={ false }
 			isShowFocus={ { inSendForm: false, } }
 		/>
 		<h3>Редактировать комментарий с кнопкой отмены отправки</h3>
 		<CommentSendForm
+			handleSubmit={ () => ({}) }
 			handleCancel={ () => ({}) }
 			submitTitle={ "Сохранить" }
-			isForInstructors={ false }
-			commentId={ 1 }
-			author={ nameOnlyUser }
+			author={ sysAdmin }
 			sending={ false }
 			isShowFocus={ { inSendForm: false, } }
 		/>
 		<h3>Форма в состоянии отправки</h3>
 		<CommentSendForm
-			isForInstructors={ false }
-			commentId={ 2 }
-			author={ userWithAvatar }
+			handleSubmit={ () => ({}) }
+			author={ { ...sysAdmin, avatarUrl: avatarUrl, } }
 			sending={ true }
 			isShowFocus={ { inSendForm: false, } }
 		/>

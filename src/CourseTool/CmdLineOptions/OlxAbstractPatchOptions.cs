@@ -26,16 +26,16 @@ namespace uLearn.CourseTool.CmdLineOptions
 
 			if (!SkipExtractingTarGz)
 			{
-				var tarGzPath = Dir.GetSingleFile(CourseTarGz ?? "*.tar.gz");
-				EdxInteraction.ExtractEdxCourseArchive(Dir, tarGzPath);
+				var tarGzPath = WorkingDirectory.GetSingleFile(CourseTarGz ?? "*.tar.gz");
+				EdxInteraction.ExtractEdxCourseArchive(WorkingDirectory, tarGzPath);
 			}
 
 			Console.WriteLine("Loading OLX");
-			var edxCourse = EdxCourse.Load(Dir + "/olx");
+			var edxCourse = EdxCourse.Load(WorkingDirectory + "/olx");
 			Console.WriteLine("Patching OLX...");
-			Patch(new OlxPatcher(Dir + "/olx"), Config, profile, edxCourse);
+			Patch(new OlxPatcher(WorkingDirectory + "/olx"), Config, profile, edxCourse);
 			Console.WriteLine("Patched!");
-			EdxInteraction.CreateEdxCourseArchive(Dir, Config.ULearnCourseId);
+			EdxInteraction.CreateEdxCourseArchive(WorkingDirectory, Config.ULearnCourseId);
 		}
 
 		public abstract void Patch(OlxPatcher patcher, Config config, Profile profile, EdxCourse edxCourse);

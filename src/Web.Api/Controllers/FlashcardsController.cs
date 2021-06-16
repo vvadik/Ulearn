@@ -11,11 +11,14 @@ using Database.Repos.Flashcards;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Ulearn.Core;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Flashcards;
 using Ulearn.Core.Courses.Units;
 using Ulearn.Web.Api.Models.Responses.Flashcards;
+using Web.Api.Configuration;
 
 namespace Ulearn.Web.Api.Controllers
 {
@@ -25,17 +28,21 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo;
 		private readonly IUserFlashcardsUnlockingRepo userFlashcardsUnlockingRepo;
 		private readonly IUnitsRepo unitsRepo;
+		private readonly string baseUrlApi;
+		private readonly string baseUrlWeb;
 
 
 		public FlashcardsController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
 			IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo,
 			IUserFlashcardsUnlockingRepo userFlashcardsUnlockingRepo,
-			IUnitsRepo unitsRepo)
+			IUnitsRepo unitsRepo, IOptions<WebApiConfiguration> configuration)
 			: base(courseManager, db, usersRepo)
 		{
 			this.usersFlashcardsVisitsRepo = usersFlashcardsVisitsRepo;
 			this.userFlashcardsUnlockingRepo = userFlashcardsUnlockingRepo;
 			this.unitsRepo = unitsRepo;
+			baseUrlApi = configuration.Value.BaseUrlApi;
+			baseUrlWeb = configuration.Value.BaseUrl;
 		}
 
 		/// <summary>
@@ -56,7 +63,7 @@ namespace Ulearn.Web.Api.Controllers
 				if (unitFlashcards.Count == 0)
 					continue;
 
-				var flashcardResponsesEnumerable = GetFlashcardResponses(unit, unitFlashcards, userFlashcardsVisitsByCourse);
+				var flashcardResponsesEnumerable = GetFlashcardResponses(course.Id, unit, unitFlashcards, userFlashcardsVisitsByCourse);
 
 				unitFlashcardsResponse.Flashcards.AddRange(flashcardResponsesEnumerable);
 				unitFlashcardsResponse.UnitId = unit.Id;
@@ -87,15 +94,16 @@ namespace Ulearn.Web.Api.Controllers
 			return true;
 		}
 
-		private IEnumerable<FlashcardResponse> GetFlashcardResponses(Unit unit, List<Flashcard> flashcards, List<UserFlashcardsVisit> userFlashcardsVisits)
+		private IEnumerable<FlashcardResponse> GetFlashcardResponses(string courseId, Unit unit, List<Flashcard> flashcards, List<UserFlashcardsVisit> userFlashcardsVisits)
 		{
 			var userFlashcardsVisitsDictionary = GetFlashcardsUsersVisitsDictionaryIncludingNotRated(userFlashcardsVisits, flashcards);
 			var lastRateIndexes = GetFlashcardsLastRateIndexes(flashcards, userFlashcardsVisits);
+			var markdownContext = new MarkdownRenderContext(baseUrlApi, baseUrlWeb, courseId, unit.UnitDirectoryRelativeToCourse);
 
 			foreach (var flashcard in flashcards)
 			{
-				var question = GetRenderedContent(flashcard.Question.Blocks);
-				var answer = GetRenderedContent(flashcard.Answer.Blocks);
+				var question = GetRenderedContent(flashcard.Question.Blocks, markdownContext);
+				var answer = GetRenderedContent(flashcard.Answer.Blocks, markdownContext);
 
 				var rateResponse = userFlashcardsVisitsDictionary.TryGetValue(flashcard.Id, out var visit) ? visit.Rate : Rate.NotRated;
 
@@ -137,11 +145,11 @@ namespace Ulearn.Web.Api.Controllers
 			return result;
 		}
 
-		private static string GetRenderedContent(SlideBlock[] blocks)
+		private static string GetRenderedContent(SlideBlock[] blocks, MarkdownRenderContext markdownContext)
 		{
 			var content = new StringBuilder();
 			foreach (var block in blocks)
-				content.Append(Flashcard.RenderBlock(block));
+				content.Append(Flashcard.RenderBlock(block, markdownContext));
 			return content.ToString();
 		}
 

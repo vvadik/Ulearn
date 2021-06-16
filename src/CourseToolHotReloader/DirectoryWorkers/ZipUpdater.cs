@@ -30,12 +30,12 @@ namespace CourseToolHotReloader.DirectoryWorkers
 				})
 				.Append(deletedFileContent)
 				.ToList();
-			return ZipUtils.CreateZipFromDirectory(new List<string>(), excludeCriterias, filesToUpdateOrCreate, Encoding.UTF8);
+			return ZipUtils.CreateZipFromDirectory(new List<string>(), excludeCriterias, filesToUpdateOrCreate);
 		}
 
 		public static MemoryStream CreateZipByFolder(string pathToFolder, List<string> excludeCriterias)
 		{
-			return ZipUtils.CreateZipFromDirectory(new List<string> {pathToFolder}, excludeCriterias, null, Encoding.UTF8);
+			return ZipUtils.CreateZipFromDirectory(new List<string> {pathToFolder}, excludeCriterias, null);
 		}
 	}
 }

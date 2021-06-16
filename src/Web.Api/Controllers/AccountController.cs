@@ -6,7 +6,6 @@ using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Database;
-using Database.Extensions;
 using Database.Models;
 using Database.Repos;
 using Database.Repos.Groups;

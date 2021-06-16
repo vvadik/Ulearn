@@ -1,27 +1,16 @@
-import React from "react";
-import CommentsList from "./CommentsList";
+import React, { useState } from "react";
+import CommentsList, { Props } from "./CommentsList";
+import { SlideType } from "src/models/slide";
+import {
+	fakeCommentsApi,
+	getMockedComment,
+	policyCommentsPostModeration,
+	student
+} from "../storiesData";
+import { Comment } from "src/models/comments";
+import type { Story } from "@storybook/react";
 
-const user = {
-	isAuthenticated: true,
-	id: "11",
-	visibleName: "Pavel",
-	avatarUrl: null,
-};
-
-const userRoles = {
-	isSystemAdministrator: true,
-	courseRole: "Student",
-	courseAccesses: [],
-};
-
-const commentPolicy = {
-	areCommentsEnabled: true,
-	moderationPolicy: "postmoderation",
-	onlyInstructorsCanReply: false,
-	status: "ok",
-};
-
-const comments = [
+const comments: Comment[] = [
 	{
 		id: 1999,
 		text:
@@ -31,7 +20,6 @@ const comments = [
 		author: {
 			id: "11",
 			visibleName: "Louisa",
-			avatarUrl: null,
 		},
 		publishTime: "2019-01-18T14:12:41.947",
 		isApproved: false,
@@ -44,8 +32,7 @@ const comments = [
 				author: {
 					id: "10",
 					visibleName: "Maria",
-					avatarUrl:
-						"https://staff.skbkontur.ru/content/images/default-user-woman.png",
+					avatarUrl: "https://staff.skbkontur.ru/content/images/default-user-woman.png",
 				},
 				text: "Я **не согласна**",
 				replies: [],
@@ -86,7 +73,6 @@ const comments = [
 		author: {
 			id: "13",
 			visibleName: "Henry",
-			avatarUrl: null,
 		},
 		publishTime: "2019-01-18T14:12:41.947",
 		isApproved: false,
@@ -95,38 +81,34 @@ const comments = [
 		likesCount: 8,
 		replies: [],
 	},
-];
-
-function getUserSolutionsUrl(userId: string) {
-	return `https://dev.ulearn.me/Analytics/UserSolutions?courseId=BasicProgramming&slideId=90bcb61e-57f0-4baa-8bc9-10c9cfd27f58&userId=${ userId }`;
-}
-
-const fakeCommentsApi = {
-	getComments: () => Promise.resolve({ topLevelComments: JSON.parse(JSON.stringify(comments)) }),
-	getComment: () => Promise.resolve(console.log("API: get comment")),
-	addComment: () => Promise.resolve(console.log("API: added comment")),
-	deleteComment: () => Promise.resolve(console.log("API: delete comment")),
-	updateComment: () => Promise.resolve(console.log("API: update comment")),
-	likeComment: () => Promise.resolve(console.log("API: like comment")),
-	dislikeComment: () => Promise.resolve(console.log("API: dislike comment")),
-};
+].map(getMockedComment);
 
 export default {
 	title: "Comments/CommentsList",
 };
 
-export const _CommentsList = () => (
-	<CommentsList
-		slideType={ "exercise" }
-		comments={ comments }
-		getUserSolutionsUrl={ getUserSolutionsUrl(user.id) }
-		user={ user }
-		userRoles={ userRoles }
-		courseId={ "BasicProgramming" }
-		slideId={ "90bcb61e-57f0-4baa-8bc9-10c9cfd27f58" }
-		commentPolicy={ commentPolicy }
-		commentsApi={ fakeCommentsApi }
-	/>
-);
+const Template: Story<Omit<Props, 'headerRef' | 'api'>> = (args) => {
+	const ref = React.createRef<HTMLDivElement>();
+	return (
+		<>
+			<div ref={ ref }/>
+			<CommentsList
+				{ ...args }
+				headerRef={ ref }
+				api={ fakeCommentsApi }
+			/>
+		</>
+	);
+};
 
-_CommentsList.storyName = "comments list";
+export const Default = Template.bind({});
+Default.args = {
+	handleTabChange: () => ({}),
+	isSlideContainsComment: (commentId) => comments.find(c => c.id === commentId) !== undefined,
+	slideType: SlideType.Exercise,
+	comments,
+	user: student,
+	courseId: "BasicProgramming",
+	slideId: "90bcb61e-57f0-4baa-8bc9-10c9cfd27f58",
+	commentPolicy: policyCommentsPostModeration,
+};

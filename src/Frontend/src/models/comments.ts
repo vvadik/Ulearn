@@ -23,7 +23,7 @@ export interface Pagination {
 }
 
 export interface ShortGroupInfo {
-	id: string,
+	id: number,
 	courseId: string,
 	name: string,
 	isArchived: boolean,
@@ -33,18 +33,16 @@ export interface ShortGroupInfo {
 export interface Comment {
 	id: number,
 	author: ShortUserInfo,
-	authorGroups: ShortGroupInfo[],
+	authorGroups: ShortGroupInfo[] | null,
 	text: string,
 	renderedText: string,
 	publishTime: string,
 	isApproved: boolean,
-	isCorrectAnswer: boolean,
-	isPinnedToTop: boolean,
+	isCorrectAnswer?: boolean,
+	isPinnedToTop?: boolean,
 	isLiked: boolean,
 	likesCount: number,
 	replies: Comment[],
-	courseId: string,
-	slideId: string,
 	parentCommentId?: number,
 	isPassed: boolean
 }

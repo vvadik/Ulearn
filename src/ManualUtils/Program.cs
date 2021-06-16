@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,11 +12,13 @@ using Database;
 using Database.Di;
 using Database.Models;
 using Database.Repos;
+using Ionic.Zip;
 using ManualUtils.AntiPlagiarism;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Configuration;
@@ -32,6 +35,7 @@ namespace ManualUtils
 	{
 		public static async Task Main(string[] args)
 		{
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 			LoggerSetup.Setup(configuration.HostLog, configuration.GraphiteServiceName);
 			try
@@ -89,6 +93,10 @@ namespace ManualUtils
 			//TextBlobsWithZeroByte(db);
 			//UpdateCertificateArchives(db);
 			//GetVKByEmail(serviceProvider);
+			//TestStagingZipsEncodings();
+			//ConvertZipsToCourseXmlInRoot();
+			//await UploadStagingToDb(serviceProvider);
+			//await UploadStagingFromDbAndExtractToCourses(serviceProvider);
 		}
 
 		private static void GenerateUpdateSequences()
@@ -106,6 +114,7 @@ namespace ManualUtils
 					var id = match.Groups[2].Value;
 					parsed.Add(Tuple.Create(table, id, (string)null));
 				}
+
 				var sequenceMatch = sequenceIdRegex.Match(line);
 				if (sequenceMatch.Success)
 				{
@@ -117,7 +126,7 @@ namespace ManualUtils
 			var strings = parsed.Select(p => $@"SELECT setval('{p.Item3}', COALESCE((SELECT MAX({p.Item2})+1 FROM {p.Item1}), 1), false);" + "\n").ToList();
 			File.WriteAllLines(@"C:\git\Ulearn-postgres\tools\pgloader\files\update_sequences.sql", strings);
 		}
-		
+
 		private static async Task ResendLti(UlearnDb db)
 		{
 			var ltiConsumersRepo = new LtiConsumersRepo(db);
@@ -135,7 +144,7 @@ namespace ManualUtils
 				try
 				{
 					var course = courseManager.GetCourse(ltiRequest.CourseId);
-					var slide = course.GetSlideById(ltiRequest.SlideId, true);
+					var slide = course.GetSlideByIdNotSafe(ltiRequest.SlideId);
 					var score = await visitsRepo.GetScore(ltiRequest.CourseId, ltiRequest.SlideId, ltiRequest.UserId);
 					await LtiUtils.SubmitScore(slide, ltiRequest.UserId, score, ltiRequest.Request, ltiConsumersRepo);
 					Console.WriteLine($"{i} requestId {ltiRequest.RequestId} score {score}");
@@ -153,7 +162,7 @@ namespace ManualUtils
 			var course = courseManager.GetCourse(courseId);
 			var slideCheckingsRepo = new SlideCheckingsRepo(db, null);
 			var visitsRepo = new VisitsRepo(db, slideCheckingsRepo);
-			var slides = course.GetSlides(true).OfType<ExerciseSlide>().ToList();
+			var slides = course.GetSlidesNotSafe().OfType<ExerciseSlide>().ToList();
 			foreach (var slide in slides)
 			{
 				var slideVisits = db.Visits.Where(v => v.CourseId == courseId && v.SlideId == slide.Id && v.IsPassed).ToList();
@@ -272,7 +281,7 @@ namespace ManualUtils
 				.ToDictionary(p => p.Key, p => p.Select(t => t.Column).ToHashSet());
 			foreach (var table in sqlserver.Keys)
 			{
-				if(!postgres.ContainsKey(table))
+				if (!postgres.ContainsKey(table))
 					continue;
 				postgres[table].SymmetricExceptWith(sqlserver[table]);
 				if (postgres[table].Count > 0)
@@ -293,6 +302,7 @@ namespace ManualUtils
 					i++;
 				}
 			}
+
 			i = 0;
 			foreach (var hash in hashes)
 			{
@@ -300,7 +310,7 @@ namespace ManualUtils
 				temp.Text = temp.Text.Replace("\0", "");
 				Console.WriteLine("s" + i);
 				i++;
-				db.SaveChanges(); 
+				db.SaveChanges();
 			}
 		}
 
@@ -328,6 +338,7 @@ namespace ManualUtils
 					});
 					db.SaveChanges();
 				}
+
 				Console.WriteLine(guid);
 			}
 		}
@@ -349,7 +360,127 @@ namespace ManualUtils
 						vk = $"https://vk.com/id{vkLogin.ProviderKey}";
 					}
 				}
+
 				Console.WriteLine($"{email}\t{vk}");
+			}
+		}
+
+		// Результат, дял всех архивов подходит использовать 866 в ReadOptions. Кажется, применяется utf-8, где нужно.
+		// А вот AlternateEncoding заставляет использовать 866 везде.
+		private static void TestStagingZipsEncodings()
+		{
+			var charactersRegex = new Regex(@"^[\\\/\w\s\d\--_\.#№'+\(\),=]*$");
+			var files = new DirectoryInfo(@"C:\Users\vorkulsky\Desktop\Courses.Staging").GetFiles();
+			var encoding = ZipUtils.Cp866;
+			foreach (var file in files)
+			{
+				using (var zip = ZipFile.Read(file.FullName, new ReadOptions { Encoding = encoding }))
+				{
+					//zip.AlternateEncoding = encoding;
+					var names = zip.Entries.Select(e => e.FileName).ToList();
+					foreach (var name in names)
+					{
+						if (!charactersRegex.IsMatch(name))
+							Console.WriteLine($"{file.Name} {name}");
+					}
+				}
+			}
+		}
+
+		private static void ConvertZipsToCourseXmlInRoot()
+		{
+			var mainDirectory = CourseManager.GetCoursesDirectory();
+			var stagingDirectory = mainDirectory.GetSubdirectory("Courses.Staging");
+			var versionsDirectory = mainDirectory.GetSubdirectory("Courses.Versions");
+
+			var newMainDirectory = mainDirectory.Parent.CreateSubdirectory("courses.new");
+			newMainDirectory.EnsureExists();
+			newMainDirectory.ClearDirectory();
+			var newStagingDirectory = newMainDirectory.GetSubdirectory("Courses.Staging");
+			newStagingDirectory.EnsureExists();
+			var newVersionsDirectory = newMainDirectory.GetSubdirectory("Courses.Versions");
+			newVersionsDirectory.EnsureExists();
+			var newCoursesDirectory = newMainDirectory.GetSubdirectory("Courses");
+			newCoursesDirectory.EnsureExists();
+
+			ProcessZips(stagingDirectory, newStagingDirectory);
+			ProcessZips(versionsDirectory, newVersionsDirectory);
+
+			foreach (var file in newStagingDirectory.GetFiles("*.zip"))
+			{
+				using (var zip = ZipFile.Read(file.FullName, new ReadOptions { Encoding = ZipUtils.Cp866 }))
+				{
+					zip.ExtractAll(Path.Combine(newCoursesDirectory.FullName, file.Name.Replace(".zip", "")), ExtractExistingFileAction.OverwriteSilently);
+				}
+			}
+		}
+
+		private static void ProcessZips(DirectoryInfo oldDirectory, DirectoryInfo newDirectory)
+		{
+			foreach (var file in oldDirectory.GetFiles("*.zip"))
+			{
+				try
+				{
+					Console.WriteLine($"Start process {file.Name}");
+					using (var stream = ZipUtils.GetZipWithFileWithNameInRoot(file.FullName, "course.xml"))
+						using (var fileStream = File.Create(Path.Combine(newDirectory.FullName, file.Name)))
+							stream.CopyTo(fileStream);
+				}
+				catch (Exception ex)
+				{
+					Console.WriteLine($"Error on {file.Name} " + ex.Message);
+				}
+			}
+		}
+
+		private static async Task UploadStagingToDb(IServiceProvider serviceProvider)
+		{
+			var mainDirectory = CourseManager.GetCoursesDirectory();
+			var stagingDirectory = mainDirectory.GetSubdirectory("Courses.Staging");
+
+			var db = serviceProvider.GetService<UlearnDb>();
+			var coursesRepo = serviceProvider.GetService<ICoursesRepo>();
+
+			var courseIdsFromCourseFiles = await coursesRepo.GetCourseIdsFromCourseFiles();
+
+			foreach (var courseId in courseIdsFromCourseFiles)
+			{
+				var fileInDb = await coursesRepo.GetCourseFile(courseId);
+				var zip = stagingDirectory.GetFile($"{fileInDb.CourseId}.zip");
+				if (!zip.Exists)
+				{
+					Console.WriteLine($"{fileInDb.CourseId}.zip does not exist");
+					return;
+				}
+				var content = await zip.ReadAllContentAsync();
+				if (fileInDb.File.Length != content.Length)
+				{
+					Console.WriteLine($"Upload course {fileInDb.CourseId}.zip uploaded");
+					fileInDb.File = content;
+					db.SaveChanges();
+				}
+			}
+		}
+
+		private static async Task UploadStagingFromDbAndExtractToCourses(IServiceProvider serviceProvider)
+		{
+			var courseManager = new CourseManager(CourseManager.GetCoursesDirectory());
+			var db = serviceProvider.GetService<UlearnDb>();
+
+			foreach (var courseFile in db.CourseFiles.AsNoTracking())
+			{
+				var stagingCourseFile = courseManager.GetStagingCourseFile(courseFile.CourseId);
+				await File.WriteAllBytesAsync(stagingCourseFile.FullName, courseFile.File);
+				var versionCourseFile = courseManager.GetCourseVersionFile(courseFile.CourseVersionId);
+				if (!versionCourseFile.Exists)
+					await File.WriteAllBytesAsync(versionCourseFile.FullName, courseFile.File);
+				var unpackDirectory = courseManager.GetExtractedCourseDirectory(courseFile.CourseId);
+				using (var zip = ZipFile.Read(stagingCourseFile.FullName, new ReadOptions { Encoding = ZipUtils.Cp866 }))
+				{
+					zip.ExtractAll(unpackDirectory.FullName, ExtractExistingFileAction.OverwriteSilently);
+					foreach (var f in unpackDirectory.GetFiles("*", SearchOption.AllDirectories).Cast<FileSystemInfo>().Concat(unpackDirectory.GetDirectories("*", SearchOption.AllDirectories)))
+						f.Attributes &= ~FileAttributes.ReadOnly;
+				}
 			}
 		}
 	}

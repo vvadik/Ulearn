@@ -7,7 +7,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 	{
 		public override void DoExecute()
 		{
-			EdxInteraction.CreateEdxCourseArchive(Dir, Config.ULearnCourseId, true);
+			EdxInteraction.CreateEdxCourseArchive(WorkingDirectory, Config.ULearnCourseId, true);
 		}
 	}
 
@@ -16,7 +16,7 @@ namespace uLearn.CourseTool.CmdLineOptions
 	{
 		public override void DoExecute()
 		{
-			EdxInteraction.CreateEdxCourseArchive(Dir, Config.ULearnCourseId, false);
+			EdxInteraction.CreateEdxCourseArchive(WorkingDirectory, Config.ULearnCourseId, false);
 		}
 	}
 }

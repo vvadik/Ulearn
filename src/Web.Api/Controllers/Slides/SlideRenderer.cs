@@ -8,6 +8,7 @@ using Database.Repos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Ulearn.Common;
+using Ulearn.Core;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Blocks;
 using Ulearn.Core.Courses.Slides.Exercises;
@@ -116,7 +117,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		
 		private async Task<IEnumerable<IApiSlideBlock>> RenderBlock(ImageGalleryBlock b, SlideRenderContext context)
 		{
-			return new[] { new ImageGalleryBlockResponse(b) };
+			return new[] { new ImageGalleryBlockResponse(b, context.BaseUrlWeb, context.CourseId, context.Slide.Unit.UnitDirectoryRelativeToCourse) };
 		}
 		
 		private async Task<IEnumerable<IApiSlideBlock>> RenderBlock(TexBlock b, SlideRenderContext context)
@@ -136,7 +137,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 
 		private static async Task<IEnumerable<IApiSlideBlock>> RenderBlock(MarkdownBlock mb, SlideRenderContext context)
 		{
-			var renderedMarkdown = mb.RenderMarkdown(context.CourseId, context.Slide, context.BaseUrl);
+			var renderedMarkdown = mb.RenderMarkdown(context.Slide, new MarkdownRenderContext(context.BaseUrlApi, context.BaseUrlWeb, context.CourseId, context.Slide.Unit.UnitDirectoryRelativeToCourse));
 			var parsedBlocks = ParseBlocksFromMarkdown(renderedMarkdown);
 			if (mb.Hide)
 				parsedBlocks.ForEach(b => b.Hide = true);
@@ -184,9 +185,9 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			{
 				Submissions = submissions,
 				CodeReviewComments = codeReviewComments,
-				SlideFile = context.Slide.Info.SlideFile,
 				CanSeeCheckerLogs = isCourseAdmin,
 				AttemptsStatistics = exerciseAttemptsStatistics,
+				markdownRenderContext = new (context.BaseUrlApi, context.BaseUrlWeb, context.CourseId, context.Slide.Unit.UnitDirectoryRelativeToCourse)
 			};
 			return new[] { new ExerciseBlockResponse(b, exerciseSlideRendererContext) };
 		}

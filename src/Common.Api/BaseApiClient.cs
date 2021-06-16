@@ -66,7 +66,7 @@ namespace Ulearn.Common.Api
 					var parametersNameValueCollection = parameters.ToNameValueCollection();
 					foreach (var key in parametersNameValueCollection.AllKeys)
 						request = request.WithAdditionalQueryParameter(key, parametersNameValueCollection[key]);
-					response = await clusterClient.SendAsync(request).ConfigureAwait(false);
+					response = await MakeRequestAsync(request).ConfigureAwait(false);
 				}
 				else if (method == HttpMethod.Post)
 				{
@@ -75,7 +75,7 @@ namespace Ulearn.Common.Api
 						.Post(BuildUrl(settings.EndpointUrl + url))
 						.WithContent(serializedPayload, Encoding.UTF8)
 						.WithContentTypeHeader("application/json");
-					response = await clusterClient.SendAsync(request).ConfigureAwait(false);
+					response = await MakeRequestAsync(request).ConfigureAwait(false);
 				}
 				else
 					throw new ApiClientException($"Internal error: unsupported http method: {method.Method}");
@@ -153,6 +153,19 @@ namespace Ulearn.Common.Api
 		protected virtual Uri AddCustomParametersToUrl(Uri url)
 		{
 			return url;
+		}
+
+		public async Task<ClusterResult> MakeRequestAsync(Request request) 
+		{
+			var response = await clusterClient.SendAsync(request).ConfigureAwait(false);
+
+			if (response.Status != ClusterResultStatus.Success)
+			{
+				log.Error("Bad response status from {serviceName}: {status}", settings.ServiceName, response.Status.ToString());
+				throw new ApiClientException($"Bad response status from {settings.ServiceName}: {response.Status}");
+			}
+
+			return response;
 		}
 	}
 

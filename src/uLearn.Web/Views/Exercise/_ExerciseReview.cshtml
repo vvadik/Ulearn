@@ -13,7 +13,7 @@
 	data-finish-line="@Model.Review.FinishLine"
 	data-finish-position="@Model.Review.FinishPosition">
 	@{
-		var hasTimestamp = Model.Review.HasAddingTime;
+		var hasTimestamp = Model.Review.AddingTime != null;
 	}
 	<div class="exercise__review__header @(hasTimestamp ? "with-timestamp" : "without-timestamp")">
 		<div class="media">
@@ -50,8 +50,8 @@
 						</span>
 					}
 				</div>
-				<div class="timestamp" title="@(hasTimestamp ? Model.Review.AddingTime.ToPrettyString() : "")">
-					@(hasTimestamp ? Model.Review.AddingTime.ToAgoPrettyString() : "")
+				<div class="timestamp" title="@(hasTimestamp ? Model.Review.AddingTime.Value.ToPrettyString() : "")">
+					@(hasTimestamp ? Model.Review.AddingTime.Value.ToAgoPrettyString() : "")
 				</div>
 			</div>
 		</div>

@@ -36,7 +36,7 @@ class NotFoundErrorBoundary extends Component<RouteComponentProps, State> {
 		if(error instanceof UrlError) {
 			this.setState({ error });
 		} else {
-			Error();
+			throw error;
 		}
 	}
 

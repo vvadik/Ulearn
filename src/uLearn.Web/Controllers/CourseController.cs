@@ -1,7 +1,6 @@
 using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -20,6 +19,7 @@ using uLearn.Web.LTI;
 using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
+using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
@@ -37,6 +37,9 @@ namespace uLearn.Web.Controllers
 		private readonly ULearnDb db = new ULearnDb();
 		private readonly WebCourseManager courseManager = WebCourseManager.Instance;
 
+		private readonly string baseUrlApi;
+		private readonly string baseUrlWeb;
+
 		private readonly UserSolutionsRepo solutionsRepo;
 		private readonly UnitsRepo unitsRepo;
 		private readonly VisitsRepo visitsRepo;
@@ -50,6 +53,10 @@ namespace uLearn.Web.Controllers
 
 		public CourseController()
 		{
+			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
+			baseUrlWeb = configuration.BaseUrl;
+			baseUrlApi = configuration.BaseUrlApi;
+
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
 			visitsRepo = new VisitsRepo(db);
 			unitsRepo = new UnitsRepo(db);
@@ -90,13 +97,13 @@ namespace uLearn.Web.Controllers
 
 			var slide = slideGuid == Guid.Empty
 				? GetInitialSlideForStartup(courseId, visibleUnits, isInstructor)
-				: course.FindSlideById(slideGuid, isInstructor);
+				: course.FindSlideById(slideGuid, isInstructor, visibleUnitIds);
 
 			if (slide == null)
 			{
-				var instructorNote = course.FindInstructorNoteById(slideGuid);
+				var instructorNote = course.FindInstructorNoteByIdNotSafe(slideGuid);
 				if (instructorNote != null && isInstructor)
-					slide = instructorNote.Slide;
+					slide = instructorNote;
 			}
 
 			if (slide == null)
@@ -111,12 +118,7 @@ namespace uLearn.Web.Controllers
 				if (slide is ExerciseSlide)
 					queueItem = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(checkQueueItemId.Value);
 
-				if (queueItem != null)
-				{
-					if (!groupsRepo.CanInstructorViewStudent(User, queueItem.UserId))
-						return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-				}
-				else
+				if (queueItem == null)
 				{
 					/* It's possible when checking has not been fully checked, lock has been released, but after it user re-send his solution and we removed old waiting checking */
 					var fakeQueueItem = slide is QuizSlide ? (AbstractManualSlideChecking)new ManualQuizChecking() : new ManualExerciseChecking();
@@ -135,7 +137,7 @@ namespace uLearn.Web.Controllers
 			if (!string.IsNullOrEmpty(Request.QueryString["error"]))
 				model.Error = Request.QueryString["error"];
 
-			if (!visibleUnits.Contains(model.Slide.Info.Unit))
+			if (!visibleUnits.Contains(model.Slide.Unit))
 				return HttpNotFound("Slide is hidden " + slideGuid);
 			return View("Slide", model);
 		}
@@ -162,7 +164,8 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("Index", "Home");
 
 			var course = courseManager.GetCourse(courseId);
-			var slide = course.GetSlideById(slideId, false);
+			var visibleUnitIds = unitsRepo.GetVisibleUnitIds(course);
+			var slide = course.GetSlideById(slideId, false, visibleUnitIds);
 
 			string userId;
 			var owinRequest = Request.GetOwinContext().Request;
@@ -229,7 +232,7 @@ namespace uLearn.Web.Controllers
 					return lastVisitedSlide;
 				if (isInstructor)
 				{
-					var instructorNoteSlide = orderedVisibleUnits.FirstOrDefault(u => u.Id == lastVisit.SlideId)?.InstructorNote?.Slide;
+					var instructorNoteSlide = orderedVisibleUnits.FirstOrDefault(u => u.Id == lastVisit.SlideId)?.InstructorNote;
 					if (instructorNoteSlide != null)
 						return instructorNoteSlide;
 				}
@@ -252,7 +255,8 @@ namespace uLearn.Web.Controllers
 				BlockRenderContext = new BlockRenderContext(
 					course,
 					slide,
-					slide.Info.DirectoryRelativePath,
+					baseUrlApi,
+					baseUrlWeb,
 					slide.Blocks.Select(block => block is AbstractExerciseBlock ? new ExerciseBlockData(course.Id, (ExerciseSlide)slide, false) { Url = Url } : (dynamic)null).ToArray(),
 					isGuest: true,
 					autoplay: autoplay),
@@ -315,7 +319,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		// returns null if user can't edit git
-		private string GetGitEditLink(Course course, FileInfo pageFile)
+		private string GetGitEditLink(Course course, string slideFilePathRelativeToCourse)
 		{
 			var courseRole = User.GetCourseRole(course.Id);
 			var canEditGit = courseRole != null && courseRole <= CourseRole.CourseAdmin;
@@ -324,10 +328,9 @@ namespace uLearn.Web.Controllers
 			var publishedCourseVersion = coursesRepo.GetPublishedCourseVersion(course.Id);
 			if (publishedCourseVersion?.RepoUrl == null)
 				return null;
-			var pathRelative2CourseXml = pageFile.FullName.Substring(course.CourseXmlDirectory.FullName.Length + 1);
 			if (publishedCourseVersion.PathToCourseXml == null)
 				return null;
-			return GitUtils.GetSlideEditLink(publishedCourseVersion.RepoUrl, publishedCourseVersion.PathToCourseXml, pathRelative2CourseXml);
+			return GitUtils.GetSlideEditLink(publishedCourseVersion.RepoUrl, publishedCourseVersion.PathToCourseXml, slideFilePathRelativeToCourse);
 		}
 
 		private int GetMaxSlideScoreForUser(Course course, Slide slide, string userId)
@@ -350,7 +353,8 @@ namespace uLearn.Web.Controllers
 			return new BlockRenderContext(
 				course,
 				slide,
-				slide.Info.DirectoryRelativePath,
+				baseUrlApi,
+				baseUrlWeb,
 				blockData,
 				isGuest: false,
 				revealHidden: User.HasAccessFor(course.Id, CourseRole.Instructor),
@@ -372,7 +376,8 @@ namespace uLearn.Web.Controllers
 		{
 			var course = courseManager.GetCourse(courseId);
 			var isInstructor = User.HasAccessFor(course.Id, CourseRole.Instructor);
-			var slide = course.GetSlideById(slideId, isInstructor) as ExerciseSlide;
+			var visibleUnits = unitsRepo.GetVisibleUnitIds(course, User);
+			var slide = course.GetSlideById(slideId, isInstructor, visibleUnits) as ExerciseSlide;
 			if (slide == null)
 				return HttpNotFound();
 
@@ -431,7 +436,8 @@ namespace uLearn.Web.Controllers
 
 			var course = courseManager.GetCourse(courseId);
 			var isInstructor = User.HasAccessFor(course.Id, CourseRole.Instructor);
-			var slide = (ExerciseSlide)course.GetSlideById(slideId, isInstructor);
+			var visibleUnits = unitsRepo.GetVisibleUnitIds(course, User);
+			var slide = (ExerciseSlide)course.GetSlideById(slideId, isInstructor, visibleUnits);
 			var model = CreateAcceptedAlertModel(slide, course);
 			return View(model);
 		}
@@ -469,17 +475,17 @@ namespace uLearn.Web.Controllers
 		public ActionResult InstructorNote(string courseId, Guid unitId)
 		{
 			var course = courseManager.GetCourse(courseId);
-			var instructorNote = course.GetUnitByIdNotSafe(unitId).InstructorNote;
-			if (instructorNote == null)
+			var slide = course.GetUnitByIdNotSafe(unitId).InstructorNote;
+			if (slide == null)
 				return HttpNotFound("No instructor note for this unit");
-			var gitEditUrl = GetGitEditLink(course, instructorNote.File);
-			return View(new IntructorNoteModel(courseId, instructorNote, gitEditUrl));
+			var gitEditUrl = GetGitEditLink(course, slide.SlideFilePathRelativeToCourse);
+			return View(new InstructorNoteModel(slide, gitEditUrl, new (baseUrlApi, baseUrlWeb, courseId, slide.Unit.UnitDirectoryRelativeToCourse)));
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Tester)]
 		public async Task<ActionResult> ForgetAll(string courseId, Guid slideId)
 		{
-			var slide = courseManager.GetCourse(courseId).GetSlideById(slideId, true);
+			var slide = courseManager.GetCourse(courseId).GetSlideByIdNotSafe(slideId);
 			var userId = User.Identity.GetUserId();
 			db.SolutionLikes.RemoveRange(db.SolutionLikes.Where(q => q.UserId == userId && q.Submission.SlideId == slideId));
 

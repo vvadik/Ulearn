@@ -10,9 +10,9 @@ namespace Ulearn.Core.Extensions
 {
 	public static class SpellCheckExtensions
 	{
-		public static string[] SpellCheck(this Course course)
+		public static string[] SpellCheck(this Course course, string courseDirectory)
 		{
-			var dictionaryPath = course.TryGetDictionaryPath();
+			var dictionaryPath = course.TryGetDictionaryPath(courseDirectory);
 			if (string.IsNullOrEmpty(dictionaryPath))
 				return Array.Empty<string>();
 
@@ -34,7 +34,7 @@ namespace Ulearn.Core.Extensions
 				.ToList();
 			var unitsTitlesError = ToPrettyMessage("Заголовки модулей:", unitsTitlesErrors);
 
-			var slidesErrors = course.GetSlides(true).Select(spellchecker.SpellCheckSlide).Where(s => !string.IsNullOrWhiteSpace(s));
+			var slidesErrors = course.GetSlidesNotSafe().Select(spellchecker.SpellCheckSlide).Where(s => !string.IsNullOrWhiteSpace(s));
 
 			var res = new List<string> { titleError, unitsTitlesError };
 			res.AddRange(slidesErrors);
@@ -63,12 +63,12 @@ namespace Ulearn.Core.Extensions
 			return title + '\n' + errorsString;
 		}
 
-		private static string TryGetDictionaryPath(this Course course)
+		private static string TryGetDictionaryPath(this Course course, string courseDirectory)
 		{
 			if (course.Settings.DictionaryFile == null)
 				return null;
 
-			var file = Path.Combine(course.CourseXmlDirectory.FullName, course.Settings.DictionaryFile);
+			var file = Path.Combine(courseDirectory, course.Settings.DictionaryFile);
 			return File.Exists(file) ? file : null;
 		}
 	}

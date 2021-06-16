@@ -739,7 +739,7 @@ namespace Database.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
-                    b.Property<DateTime>("AddingTime")
+                    b.Property<DateTime?>("AddingTime")
                         .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("AuthorId")

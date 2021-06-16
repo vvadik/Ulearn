@@ -17,6 +17,7 @@ import { CommentStatus } from "src/consts/comments";
 
 import styles from "./CommentsList.less";
 import {
+	CommentsApi,
 	findIndexOfComment,
 	getCommentsByCount,
 	parseCommentIdFromHash,
@@ -27,7 +28,7 @@ const defaultPaginationOptions = {
 	scrollDistance: 500,
 };
 
-interface Props {
+export interface Props {
 	key?: string;
 	headerRef: React.RefObject<HTMLDivElement>;
 
@@ -45,17 +46,7 @@ interface Props {
 	handleTabChange: () => void;
 	isSlideContainsComment: (commentId: number) => boolean;
 
-	api: {
-		addComment: (text: string, parentCommentId?: number) => Promise<Comment>;
-		deleteComment: (commentId: number,) => Promise<void>;
-
-		likeComment: (commentId: number) => Promise<unknown>;
-		dislikeComment: (commentId: number) => Promise<unknown>;
-
-		updateComment: (commentId: number,
-			updatedFields?: Pick<Partial<Comment>, 'text' | 'isApproved' | 'isCorrectAnswer' | 'isPinnedToTop'>
-		) => Promise<Comment>;
-	}
+	api: CommentsApi;
 }
 
 interface State {
@@ -490,8 +481,11 @@ class CommentsList extends Component<Props, State> {
 		}
 	};
 
-	sendData = (method: (commentId: number, updatedFields?: Pick<Partial<Comment>, 'text' | 'isApproved' | 'isCorrectAnswer' | 'isPinnedToTop'>) =>
-			Promise<unknown>, commentId: number, updatedFields?: Pick<Partial<Comment>, 'text' | 'isApproved' | 'isCorrectAnswer' | 'isPinnedToTop'>
+	sendData = (method: (commentId: number,
+		updatedFields?: Pick<Partial<Comment>, 'text' | 'isApproved' | 'isCorrectAnswer' | 'isPinnedToTop'>
+		) =>
+			Promise<unknown>, commentId: number,
+		updatedFields?: Pick<Partial<Comment>, 'text' | 'isApproved' | 'isCorrectAnswer' | 'isPinnedToTop'>
 	): Promise<unknown> =>
 		method(commentId, updatedFields)
 			.catch(e => {

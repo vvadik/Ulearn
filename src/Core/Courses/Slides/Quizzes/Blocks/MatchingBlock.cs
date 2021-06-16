@@ -31,7 +31,7 @@ namespace Ulearn.Core.Courses.Slides.Quizzes.Blocks
 			return Matches.ToList();
 		}
 
-		public override Component ToEdxComponent(string displayName, string courseId, Slide slide, int componentIndex, string ulearnBaseUrl, DirectoryInfo coursePackageRoot)
+		public override Component ToEdxComponent(EdxComponentBuilderContext context)
 		{
 			throw new NotSupportedException();
 		}

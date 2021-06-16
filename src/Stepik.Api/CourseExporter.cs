@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
-using uLearn;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
@@ -114,13 +112,15 @@ namespace Stepik.Api
 	{
 		private const string stepikCSharpLanguageName = "mono c#";
 
-		private readonly string ulearnBaseUrl;
+		private readonly string ulearnApiBaseUrl;
+		private readonly string ulearnWebBaseUrl;
 		private readonly StepikApiClient client;
 		private readonly YoutubeVideoUrlExtractor youtubeVideoUrlExtractor;
 
-		public CourseExporter(string stepikClientId, string stepikClientSecret, string ulearnBaseUrl, string accessToken)
+		public CourseExporter(string stepikClientId, string stepikClientSecret, string ulearnApiBaseUrl, string ulearnWebBaseUrl, string accessToken)
 		{
-			this.ulearnBaseUrl = ulearnBaseUrl;
+			this.ulearnApiBaseUrl = ulearnApiBaseUrl;
+			this.ulearnWebBaseUrl = ulearnWebBaseUrl;
 			client = new StepikApiClient(new StepikApiOptions
 			{
 				ClientId = stepikClientId,
@@ -128,16 +128,6 @@ namespace Stepik.Api
 				AccessToken = accessToken,
 			});
 			youtubeVideoUrlExtractor = new YoutubeVideoUrlExtractor();
-		}
-
-		public CourseExporter(string accessToken)
-			: this(
-				System.Configuration.ConfigurationManager.AppSettings["stepik.clientId"],
-				ConfigurationManager.AppSettings["stepik.clientSecret"],
-				ConfigurationManager.AppSettings["ulearn.baseUrl"],
-				accessToken
-			)
-		{
 		}
 
 		public async Task<CourseExportResults> InitialExportCourse(Course course, CourseInitialExportOptions exportOptions)
@@ -211,7 +201,8 @@ namespace Stepik.Api
 
 		private async Task<int> InsertSlideAsStepsInLesson(Course course, Slide slide, int stepikLessonId, int position, CourseExportOptions options, CourseExportResults results)
 		{
-			var stepikBlocks = (await ConvertUlearnBlocksIntoStepikBlocks(course.Id, slide, slide.Blocks, options, stepikLessonId, results).ConfigureAwait(false)).ToList();
+			var markdownContext = new MarkdownRenderContext(ulearnApiBaseUrl, ulearnWebBaseUrl, course.Id, slide.Unit.UnitDirectoryRelativeToCourse);
+			var stepikBlocks = (await ConvertUlearnBlocksIntoStepikBlocks(course.Id, slide, slide.Blocks, markdownContext, options, stepikLessonId, results).ConfigureAwait(false)).ToList();
 			var blocksCountToInsert = stepikBlocks.Count;
 
 			await MoveStepsForSpaceEmpting(stepikLessonId, position, blocksCountToInsert).ConfigureAwait(false);
@@ -289,7 +280,7 @@ namespace Stepik.Api
 			foreach (var slideUpdateOptions in updateOptions.SlidesUpdateOptions)
 			{
 				var slideId = slideUpdateOptions.SlideId;
-				var slide = course.FindSlideById(slideId, false);
+				var slide = course.FindSlideByIdNotSafe(slideId);
 				if (slide == null)
 				{
 					results.Error($"Unable to find slide {slideId}, continue without it");
@@ -377,7 +368,7 @@ namespace Stepik.Api
 		}
 
 		/* Convert ulearn's blocks and group some of them into on stepik's text block*/
-		private async Task<IEnumerable<StepikApiBlock>> ConvertUlearnBlocksIntoStepikBlocks(string courseId, Slide slide, IEnumerable<SlideBlock> blocks, CourseExportOptions options, int stepikLessonId, CourseExportResults results)
+		private async Task<IEnumerable<StepikApiBlock>> ConvertUlearnBlocksIntoStepikBlocks(string courseId, Slide slide, IEnumerable<SlideBlock> blocks, MarkdownRenderContext markdownContext, CourseExportOptions options, int stepikLessonId, CourseExportResults results)
 		{
 			var stepikBlocks = new List<StepikApiBlock>();
 
@@ -395,7 +386,7 @@ namespace Stepik.Api
 				var isCurrentBlockText = IsCurrentBlockText(block, options);
 				if (isCurrentBlockText)
 				{
-					previousTextBlock.Text += GetTextForStepikBlockFromUlearnBlock(courseId, slide, block);
+					previousTextBlock.Text += GetTextForStepikBlockFromUlearnBlock(slide, block, markdownContext);
 				}
 				else
 				{
@@ -428,12 +419,12 @@ namespace Stepik.Api
 			return block is MarkdownBlock || block is CodeBlock || (options.VideoUploadOptions == UploadVideoToStepikOption.Iframe && block is YoutubeBlock);
 		}
 
-		private string GetTextForStepikBlockFromUlearnBlock(string courseId, Slide slide, SlideBlock block)
+		private string GetTextForStepikBlockFromUlearnBlock(Slide slide, SlideBlock block, MarkdownRenderContext context)
 		{
 			switch (block)
 			{
 				case MarkdownBlock markdownBlock:
-					return markdownBlock.RenderMarkdown(courseId, slide, slide.Info.SlideFile, ulearnBaseUrl);
+					return markdownBlock.RenderMarkdown(slide, context);
 				case CodeBlock codeBlock:
 				{
 					const string codeTemplate = "<pre><code class=\"%LANG%\">%CODE%</code></pre>";

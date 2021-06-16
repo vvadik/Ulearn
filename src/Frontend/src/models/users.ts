@@ -5,12 +5,12 @@ export enum Gender {
 
 export interface ShortUserInfo {
 	id: string;
-	login: string;
-	email: string;
+	login?: string;
+	email?: string;
 	firstName: string;
 	lastName: string;
 	visibleName: string;
-	avatarUrl: string;
+	avatarUrl: string | null;
 	gender?: Gender;
 }
 

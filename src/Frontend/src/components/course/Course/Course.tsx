@@ -32,6 +32,7 @@ import {
 import { buildQuery } from "src/utils";
 import { UserInfo, UserRoles } from "src/utils/courseRoles";
 import documentReadyFunctions from "src/legacy/legacy";
+import runLegacy from "src/legacy/legacyRunner";
 
 import { constructPathToSlide, flashcards, flashcardsPreview, signalrWS, } from 'src/consts/routes';
 import { ShortSlideInfo, SlideType, } from 'src/models/slide';
@@ -157,7 +158,7 @@ class Course extends Component<Props, State> {
 		}
 
 		/* TODO: (rozentor) for now it copied from downloadedHtmlContetn, which run documentReadyFunctions scripts. In future, we will have no scripts in back, so it can be removed totally ( in other words, remove it when DownloadedHtmlContent will be removed)  */
-		documentReadyFunctions.forEach(f => f());
+		runLegacy(documentReadyFunctions);
 	}
 
 	startSignalRConnection = (): void => {

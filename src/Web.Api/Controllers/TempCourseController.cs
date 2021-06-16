@@ -246,7 +246,7 @@ namespace Ulearn.Web.Api.Controllers
 		{
 			var courseDirectory = courseManager.GetExtractedCourseDirectory(courseId);
 			var stagingFile = courseManager.GetStagingCourseFile(courseId);
-			var stream = ZipUtils.CreateZipFromDirectory(new List<string> { courseDirectory.FullName }, null, null, Encoding.UTF8);
+			var stream = ZipUtils.CreateZipFromDirectory(new List<string> { courseDirectory.FullName }, null, null);
 			await using (var fs = stagingFile.Open(FileMode.Create, FileAccess.Write))
 				await stream.CopyToAsync(fs);
 		}

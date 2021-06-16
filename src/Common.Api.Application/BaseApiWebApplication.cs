@@ -52,8 +52,11 @@ namespace Ulearn.Common.Api
 					   See https://github.com/IharYakimush/asp-net-core-exception-handling */
 					app.UseExceptionHandlingPolicies();
 
+					UseStaticFiles(app);
+
 					app.UseAuthentication();
 					app.UseAuthorization();
+
 					app.UseMvc();
 
 					/* Configure swagger documentation. Now it's available at /swagger/v1/swagger.json.
@@ -65,7 +68,7 @@ namespace Ulearn.Common.Api
 						{
 							var isLocalhost = httpReq.Host.Host.StartsWith("localhost");
 							var schemas = isLocalhost ? new[] { "http", "https" } : new[] { "https", "http" };
-							swagger.Servers = schemas.Select(s => new OpenApiServer { Url = $"{s}://{httpReq.Host.Host}" }).ToList();
+							swagger.Servers = schemas.Select(s => new OpenApiServer { Url = $"{s}://{httpReq.Host.Host}:{httpReq.Host.Port}" }).ToList();
 						});
 					});
 					/* And add swagger UI, available at /documentation */
@@ -88,11 +91,17 @@ namespace Ulearn.Common.Api
 				s.LogQueryString = new LoggingCollectionSettings(_ => true);
 			})
 			.SetupThrottling(b => b.DisableThrottling());
+			ConfigureBackgroundWorkers(builder);
 		}
 
 		public class UlearnPortConfiguration
 		{
 			public string Port { get; set; }
+		}
+
+		protected virtual IApplicationBuilder UseStaticFiles(IApplicationBuilder app)
+		{
+			return app;
 		}
 
 		protected virtual IApplicationBuilder ConfigureCors(IApplicationBuilder app)
@@ -103,6 +112,10 @@ namespace Ulearn.Common.Api
 		protected virtual IApplicationBuilder ConfigureWebApplication(IApplicationBuilder app)
 		{
 			return app;
+		}
+		
+		protected virtual void ConfigureBackgroundWorkers(IVostokAspNetCoreApplicationBuilder builder)
+		{
 		}
 
 		protected virtual void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment)

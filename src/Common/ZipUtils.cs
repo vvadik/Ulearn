@@ -11,13 +11,20 @@ namespace Ulearn.Common
 {
 	public static class ZipUtils
 	{
+		static ZipUtils()
+		{
+			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+		}
+
+		public static Encoding Cp866 => Encoding.GetEncoding(866);
+
 		public static MemoryStream CreateZipFromDirectory([NotNull]List<string> directoriesToInclude, [CanBeNull]List<string> excludeCriterias,
-			[CanBeNull]IEnumerable<FileContent> filesToUpdateOrCreate, [CanBeNull]Encoding encoding)
+			[CanBeNull]IEnumerable<FileContent> filesToUpdateOrCreate)
 		{
 			if (excludeCriterias == null)
 				excludeCriterias = excludeCriterias.EmptyIfNull().ToList();
 			var excludeRegexps = GetExcludeRegexps(excludeCriterias).ToList();
-			using (var zip = encoding != null ? new ZipFile(encoding) : new ZipFile())
+			using (var zip = new ZipFile(Encoding.UTF8))
 			{
 				foreach (var pathToDirectory in directoriesToInclude)
 				{
@@ -110,6 +117,46 @@ namespace Ulearn.Common
 						{
 							throw new IOException("File " + file.FileName, e);
 						}
+				}
+			}
+		}
+
+		public static Stream GetZipWithFileWithNameInRoot(string inputZipFileName, string fileNameInRoot)
+		{
+			using (var zip = ZipFile.Read(inputZipFileName, new ReadOptions { Encoding = Cp866 }))
+			{
+				var rootFiles = zip.SelectEntries(fileNameInRoot);
+				if (rootFiles.Count == 0 || rootFiles.Any(x => x.FileName.Equals(fileNameInRoot, StringComparison.OrdinalIgnoreCase)))
+					return new FileStream(inputZipFileName, FileMode.Open, FileAccess.Read);
+
+				var rootFile = rootFiles.First();
+				var rootFileDirectory = Path.GetDirectoryName(rootFile.FileName);
+				var entries = zip.SelectEntries(rootFileDirectory + "/*").Where(e => !e.IsDirectory);
+				using var newZip = new ZipFile(Encoding.UTF8)
+				{
+					CompressionLevel = zip.CompressionLevel,
+					CompressionMethod = zip.CompressionMethod
+				};
+				var toDispose = new List<MemoryStream>();
+				try
+				{
+					foreach (var entry in entries)
+					{
+						var newName = entry.FileName.Remove(0, rootFileDirectory.Length + 1);
+						var ms = StaticRecyclableMemoryStreamManager.Manager.GetStream();
+						toDispose.Add(ms);
+						entry.Extract(ms);
+						ms.Position = 0;
+						newZip.AddEntry(newName, ms);
+					}
+					var result = StaticRecyclableMemoryStreamManager.Manager.GetStream();
+					newZip.Save(result);
+					result.Position = 0;
+					return result;
+				}
+				finally
+				{
+					toDispose.ForEach(s => s.Dispose());
 				}
 			}
 		}

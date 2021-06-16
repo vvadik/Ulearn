@@ -25,6 +25,7 @@ namespace uLearn.Web.Controllers
 		private readonly NotificationsRepo notificationsRepo;
 		private readonly CoursesRepo coursesRepo;
 		private readonly SystemAccessesRepo systemAccessesRepo;
+		private readonly UnitsRepo unitsRepo;
 		private readonly UserManager<ApplicationUser> userManager;
 
 		public CommentsController(ULearnDb db)
@@ -34,6 +35,7 @@ namespace uLearn.Web.Controllers
 			notificationsRepo = new NotificationsRepo(db);
 			coursesRepo = new CoursesRepo(db);
 			systemAccessesRepo = new SystemAccessesRepo(db);
+			unitsRepo = new UnitsRepo(db);
 		}
 
 		public CommentsController()
@@ -44,7 +46,8 @@ namespace uLearn.Web.Controllers
 		public ActionResult SlideComments(string courseId, Guid slideId, bool openInstructorsComments = false)
 		{
 			var course = courseManager.GetCourse(courseId);
-			var slide = course.FindSlideById(slideId, true);
+			var visibleUnits = unitsRepo.GetVisibleUnitIds(course, User);
+			var slide = course.FindSlideById(slideId, false, visibleUnits);
 			if (slide == null)
 				return Content("");
 

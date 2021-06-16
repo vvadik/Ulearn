@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Linq;
 using System.Runtime.Serialization;
 using Ulearn.Core.Courses.Slides.Blocks;
 
@@ -15,10 +16,10 @@ namespace Ulearn.Web.Api.Models.Responses.SlideBlocks
 		[DataMember(Name = "imageUrls")]
 		public string[] ImageUrls { get; set; }
 
-		public ImageGalleryBlockResponse(ImageGalleryBlock texBlock)
+		public ImageGalleryBlockResponse(ImageGalleryBlock imageGalleryBlock, string baseUrlApi, string courseId, string unitPathRelativeToCourse)
 		{
-			Hide = texBlock.Hide;
-			ImageUrls = texBlock.ImageUrls;
+			Hide = imageGalleryBlock.Hide;
+			ImageUrls = imageGalleryBlock.GetAbsoluteImageUrls(baseUrlApi, courseId, unitPathRelativeToCourse).ToArray();
 		}
 
 		public ImageGalleryBlockResponse()

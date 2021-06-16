@@ -61,7 +61,7 @@
         </ObjectGroup>
       </Objects>
     </PublishDatabaseSettings>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -71,7 +71,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PublishDatabases>false</PublishDatabases>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AjaxMin, Version=5.14.5506.26196, Culture=neutral, PublicKeyToken=21ef50ce11b5d80f, processorArchitecture=MSIL">
@@ -254,15 +254,15 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Build, Version=15.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\packages\Microsoft.Build.16.9.0\lib\net472\Microsoft.Build.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Build.16.10.0\lib\net472\Microsoft.Build.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Build.Framework, Version=15.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\packages\Microsoft.Build.Framework.16.9.0\lib\net472\Microsoft.Build.Framework.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Build.Framework.16.10.0\lib\net472\Microsoft.Build.Framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Build.Utilities.Core, Version=15.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\packages\Microsoft.Build.Utilities.Core.16.9.0\lib\net472\Microsoft.Build.Utilities.Core.dll</HintPath>
+      <HintPath>..\packages\Microsoft.Build.Utilities.Core.16.10.0\lib\net472\Microsoft.Build.Utilities.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CodeAnalysis, Version=3.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
@@ -381,6 +381,10 @@
       <HintPath>..\packages\Microsoft.Net.Http.Headers.2.2.8\lib\netstandard2.0\Microsoft.Net.Http.Headers.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.NET.StringTools, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <HintPath>..\packages\Microsoft.NET.StringTools.1.0.0\lib\net472\Microsoft.NET.StringTools.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Owin, Version=4.1.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <HintPath>..\packages\Microsoft.Owin.4.1.1\lib\net45\Microsoft.Owin.dll</HintPath>
       <Private>True</Private>
@@ -481,6 +485,10 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
+    <Reference Include="System.Configuration.ConfigurationManager, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
+      <HintPath>..\packages\System.Configuration.ConfigurationManager.4.7.0\lib\net461\System.Configuration.ConfigurationManager.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.OracleClient" />
@@ -820,6 +828,7 @@
     <Compile Include="Controllers\JsonDataContractHelpers.cs" />
     <Compile Include="Controllers\NotificationsController.cs" />
     <Compile Include="Controllers\SpaController.cs" />
+    <Compile Include="Controllers\StaticFilesController.cs" />
     <Compile Include="Controllers\StepikController.cs" />
     <Compile Include="Controllers\TelegramController.cs" />
     <Compile Include="Controllers\BaseUserController.cs" />
@@ -882,7 +891,6 @@
     <Compile Include="Controllers\AnalyticsController.cs" />
     <Compile Include="Controllers\QuizController.cs" />
     <Compile Include="Controllers\ExerciseController.cs" />
-    <Compile Include="Controllers\HintController.cs" />
     <Compile Include="Controllers\VisitsController.cs" />
     <Compile Include="FilterAttributes\ULearnAuthorizeAttribute.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
@@ -1025,11 +1033,6 @@
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Course\Slide.cshtml" />
     <Content Include="Views\Course\AcceptedSolutions.cshtml" />
-    <Content Include="Views\Shared\DisplayTemplates\CodeBlock.cshtml" />
-    <Content Include="Views\Shared\DisplayTemplates\MdBlock.cshtml" />
-    <Content Include="Views\Shared\DisplayTemplates\YoutubeBlock.cshtml" />
-    <Content Include="Views\Shared\DisplayTemplates\HintWithLikeButton.cshtml" />
-    <Content Include="Views\Hint\UseHint.cshtml" />
     <Content Include="Views\Account\List.cshtml" />
     <Content Include="Views\Admin\Units.cshtml" />
     <Content Include="Views\Analytics\UnitSheet.cshtml" />
@@ -1038,11 +1041,9 @@
     <Content Include="Views\Analytics\UsersProgress.cshtml" />
     <Content Include="Views\Analytics\UserSolutions.cshtml" />
     <Content Include="Views\Account\ChangeDetailsPartial.cshtml" />
-    <Content Include="Views\Shared\DisplayTemplates\TexBlock.cshtml" />
     <Content Include="Views\Quiz\Quiz.cshtml" />
     <Content Include="Views\Account\Info.cshtml" />
     <Content Include="Views\Account\CourseInfo.cshtml" />
-    <Content Include="Views\Shared\DisplayTemplates\ImageGaleryBlock.cshtml" />
     <Content Include="Views\Course\SlideHtml.cshtml">
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>SlideHtml.generated.cs</LastGenOutput>
@@ -1126,9 +1127,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Courses.Staging\" />
-    <Folder Include="Courses.Versions\" />
-    <Folder Include="Courses\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Microsoft.Owin.Security.VK\Resources.resx" />
@@ -1165,6 +1163,10 @@
     <ProjectReference Include="..\VideoAnnotations.Api\VideoAnnotations.Api.csproj">
       <Project>{8dbf67fc-f88e-4f33-bf81-8033ff597c91}</Project>
       <Name>VideoAnnotations.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Web.Api.Client\Web.Api.Client.csproj">
+      <Project>{bea02a48-3d9e-47ce-a005-f96601d07bbb}</Project>
+      <Name>Web.Api.Client</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

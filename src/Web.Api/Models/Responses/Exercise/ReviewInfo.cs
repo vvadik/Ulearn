@@ -53,7 +53,7 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 				Comment = r.Comment,
 				RenderedComment = CommentTextHelper.RenderCommentTextToHtml(r.Comment),
 				Author = isUlearnBot ? null : BaseController.BuildShortUserInfo(r.Author),
-				AddingTime = isUlearnBot || r.AddingTime <= DateTime.UnixEpoch ? (DateTime?)null : r.AddingTime,
+				AddingTime = isUlearnBot ? null : r.AddingTime,
 				FinishLine = r.FinishLine,
 				FinishPosition = r.FinishPosition,
 				StartLine = r.StartLine,

@@ -25,12 +25,12 @@ namespace Ulearn.Core.Courses.Slides.Blocks
 			return $"Tex {string.Join("\n", TexLines)}";
 		}
 
-		public override Component ToEdxComponent(string displayName, string courseId, Slide slide, int componentIndex, string ulearnBaseUrl, DirectoryInfo coursePackageRoot)
+		public override Component ToEdxComponent(EdxComponentBuilderContext context)
 		{
-			var urlName = slide.NormalizedGuid + componentIndex;
+			var urlName = context.Slide.NormalizedGuid + context.ComponentIndex;
 			return new HtmlComponent(
 				urlName,
-				displayName,
+				context.DisplayName,
 				urlName,
 				string.Join("\n", TexLines.Select(x => "$$" + x + "$$")).GetHtmlWithUrls("/static").Item1
 			);

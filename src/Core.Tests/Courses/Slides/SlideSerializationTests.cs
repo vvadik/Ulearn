@@ -141,12 +141,11 @@ namespace Ulearn.Core.Tests.Courses.Slides
 				"a_i = \\left{(}\\frac{n(n+1)}{2}\\right{)}"
 			}, ((TexBlock)slide.Blocks[3]).TexLines);
 			var imageGalleryBlock = (ImageGalleryBlock)slide.Blocks[4];
-			imageGalleryBlock.BaseUrl = "/";
 			CollectionAssert.AreEqual(new []
 			{
-				"/image1.png",
-				"/image2.png"
-			}, imageGalleryBlock.ImageUrls);
+				"baseUrlApi/courses/courseId/files/unit/image1.png",
+				"baseUrlApi/courses/courseId/files/unit/image2.png"
+			}, imageGalleryBlock.GetAbsoluteImageUrls("baseUrlApi", "courseId", "unit"));
 		}
 	}
 }

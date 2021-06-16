@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Database;
 using Database.Di;
@@ -15,9 +16,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Rewrite;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
@@ -28,6 +32,7 @@ using Ulearn.Common.Api.Swagger;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Helpers;
 using Ulearn.Core.Metrics;
 using Ulearn.Core.RunCheckerJobApi;
 using Ulearn.Core.Telegram;
@@ -41,6 +46,8 @@ using Ulearn.Web.Api.Models;
 using Ulearn.Web.Api.Models.Binders;
 using Ulearn.Web.Api.Models.Responses.SlideBlocks;
 using Ulearn.Web.Api.Swagger;
+using Ulearn.Web.Api.Workers;
+using Vostok.Applications.AspNetCore.Builders;
 using Vostok.Hosting.Abstractions;
 using Web.Api.Configuration;
 using Enum = System.Enum;
@@ -93,9 +100,9 @@ namespace Ulearn.Web.Api
 		}
 
 		private const string websocketsPath = "/ws";
+
 		private static void ConfigureWebsockets(IApplicationBuilder app)
 		{
-			
 			app.Map(
 				new PathString(websocketsPath), // Map применяет middleware только при обработке запросов по указанному префиксу пути
 				a =>
@@ -110,6 +117,31 @@ namespace Ulearn.Web.Api
 						});
 					});
 				});
+		}
+
+		private static readonly Regex coursesStaticFilesPattern = new Regex("/courses/[^/]+/files", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+		protected override IApplicationBuilder UseStaticFiles(IApplicationBuilder app)
+		{
+			var contentTypeProvider = new FileExtensionContentTypeProvider(CourseStaticFilesHelper.AllowedExtensions);
+			var coursesDirectory = Path.Combine(CourseManager.GetCoursesDirectory().FullName, "Courses");
+
+			var options = new RewriteOptions()
+				.AddRewrite(@"^courses/([^/]+)/files/(.+)", "courses/$1/$2", skipRemainingRules: true);
+			app.UseRewriter(options);
+			app.MapWhen(c => coursesStaticFilesPattern.IsMatch(c.Request.Path.Value),
+				a =>
+				{
+					app.UseStaticFiles(new StaticFileOptions
+					{
+						ContentTypeProvider = contentTypeProvider,
+						ServeUnknownFileTypes = false,
+						FileProvider = new PhysicalFileProvider(coursesDirectory),
+						RequestPath = "/courses",
+						OnPrepareResponse = ctx => ctx.Context.Response.Headers.Append("Cache-Control", "no-cache")
+					});
+				});
+			return app;
 		}
 
 		protected override void ConfigureServices(IServiceCollection services, IVostokHostingEnvironment hostingEnvironment)
@@ -209,6 +241,11 @@ namespace Ulearn.Web.Api
 			services.AddScoped<LtiResultObserver>();
 
 			services.AddDatabaseServices();
+		}
+
+		protected override void ConfigureBackgroundWorkers(IVostokAspNetCoreApplicationBuilder builder)
+		{
+			builder.AddHostedServiceFromApplication<ArchiveGroupsWorker>();
 		}
 
 		public void ConfigureAuthServices(IServiceCollection services, WebApiConfiguration configuration)

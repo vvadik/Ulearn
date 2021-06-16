@@ -210,6 +210,8 @@ namespace Database.Repos
 			return query;
 		}
 
+		// Переписать, см в Database
+		[Obsolete]
 		public async Task<List<AcceptedSolutionInfo>> GetBestTrendingAndNewAcceptedSolutions(string courseId, List<Guid> slidesIds)
 		{
 			var prepared = await GetAllAcceptedSubmissions(courseId, slidesIds)
@@ -250,6 +252,8 @@ namespace Database.Repos
 				.ToList();
 		}
 
+		// Переписать, см в Database
+		[Obsolete]
 		public async Task<List<AcceptedSolutionInfo>> GetBestTrendingAndNewAcceptedSolutions(string courseId, Guid slideId)
 		{
 			return await GetBestTrendingAndNewAcceptedSolutions(courseId, new List<Guid> { slideId });
@@ -466,10 +470,10 @@ namespace Database.Repos
 			var exerciseSlide = isWebRunner
 				? null
 				: (ExerciseSlide)(await courseManager.GetCourseAsync(checking.CourseId))
-				.GetSlideById(checking.SlideId, true);
-			
+				.GetSlideByIdNotSafe(checking.SlideId);
+
 			var withFullDescription = (exerciseSlide?.Exercise as PolygonExerciseBlock)?.ShowTestDescription ?? false;
-			
+
 			var compilationErrorHash = (await textsRepo.AddText(result.CompilationOutput)).Hash;
 			var output = result.GetOutput(withFullDescription).NormalizeEoln();
 			var outputHash = (await textsRepo.AddText(output)).Hash;

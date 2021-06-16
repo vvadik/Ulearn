@@ -199,19 +199,27 @@ namespace Database.Repos
 				CourseVersionId = versionId,
 				File = content
 			};
-			db.CourseFiles.RemoveRange(db.CourseFiles.Where(f => f.CourseId.Equals(courseId, StringComparison.OrdinalIgnoreCase)));
+			db.CourseFiles.RemoveRange(db.CourseFiles.Where(f => f.CourseId == courseId));
 			db.CourseFiles.Add(file);
 			await db.SaveChangesAsync();
 		}
 
 		public async Task<CourseFile> GetCourseFile(string courseId)
 		{
-			return await db.CourseFiles.FirstOrDefaultAsync(f => f.CourseId.Equals(courseId, StringComparison.OrdinalIgnoreCase));
+			return await db.CourseFiles.FirstOrDefaultAsync(f => f.CourseId == courseId);
 		}
 
-		public async Task<List<CourseFile>> GetCourseFiles(IEnumerable<string> exceptCourseIds)
+		public async Task<List<string>> GetCourseIdsFromCourseFiles()
 		{
-			return await db.CourseFiles.Where(a => !exceptCourseIds.Contains(a.CourseId)).ToListAsync();
+			return await db.CourseFiles.Select(cf => cf.CourseId).ToListAsync();
+		}
+
+		// Итерирование выполняется лениво и должно быть закончено до выполнения любых других методов
+		// AsNoTracking делает запрос ленивым
+		// Запрос всего списка сразу приведет к переполнению памяти в базе.
+		public IQueryable<CourseFile> GetCourseFilesLazyNotSafe(IEnumerable<string> existingOnDiskCourseIds)
+		{
+			return db.CourseFiles.Where(a => !existingOnDiskCourseIds.Contains(a.CourseId)).AsNoTracking();
 		}
 	}
 }

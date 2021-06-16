@@ -37,7 +37,7 @@ namespace Database.DataContexts
 		}
 
 		public async Task<CourseVersion> AddCourseVersion(string courseId, Guid versionId, string authorId,
-			string pathToCourseXml, string repoUrl, string commitHash, string description)
+			string pathToCourseXmlInRepo, string repoUrl, string commitHash, string description)
 		{
 			var courseVersion = new CourseVersion
 			{
@@ -46,7 +46,7 @@ namespace Database.DataContexts
 				LoadingTime = DateTime.Now,
 				PublishTime = null,
 				AuthorId = authorId,
-				PathToCourseXml = pathToCourseXml,
+				PathToCourseXml = pathToCourseXmlInRepo,
 				CommitHash = commitHash,
 				Description = description,
 				RepoUrl = repoUrl
@@ -182,7 +182,7 @@ namespace Database.DataContexts
 				CourseVersionId = versionId,
 				File = content
 			};
-			db.CourseFiles.RemoveRange(db.CourseFiles.Where(f => f.CourseId.Equals(courseId, StringComparison.OrdinalIgnoreCase)));
+			db.CourseFiles.RemoveRange(db.CourseFiles.Where(f => f.CourseId == courseId));
 			db.CourseFiles.Add(file);
 			await db.SaveChangesAsync();
 		}
@@ -190,12 +190,20 @@ namespace Database.DataContexts
 		[CanBeNull]
 		public CourseFile GetCourseFile(string courseId)
 		{
-			return db.CourseFiles.FirstOrDefault(f => f.CourseId.Equals(courseId, StringComparison.OrdinalIgnoreCase));
+			return db.CourseFiles.FirstOrDefault(f => f.CourseId == courseId);
 		}
 
-		public List<CourseFile> GetCourseFiles(IEnumerable<string> existingOnDiskCourseIds)
+		// Итерирование выполняется лениво и должно быть закончено до выполнения любых других методов
+		// AsNoTracking делает запрос ленивым
+		// Запрос всего списка сразу приведет к переполнению памяти в базе.
+		//public IQueryable<CourseFile> GetCourseFilesLazyNotSafe(IEnumerable<string> existingOnDiskCourseIds)
+		//{
+		//	return db.CourseFiles.Where(a => !existingOnDiskCourseIds.Contains(a.CourseId)).AsNoTracking();
+		//}
+
+		public List<string> GetCourseIdsFromCourseFiles()
 		{
-			return db.CourseFiles.Where(a => !existingOnDiskCourseIds.Contains(a.CourseId)).ToList();
+			return db.CourseFiles.Select(cf => cf.CourseId).ToList();
 		}
 
 		[CanBeNull]

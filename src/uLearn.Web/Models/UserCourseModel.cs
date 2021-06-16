@@ -22,9 +22,9 @@ namespace uLearn.Web.Models
 				.GroupBy(v => v.SlideId)
 				.ToDictionary(g => g.Key, g => g.FirstOrDefault());
 			var unitResults = new Dictionary<Guid, UserCourseUnitModel>();
-			foreach (var slide in Course.GetSlides(true))
+			foreach (var slide in Course.GetSlidesNotSafe())
 			{
-				var unit = slide.Info.Unit;
+				var unit = slide.Unit;
 				if (!unitResults.ContainsKey(unit.Id))
 					unitResults.Add(unit.Id, new UserCourseUnitModel
 					{

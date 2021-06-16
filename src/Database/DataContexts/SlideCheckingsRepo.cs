@@ -198,18 +198,18 @@ namespace Database.DataContexts
 			return checkedScoresAndPercents;
 		}
 
-		public List<(Guid SlideId, int Score, int Percent)> GetPassedManualExerciseCheckingsScoresAndPercents(Course course, string userId)
+		public List<(Guid SlideId, int Score, int Percent)> GetPassedManualExerciseCheckingsScoresAndPercents(Course course, string userId, IEnumerable<Guid> visibleUnits)
 		{
 			var checkings = db.ManualExerciseCheckings
 				.Where(c => c.CourseId == course.Id && c.UserId == userId && c.IsChecked)
 				.ToList();
-			var slides = course.GetSlides(false).OfType<ExerciseSlide>().Select(s => s.Id).ToHashSet();
+			var slides = course.GetSlides(false, visibleUnits).OfType<ExerciseSlide>().Select(s => s.Id).ToHashSet();
 			return checkings.GroupBy(s => s.SlideId)
 				.Where(s => slides.Contains(s.Key))
 				.Select(g =>
 				{
 					var checkedScoresAndPercents = g.Select(c => (c.Score, c.Percent )).ToList();
-					var slide = course.GetSlideById(g.Key, false) as ExerciseSlide;
+					var slide = course.GetSlideByIdNotSafe(g.Key) as ExerciseSlide;
 					var (score, percent) = GetScoreAndPercentByScoresAndPercents(slide, checkedScoresAndPercents);
 					return (g.Key, score, percent.Value);
 				}).ToList();
@@ -403,7 +403,7 @@ namespace Database.DataContexts
 				StartPosition = startPosition,
 				FinishLine = finishLine,
 				FinishPosition = finishPosition,
-				AddingTime = setAddingTime ? DateTime.Now : ExerciseCodeReview.NullAddingTime,
+				AddingTime = setAddingTime ? DateTime.Now : null
 			});
 
 			await db.SaveChangesAsync().ConfigureAwait(false);

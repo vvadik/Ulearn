@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Flashcards;
 
@@ -10,16 +8,16 @@ namespace Ulearn.Core.Courses.Units
 {
 	public class Unit
 	{
-		public Unit(UnitSettings settings, DirectoryInfo directory)
+		public Unit(UnitSettings settings, string unitDirectoryRelativeToCourse)
 		{
 			Settings = settings;
-			Directory = directory;
+			UnitDirectoryRelativeToCourse = unitDirectoryRelativeToCourse;
 			Flashcards = new List<Flashcard>();
 		}
 
 		public UnitSettings Settings { get; set; }
 
-		public InstructorNote InstructorNote { get; set; }
+		public Slide InstructorNote { get; set; }
 
 		private List<Slide> Slides { get; set; }
 
@@ -31,7 +29,7 @@ namespace Ulearn.Core.Courses.Units
 
 		public List<Flashcard> Flashcards { get; set; }
 
-		public DirectoryInfo Directory { get; set; }
+		public string UnitDirectoryRelativeToCourse { get; }
 
 		public Guid Id => Settings.Id;
 
@@ -54,19 +52,10 @@ namespace Ulearn.Core.Courses.Units
 				return Slides;
 			return NotHiddenSlides;
 		}
-		
+
 		public List<Slide> GetHiddenSlides()
 		{
 			return Slides.Where(s => s.Hide).ToList();
-		}
-
-		public void LoadInstructorNote(CourseLoadingContext context)
-		{
-			var instructorNoteFile = Directory.GetFile("InstructorNotes.md");
-			if (instructorNoteFile.Exists)
-			{
-				InstructorNote = InstructorNote.Load(context, instructorNoteFile, this);
-			}
 		}
 
 		public Flashcard GetFlashcardById(string id)

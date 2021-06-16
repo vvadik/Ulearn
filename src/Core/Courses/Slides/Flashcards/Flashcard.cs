@@ -73,28 +73,28 @@ namespace Ulearn.Core.Courses.Slides.Flashcards
 			}
 		}
 
-		public string RenderQuestion()
+		public string RenderQuestion(MarkdownRenderContext markdownContext)
 		{
 			var content = new StringBuilder();
 			foreach (var block in Question.Blocks)
-				content.Append(RenderBlock(block));
+				content.Append(RenderBlock(block, markdownContext));
 			return content.ToString();
 		}
 
-		public string RenderAnswer()
+		public string RenderAnswer(MarkdownRenderContext markdownContext)
 		{
 			var content = new StringBuilder();
 			foreach (var block in Answer.Blocks)
-				content.Append(RenderBlock(block));
+				content.Append(RenderBlock(block, markdownContext));
 			return content.ToString();
 		}
 
-		public static string RenderBlock(SlideBlock block)
+		public static string RenderBlock(SlideBlock block, MarkdownRenderContext markdownContext)
 		{
 			switch (block)
 			{
 				case MarkdownBlock markdownBlock:
-					return markdownBlock.TryGetText().RenderMarkdown();
+					return markdownBlock.TryGetText().RenderMarkdown(markdownContext);
 				case CodeBlock codeBlock:
 					return $"\n<textarea class=\"code code-sample\" data-lang=\"{codeBlock.Language.GetName()}\">{codeBlock.Code}</textarea>";
 				case TexBlock texBlock:

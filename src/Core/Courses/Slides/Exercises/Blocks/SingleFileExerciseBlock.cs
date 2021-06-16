@@ -97,7 +97,7 @@ namespace Ulearn.Core.Courses.Slides.Exercises.Blocks
 			return new SolutionBuilder(IndexToInsertSolution, ExerciseCode, Validator).BuildSolution(userWrittenCode);
 		}
 
-		public override RunnerSubmission CreateSubmission(string submissionId, string code)
+		public override RunnerSubmission CreateSubmission(string submissionId, string code, string courseDirectory)
 		{
 			return new FileRunnerSubmission
 			{

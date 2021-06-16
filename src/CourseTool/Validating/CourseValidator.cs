@@ -23,7 +23,7 @@ namespace uLearn.CourseTool.Validating
 		private readonly List<Slide> slides;
 		private readonly XmlValidator xmlValidator;
 
-		public CourseValidator(List<Slide> slides)
+		public CourseValidator(List<Slide> slides, string courseDirectory) : base(courseDirectory)
 		{
 			this.slides = slides;
 			string schemaPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "schema.xsd");
@@ -32,7 +32,7 @@ namespace uLearn.CourseTool.Validating
 
 		public void ValidateSlidesXml()
 		{
-			var error = xmlValidator.ValidateSlidesFiles(slides.Select(x => x.Info.SlideFile).ToList());
+			var error = xmlValidator.ValidateSlidesFiles(slides.Select(s => new FileInfo(Path.Combine(CourseDirectory, s.SlideFilePathRelativeToCourse))).ToList());
 			if (!string.IsNullOrEmpty(error))
 				ReportError(error);
 		}
@@ -98,7 +98,7 @@ namespace uLearn.CourseTool.Validating
 
 		private void LogSlideProcessing(string prefix, Slide slide)
 		{
-			LogInfoMessage(prefix + " " + slide.Info.Unit.Title + " - " + slide.Title);
+			LogInfoMessage(prefix + " " + slide.Unit.Title + " - " + slide.Title);
 		}
 
 		private void LogFlashcardProcessing(string prefix, Flashcard flashcard)
@@ -158,7 +158,7 @@ namespace uLearn.CourseTool.Validating
 				ReportSlideWarning(slide, "Style issue(s): " + errorMessages);
 			}
 
-			var result = new CsSandboxRunnerClient().Run(exercise.CreateSubmission(slide.Id.ToString(), ethalon));
+			var result = new CsSandboxRunnerClient().Run(exercise.CreateSubmission(slide.Id.ToString(), ethalon, CourseDirectory));
 
 			var output = result.GetOutput().NormalizeEoln();
 
@@ -184,11 +184,11 @@ ERROR:
 {solution.ErrorMessage}");
 		}
 
-		public void ValidateSpelling(Course course)
+		public void ValidateSpelling(Course course, string courseDirectory)
 		{
 			LogInfoMessage("Spell checking...");
 			var sw = Stopwatch.StartNew();
-			var errors = course.SpellCheck();
+			var errors = course.SpellCheck(courseDirectory);
 			foreach (string error in errors)
 			{
 				ReportError("Spelling: " + error);

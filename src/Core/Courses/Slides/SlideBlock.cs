@@ -22,7 +22,7 @@ namespace Ulearn.Core.Courses.Slides
 			yield return this;
 		}
 
-		public abstract Component ToEdxComponent(string displayName, string courseId, Slide slide, int componentIndex, string ulearnBaseUrl, DirectoryInfo coursePackageRoot);
+		public abstract Component ToEdxComponent(EdxComponentBuilderContext context);
 
 		public virtual string TryGetText()
 		{

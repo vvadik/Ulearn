@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Units;
 
 namespace Ulearn.Core.Courses.Slides
@@ -8,16 +9,14 @@ namespace Ulearn.Core.Courses.Slides
 		public string CourseId { get; private set; }
 		public CourseSettings CourseSettings { get; private set; }
 		public DirectoryInfo CourseDirectory { get; }
-		public DirectoryInfo UnitDirectory { get; }
+		public DirectoryInfo UnitDirectory => SlideFile.Directory;
 		public FileInfo SlideFile { get; }
-
 		public Unit Unit { get; }
 
 		public SlideLoadingContext(string courseId, Unit unit, CourseSettings courseSettings, DirectoryInfo courseDirectory, FileInfo slideFile)
 		{
 			CourseId = courseId;
 			Unit = unit;
-			UnitDirectory = unit.Directory;
 			CourseDirectory = courseDirectory;
 			CourseSettings = courseSettings;
 			SlideFile = slideFile;
@@ -27,5 +26,7 @@ namespace Ulearn.Core.Courses.Slides
 			: this(courseLoadingContext.CourseId, unit, courseLoadingContext.CourseSettings, courseLoadingContext.CourseDirectory, slideFile)
 		{
 		}
+
+		public string SlideFilePathRelativeToCourse => SlideFile.GetRelativePath(CourseDirectory);
 	}
 }

@@ -1,24 +1,15 @@
 import React from "react";
-import CommentsList from "./CommentsList";
+import CommentsList, { Props } from "./CommentsList";
+import { getMockedComment, student, } from "../storiesData";
+import { CommentsApi, } from "../utils";
+import { CommentPolicy } from "src/models/comments";
+import type { Story } from "@storybook/react";
+import { SlideType } from "src/models/slide";
 
-const user = {
-	isAuthenticated: true,
-	id: "11",
-	visibleName: "Pavel",
-	avatarUrl: null,
-};
-
-const userRoles = {
-	isSystemAdministrator: true,
-	courseRole: "Student",
-	courseAccesses: [],
-};
-
-const commentPolicy = {
+const commentPolicy: CommentPolicy = {
 	areCommentsEnabled: true,
 	moderationPolicy: "postmoderation",
 	onlyInstructorsCanReply: false,
-	status: "ok",
 };
 
 const comments = [
@@ -31,7 +22,6 @@ const comments = [
 		author: {
 			id: "11",
 			visibleName: "Louisa",
-			avatarUrl: null,
 		},
 		publishTime: "2019-01-18T14:12:41.947",
 		isApproved: false,
@@ -86,7 +76,6 @@ const comments = [
 		author: {
 			id: "13",
 			visibleName: "Henry",
-			avatarUrl: null,
 		},
 		publishTime: "2019-01-18T14:12:41.947",
 		isApproved: false,
@@ -95,20 +84,9 @@ const comments = [
 		likesCount: 8,
 		replies: [],
 	},
-];
+].map(getMockedComment);
 
-const brokenCommentsApi = {
-	getComments: () => Promise.reject(new Error("Произошла ошибка. Попробуйте обновить страницу")),
-	addComment: () => Promise.resolve(console.log("API: added comment")),
-	deleteComment: () => Promise.resolve(console.log("API: delete comment")),
-	updateComment: () => Promise.resolve(console.log("API: update comment")),
-	likeComment: () => Promise.resolve(console.log("API: like comment")),
-	dislikeComment: () => Promise.resolve(console.log("API: dislike comment")),
-};
-
-const brokenMethodsCommentsApi = {
-	getComments: () => Promise.resolve({ topLevelComments: JSON.parse(JSON.stringify(comments)) }),
-	getComment: () => Promise.reject(new Error("произошла ошибка")),
+const brokenMethodsCommentsApi: CommentsApi = {
 	addComment: () => Promise.reject(new Error("произошла ошибка")),
 	deleteComment: () => Promise.reject(new Error("произошла ошибка")),
 	updateComment: () => Promise.reject(new Error("произошла ошибка")),
@@ -116,42 +94,25 @@ const brokenMethodsCommentsApi = {
 	dislikeComment: () => Promise.reject(new Error("произошла ошибка")),
 };
 
-function getUserSolutionsUrl(userId: string) {
-	return `https://dev.ulearn.me/Analytics/UserSolutions?courseId=BasicProgramming&slideId=90bcb61e-57f0-4baa-8bc9-10c9cfd27f58&userId=${ userId }`;
-}
-
 export default {
 	title: "Comments/CommentsList",
 };
 
-export const ApiError500 = () => (
-	<CommentsList
-		slideType={ "exercise" }
-		comments={ comments }
-		getUserSolutionsUrl={ getUserSolutionsUrl(user.id) }
-		user={ user }
-		userRoles={ userRoles }
-		courseId={ "BasicProgramming" }
-		slideId={ "90bcb61e-57f0-4baa-8bc9-10c9cfd27f58" }
-		commentsApi={ brokenCommentsApi }
-		commentPolicy={ commentPolicy }
-	/>
-);
+const Template: Story<Props> = (args) => {
+	return (
+		<CommentsList
+			{ ...args }
+			slideType={ SlideType.Exercise }
+			courseId={ "BasicProgramming" }
+			slideId={ "90bcb61e-57f0-4baa-8bc9-10c9cfd27f58" }
+			commentPolicy={ commentPolicy }
+			user={ student }
+			comments={ comments }
+		/>
+	);
+};
 
-ApiError500.storyName = "api error 500";
-
-export const ApiRequestError = () => (
-	<CommentsList
-		slideType={ "exercise" }
-		comments={ comments }
-		getUserSolutionsUrl={ getUserSolutionsUrl(user.id) }
-		user={ user }
-		userRoles={ userRoles }
-		courseId={ "BasicProgramming" }
-		slideId={ "90bcb61e-57f0-4baa-8bc9-10c9cfd27f58" }
-		commentsApi={ brokenMethodsCommentsApi }
-		commentPolicy={ commentPolicy }
-	/>
-);
-
-ApiRequestError.storyName = "api request error";
+export const ApiRequestError = Template.bind({});
+ApiRequestError.args = {
+	api: brokenMethodsCommentsApi,
+};
