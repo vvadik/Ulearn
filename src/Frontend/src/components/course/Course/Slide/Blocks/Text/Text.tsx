@@ -60,7 +60,7 @@ function Text(props: Props): React.ReactElement {
 		}
 
 		const sameOriginLinks = anchors.filter(
-			a => a.origin === window.location.origin && a.pathname === window.location.pathname
+			a => a.origin === window.location.origin && a.pathname !== window.location.pathname
 		);
 		for (const anchor of sameOriginLinks) {
 			anchor.addEventListener('click', (e) => {
