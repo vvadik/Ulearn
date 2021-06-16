@@ -9,11 +9,11 @@ import api from "src/api";
 
 import CourseLoader from "src/components/course/Course/CourseLoader/CourseLoader";
 import { UrlError } from "./Error/NotFoundErrorBoundary";
-import Error404 from "./Error/Error404";
 
 import { getQueryStringParameter } from "src/utils";
 import { exerciseSolutions, removeFromCache, setBlockCache, } from "src/utils/localStorageManager";
 import documentReadyFunctions from "src/legacy/legacy";
+import runLegacy from "src/legacy/legacyRunner";
 
 
 import { changeCurrentCourseAction } from "src/actions/course";
@@ -35,15 +35,7 @@ function getUrlParts(url) {
 	};
 }
 
-function safeEval(code) {
-	if(!$) console.error('jQuery is not initialized');
-	try {
-// eslint-disable-next-line
-		eval(code)
-	} catch (e) {
-		console.error(e);
-	}
-}
+if(!$) console.error('jQuery is not initialized');
 
 let decodeHtmlEntities = (function () {
 	// this prevents any overhead from creating the object each time
@@ -120,14 +112,11 @@ class DownloadedHtmlContent extends Component {
 				if(url !== this.props.url) {
 					return;
 				}
-				if(response.headers.has('ReactRender')) {
+				if(response.headers.has('ReactRender') || response.status === 404) {
 					this.setState({
-						error: new UrlError(),
+						error: new UrlError(response.statusText),
 					});
 					return;
-				}
-				if(response.status === 404) {
-					throw new UrlError();
 				}
 				if(response.redirected) {
 					/* If it was a redirect from external login callback, then update user information */
@@ -178,8 +167,7 @@ class DownloadedHtmlContent extends Component {
 
 				this.processNewHtmlContent(url, data);
 			}).catch((error) => {
-			console.error(error);
-			this.setState({ error });
+
 		});
 	}
 
@@ -206,17 +194,12 @@ class DownloadedHtmlContent extends Component {
 		DownloadedHtmlContent.removeStickyHeaderAndColumn();
 
 		/* Run scripts */
-		documentReadyFunctions.forEach(f => f());
+		runLegacy(documentReadyFunctions);
 
 		window.meta = undefined;
 		let allScriptTags = Array.from(body.getElementsByTagName('script'));
 		/* Eval embedded scripts */
-		let embeddedScripts = allScriptTags.filter(s => !s.src).map(s => s.innerHTML);
-		embeddedScripts.forEach(safeEval);
-		/* Eval remote scripts */
-		allScriptTags.filter(s => s.src).map(s => s.src).forEach(url => {
-			fetch(url).then(r => r.text()).then(safeEval);
-		});
+		allScriptTags.filter(s => !s.src).forEach(s => runLegacy(s.innerHTML));
 
 		this.loadContentByClass();
 		this.setPostFormSubmitHandler();
@@ -261,8 +244,9 @@ class DownloadedHtmlContent extends Component {
 	}
 
 	render() {
-		if(this.state.error)
-			return <Error404/>;
+		if(this.state.error) {
+			throw this.state.error;
+		}
 		if(this.props.injectInWrapperAfterContentReady) {
 			if(!this.state.body)
 				return null;
@@ -296,7 +280,7 @@ class DownloadedHtmlContent extends Component {
 			fetch(url, { credentials: 'include' }).then(r => r.text()).then(data => {
 				e.innerHTML = data;
 				let scripts = Array.from(e.getElementsByTagName('script'));
-				scripts.filter(s => !s.src).forEach(s => safeEval(s.innerHTML));
+				scripts.filter(s => !s.src).forEach(s => runLegacy(s.innerHTML));
 			});
 		});
 	}
