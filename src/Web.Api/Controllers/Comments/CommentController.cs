@@ -292,7 +292,6 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		/// </summary>
 		[HttpPost("like")]
 		[Authorize]
-		[SwaggerResponse((int)HttpStatusCode.Conflict, "You have liked the comment already")]
 		public async Task<IActionResult> Like(int commentId)
 		{
 			if (await commentLikesRepo.DidUserLikeComment(commentId, UserId).ConfigureAwait(false))
@@ -310,7 +309,6 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		/// </summary>
 		[HttpDelete("like")]
 		[Authorize]
-		[SwaggerResponse((int)HttpStatusCode.NotFound, "You don't have like for the comment")]
 		public async Task<IActionResult> Unlike(int commentId)
 		{
 			if (!await commentLikesRepo.DidUserLikeComment(commentId, UserId).ConfigureAwait(false))

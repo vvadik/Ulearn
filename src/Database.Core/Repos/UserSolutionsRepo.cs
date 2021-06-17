@@ -98,41 +98,6 @@ namespace Database.Repos
 			return submission.Id;
 		}
 
-		///<returns>(likesCount, isLikedByThisUsed)</returns>
-		public async Task<Tuple<int, bool>> Like(int solutionId, string userId)
-		{
-			return await FuncUtils.TrySeveralTimesAsync(() => TryLike(solutionId, userId), 3);
-		}
-
-		private async Task<Tuple<int, bool>> TryLike(int solutionId, string userId)
-		{
-			using (var transaction = db.Database.BeginTransaction())
-			{
-				var solutionForLike = await db.UserExerciseSubmissions.FindAsync(solutionId);
-				if (solutionForLike == null)
-					throw new Exception("Solution " + solutionId + " not found");
-				var hisLike = await db.SolutionLikes.FirstOrDefaultAsync(like => like.UserId == userId && like.SubmissionId == solutionId);
-				var votedAlready = hisLike != null;
-				var likesCount = solutionForLike.Likes.Count;
-				if (votedAlready)
-				{
-					db.SolutionLikes.Remove(hisLike);
-					likesCount--;
-				}
-				else
-				{
-					db.SolutionLikes.Add(new Like { SubmissionId = solutionId, Timestamp = DateTime.Now, UserId = userId });
-					likesCount++;
-				}
-
-				await db.SaveChangesAsync();
-
-				await transaction.CommitAsync();
-
-				return Tuple.Create(likesCount, !votedAlready);
-			}
-		}
-
 		public IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId, bool includeManualAndAutomaticCheckings = true)
 		{
 			var query = db.UserExerciseSubmissions.AsQueryable();
@@ -166,6 +131,13 @@ namespace Database.Repos
 		{
 			return GetAllSubmissions(courseId, slidesIds).Where(s => s.AutomaticCheckingIsRightAnswer);
 		}
+
+		public IQueryable<UserExerciseSubmission> GetAllAcceptedSubmissions(string courseId, Guid slideId)
+		{
+			return db.UserExerciseSubmissions
+				.Where(s => s.CourseId == courseId && s.SlideId == slideId && s.AutomaticCheckingIsRightAnswer);
+		}
+
 
 		public IQueryable<UserExerciseSubmission> GetAllAcceptedSubmissions(string courseId)
 		{
@@ -208,55 +180,6 @@ namespace Database.Repos
 			if (userIds != null)
 				query = query.Where(v => userIds.Contains(v.UserId));
 			return query;
-		}
-
-		// Переписать, см в Database
-		[Obsolete]
-		public async Task<List<AcceptedSolutionInfo>> GetBestTrendingAndNewAcceptedSolutions(string courseId, List<Guid> slidesIds)
-		{
-			var prepared = await GetAllAcceptedSubmissions(courseId, slidesIds)
-				.GroupBy(x => x.CodeHash,
-					(codeHash, ss) => new
-					{
-						codeHash,
-						timestamp = ss.Min(s => s.Timestamp)
-					})
-				.Join(
-					GetAllAcceptedSubmissions(courseId, slidesIds),
-					g => g,
-					s => new { codeHash = s.CodeHash, timestamp = s.Timestamp }, (k, s) => new { submission = s, k.timestamp })
-				.Select(x => new { x.submission.Id, likes = x.submission.Likes.Count, x.timestamp })
-				.ToListAsync();
-
-			var best = prepared
-				.OrderByDescending(x => x.likes);
-			var timeNow = DateTime.Now;
-			var trending = prepared
-				.OrderByDescending(x => (x.likes + 1) / timeNow.Subtract(x.timestamp).TotalMilliseconds);
-			var newest = prepared
-				.OrderByDescending(x => x.timestamp);
-			var selectedSubmissionsIds = best.Take(3).Concat(trending.Take(3)).Concat(newest).Distinct().Take(10).Select(x => x.Id);
-
-			var selectedSubmissions = await db.UserExerciseSubmissions
-				.Where(s => selectedSubmissionsIds.Contains(s.Id))
-				.Select(s => new
-				{
-					s.Id,
-					Code = s.SolutionCode.Text,
-					Likes = s.Likes.Select(y => y.UserId)
-				})
-				.ToListAsync();
-			return selectedSubmissions
-				.Select(s => new AcceptedSolutionInfo(s.Code, s.Id, s.Likes))
-				.OrderByDescending(info => info.UsersWhoLike.Count)
-				.ToList();
-		}
-
-		// Переписать, см в Database
-		[Obsolete]
-		public async Task<List<AcceptedSolutionInfo>> GetBestTrendingAndNewAcceptedSolutions(string courseId, Guid slideId)
-		{
-			return await GetBestTrendingAndNewAcceptedSolutions(courseId, new List<Guid> { slideId });
 		}
 
 		public async Task<int> GetAcceptedSolutionsCount(string courseId, Guid slideId)
