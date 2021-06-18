@@ -44,7 +44,7 @@ namespace Ulearn.Web.Api.Controllers.Users
 			if (!string.IsNullOrEmpty(parameters.CourseId))
 			{
 				if (!parameters.CourseRoleType.HasValue)
-					return BadRequest(new ErrorResponse("You should specify course_role with course_id"));
+					return BadRequest(new ErrorResponse("You should specify courseRole with courseId"));
 				if (parameters.CourseRoleType == CourseRoleType.Student)
 					return BadRequest(new ErrorResponse("You can not search students by this method: there are too many students"));
 
@@ -57,7 +57,7 @@ namespace Ulearn.Web.Api.Controllers.Users
 			{
 				/* Only sys-admins can search all instructors or all course-admins */
 				if (!isSystemAdministrator)
-					return StatusCode((int)HttpStatusCode.Unauthorized, new ErrorResponse("Only system administrator can search by course role without specified course_id"));
+					return StatusCode((int)HttpStatusCode.Unauthorized, new ErrorResponse("Only system administrator can search by course role without specified courseId"));
 			}
 
 			if (parameters.LmsRoleType.HasValue)

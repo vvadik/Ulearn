@@ -43,8 +43,8 @@ namespace Ulearn.Web.Api.Controllers
 		/// </summary>
 		[HttpGet]
 		[CourseAccessAuthorize(CourseAccessType.ApiViewCodeReviewStatistics)]
-		public async Task<ActionResult<CodeReviewInstructorsStatisticsResponse>> InstructorsStatistics([FromQuery(Name = "course_id")] [BindRequired]
-			string courseId, int count = 10000, DateTime? from = null, DateTime? to = null)
+		public async Task<ActionResult<CodeReviewInstructorsStatisticsResponse>> InstructorsStatistics([FromQuery][BindRequired] string courseId,
+			int count = 10000, DateTime? from = null, DateTime? to = null)
 		{
 			var course = await courseManager.FindCourseAsync(courseId);
 			if (course == null)

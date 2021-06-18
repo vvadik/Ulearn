@@ -5,11 +5,11 @@ namespace Ulearn.Web.Api.Models.Parameters.Groups
 {
 	public class CopyGroupParameters
 	{
-		[FromQuery(Name = "destination_course_id")]
+		[FromQuery(Name = "destinationCourseId")]
 		[BindRequired]
 		public string DestinationCourseId { get; set; }
 
-		[FromQuery(Name = "make_me_owner")]
+		[FromQuery(Name = "makeMeOwner")]
 		public bool ChangeOwner { get; set; } = false;
 	}
 }

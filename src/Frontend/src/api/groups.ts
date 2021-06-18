@@ -10,11 +10,11 @@ import {
 
 // Groups
 export function getCourseGroups(courseId: string): Promise<{ groups: GroupInfo[] }> {
-	return api.get("groups?course_id=" + courseId);
+	return api.get("groups?courseId=" + courseId);
 }
 
 export function getCourseArchivedGroups(courseId: string): Promise<{ groups: GroupInfo[] }> {
-	return api.get("groups?course_id=" + courseId + "&archived=true");
+	return api.get("groups?courseId=" + courseId + "&archived=true");
 }
 
 // Group
@@ -23,15 +23,15 @@ export function getGroup(groupId: string): Promise<GroupInfo> {
 }
 
 export function createGroup(courseId: string, name: string): Promise<Response> {
-	return api.post("groups?course_id=" + courseId,
+	return api.post("groups?courseId=" + courseId,
 		api.createRequestParams({ name }));
 }
 
 export function copyGroup(groupId: string, destinationCourseId: string,
 	makeMeOwner: boolean
 ): Promise<CopyGroupResponse> {
-	return api.post("groups/" + groupId + "/copy?destination_course_id="
-		+ encodeURIComponent(destinationCourseId) + '&make_me_owner=' + makeMeOwner);
+	return api.post("groups/" + groupId + "/copy?destinationCourseId="
+		+ encodeURIComponent(destinationCourseId) + '&makeMeOwner=' + makeMeOwner);
 }
 
 export function saveGroupSettings(groupId: string, groupSettings: Record<string, unknown>): Promise<GroupInfo> {
