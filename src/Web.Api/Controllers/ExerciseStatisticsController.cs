@@ -49,8 +49,8 @@ namespace Ulearn.Web.Api.Controllers
 		/// Статистика по выполнению каждого упражнения в курсе
 		/// </summary>
 		[HttpGet]
-		public async Task<ActionResult<CourseExercisesStatisticsResponse>> CourseStatistics([FromQuery(Name = "course_id")] [BindRequired]
-			string courseId, int count = 10000, DateTime? from = null, DateTime? to = null)
+		public async Task<ActionResult<CourseExercisesStatisticsResponse>> CourseStatistics([FromQuery][BindRequired] string courseId,
+			int count = 10000, DateTime? from = null, DateTime? to = null)
 		{
 			var course = await courseManager.FindCourseAsync(courseId);
 			if (course == null)

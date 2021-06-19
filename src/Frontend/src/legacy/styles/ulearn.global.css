@@ -3639,6 +3639,12 @@ body.without-topbar {
 	cursor: pointer;
 }
 
+.legacy-page .dropdown-menu li span.text {
+	max-width: calc(100vw - 100px);
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 @media (max-width: 800px) {
 	.legacy-page h1 {
 		font-size: 20px;

@@ -32,8 +32,7 @@ namespace Ulearn.Web.Api.Controllers
 		}
 
 		[HttpGet]
-		public async Task<ActionResult<UserFlashcardStatisticResponse>> UserFlashcardStatistics([FromQuery(Name = "course_id")] [BindRequired]
-			string courseId)
+		public async Task<ActionResult<UserFlashcardStatisticResponse>> UserFlashcardStatistics([FromQuery][BindRequired] string courseId)
 		{
 			var course = await courseManager.FindCourseAsync(courseId);
 			if (course == null)

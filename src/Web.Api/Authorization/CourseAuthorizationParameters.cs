@@ -10,7 +10,7 @@ namespace Ulearn.Web.Api.Authorization
 
 	public class CourseAuthorizationParameters : ICourseAuthorizationParameters
 	{
-		[FromQuery(Name = "course_id")]
+		[FromQuery(Name = "courseId")]
 		[BindRequired]
 		public string CourseId { get; set; }
 	}

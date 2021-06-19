@@ -9,15 +9,15 @@ namespace Ulearn.Web.Api.Models.Parameters.Comments
 {
 	public class SlideCommentsParameters : IPaginationParameters, ICourseAuthorizationParameters
 	{
-		[FromQuery(Name = "course_id")]
+		[FromQuery(Name = "courseId")]
 		[BindRequired]
 		public string CourseId { get; set; }
 
-		[FromQuery(Name = "slide_id")]
+		[FromQuery(Name = "slideId")]
 		[BindRequired]
 		public Guid SlideId { get; set; }
 
-		[FromQuery(Name = "for_instructors")]
+		[FromQuery(Name = "forInstructors")]
 		public bool ForInstructors { get; set; }
 
 		[FromQuery(Name = "offset")]

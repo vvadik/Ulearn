@@ -20,7 +20,7 @@ export function getCourse(courseId: string): Promise<CourseInfo> {
 }
 
 export function getCourseErrors(courseId: string): Promise<TempCourseErrorsResponse> {
-	return api.get(`tempCourses/${ courseId }/errors`);
+	return api.get(`temp-courses/${ courseId }/errors`);
 }
 
 export function getUserCourses(): Promise<CoursesListResponse> {

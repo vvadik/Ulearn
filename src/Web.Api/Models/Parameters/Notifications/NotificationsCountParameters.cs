@@ -6,7 +6,7 @@ namespace Ulearn.Web.Api.Models.Parameters.Notifications
 {
 	public class NotificationsCountParameters : ApiParameters
 	{
-		[FromQuery(Name = "last_timestamp")]
+		[FromQuery(Name = "lastTimestamp")]
 		public DateTime? LastTimestamp { get; set; }
 	}
 }

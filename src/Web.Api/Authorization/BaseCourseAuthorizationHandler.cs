@@ -28,7 +28,7 @@ namespace Ulearn.Web.Api.Authorization
 			if (routeData.Values["courseId"] is string courseIdFromRoute)
 				return courseIdFromRoute;
 
-			var courseIdFromQuery = mvcContext.HttpContext.Request.Query["course_id"].FirstOrDefault();
+			var courseIdFromQuery = mvcContext.HttpContext.Request.Query["courseId"].FirstOrDefault();
 			if (!courseIdFromQuery.IsNullOrEmpty())
 				return courseIdFromQuery;
 
