@@ -6,8 +6,6 @@ using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Parameters.Comments;
 using Ulearn.Web.Api.Models.Responses.Comments;
@@ -27,24 +25,15 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			this.commentPoliciesRepo = commentPoliciesRepo;
 		}
 
-		public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
-		{
-			var courseId = (string)context.ActionArguments["courseId"];
-			if (!await courseManager.HasCourseAsync(courseId))
-			{
-				context.Result = NotFound(new ErrorResponse($"Course {courseId} not found"));
-				return;
-			}
-
-			await base.OnActionExecutionAsync(context, next);
-		}
-
 		/// <summary>
 		/// Политика комментариев в курсе
 		/// </summary>
 		[HttpGet]
-		public async Task<ActionResult<CommentPolicyResponse>> Policy([FromQuery][BindRequired] string courseId)
+		public async Task<ActionResult<CommentPolicyResponse>> Policy([FromQuery] string courseId)
 		{
+			if (!await courseManager.HasCourseAsync(courseId))
+				return NotFound(new ErrorResponse($"Course '{courseId}' not found"));
+
 			var policy = await commentPoliciesRepo.GetCommentsPolicyAsync(courseId).ConfigureAwait(false);
 			return new CommentPolicyResponse
 			{
@@ -59,8 +48,11 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		/// </summary>
 		[HttpPatch]
 		[Authorize(Policy = "CourseAdmins")]
-		public async Task<IActionResult> UpdatePolicy([FromQuery][BindRequired] string courseId, [FromBody] UpdatePolicyParameters parameters)
+		public async Task<IActionResult> UpdatePolicy([FromQuery]string courseId, [FromBody] UpdatePolicyParameters parameters)
 		{
+			if (!await courseManager.HasCourseAsync(courseId))
+				return NotFound(new ErrorResponse($"Course '{courseId}' not found"));
+
 			var policy = await commentPoliciesRepo.GetCommentsPolicyAsync(courseId).ConfigureAwait(false);
 
 			if (parameters.AreCommentsEnabled.HasValue)
