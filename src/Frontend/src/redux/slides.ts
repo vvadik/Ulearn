@@ -151,6 +151,8 @@ export default function slides(state = initialCoursesSlidesState, action: SlideA
 			const newReviews = JSON.parse(JSON.stringify(manualCheckingReviews)) as ReviewInfoRedux[];
 			const review = newReviews.find(r => r.id === reviewId);
 			if(review) {
+				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+				// @ts-ignore
 				review.comments.push({ isLoading: true, });
 			}
 

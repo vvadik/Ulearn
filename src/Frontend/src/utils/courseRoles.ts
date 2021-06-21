@@ -16,7 +16,7 @@ interface UserRoles {
 	courseRole: CourseRoleType;
 }
 
-interface UserInfo extends Partial<ShortUserInfo>, UserRoles {
+interface UserInfo extends ShortUserInfo, UserRoles {
 	isAuthenticated: boolean;
 	systemAccesses: SystemAccessType[];
 	courseAccesses: CourseAccessType[];

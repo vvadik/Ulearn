@@ -1,7 +1,34 @@
 import { CourseMenuItem, MenuItem, SlideProgressStatus } from "./types";
 import { SlideType } from "src/models/slide";
+import { Props } from "./Navigation";
+import { mock } from "src/storiesUtils";
+import { DeviceType } from "src/consts/deviceType";
+import React from "react";
 
-const standardSlide: MenuItem<SlideType> = {
+export const DesktopWrapper: React.FunctionComponent = ({ children }) => (
+	<div style={ { width: '360px', } }>
+		{ children }
+	</div>
+);
+
+export const disableViewport = {
+	parameters: {
+		viewport: {
+			disable: true,
+		},
+	},
+};
+
+export const defaultNavigationProps: Pick<Props, 'navigationOpened' | 'deviceType' | 'toggleNavigation' | 'onCourseClick' | 'returnInUnit'> = {
+	navigationOpened: true,
+	deviceType: DeviceType.desktop,
+
+	toggleNavigation: mock,
+	onCourseClick: mock,
+	returnInUnit: mock,
+};
+
+export const standardSlideProps: MenuItem<SlideType> = {
 	containsVideo: false,
 	id: "1",
 	isActive: false,
@@ -16,104 +43,64 @@ const standardSlide: MenuItem<SlideType> = {
 	visited: false,
 };
 
+const metro = {
+	isFirstItem: false,
+	isLastItem: false,
+	connectToPrev: false,
+	connectToNext: false,
+};
+
+const slidesExamples = [
+	{ metro: { ...metro, isFirstItem: true, } },
+	{ containsVideo: true },
+	{ type: SlideType.Quiz, questionsCount: 5, quizMaxTriesCount: 2, },
+	{
+		type: SlideType.Quiz,
+		status: SlideProgressStatus.canBeImproved,
+		questionsCount: 5,
+		quizMaxTriesCount: 2,
+		score: 0,
+		maxScore: 5,
+		metro: { ...metro, connectToNext: true, }
+	},
+	{
+		type: SlideType.Exercise,
+		score: 50,
+		maxScore: 100,
+		visited: true,
+		status: SlideProgressStatus.canBeImproved,
+		metro: { ...metro, connectToPrev: true, },
+	},
+	{ type: SlideType.Flashcards, hide: true, },
+	{ status: SlideProgressStatus.done, metro: { ...metro, connectToNext: true, } },
+	{ status: SlideProgressStatus.done, metro: { ...metro, connectToPrev: true, } },
+	{},
+	{ status: SlideProgressStatus.done, metro: { ...metro, connectToNext: true, } },
+	{ status: SlideProgressStatus.done, metro: { ...metro, connectToPrev: true, } },
+	{ metro: { ...metro, isLastItem: true, } },
+];
+
 export function getModuleNavigationProps(): MenuItem<SlideType>[] {
-	return [
-		{
-			type: SlideType.Lesson,
-			title: "Урок без видео",
-			containsVideo: false,
-		},
-		{
-			type: SlideType.Lesson,
-			title: "Урок с видео",
-			containsVideo: true,
-		},
-		{
-			type: SlideType.Lesson,
-			title: "Урок без видео",
-			containsVideo: false,
-		},
-		{
-			type: SlideType.Quiz,
-			title: "Квиз",
-		},
-		{
-			type: SlideType.Exercise,
-			title: "Первый шаг",
-		},
-		{
-			type: SlideType.Lesson,
-			title: "Источники информации",
-		},
-		{
-			type: SlideType.Lesson,
-			title: "Числовые типы данных",
-		},
-		{
-			type: SlideType.Exercise,
-			title: "Неверный тип данных",
-		},
-		{
-			type: SlideType.Exercise,
-			title: "Ошибки преобразования типов",
-		},
-		{
-			type: SlideType.Exercise,
-			title: "Биткоины в массы!",
-		},
-		{
-			type: SlideType.Lesson,
-			title: "Строки",
-		},
-		{
-			type: SlideType.Exercise,
-			title: "Преобразование строки в число",
-		},
-		{
-			type: SlideType.Lesson,
-			title: "Арифметические операции и var",
-		},
-		{
-			type: SlideType.Exercise,
-			title: "Использование var",
-		},
-		{
-			type: SlideType.Lesson,
-			title: "Методы",
-		},
-		{
-			type: SlideType.Exercise,
-			title: "Добрый работодатель",
-		},
-		{
-			type: SlideType.Exercise,
-			title: "Главный вопрос Вселенной",
-		},
-		{
-			type: SlideType.Exercise,
-			title: "Разыскиваются методы!",
-		},
-		{
-			type: SlideType.Lesson,
-			title: "Переменные",
-		},
-		{
-			type: SlideType.Quiz,
-			title: "Области видимости",
-		},
-		{
-			type: SlideType.Lesson,
-			title: "Задачи на семинар",
-		},
-	].map((slide, index) => {
-		const finalSlide = { ...standardSlide, ...slide };
-		setSlideTitleFromProps(finalSlide);
-		finalSlide.id = index.toString();
-		return finalSlide;
-	});
+	return slidesExamples
+		.map(s => ({ ...s, status: s.status || SlideProgressStatus.notVisited, }))
+		.map(s => ({ ...s, visited: s.status !== SlideProgressStatus.notVisited, }))
+		.map((slide, index, array,) => {
+			const finalSlide = { ...standardSlideProps, ...slide };
+			setSlideTitleFromProps(finalSlide);
+			finalSlide.id = index.toString();
+			const isFirstItem = index === 0;
+			const isLastItem = index === array.length - 1;
+			finalSlide.metro = {
+				isFirstItem: isFirstItem,
+				isLastItem: isLastItem,
+				connectToPrev: finalSlide.visited && index > 0 && array[index - 1].visited || false,
+				connectToNext: !isLastItem && finalSlide.visited && (isLastItem || array[index + 1].visited) || false,
+			};
+			return finalSlide;
+		});
 }
 
-function setSlideTitleFromProps(slide: MenuItem<SlideType>) {
+export function setSlideTitleFromProps(slide: MenuItem<SlideType>): void {
 	const descriptions = [];
 
 	const addToDescription = (description: string) => descriptions.push(description);
@@ -160,7 +147,7 @@ function setSlideTitleFromProps(slide: MenuItem<SlideType>) {
 	slide.title = descriptions.join(', ');
 }
 
-function getCourseNav(): CourseMenuItem[] {
+export function getCourseModules(): CourseMenuItem[] {
 	return [{
 		title: "Преподавателю о курсе",
 		id: "c069ba64-e101-40e3-9b76-b65a1ae619ae",
@@ -172,11 +159,9 @@ function getCourseNav(): CourseMenuItem[] {
 		isActive: true,
 		progress: {
 			statusesBySlides: {},
-			doneSlidesCount: 0,
-			slidesCount: 100,
-			inProgressSlidesCount: 0,
 			current: 0,
-			max: 0,
+			max: 100,
+			inProgress: 0,
 		},
 	}, {
 		title: "Ошибки",
@@ -184,11 +169,9 @@ function getCourseNav(): CourseMenuItem[] {
 		isActive: false,
 		progress: {
 			statusesBySlides: {},
-			doneSlidesCount: 25,
-			slidesCount: 100,
-			inProgressSlidesCount: 0,
-			current: 0,
-			max: 0,
+			current: 25,
+			max: 100,
+			inProgress: 0,
 		},
 	}, {
 		title: "Ветвления",
@@ -196,11 +179,9 @@ function getCourseNav(): CourseMenuItem[] {
 		isActive: false,
 		progress: {
 			statusesBySlides: {},
-			doneSlidesCount: 50,
-			slidesCount: 100,
-			inProgressSlidesCount: 0,
-			current: 0,
-			max: 0,
+			current: 50,
+			max: 100,
+			inProgress: 0,
 		},
 		isNotPublished: true,
 		publicationDate: "2021-08-18T11:05:27"
@@ -210,11 +191,9 @@ function getCourseNav(): CourseMenuItem[] {
 		isActive: false,
 		progress: {
 			statusesBySlides: {},
-			doneSlidesCount: 75,
-			slidesCount: 100,
-			inProgressSlidesCount: 0,
-			current: 0,
-			max: 0,
+			current: 75,
+			max: 100,
+			inProgress: 0,
 		},
 		isNotPublished: true
 	}, {
@@ -223,11 +202,9 @@ function getCourseNav(): CourseMenuItem[] {
 		isActive: false,
 		progress: {
 			statusesBySlides: {},
-			doneSlidesCount: 100,
-			slidesCount: 100,
-			inProgressSlidesCount: 0,
-			current: 0,
-			max: 0,
+			current: 100,
+			max: 100,
+			inProgress: 0,
 		},
 		isNotPublished: true
 	}, {
@@ -236,11 +213,9 @@ function getCourseNav(): CourseMenuItem[] {
 		isActive: false,
 		progress: {
 			statusesBySlides: {},
-			doneSlidesCount: 50,
-			slidesCount: 100,
-			inProgressSlidesCount: 25,
-			current: 0,
-			max: 0,
+			current: 50,
+			max: 100,
+			inProgress: 25,
 		},
 		isNotPublished: true
 	}, {
@@ -249,11 +224,9 @@ function getCourseNav(): CourseMenuItem[] {
 		isActive: false,
 		progress: {
 			statusesBySlides: {},
-			doneSlidesCount: 50,
-			slidesCount: 100,
-			inProgressSlidesCount: 50,
-			current: 0,
-			max: 0,
+			current: 50,
+			max: 100,
+			inProgress: 50,
 		},
 		isNotPublished: true
 	}, {
@@ -262,11 +235,9 @@ function getCourseNav(): CourseMenuItem[] {
 		isActive: false,
 		progress: {
 			statusesBySlides: {},
-			doneSlidesCount: 0,
-			slidesCount: 100,
-			inProgressSlidesCount: 75,
 			current: 0,
-			max: 0,
+			max: 100,
+			inProgress: 75,
 		},
 		isNotPublished: true
 	}, {
@@ -275,11 +246,9 @@ function getCourseNav(): CourseMenuItem[] {
 		isActive: false,
 		progress: {
 			statusesBySlides: {},
-			doneSlidesCount: 0,
-			slidesCount: 100,
-			inProgressSlidesCount: 100,
 			current: 0,
-			max: 0,
+			max: 100,
+			inProgress: 100,
 		},
 		isNotPublished: true
 	}, {
@@ -288,11 +257,9 @@ function getCourseNav(): CourseMenuItem[] {
 		isActive: false,
 		progress: {
 			statusesBySlides: {},
-			doneSlidesCount: 50,
-			slidesCount: 100,
-			inProgressSlidesCount: 50,
-			current: 0,
-			max: 0,
+			current: 50,
+			max: 100,
+			inProgress: 50,
 		},
 		isNotPublished: true
 	}, {
@@ -301,11 +268,9 @@ function getCourseNav(): CourseMenuItem[] {
 		isActive: false,
 		progress: {
 			statusesBySlides: {},
-			doneSlidesCount: 100,
-			slidesCount: 100,
-			inProgressSlidesCount: 0,
-			current: 0,
-			max: 0,
+			current: 100,
+			max: 100,
+			inProgress: 0,
 		},
 		isNotPublished: true
 	}, {
@@ -314,11 +279,9 @@ function getCourseNav(): CourseMenuItem[] {
 		isActive: false,
 		progress: {
 			statusesBySlides: {},
-			doneSlidesCount: 0,
-			slidesCount: 100,
-			inProgressSlidesCount: 100,
 			current: 0,
-			max: 0,
+			max: 100,
+			inProgress: 100,
 		},
 		isNotPublished: true
 	}, {
@@ -327,11 +290,9 @@ function getCourseNav(): CourseMenuItem[] {
 		isActive: false,
 		progress: {
 			statusesBySlides: {},
-			doneSlidesCount: 28,
-			slidesCount: 100,
-			inProgressSlidesCount: 54,
-			current: 0,
-			max: 0,
+			current: 28,
+			max: 100,
+			inProgress: 54,
 		},
 		isNotPublished: true
 	}, {
@@ -340,11 +301,9 @@ function getCourseNav(): CourseMenuItem[] {
 		isActive: false,
 		progress: {
 			statusesBySlides: {},
-			doneSlidesCount: 30,
-			slidesCount: 100,
-			inProgressSlidesCount: 30,
-			current: 0,
-			max: 0,
+			current: 30,
+			max: 100,
+			inProgress: 30,
 		},
 		isNotPublished: true
 	}, {
@@ -353,11 +312,9 @@ function getCourseNav(): CourseMenuItem[] {
 		isActive: false,
 		progress: {
 			statusesBySlides: {},
-			doneSlidesCount: 33,
-			slidesCount: 100,
-			inProgressSlidesCount: 66,
-			current: 0,
-			max: 0,
+			current: 33,
+			max: 100,
+			inProgress: 66,
 		},
 		isNotPublished: true
 	}];

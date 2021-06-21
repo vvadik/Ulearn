@@ -75,11 +75,12 @@ export interface ReviewInfo {
 }
 
 export interface ReviewCommentResponse {
-	id?: number;
-	text?: string;
-	renderedText?: string;
-	publishTime?: string;
-	author?: ShortUserInfo;
+	id: number;
+	text: string;
+	renderedText: string;
+	publishTime: string;
+	author: ShortUserInfo;
+	addedToFavourite?: boolean;
 }
 
 export interface AttemptsStatistics {

@@ -18,7 +18,7 @@ export function getCourseArchivedGroups(courseId: string): Promise<{ groups: Gro
 }
 
 // Group
-export function getGroup(groupId: string): Promise<GroupInfo> {
+export function getGroup(groupId: number): Promise<GroupInfo> {
 	return api.get("groups/" + groupId);
 }
 
@@ -27,66 +27,66 @@ export function createGroup(courseId: string, name: string): Promise<Response> {
 		api.createRequestParams({ name }));
 }
 
-export function copyGroup(groupId: string, destinationCourseId: string,
+export function copyGroup(groupId: number, destinationCourseId: string,
 	makeMeOwner: boolean
 ): Promise<CopyGroupResponse> {
 	return api.post("groups/" + groupId + "/copy?destinationCourseId="
 		+ encodeURIComponent(destinationCourseId) + '&makeMeOwner=' + makeMeOwner);
 }
 
-export function saveGroupSettings(groupId: string, groupSettings: Record<string, unknown>): Promise<GroupInfo> {
+export function saveGroupSettings(groupId: number, groupSettings: Record<string, unknown>): Promise<GroupInfo> {
 	return api.patch("groups/" + groupId,
 		api.createRequestParams(groupSettings));
 }
 
-export function deleteGroup(groupId: string): Promise<Response> {
+export function deleteGroup(groupId: number): Promise<Response> {
 	return api.delete("groups/" + groupId);
 }
 
-export function changeGroupOwner(groupId: string, ownerId: string): Promise<Response> {
+export function changeGroupOwner(groupId: number, ownerId: string): Promise<Response> {
 	return api.put("groups/" + groupId + '/owner',
 		api.createRequestParams({ ownerId }));
 }
 
 // Scores
-export function getGroupScores(groupId: string): Promise<GroupScoringGroupsResponse> {
+export function getGroupScores(groupId: number): Promise<GroupScoringGroupsResponse> {
 	return api.get("groups/" + groupId + '/scores');
 }
 
-export function saveScoresSettings(groupId: string, checkedScoresSettingsIds: string[]): Promise<Response> {
+export function saveScoresSettings(groupId: number, checkedScoresSettingsIds: string[]): Promise<Response> {
 	return api.post("groups/" + groupId + '/scores',
 		api.createRequestParams({ 'scores': checkedScoresSettingsIds }));
 }
 
 // Accesses
-export function getGroupAccesses(groupId: string): Promise<GroupAccessesResponse> {
+export function getGroupAccesses(groupId: number): Promise<GroupAccessesResponse> {
 	return api.get("groups/" + groupId + "/accesses");
 }
 
-export function addGroupAccesses(groupId: string, userId: string): Promise<Response> {
+export function addGroupAccesses(groupId: number, userId: string): Promise<Response> {
 	return api.post("groups/" + groupId + "/accesses/" + userId);
 }
 
-export function removeAccess(groupId: string, userId: string): Promise<Response> {
+export function removeAccess(groupId: number, userId: string): Promise<Response> {
 	return api.delete("groups/" + groupId + "/accesses/" + userId);
 }
 
 // Students
-export function getStudents(groupId: string): Promise<GroupStudentsResponse> {
+export function getStudents(groupId: number): Promise<GroupStudentsResponse> {
 	return api.get("groups/" + groupId + "/students");
 }
 
-export function deleteStudents(groupId: string, studentIds: string[]): Promise<Response> {
+export function deleteStudents(groupId: number, studentIds: string[]): Promise<Response> {
 	return api.delete("groups/" + groupId + "/students",
 		api.createRequestParams({ studentIds }));
 }
 
-export function copyStudents(groupId: string, studentIds: string[]): Promise<Response> {
+export function copyStudents(groupId: number, studentIds: string[]): Promise<Response> {
 	return api.post("groups/" + groupId + "/students",
 		api.createRequestParams({ studentIds }));
 }
 
-export function resetLimitsForStudents(groupId: string, studentIds: string[]): Promise<Response> {
+export function resetLimitsForStudents(groupId: number, studentIds: string[]): Promise<Response> {
 	return api.post("groups/" + groupId + resetStudentsLimits,
 		api.createRequestParams({ studentIds }));
 }

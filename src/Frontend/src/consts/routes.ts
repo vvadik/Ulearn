@@ -70,6 +70,6 @@ export function constructPathToAccount(userId: string): string {
 	return accountProfile + buildQuery({ userId });
 }
 
-export function constructPathToGroup(courseId: string, groupId: string): string {
+export function constructPathToGroup(courseId: string, groupId: number): string {
 	return `/${ courseId }/${ groups }/${ groupId }`;
 }

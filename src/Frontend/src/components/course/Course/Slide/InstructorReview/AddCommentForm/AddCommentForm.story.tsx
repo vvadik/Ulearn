@@ -2,17 +2,11 @@ import React from "react";
 import AddCommentForm, { Props } from "./AddCommentForm";
 import type { Story } from "@storybook/react";
 import { mockFunc, returnPromiseAfterDelay } from "src/utils/storyMock";
-import { useArgs } from '@storybook/client-api';
+import { StoryUpdater } from "src/storiesUtils";
 
-const Template: Story<Props> = (args: Props) => {
-	const [, updateArgs] = useArgs();
-
-	const onValueChange = (value: string) => {
-		updateArgs({ ...args, value });
-	};
-	return (<AddCommentForm  { ...args } onValueChange={ onValueChange }/>);
+const Template: Story<Props> = (args) => {
+	return (<StoryUpdater args={ args } childrenBuilder={ (args) => <AddCommentForm  { ...args } /> }/>);
 };
-
 const comments = [
 	{
 		text: 'Вот это выглядит довольно непонятно: зачем делать цикл <=, а потом ка каждом (!) шаге проверять не превысило ли i допустимое значение. Постарайтесь обойтись без этого, если что-то непонятно - задавайте вопросы ',
@@ -45,8 +39,8 @@ const addCommentToFavourite = (comment: string) => {
 	return returnPromiseAfterDelay(100, newComment);
 };
 
-function toggleCommentFavourite(commentId: number) {
-	const comment = comments.find(c => c.id === commentId);
+function toggleCommentFavourite(commentText: string) {
+	const comment = comments.find(c => c.text === commentText);
 	if(!comment) {
 		return;
 	}
@@ -55,17 +49,22 @@ function toggleCommentFavourite(commentId: number) {
 	return returnPromiseAfterDelay(100);
 }
 
-const args = {
+const args: Props = {
 	comments,
 	addCommentToFavourite,
 	addComment,
 	toggleCommentFavourite,
 	onClose: mockFunc,
+	onValueChange: function (value) {
+		this.value = value;
+		this.valueCanBeAddedToFavourite = !comments.some(c => c.text === value);
+	},
 	coordinates: { left: 0, top: 0, bottom: 0 },
 	value: '',
+	valueCanBeAddedToFavourite: false,
 };
 
-export const Default = Template.bind(args);
+export const Default = Template.bind({});
 Default.args = args;
 
 

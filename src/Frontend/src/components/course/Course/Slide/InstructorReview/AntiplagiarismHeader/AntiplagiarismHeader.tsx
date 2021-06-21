@@ -6,7 +6,7 @@ import texts from './AntiplagiarismHeader.texts';
 import { Button, } from "ui";
 import cn from "classnames";
 
-type SuspicionLevel = 'notChecking' | 'accepted' | 'warning' | 'strongWarning' | 'running';
+export type SuspicionLevel = 'notChecking' | 'accepted' | 'warning' | 'strongWarning' | 'running';
 
 export interface AntiplagiarismInfo {
 	suspicionLevel: SuspicionLevel;

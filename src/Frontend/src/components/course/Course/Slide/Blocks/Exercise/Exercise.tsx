@@ -58,6 +58,7 @@ import registerCodeMirrorHelpers from "./CodeMirrorAutocompleteExtension";
 import styles from './Exercise.less';
 
 import texts from './Exercise.texts';
+import { UserInfo } from "src/utils/courseRoles";
 
 
 interface DispatchFunctionsProps {
@@ -80,7 +81,7 @@ interface FromSlideProps {
 interface FromMapStateToProps {
 	isAuthenticated: boolean;
 	lastCheckingResponse: RunSolutionResponse | null;
-	userId?: string | null;
+	user?: UserInfo;
 	slideProgress: SlideUserProgress;
 	submissionError: string | null;
 	deviceType: DeviceType;
@@ -387,7 +388,7 @@ class Exercise extends React.Component<Props, State> {
 
 	renderControlledCodeMirror = (opts: EditorConfiguration): React.ReactElement => {
 		const {
-			expectedOutput, submissions, userId,
+			expectedOutput, submissions, user,
 			slideProgress, maxScore, languages,
 			courseId, slideId, hideSolutions, renderedHints,
 			attemptsStatistics, isAuthenticated,
@@ -446,7 +447,8 @@ class Exercise extends React.Component<Props, State> {
 					/>
 					{ exerciseCodeDoc && isReview &&
 					<Review
-						userId={ userId }
+						editReviewOrComment={()=>({})}
+						user={ user }
 						addReviewComment={ this.addReviewComment }
 						deleteReviewOrComment={ this.deleteReviewComment }
 						selectedReviewId={ selectedReviewId }

@@ -1,21 +1,21 @@
 ﻿import React from "react";
 import { Review, ReviewProps } from "./Review";
 
-import { ReviewInfo, } from "src/models/exercise";
 import type { Story } from "@storybook/react";
+import { UserInfo } from "src/utils/courseRoles";
+import { getMockedUser } from "../../../../../../comments/storiesData";
 
 const addingTime = "2020-12-03T20:03:29.9725057+05:00";
 
-const author = {
+const author: UserInfo = getMockedUser({
 	avatarUrl: "",
 	firstName: "Name",
-	gender: null,
 	id: "0",
 	lastName: "LastName",
 	visibleName: "Name LastName",
 	login: undefined,
 	email: undefined,
-};
+});
 
 const authorWithLongName = {
 	...author,
@@ -60,11 +60,13 @@ const reviews = [
 const props: ReviewProps = {
 	reviews,
 	selectedReviewId: -1,
-	userId: "-1",
+	user: { ...author, id: '-1' },
 	onSelectComment: () => void (0),
 	addReviewComment: () => void (0),
-	deleteReviewComment: () => void (0),
-	getReviewAnchorTop: (review: ReviewInfo) => review.startLine * 15,
+	addOrRemoveCommentToFavourite: () => void (0),
+	deleteReviewOrComment: () => void (0),
+	editReviewOrComment: () => void (0),
+	editor: null,
 };
 
 const Template: Story<ReviewProps> = (args: ReviewProps) =>
@@ -98,7 +100,7 @@ ThirdSelected.args = {
 export const UserCanDeleteComment = Template.bind({});
 UserCanDeleteComment.args = {
 	...props,
-	userId: author.id,
+	user: author,
 	selectedReviewId: 1,
 };
 

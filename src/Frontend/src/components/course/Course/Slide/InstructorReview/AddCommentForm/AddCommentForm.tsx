@@ -1,18 +1,17 @@
 import React, { CSSProperties } from "react";
-import { Button, Link, ScrollContainer, Hint, Toast, Gapped, } from "ui";
+import { Button, ScrollContainer, Hint, Toast, Gapped, } from "ui";
 
-import { Star2, Star, Edit, Delete, } from "icons";
+import { Star2, Star, Delete, } from "icons";
 import { SvgIconProps } from "@skbkontur/react-icons/icons/internal/SvgIcon";
 
-import { childOf, countLines } from "src/utils/domExtensions";
+import { countLines } from "src/utils/domExtensions";
 
 import texts from './AddCommentForm.texts';
 import styles from './AddCommentForm.less';
 import { MarkdownDescription } from "src/consts/comments";
 import MarkdownEditor from "src/components/comments/CommentSendForm/MarkdownEditor/MarkdownEditor";
-import scrollToView from "../../../../../../utils/scrollToView";
 
-export interface ReviewComment {
+export interface FavouriteComment {
 	id: number;
 	text: string;
 	renderedText: string;
@@ -20,28 +19,27 @@ export interface ReviewComment {
 	useCount: number;
 }
 
-interface ReviewCommentWithStyles extends ReviewComment {
+interface FavouriteCommentWithStyles extends FavouriteComment {
 	overextended?: boolean;
 	ref: React.RefObject<HTMLLIElement>;
 }
 
 export interface Props {
 	coordinates: { left: number; top: number; bottom: number };
-	comments: ReviewComment[];
+	comments: FavouriteComment[];
 	value: string;
+	valueCanBeAddedToFavourite: boolean;
 
 	onValueChange: (comment: string) => void;
 	addComment: (comment: string) => void;
-	addCommentToFavourite: (comment: string) => Promise<ReviewComment>;
-	toggleCommentFavourite: (commentId: number) => void;
+	addCommentToFavourite: (comment: string,) => Promise<FavouriteComment>;
+	toggleCommentFavourite: (commentText: string,) => void;
 	onClose: () => void;
 }
 
 interface State {
-	canBeAddedToFavourite: boolean;
-	commentsTextsSet: Set<string>;
-	favouriteComments: ReviewCommentWithStyles[];
-	otherComments: ReviewCommentWithStyles[];
+	favouriteComments: FavouriteCommentWithStyles[];
+	otherComments: FavouriteCommentWithStyles[];
 }
 
 const markupByOperation: MarkdownDescription = {
@@ -105,8 +103,6 @@ class AddCommentForm extends React.Component<Props, State> {
 		favouriteComments.sort((c1, c2) => c2.useCount - c1.useCount);
 
 		this.state = {
-			canBeAddedToFavourite: false,
-			commentsTextsSet: new Set(props.comments.map(c => c.text)),
 			otherComments: otherComments.map(c => ({ ...c, ref: React.createRef() })),
 			favouriteComments: favouriteComments.map(c => ({ ...c, ref: React.createRef() })),
 		};
@@ -139,7 +135,7 @@ class AddCommentForm extends React.Component<Props, State> {
 		}
 	}
 
-	markOverextendedComments = (comments: ReviewCommentWithStyles[]): ReviewCommentWithStyles[] | null => {
+	markOverextendedComments = (comments: FavouriteCommentWithStyles[]): FavouriteCommentWithStyles[] | null => {
 		const newOtherComments = [...comments];
 		let anyOverextended = false;
 		for (let i = 0; i < newOtherComments.length; i++) {
@@ -159,8 +155,8 @@ class AddCommentForm extends React.Component<Props, State> {
 	};
 
 	render = (): React.ReactElement => {
-		const { coordinates, onClose, value, } = this.props;
-		const { otherComments, favouriteComments, canBeAddedToFavourite, } = this.state;
+		const { coordinates, onClose, value, valueCanBeAddedToFavourite, } = this.props;
+		const { otherComments, favouriteComments, } = this.state;
 
 		const style: CSSProperties = {
 			top: coordinates.top,
@@ -170,7 +166,7 @@ class AddCommentForm extends React.Component<Props, State> {
 		return (
 			<div ref={ this.wrapper } className={ styles.wrapper } style={ style }>
 				<Delete className={ styles.closeFormButton } onClick={ onClose }/>
-				{ this.renderTextareaSection(value, canBeAddedToFavourite,) }
+				{ this.renderTextareaSection(value, valueCanBeAddedToFavourite,) }
 				<div className={ styles.divider }/>
 				{ this.renderCommentSection(favouriteComments, otherComments) }
 			</div>);
@@ -188,7 +184,7 @@ class AddCommentForm extends React.Component<Props, State> {
 				text={ comment }
 				hasError={ false }
 				isShowFocus={ false }
-				handleChange={ this.onValueChange }
+				handleChange={ this.props.onValueChange }
 				handleSubmit={ this.onAddComment }
 				hideDescription
 				hidePlaceholder
@@ -213,11 +209,10 @@ class AddCommentForm extends React.Component<Props, State> {
 				</Hint>
 			</Gapped>
 		</div>
-
 	);
 
-	renderCommentSection = (favouriteComments: ReviewCommentWithStyles[],
-		otherComments: ReviewCommentWithStyles[]
+	renderCommentSection = (favouriteComments: FavouriteCommentWithStyles[],
+		otherComments: FavouriteCommentWithStyles[]
 	): React.ReactElement => (
 		<div className={ styles.favouriteSection }>
 			{ this.renderCommentsHeader() }
@@ -239,7 +234,7 @@ class AddCommentForm extends React.Component<Props, State> {
 		</header>
 	);
 
-	renderFavouriteComments = (favouriteComments: ReviewCommentWithStyles[]): React.ReactElement => (
+	renderFavouriteComments = (favouriteComments: FavouriteCommentWithStyles[]): React.ReactElement => (
 		favouriteComments.length > 0
 			? <ul className={ styles.commentsList }>
 				{ favouriteComments.map(this.mapCommentToRendered) }
@@ -248,7 +243,7 @@ class AddCommentForm extends React.Component<Props, State> {
 				{ texts.noFavouriteCommentsText() }
 			</span>);
 
-	renderOtherComments = (otherComments: ReviewCommentWithStyles[]): React.ReactElement => (
+	renderOtherComments = (otherComments: FavouriteCommentWithStyles[]): React.ReactElement => (
 		<>
 			<header className={ styles.header }>
 				{ texts.instructorFavouriteSectionHeaderText }
@@ -259,7 +254,7 @@ class AddCommentForm extends React.Component<Props, State> {
 		</>
 	);
 
-	mapCommentToRendered = (c: ReviewCommentWithStyles): React.ReactElement => {
+	mapCommentToRendered = (c: FavouriteCommentWithStyles): React.ReactElement => {
 		const Icon = c.isFavourite
 			? (props: SvgIconProps) => <Star { ...props }/>
 			: (props: SvgIconProps) => <Star2 { ...props }/>;
@@ -298,14 +293,6 @@ class AddCommentForm extends React.Component<Props, State> {
 			</li>);
 	};
 
-	onValueChange = (value: string): void => {
-		const trimmed = this.removeWhiteSpaces(value);
-		this.props.onValueChange(value);
-		this.setState({
-			canBeAddedToFavourite: trimmed.length > 0 && !this.isInFavourite(trimmed),
-		});
-	};
-
 	onAddComment = (): void => {
 		const { addComment, value, } = this.props;
 
@@ -313,7 +300,7 @@ class AddCommentForm extends React.Component<Props, State> {
 	};
 
 	onAddToFavourite = (): void => {
-		const { favouriteComments, commentsTextsSet, } = this.state;
+		const { favouriteComments, } = this.state;
 		const { addCommentToFavourite, value, } = this.props;
 		const trimmedText = this.removeWhiteSpaces(value);
 
@@ -324,13 +311,11 @@ class AddCommentForm extends React.Component<Props, State> {
 					...favouriteComments, {
 						...c,
 						ref: React.createRef(),
-					} as ReviewCommentWithStyles
+					} as FavouriteCommentWithStyles
 				];
 
 				this.setState({
 					favouriteComments: newFavouriteComments,
-					canBeAddedToFavourite: false,
-					commentsTextsSet: new Set([...commentsTextsSet, c.text]),
 				}, () => {
 					const overextendedFavouriteComments = this.markOverextendedComments(newFavouriteComments);
 					if(overextendedFavouriteComments) {
@@ -347,7 +332,6 @@ class AddCommentForm extends React.Component<Props, State> {
 		const { otherComments, favouriteComments, } = this.state;
 
 		const id = Number.parseInt(event.currentTarget.id);
-		toggleCommentFavourite(id);
 
 		const indexInFavourite = favouriteComments.findIndex(c => c.id === id);
 		const indexInOthers = otherComments.findIndex(c => c.id === id);
@@ -359,6 +343,7 @@ class AddCommentForm extends React.Component<Props, State> {
 			this.setState({
 				favouriteComments: comments,
 			});
+			toggleCommentFavourite(comment.text);
 		} else {
 			const comments = [...otherComments];
 			const comment = comments[indexInOthers];
@@ -366,6 +351,7 @@ class AddCommentForm extends React.Component<Props, State> {
 			this.setState({
 				otherComments: comments,
 			});
+			toggleCommentFavourite(comment.text);
 		}
 	};
 
@@ -375,14 +361,6 @@ class AddCommentForm extends React.Component<Props, State> {
 		const commentText = comments.find(c => c.id === id)?.text;
 
 		onValueChange(commentText || '');
-		this.setState({
-			canBeAddedToFavourite: false,
-		});
-	};
-
-	isInFavourite = (trimmedText: string): boolean => {
-		const { commentsTextsSet, } = this.state;
-		return commentsTextsSet.has(trimmedText);
 	};
 
 	removeWhiteSpaces = (commentText: string): string => {

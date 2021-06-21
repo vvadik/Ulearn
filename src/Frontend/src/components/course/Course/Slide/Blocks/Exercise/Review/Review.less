@@ -80,6 +80,7 @@
 }
 
 .commentInfoWrapper {
+  width: 100%;
   max-width: calc(100% - 24px - 8px);
   display: inline-block;
   margin-left: 8px;
@@ -150,16 +151,6 @@
   margin-bottom: 0;
 }
 
-.authorWrapper:hover {
-  .innerCommentDeleteButton {
-    color: @progressBarRed;
-  }
-
-  .kebabMenu {
-    color: @additionalColor;
-  }
-}
-
 .commentReplyTextArea {
   position: relative;
   margin: 16px -16px -35px;
@@ -197,7 +188,9 @@
 
 .commentRepliesList {
   list-style: none;
-  padding: 0;
+  border-top: 1px solid @whiteSmoke;
+  margin-top: -4px;
+  padding: 12px 0 0;
 }
 
 .commentDeleteButton {
@@ -213,20 +206,28 @@
 }
 
 .innerCommentDeleteButton {
+  display: none;
   cursor: pointer;
-  color: transparent;
+  color: @progressBarRed;
   margin-left: 8px;
 }
 
 .kebabMenu {
-  margin-left: 8px;
+  margin-left: auto;
+  margin-right: -11px;
   cursor: pointer;
-  color: transparent;
+  color: @additionalColor;
+}
+
+.kebabMenuIcon {
+  padding: 0 1.72px;
+  border-radius: 4px;
 }
 
 .kebabMenu:hover {
-  background: @whiteSmoke;
-  border-radius: 4px;
+  .kebabMenuIcon {
+    background: @whiteSmoke;
+  }
 }
 
 @media (min-width: @minTabletWidth) {

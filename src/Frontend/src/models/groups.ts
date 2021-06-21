@@ -44,7 +44,7 @@ export interface GroupScoringGroupInfo {
 }
 
 export interface GroupInfo {
-	id: string,
+	id: number,
 	createTime?: string | null,
 	name: string,
 	isArchived: boolean,

@@ -30,10 +30,11 @@ import CodeMirror, { Editor, EditorConfiguration, TextMarker, } from "codemirror
 import texts from "./InstructorReview.texts";
 
 import styles from './InstructorReview.less';
-import AddCommentForm, { ReviewComment } from "./AddCommentForm/AddCommentForm";
+import AddCommentForm, { FavouriteComment } from "./AddCommentForm/AddCommentForm";
 import AntiplagiarismHeader, { AntiplagiarismInfo } from "./AntiplagiarismHeader/AntiplagiarismHeader";
 import StickyWrapper from "./AntiplagiarismHeader/StickyWrapper";
 import { KeyboardEventCodes } from "@skbkontur/react-ui/lib/events/keyboard/KeyboardEventCodes";
+import { UserInfo } from "../../../../../utils/courseRoles";
 
 export interface Props {
 	authorSolution: {
@@ -42,11 +43,11 @@ export interface Props {
 	}
 	formulation: React.ReactNode;
 	studentSubmissions: SubmissionInfo[];
-	comments: ReviewComment[];
+	comments: FavouriteComment[];
 
 	student: ShortUserInfo;
 	group?: ShortGroupInfo;
-	user: ShortUserInfo;
+	user: UserInfo;
 
 	prevReviewScore?: number;
 	currentScore?: number;
@@ -56,8 +57,8 @@ export interface Props {
 
 	onScoreSubmit: (score: number) => void;
 	onProhibitFurtherReviewToggleChange: (value: boolean) => void;
-	onAddComment: (comment: string) => Promise<ReviewComment>;
-	onAddCommentToFavourite: (comment: string) => Promise<ReviewComment>;
+	onAddComment: (comment: string) => Promise<FavouriteComment>;
+	onAddCommentToFavourite: (comment: string) => Promise<FavouriteComment>;
 	onToggleCommentFavourite: (commentId: number) => void;
 	getAntiPlagiarismStatus: () => Promise<AntiplagiarismInfo>;
 
@@ -99,7 +100,7 @@ interface State {
 
 	diffInfo?: DiffInfo;
 	selectedReviewId: number;
-	reviewsWithTextMarkers: ReviewInfoWithMarker[],
+	reviewsWithTextMarkers: ReviewInfoWithMarker[];
 
 	editor: null | Editor;
 
@@ -114,12 +115,20 @@ class InstructorReview extends React.Component<Props, State> {
 	private shameComment = 'Ой! Наш робот нашёл решения других студентов, подозрительно похожие на ваше. ' +
 		'Так может быть, если вы позаимствовали части программы, взяли их из открытых источников либо сами поделились своим кодом. ' +
 		'Выполняйте задания самостоятельно.';
+	private readonly commentsSet: Set<string>;
+
+	removeWhiteSpaces = (text: string): string => {
+		//do not replace spaces in text to avoid scenario with multi line code //
+		// .replace(/\s+/g, ' ');
+		return text.trim();
+	};
 
 	constructor(props: Props) {
 		super(props);
 		const submission = { ...props.studentSubmissions[0] };
 		const prevSubmissionInfo = getPreviousManualCheckingInfo(props.studentSubmissions, 0);
 
+		this.commentsSet = new Set(props.comments.map(c => c.text));
 		this.state = {
 			selectedReviewId: -1,
 			reviewsWithTextMarkers: [],
@@ -273,8 +282,6 @@ class InstructorReview extends React.Component<Props, State> {
 		const {
 			user,
 			comments,
-			onAddCommentToFavourite,
-			onToggleCommentFavourite,
 		} = this.props;
 		const {
 			currentSubmission,
@@ -309,9 +316,11 @@ class InstructorReview extends React.Component<Props, State> {
 						disableLineNumbers={ diffInfo && showDiff }
 						reviewBackgroundColor={ 'gray' }
 						editor={ editor }
-						userId={ user.id }
+						user={ user }
 						addReviewComment={ this.onAddReviewComment }
+						addOrRemoveCommentToFavourite={ this.onToggleCommentFavourite }
 						deleteReviewOrComment={ this.onDeleteReviewOrComment }
+						editReviewOrComment={ () => ({}) }
 						selectedReviewId={ selectedReviewId }
 						onSelectComment={ this.selectComment }
 						reviews={ reviewsWithTextMarkers }
@@ -321,11 +330,12 @@ class InstructorReview extends React.Component<Props, State> {
 				{ addCommentFormCoords &&
 				<AddCommentForm
 					value={ commentValue }
+					valueCanBeAddedToFavourite={ this.commentsSet.has(commentValue) }
 					onValueChange={ this.onCommentFormValueChange }
 					addComment={ this.onFormAddComment }
 					comments={ comments }
-					addCommentToFavourite={ onAddCommentToFavourite }
-					toggleCommentFavourite={ onToggleCommentFavourite }
+					addCommentToFavourite={ this.onAddCommentToFavourite }
+					toggleCommentFavourite={ this.onToggleCommentFavourite }
 					coordinates={ addCommentFormCoords }
 					onClose={ this.onFormClose }
 				/> }
@@ -337,9 +347,32 @@ class InstructorReview extends React.Component<Props, State> {
 		return;
 	};
 
+	onAddCommentToFavourite = (comment: string): Promise<FavouriteComment> => {
+		const {
+			onAddCommentToFavourite,
+		} = this.props;
+
+		this.commentsSet.add(comment);
+		return onAddCommentToFavourite(comment);
+	};
+
+	onToggleCommentFavourite = (commentText: string,): void => {
+		const {
+			onToggleCommentFavourite,
+			comments,
+		} = this.props;
+
+		if(this.commentsSet.has(commentText)) {
+			this.commentsSet.delete(commentText);
+		} else {
+			this.commentsSet.add(commentText);
+		}
+		//onToggleCommentFavourite(commentId);
+	};
+
 	onCommentFormValueChange = (comment: string): void => {
 		this.setState({
-			commentValue: comment,
+			commentValue: this.removeWhiteSpaces(comment),
 		});
 	};
 
@@ -454,7 +487,6 @@ class InstructorReview extends React.Component<Props, State> {
 			const oldReviews = getAllReviewsFromSubmission(diffInfo.prevReviewedSubmission,)
 				.map(r => ({
 					...r,
-					outdated: true,
 					startLine: diffInfo.oldCodeNewLineIndex[r.startLine],
 					finishLine: diffInfo.oldCodeNewLineIndex[r.finishLine],
 				}));
@@ -851,6 +883,7 @@ class InstructorReview extends React.Component<Props, State> {
 		//diff-match-patch is not package very well, so we just ignoring types errors
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
+		// noinspection JSPotentiallyInvalidConstructorUsage
 		const dmp = new diff_match_patch();
 		const a = dmp.diff_linesToChars_(previousCode, code);
 		const lineText1 = a.chars1;

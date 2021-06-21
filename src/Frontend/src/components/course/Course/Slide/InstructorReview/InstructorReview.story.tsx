@@ -11,6 +11,7 @@ import { ShortUserInfo } from "src/models/users";
 import { returnPromiseAfterDelay } from "src/utils/storyMock";
 import { AntiplagiarismInfo } from "./AntiplagiarismHeader/AntiplagiarismHeader";
 import { useArgs } from "@storybook/client-api";
+import { getMockedUser } from "../../../../comments/storiesData";
 
 
 const user: ShortUserInfo = {
@@ -455,13 +456,13 @@ const args: Partial<Props> = {
 		login: 'superStudnet',
 	},
 	group: {
-		id: "groupId",
+		id: 12,
 		apiUrl: 'groupApi',
 		courseId: 'basicprogramming',
 		isArchived: false,
 		name: 'группа Екатеринбург АТ-666, 333 юг-запад Авеню Гейб'
 	},
-	user: {
+	user: getMockedUser({
 		visibleName: 'Пользователь ДлиннаяФамилияКоторояМожетСломатьВерстку',
 		lastName: 'ДлиннаяФамилияКоторояМожетСломатьВерстку',
 		firstName: 'Пользователь',
@@ -469,7 +470,7 @@ const args: Partial<Props> = {
 		avatarUrl: "",
 		email: "user@email.com",
 		login: 'Administrator of everything on ulearn.me',
-	},
+	}),
 
 	currentScore: undefined,
 	prevReviewScore: 25,
