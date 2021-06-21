@@ -10,7 +10,7 @@ namespace CourseToolHotReloader.Dtos
 		[JsonPropertyName("message")]
 		public string Message { get; set; }
 		
-		[JsonPropertyName("trace_id")]
+		[JsonPropertyName("traceId")]
 		public string TraceId { get; set; }
 
 		[JsonPropertyName("timestamp")]

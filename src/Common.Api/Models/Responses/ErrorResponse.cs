@@ -14,7 +14,7 @@ namespace Ulearn.Common.Api.Models.Responses
 		[DataMember(Name = "message")]
 		public string Message { get; set; }
 
-		[DataMember(Name = "trace_id")]
+		[DataMember(Name = "traceId")]
 		public Guid TraceId => FlowingContext.Globals.Get<TraceContext>().TraceId;
 
 		[DataMember(Name = "timestamp")]

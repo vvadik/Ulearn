@@ -22,10 +22,10 @@ export function getCourseStatistics(
 	units: UnitsInfo | null,
 	progress: { [p: string]: SlideUserProgress },
 	scoringGroups: ScoringGroup[],
-	flashcardsStatisticsByUnits: { [unitId: string]: FlashcardsStatistics }
+	flashcardsStatisticsByUnits: { [unitId: string]: FlashcardsStatistics },
 ): CourseStatistics {
 	const courseStatistics: CourseStatistics = {
-		courseProgress: { current: 0, max: 0 },
+		courseProgress: { current: 0, max: 0, inProgress:0, },
 		byUnits: {},
 		flashcardsStatistics: { count: 0, unratedCount: 0 },
 		flashcardsStatisticsByUnits,
@@ -41,6 +41,7 @@ export function getCourseStatistics(
 
 		courseStatistics.courseProgress.current += unitStatistics.current;
 		courseStatistics.courseProgress.max += unitStatistics.max;
+		courseStatistics.courseProgress.inProgress += unitStatistics.inProgress;
 		courseStatistics.flashcardsStatistics.count += flashcardsStatisticsByUnits[unit.id]?.count || 0;
 		courseStatistics.flashcardsStatistics.unratedCount += flashcardsStatisticsByUnits[unit.id]?.unratedCount || 0;
 		courseStatistics.byUnits[unit.id] = unitStatistics;
@@ -139,12 +140,13 @@ export const getUnitStatistics = (
 		}
 	}
 	return {
-		doneSlidesCount: unitDoneSlidesCount,
-		inProgressSlidesCount: unitInProgressSlidesCount,
-		slidesCount: unit.slides.length,
+		current: unitDoneSlidesCount,
+		inProgress: unitInProgressSlidesCount,
+		max: unit.slides.length,
 		statusesBySlides,
-		current: unitScore,
-		max: unitMaxScore,
+		// redundant, no more score calculation, for more info visit ULEARN-840 on yt
+		// current: unitScore,
+		// max: unitMaxScore,
 		startupSlide: mostPreferablySlideToOpen,
 	};
 };

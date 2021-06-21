@@ -4,7 +4,7 @@ namespace Ulearn.Web.Api.Models.Parameters.Comments
 {
 	public class CommentParameters
 	{
-		[FromQuery(Name = "with_replies")]
+		[FromQuery(Name = "withReplies")]
 		public bool WithReplies { get; set; } = false;
 	}
 }

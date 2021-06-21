@@ -1,7 +1,6 @@
 import api from "./index";
 
 import { buildQuery } from "src/utils";
-import { convertCamelCaseToSnakeCase } from "src/utils/caseConverter";
 
 import { commentPoliciesPath, commentsPath, constructPathToComment } from "src/consts/routes";
 import { Comment, CommentPolicyResponse, SlideCommentsResponse, } from "src/models/comments";
@@ -25,7 +24,7 @@ import {
 export function getComments(courseId: string, slideId: string, forInstructors: boolean, offset?: number,
 	count?: number
 ): (dispatch: Dispatch) => Promise<CommentsLoadedAction> {
-	const query = buildQuery({ courseId, slideId, forInstructors, count, offset }, convertCamelCaseToSnakeCase);
+	const query = buildQuery({ courseId, slideId, forInstructors, count, offset });
 	const url = commentsPath + query;
 
 	return (dispatch: Dispatch): Promise<CommentsLoadedAction> => {
@@ -37,7 +36,7 @@ export function getComments(courseId: string, slideId: string, forInstructors: b
 export function addComment(courseId: string, slideId: string, text: string, parentCommentId?: number,
 	forInstructors?: boolean
 ): (dispatch: Dispatch) => Promise<CommentAddedAction> {
-	const query = buildQuery({ courseId }, convertCamelCaseToSnakeCase);
+	const query = buildQuery({ courseId });
 	const url = commentsPath + query;
 	const params = api.createRequestParams({
 		slideId,
@@ -104,7 +103,7 @@ export function dislikeComment(commentId: number)
 
 export function getCommentPolicy(courseId: string) {
 	return (dispatch: Dispatch): Promise<CommentsPolicyAction> => {
-		const query = buildQuery({ courseId }, convertCamelCaseToSnakeCase);
+		const query = buildQuery({ courseId });
 		const url = commentPoliciesPath + query;
 
 		return api.get<CommentPolicyResponse>(url)

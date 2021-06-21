@@ -81,19 +81,19 @@ namespace CourseToolHotReloader.ApiClient
 
 		public async Task<TempCourseUpdateResponse> UploadCourse(MemoryStream memoryStream, string id)
 		{
-			var url = $"{config.ApiUrl}/tempCourses/{id}";
+			var url = $"{config.ApiUrl}/temp-courses/{id}";
 			return await UpdateTempCourse(memoryStream, url, HttpMethod.Patch);
 		}
 
 		public async Task<TempCourseUpdateResponse> UploadFullCourse(MemoryStream memoryStream, string id)
 		{
-			var url = $"{config.ApiUrl}/tempCourses/{id}";
+			var url = $"{config.ApiUrl}/temp-courses/{id}";
 			return await UpdateTempCourse(memoryStream, url, HttpMethod.Put);
 		}
 
 		public async Task<TempCourseUpdateResponse> CreateCourse(string id)
 		{
-			var url = $"{config.ApiUrl}/tempCourses/{id}";
+			var url = $"{config.ApiUrl}/temp-courses/{id}";
 			using var client = HttpClient();
 			var response = await client.PostAsync(url, null);
 			ThrowExceptionIfBadCode(response);

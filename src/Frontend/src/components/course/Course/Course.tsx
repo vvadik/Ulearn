@@ -121,7 +121,7 @@ class Course extends Component<Props, State> {
 			highlightedUnit: null,
 			meta: defaultMeta,
 			courseStatistics: {
-				courseProgress: { current: 0, max: 0 },
+				courseProgress: { current: 0, max: 0, inProgress: 0, },
 				byUnits: {},
 				flashcardsStatistics: { count: 0, unratedCount: 0 },
 				flashcardsStatisticsByUnits: {},
@@ -243,6 +243,8 @@ class Course extends Component<Props, State> {
 		}
 
 		const newStats = getCourseStatistics(units, progress, courseInfo.scoring.groups, flashcardsStatisticsByUnits);
+		//TMP TODO rozentor: remove next line if orrange approved
+		newStats.courseProgress.inProgress = 0;
 
 		if(state.currentCourseId !== courseId || state.currentSlideId !== slideId) {
 			enterToCourse(courseId);

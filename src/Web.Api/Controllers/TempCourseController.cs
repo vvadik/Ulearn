@@ -21,7 +21,8 @@ using Vostok.Logging.Abstractions;
 
 namespace Ulearn.Web.Api.Controllers
 {
-	[Route("/tempCourses")]
+	[Route("/temp-courses")]
+	[Route("/tempCourses")] // Obsolete
 	public class TempCourseController : BaseController
 	{
 		private readonly ITempCoursesRepo tempCoursesRepo;

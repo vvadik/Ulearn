@@ -12,13 +12,13 @@ namespace Ulearn.Web.Api.Models.Parameters.Users
 		[MaxLength(100, ErrorMessage = "Query should be at most 100 chars")]
 		public string Query { get; set; }
 
-		[FromQuery(Name = "course_id")]
+		[FromQuery(Name = "courseId")]
 		public string CourseId { get; set; }
 
-		[FromQuery(Name = "course_role")]
+		[FromQuery(Name = "courseRole")]
 		public CourseRoleType? CourseRoleType { get; set; }
 
-		[FromQuery(Name = "lms_role")]
+		[FromQuery(Name = "lmsRole")]
 		public LmsRoleType? LmsRoleType { get; set; }
 
 		[FromQuery(Name = "offset")]

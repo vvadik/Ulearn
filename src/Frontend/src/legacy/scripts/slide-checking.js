@@ -68,7 +68,7 @@
 		});
 	};
 
-	$scoreBlock.on('click', '.simple-score-link', function(e) {
+	$scoreBlock.on('click', '.simple-score-link', function (e) {
 		e.preventDefault();
 		const $self = $(this);
 		const submissionId = $self.data('submissionId');
@@ -92,7 +92,7 @@
 
 		$exerciseScoreFormWrapper.removeClass('short');
 
-        /* Restore prohibitFurtherReview checkbox state */
+		/* Restore prohibitFurtherReview checkbox state */
 		$prohibitFurtherReviewCheckbox.prop('checked', $prohibitFurtherReviewCheckbox.data('initial-state'));
 	});
 
@@ -102,7 +102,7 @@
 		const $btnGroup = $self.closest('.btn-group');
 
 		$btnGroup.find('.btn').removeClass('active');
-		if (isSimpleScoreForm) {
+		if(isSimpleScoreForm) {
 			$otherPercentInput.val($self.data('percent'));
 			$self.addClass('active');
 
@@ -114,13 +114,13 @@
 			$otherPercentInput.hide();
 			$otherScoreLink.removeClass('active');
 			$otherPercentInput.val(wasActive ? "" : $self.data('percent'));
-			
+
 			/* If score form is fixed, then open full version */
-			if (!wasActive)
+			if(!wasActive)
 				$exerciseScoreFormWrapper.removeClass('short');
 
 			/* Clicking on button "100%" makes prohibitFurtherReview checkbox checked. */
-			if ($self.data('percent') === 100) {
+			if($self.data('percent') === 100) {
 				/* Remember checkbox state before changing */
 				$prohibitFurtherReviewCheckbox.data('initial-state', $prohibitFurtherReviewCheckbox.prop('checked'));
 				$prohibitFurtherReviewCheckbox.prop('checked', true);
@@ -131,12 +131,12 @@
 		}
 	});
 
-	$prohibitFurtherReviewCheckbox.change(function() {
+	$prohibitFurtherReviewCheckbox.change(function () {
 		$prohibitFurtherReviewCheckbox.data('initial-state', $prohibitFurtherReviewCheckbox.prop('checked'));
 	});
 
-	$exerciseScoreForm.find('input[type=submit]').click(function() {
-		if ($otherPercentInput.is(':invalid')) {
+	$exerciseScoreForm.find('input[type=submit]').click(function () {
+		if($otherPercentInput.is(':invalid')) {
 			$otherPercentInput.show();
 			$otherScoreLink.addClass('active');
 		} else {
@@ -150,10 +150,16 @@
 			const errorUrl = $form.find('[name=errorUrl]').val();
 			const exercisePercent = $form.find('[name=exercisePercent]').val();
 			const prohibitFurtherReview = $prohibitFurtherReviewCheckbox.prop('checked');
-			$.post(action, { id: id, nextUrl: nextUrl, errorUrl: errorUrl, exercisePercent: exercisePercent, prohibitFurtherReview: prohibitFurtherReview })
-				.done(function(data) {
+			$.post(action, {
+				id: id,
+				nextUrl: nextUrl,
+				errorUrl: errorUrl,
+				exercisePercent: exercisePercent,
+				prohibitFurtherReview: prohibitFurtherReview
+			})
+				.done(function (data) {
 					if(data.status === "ok") {
-						if (buttonType === "next") {
+						if(buttonType === "next") {
 							loadNextReview();
 						} else {
 							window.legacy.reactHistory.push(nextUrl);
@@ -162,7 +168,7 @@
 						window.legacy.reactHistory.push(data.redirect);
 					}
 				})
-				.fail(function() {
+				.fail(function () {
 					alert("Ошибка на сервере");
 					$button.prop('disabled', false);
 				});
@@ -180,7 +186,7 @@
 		}
 	});
 
-	if (!window.localStorage.getItem('hideExerciseScoreFormPrompt')) {
+	if(!window.localStorage.getItem('hideExerciseScoreFormPrompt')) {
 		$exerciseScoreForm.find('.exercise__score-form-prompt').removeClass("hide");
 		$('.exercise__score-form-prompt .internal-page-link').on('click', function (e) {
 			window.localStorage.setItem('hideExerciseScoreFormPrompt', 'true');
@@ -191,7 +197,7 @@
 
 	function updateTopReviewComments($exerciseAddReviewBlock) {
 		const $topReviewComments = $('.exercise__top-review-comments.hidden');
-		if ($topReviewComments.find('.comment').length === 0) {
+		if($topReviewComments.find('.comment').length === 0) {
 			$exerciseAddReviewBlock.addClass('without-comments');
 			return;
 		}
@@ -205,31 +211,28 @@
 		updateTopReviewComments($(this));
 	});
 
-	function getSelectedText($textarea)
-	{
+	function getSelectedText($textarea) {
 		const textarea = $textarea[0];
 
 		// Standards Compliant Version
-		if (textarea.selectionStart !== undefined)
-		{
+		if(textarea.selectionStart !== undefined) {
 			const startPos = textarea.selectionStart;
 			const endPos = textarea.selectionEnd;
 			return textarea.value.substring(startPos, endPos);
 		}
 		// IE Version
-		else if (document.selection !== undefined)
-		{ 
+		else if(document.selection !== undefined) {
 			textarea.focus();
 			const sel = document.selection.createRange();
 			return sel.text;
 		}
 	}
-	
+
 	/* Ctrl+C should copy text from CodeMirror if nothing is selected in review comment form */
-	$('.exercise__add-review__comment').keydown(function(e) {
-		if (e.keyCode === 67 && e.ctrlKey) {
+	$('.exercise__add-review__comment').keydown(function (e) {
+		if(e.keyCode === 67 && e.ctrlKey) {
 			const selectedText = getSelectedText($('.exercise__add-review__comment'));
-			if (selectedText.length === 0) {
+			if(selectedText.length === 0) {
 				const codeMirrorSelectedText = $('.code-review')[0].codeMirrorEditor.getSelection();
 				/* We use new AsyncClipboardAPI. It is supported only by modern browsers
 				   https://www.w3.org/TR/clipboard-apis/#async-clipboard-api
@@ -239,7 +242,7 @@
 		}
 	});
 
-	$('.exercise__top-review-comments').on('click', '.comment .copy-comment-link', function(e) {
+	$('.exercise__top-review-comments').on('click', '.comment .copy-comment-link', function (e) {
 		e.preventDefault();
 		$('.exercise__add-review__comment')
 			.val($(this).data('value'))
@@ -254,24 +257,30 @@
 		const comment = $self.data('value');
 		const $exerciseAddReviewBlock = $self.closest('.exercise__add-review');
 
-		$.post(url, {comment: comment}).done(function(data) {
+		$.post(url, { comment: comment }).done(function (data) {
 			const $data = $(data);
 			$('.exercise__top-review-comments.hidden').html($data.filter(':not(script)').html());
 			updateTopReviewComments($exerciseAddReviewBlock);
-		}).fail(function() {
+		}).fail(function () {
 			alert('Произошла ошибка при удалении комментария. Попробуйте повторить позже');
 		});
 
 		return false;
 	});
-	
-	$('.user-submission__info').bind('move', function (e) {
+
+	let startX;
+
+	$('.user-submission__info').on('touchstart', function (e) {
+		startX = e.touches[0].pageX;
+	}).on('touchmove', function (e) {
 		const $self = $(this);
 		const left = parseInt($self.css('left'));
-		$self.css({ left: left + e.deltaX });
-	}).bind('moveend', function(e) {
+		$self.css({ left: left + e.touches[0].pageX - startX });
+		startX = e.touches[0].pageX;
+	}).on('touchend ', function (e) {
 		const $self = $(this);
-		if (e.distX < 50)
+		const left = parseInt($self.css('left'));
+		if(left < 50)
 			$self.animate({ left: 15 });
 		else {
 			/* Unlock */
@@ -281,17 +290,21 @@
 		}
 	});
 
-	$exerciseSimpleScoreForm.bind('move', function(e) {
+	$exerciseSimpleScoreForm.on('touchstart', function (e) {
+		startX = e.touches[0].pageX;
+	}).on('touchmove', function (e) {
 		const $submissionInfo = $(this).closest('.user-submission').find('.user-submission__info');
 		const left = parseInt($submissionInfo.css('left'));
-		$submissionInfo.css({ left: left + e.deltaX });
-	}).bind('moveend', function (e) {
+		$submissionInfo.css({ left: left + e.touches[0].pageX - startX });
+		startX = e.touches[0].pageX;
+	}).on('touchend', function (e) {
 		const $submissionInfo = $(this).closest('.user-submission').find('.user-submission__info');
 		clearLockTimeout($submissionInfo);
+		const left = parseInt($submissionInfo.css('left'));
 		/* Unlock or lock */
-		if (Math.abs(e.distX) < 50) {
+		if(Math.abs(left) < 50) {
 			$submissionInfo.animate({ left: $(window).width() + 15 });
-			setLockTimeout($submissionInfo); 
+			setLockTimeout($submissionInfo);
 		} else {
 			$submissionInfo.animate({ left: 15 });
 			$submissionInfo.closest('.user-submission').find('.status').text('');

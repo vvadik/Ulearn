@@ -1,18 +1,25 @@
 import React from "react";
 import classnames from 'classnames';
 import styles from "./ProgressBar.less";
+import cn from "classnames";
 
 interface Props {
 	value: number;
+	inProgressValue: number;
 	small?: boolean;
 }
 
-function ProgressBar({ value, small, }: Props): React.ReactElement {
+function ProgressBar({ value, small, inProgressValue, }: Props): React.ReactElement {
 	return (
 		<div className={ classnames(styles.wrapper, { [styles.small]: small }) }>
-			<div
-				className={ styles.value }
-				style={ { width: `${ value * 100 }%` } }/>
+			< div
+				className={ cn(styles.value, { [styles.valueWithoutBorders]: inProgressValue !== 0 }) }
+				style={ { width: `${ value * 100 }%` } }
+			/>
+			{ inProgressValue > 0 && <div
+				className={ cn(styles.inProgressValue, { [styles.inProgressValueWithoutBorders]: value !== 0 }) }
+				style={ { width: `${ inProgressValue * 100 }%`, left: `${ value * 100 }%` } }
+			/> }
 		</div>
 	);
 }

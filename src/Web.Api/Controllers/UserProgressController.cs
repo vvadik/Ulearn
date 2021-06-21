@@ -20,7 +20,7 @@ using Ulearn.Web.Api.Utils.LTI;
 
 namespace Ulearn.Web.Api.Controllers
 {
-	[Route("/userProgress")]
+	[Route("/user-progress")]
 	public class UserProgressController : BaseController
 	{
 		private readonly IVisitsRepo visitsRepo;

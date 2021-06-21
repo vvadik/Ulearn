@@ -26,12 +26,10 @@ export interface QuizMenuItem extends MenuItem<SlideType.Quiz> {
 export interface Progress {
 	current: number;
 	max: number;
+	inProgress: number;
 }
 
 export interface UnitProgress extends Progress {
-	doneSlidesCount: number;
-	inProgressSlidesCount: number;
-	slidesCount: number;
 	statusesBySlides: { [slideId: string]: SlideProgressStatus };
 }
 
