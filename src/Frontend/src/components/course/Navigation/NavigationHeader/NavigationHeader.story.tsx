@@ -130,7 +130,7 @@ class DynamicallyChangingProgressClass extends React.Component<ChangingProps, Pr
 		this.setState({ ...this.props }, () => {
 			setTimeout(() => {
 				this.interval = setInterval(this.update, this.timeout) as unknown as number;
-				this.currentChange = 'current';
+				this.currentChange = this.props.startFromChanging;
 			}, 1000);
 		});
 	};
