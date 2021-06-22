@@ -31,7 +31,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		[HttpGet]
 		public async Task<ActionResult<CommentPolicyResponse>> Policy([FromQuery] string courseId)
 		{
-			if (!await courseManager.HasCourseAsync(courseId))
+			if (courseId == null || !await courseManager.HasCourseAsync(courseId))
 				return NotFound(new ErrorResponse($"Course '{courseId}' not found"));
 
 			var policy = await commentPoliciesRepo.GetCommentsPolicyAsync(courseId).ConfigureAwait(false);
@@ -50,7 +50,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		[Authorize(Policy = "CourseAdmins")]
 		public async Task<IActionResult> UpdatePolicy([FromQuery]string courseId, [FromBody] UpdatePolicyParameters parameters)
 		{
-			if (!await courseManager.HasCourseAsync(courseId))
+			if (courseId == null || !await courseManager.HasCourseAsync(courseId))
 				return NotFound(new ErrorResponse($"Course '{courseId}' not found"));
 
 			var policy = await commentPoliciesRepo.GetCommentsPolicyAsync(courseId).ConfigureAwait(false);
