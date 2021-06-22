@@ -21,7 +21,3 @@ export function sendCodeReviewComment(reviewId: number, text: string): Promise<R
 export function deleteCodeReviewComment(reviewId: number, commentId: number): Promise<Response> {
 	return api.delete(`review/${ reviewId }/comments/${ commentId }`);
 }
-
-export function skipExercise(courseId: string, slideId: string): Promise<Response> {
-	return api.put(`slides/${ courseId }/${ slideId }/exercise/skip`);
-}

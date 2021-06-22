@@ -67,7 +67,7 @@ interface DispatchFunctionsProps {
 	) => unknown;
 	deleteReviewComment:
 		(courseId: string, slideId: string, submissionId: number, reviewId: number, commentId: number) => unknown;
-	visitAcceptedSolutions: (courseId: string, slideId: string) => unknown;
+	skipExercise: (courseId: string, slideId: string, onSuccess: () => void) => unknown;
 }
 
 interface FromSlideProps {
@@ -680,12 +680,15 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	openAcceptedSolutionsModal = (): void => {
-		const { courseId, slideId, visitAcceptedSolutions, submissions, } = this.props;
+		const { courseId, slideId, skipExercise, slideProgress } = this.props;
 
-		if(!hasSuccessSubmission(submissions)) {
-			visitAcceptedSolutions(courseId, slideId);
+		if(slideProgress.isSkipped || slideProgress.score > 0) {
+			this.openModal({ type: ModalType.acceptedSolutions });
+		} else {
+			skipExercise(courseId, slideId, () => {
+				this.openModal({ type: ModalType.acceptedSolutions });
+			});
 		}
-		this.openModal({ type: ModalType.acceptedSolutions });
 	};
 
 	renderOverview = (submission: SubmissionInfoRedux): React.ReactElement => {
