@@ -283,5 +283,33 @@ namespace Ulearn.Web.Api.Controllers.Slides
 
 			return PhysicalFile(zipFile.FullName, "application/zip", studentZipName);
 		}
+
+		/// <summary>
+		/// Пропустить задачу. Это позволит увидеть чужие решения. Но не даст получить баллы за задачу, если их еще нет
+		/// </summary>
+		[HttpPut("/slides/{courseId}/{slideId}/exercise/skip")]
+		[Authorize]
+		public async Task<IActionResult> SkipExercise([FromRoute] Course course, [FromRoute] Guid slideId)
+		{
+			if (course == null)
+				return NotFound(new { status = "error", message = "Course not found" });
+
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, course.Id, CourseRoleType.Instructor);
+			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIds(course, UserId);
+			var exerciseSlide = course.FindSlideById(slideId, isInstructor, visibleUnitsIds) as ExerciseSlide;
+
+			if (exerciseSlide == null)
+				return NotFound(new { status = "error", message = "Slide not found" });
+
+			if (exerciseSlide.Exercise.HideShowSolutionsButton)
+				return NotFound(new { status = "error", message = "Showing solutions is not enabled for this slide" });
+
+			var isSkippedOrPassed = await visitsRepo.IsSkippedOrPassed(course.Id, exerciseSlide.Id, UserId);
+			if (isSkippedOrPassed)
+				return Ok(new SuccessResponseWithMessage("You have already passed or skipped the slide"));
+
+			await visitsRepo.SkipSlide(course.Id, exerciseSlide.Id, UserId);
+			return Ok(new SuccessResponseWithMessage($"You have skipped slide {slideId}"));
+		}
 	}
 }
