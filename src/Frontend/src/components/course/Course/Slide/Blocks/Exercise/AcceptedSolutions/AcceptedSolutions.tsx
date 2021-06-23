@@ -4,9 +4,11 @@ import { Modal, Tabs } from "@skbkontur/react-ui";
 import texts from "./AcceptedSolutions.texts";
 import { getAcceptedSolutions, getLikedAcceptedSolutions } from "src/api/acceptedSolutions";
 import {
+	AcceptedSolution,
 	AcceptedSolutionsResponse,
 	LikedAcceptedSolutionsResponse
 } from "src/models/acceptedSolutions";
+import StaticCode from "../StaticCode";
 
 interface AcceptedSolutionsProps {
 	courseId: string,
@@ -89,9 +91,9 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 				<Modal.Body>
 					{ error }
 					{ !error && isInstructor &&
-					<Tabs value={ activeTab } onValueChange={ this.handleTabChange }>
-						<Tabs.Tab id={ TabsType.instructorTab }>{texts.instructorTabName}</Tabs.Tab>
-						<Tabs.Tab id={ TabsType.studentTab }>{texts.studentTabName}</Tabs.Tab>
+					<Tabs value={ activeTab } onValueChange={ s => this.handleTabChange(s) }>
+						<Tabs.Tab id={ TabsType.instructorTab }>{ texts.instructorTabName }</Tabs.Tab>
+						<Tabs.Tab id={ TabsType.studentTab }>{ texts.studentTabName }</Tabs.Tab>
 					</Tabs>
 					}
 					{ !error && activeTab === TabsType.instructorTab && this.renderInstructorTab() }
@@ -101,14 +103,33 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 	}
 
 	renderInstructorTab() {
+		const { acceptedSolutionsResponse, likedAcceptedSolutionsResponse } = this.state;
+		const { promotedSolutions, } = acceptedSolutionsResponse!;
+		const likedSolutions = likedAcceptedSolutionsResponse!.likedSolutions.filter(
+			s => promotedSolutions.every(ss => ss.submissionId !== s.submissionId));
+
 		return <div key={ TabsType.instructorTab }>
-			Инструктор
+			{
+				promotedSolutions.concat(likedSolutions).map(s => this.renderSolution(s))
+			}
 		</div>;
 	}
 
 	renderStudentTab() {
+		const { acceptedSolutionsResponse } = this.state;
+		const { promotedSolutions, randomLikedSolutions, newestSolutions } = acceptedSolutionsResponse!;
+
 		return <div key={ TabsType.studentTab }>
-			Студент
+			{
+				promotedSolutions.concat(randomLikedSolutions).concat(newestSolutions).map(s => this.renderSolution(s))
+			}
+		</div>;
+	}
+
+	renderSolution(solution: AcceptedSolution) {
+		const { isInstructor, } = this.props;
+		return <div key={ solution.submissionId }>
+			<StaticCode code={solution.code} language={solution.language} />
 		</div>;
 	}
 }

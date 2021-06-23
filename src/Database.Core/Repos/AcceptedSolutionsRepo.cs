@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Database.Models;
 using Database.Repos.Users;
 using Microsoft.EntityFrameworkCore;
+using Ulearn.Common;
 using Ulearn.Core.Extensions;
 using Z.EntityFramework.Plus;
 
@@ -12,10 +13,10 @@ namespace Database.Repos
 {
 	public interface IAcceptedSolutionsRepo
 	{
-		Task<List<(int SubmissionId, string Code, int LikesCount)>> GetNewestSubmissions(string courseId, Guid slideId, int count);
-		Task<List<(int SubmissionId, string Code, ApplicationUser UserWhoPromote)>> GetPromotedSubmissions(string courseId, Guid slideId);
-		Task<(int SubmissionId, string Code, int LikesCount)?> GetRandomLikedSubmission(string courseId, Guid slideId);
-		Task<List<(int SubmissionId, string Code, int LikesCount)>> GetLikedAcceptedSolutions(string courseId, Guid slideId, int offset, int count);
+		Task<List<(int SubmissionId, string Code, Language Language, int LikesCount)>> GetNewestSubmissions(string courseId, Guid slideId, int count);
+		Task<List<(int SubmissionId, string Code, Language Language, ApplicationUser UserWhoPromote)>> GetPromotedSubmissions(string courseId, Guid slideId);
+		Task<(int SubmissionId, string Code, Language Language, int LikesCount)?> GetRandomLikedSubmission(string courseId, Guid slideId);
+		Task<List<(int SubmissionId, string Code, Language Language, int LikesCount)>> GetLikedAcceptedSolutions(string courseId, Guid slideId, int offset, int count);
 		Task<HashSet<int>> GetSubmissionsLikedByMe(string courseId, Guid slideId, string userId);
 		Task<bool> DidUserLikeSubmission(int submissionId, string userId);
 		Task TryLikeSubmission(int submissionId, string userId);
@@ -36,7 +37,7 @@ namespace Database.Repos
 			this.userSolutionsRepo = userSolutionsRepo;
 		}
 
-		public async Task<List<(int SubmissionId, string Code, int LikesCount)>> GetNewestSubmissions(string courseId, Guid slideId, int count)
+		public async Task<List<(int SubmissionId, string Code, Language Language, int LikesCount)>> GetNewestSubmissions(string courseId, Guid slideId, int count)
 		{
 			var ulearnBotId = db.Users.FirstOrDefault(u => u.UserName == UsersRepo.UlearnBotUsername).Id;
 			var allAcceptedSubmissions = userSolutionsRepo.GetAllAcceptedSubmissions(courseId, slideId);
@@ -44,27 +45,27 @@ namespace Database.Repos
 				.Where(x => x.Reviews.All(r => r.AuthorId != ulearnBotId))
 				.OrderByDescending(s => s.Timestamp)
 				.Take(count * 10)
-				.Select(s => new { SubmissionId = s.Id, Code = s.SolutionCode.Text, s.Timestamp, Likes = s.Likes.Count, s.UserId })
+				.Select(s => new { SubmissionId = s.Id, Code = s.SolutionCode.Text, s.Language, s.Timestamp, Likes = s.Likes.Count, s.UserId })
 				.ToListAsync();
 			return submissionsFromDb
 				.GroupBy(s => s.UserId)
 				.Select(g => g.MaxBy(m => m.Timestamp))
 				.GroupBy(s => s.Code)
 				.Select(g => g.MaxBy(m => m.Timestamp))
-				.Select(t => (t.SubmissionId, t.Code, t.Likes))
+				.Select(t => (t.SubmissionId, t.Code, t.Language, t.Likes))
 				.ToList();
 		}
 
-		public async Task<List<(int SubmissionId, string Code, ApplicationUser UserWhoPromote)>> GetPromotedSubmissions(string courseId, Guid slideId)
+		public async Task<List<(int SubmissionId, string Code, Language Language, ApplicationUser UserWhoPromote)>> GetPromotedSubmissions(string courseId, Guid slideId)
 		{
 			return (await db.AcceptedSolutionsPromotes.Where(p => p.Submission.CourseId == courseId && p.Submission.SlideId == slideId)
-				.Select(s => new { s.SubmissionId, Code = s.Submission.SolutionCode.Text, UserWhoPromote = s.User })
+				.Select(s => new { s.SubmissionId, Code = s.Submission.SolutionCode.Text, s.Submission.Language, UserWhoPromote = s.User })
 				.ToListAsync())
-				.Select(s => (s.SubmissionId, s.Code, s.UserWhoPromote))
+				.Select(s => (s.SubmissionId, s.Code, s.Language, s.UserWhoPromote))
 				.ToList();
 		}
 
-		public async Task<(int SubmissionId, string Code, int LikesCount)?> GetRandomLikedSubmission(string courseId, Guid slideId)
+		public async Task<(int SubmissionId, string Code, Language Language, int LikesCount)?> GetRandomLikedSubmission(string courseId, Guid slideId)
 		{
 			var allAcceptedSubmissions = userSolutionsRepo.GetAllAcceptedSubmissions(courseId, slideId);
 			var submissionIds = await allAcceptedSubmissions.Where(s => s.Likes.Count > 0)
@@ -78,21 +79,21 @@ namespace Database.Repos
 			var selectedId = submissionIds[rnd.Next(0, submissionIds.Count)];
 			var result = await db.UserExerciseSubmissions
 				.Where(s => s.Id == selectedId)
-				.Select(s => new { SubmissionId = s.Id, Code = s.SolutionCode.Text, Likes = s.Likes.Count })
+				.Select(s => new { SubmissionId = s.Id, Code = s.SolutionCode.Text, s.Language, Likes = s.Likes.Count })
 				.FirstOrDefaultAsync();
-			return (result.SubmissionId, result.Code, result.Likes);
+			return (result.SubmissionId, result.Code, result.Language, result.Likes);
 		}
 
-		public async Task<List<(int SubmissionId, string Code, int LikesCount)>> GetLikedAcceptedSolutions(string courseId, Guid slideId, int offset, int count)
+		public async Task<List<(int SubmissionId, string Code, Language Language, int LikesCount)>> GetLikedAcceptedSolutions(string courseId, Guid slideId, int offset, int count)
 		{
 			var allAcceptedSubmissions = userSolutionsRepo.GetAllAcceptedSubmissions(courseId, slideId);
 			return (await allAcceptedSubmissions.Where(s => s.Likes.Count > 0)
 				.OrderByDescending(s => s.Timestamp)
-				.Select(s =>  new { SubmissionId = s.Id, Code = s.SolutionCode.Text, Likes = s.Likes.Count })
+				.Select(s =>  new { SubmissionId = s.Id, Code = s.SolutionCode.Text, s.Language, Likes = s.Likes.Count })
 				.Skip(offset)
 				.Take(count)
 				.ToListAsync())
-				.Select(s => (s.SubmissionId, s.Code, s.Likes))
+				.Select(s => (s.SubmissionId, s.Code, s.Language, s.Likes))
 				.ToList();
 		}
 

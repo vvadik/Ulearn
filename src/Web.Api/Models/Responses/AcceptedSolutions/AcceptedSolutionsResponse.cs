@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 using JetBrains.Annotations;
+using Ulearn.Common;
 using Ulearn.Web.Api.Models.Common;
 
 namespace Ulearn.Web.Api.Models.Responses.AcceptedSolutions
@@ -36,6 +37,9 @@ namespace Ulearn.Web.Api.Models.Responses.AcceptedSolutions
 		public string Code { get; set; }
 
 		[DataMember]
+		public Language Language { get; set; }
+
+		[DataMember]
 		[CanBeNull]
 		public int? LikesCount { get; set; }
 
@@ -47,10 +51,11 @@ namespace Ulearn.Web.Api.Models.Responses.AcceptedSolutions
 		[CanBeNull]
 		public ShortUserInfo PromotedBy { get; set; }
 
-		public AcceptedSolution(int submissionId, string code, int? likesCount, bool? likedByMe, [CanBeNull] ShortUserInfo promotedBy)
+		public AcceptedSolution(int submissionId, string code, Language language, int? likesCount, bool? likedByMe, [CanBeNull] ShortUserInfo promotedBy)
 		{
 			SubmissionId = submissionId;
 			Code = code;
+			Language = language;
 			LikesCount = likesCount;
 			LikedByMe = likedByMe;
 			PromotedBy = promotedBy;
