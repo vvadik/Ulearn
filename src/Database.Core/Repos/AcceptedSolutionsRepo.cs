@@ -42,19 +42,17 @@ namespace Database.Repos
 			var allAcceptedSubmissions = userSolutionsRepo.GetAllAcceptedSubmissions(courseId, slideId);
 			var submissionsFromDb = await allAcceptedSubmissions
 				.Where(x => x.Reviews.All(r => r.AuthorId != ulearnBotId))
-				.GroupBy(s => s.UserId)
-				.Select(g => g.OrderByDescending(s => s.Timestamp).FirstOrDefault())
 				.OrderByDescending(s => s.Timestamp)
-				.Take(count * 2)
-				.Select(s => new { SubmissionId = s.Id, Code = s.SolutionCode.Text, s.Timestamp, Likes = s.Likes.Count })
+				.Take(count * 10)
+				.Select(s => new { SubmissionId = s.Id, Code = s.SolutionCode.Text, s.Timestamp, Likes = s.Likes.Count, s.UserId })
 				.ToListAsync();
 			return submissionsFromDb
+				.GroupBy(s => s.UserId)
+				.Select(g => g.MaxBy(m => m.Timestamp))
 				.GroupBy(s => s.Code)
-				.Select(g =>
-				{
-					var last = g.MaxBy(m => m.Timestamp);
-					return (last.SubmissionId, last.Code, last.Likes);
-				}).ToList();
+				.Select(g => g.MaxBy(m => m.Timestamp))
+				.Select(t => (t.SubmissionId, t.Code, t.Likes))
+				.ToList();
 		}
 
 		public async Task<List<(int SubmissionId, string Code, ApplicationUser UserWhoPromote)>> GetPromotedSubmissions(string courseId, Guid slideId)

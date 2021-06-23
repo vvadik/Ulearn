@@ -58,7 +58,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				return NotFound(new { status = "error", message = "Showing solutions is not enabled for this slide" });
 
 			var isSkippedOrPassed = await visitsRepo.IsSkippedOrPassed(course.Id, slide.Id, UserId);
-			if (isSkippedOrPassed)
+			if (!isSkippedOrPassed)
 				return StatusCode((int)HttpStatusCode.NotAcceptable, new { status = "error", message = "You must solve exercise or agree to lose points" });
 
 			var promotedSolutions = (await acceptedSolutionsRepo.GetPromotedSubmissions(course.Id, slideId))
@@ -70,7 +70,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			var randomLikedSolution = await acceptedSolutionsRepo.GetRandomLikedSubmission(course.Id, slideId);
 			if (randomLikedSolution != null && promotedSolutions.Any(s => s.SubmissionId == randomLikedSolution.Value.SubmissionId || s.Code == randomLikedSolution.Value.Code))
 				randomLikedSolution = null;
-			var randomLikedSolutions = Enumerable.Repeat(randomLikedSolution, 1).EmptyIfNull()
+			var randomLikedSolutions = Enumerable.Repeat(randomLikedSolution, 1).Where(s => s.HasValue)
 				.Select(s => new AcceptedSolution(s.Value.SubmissionId, s.Value.Code, s.Value.LikesCount, submissionsLikedByMe?.Contains(s.Value.SubmissionId), null))
 				.ToList();
 
