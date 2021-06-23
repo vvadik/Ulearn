@@ -262,6 +262,10 @@ function replaceReviewMarker(
 	return { reviews: newCurrentReviews, selectedReviewLine: line, };
 }
 
+function isAcceptedSolutionsWillNotDiscardScore(submissions: SubmissionInfo[], isSkipped: boolean) {
+	return submissions.filter(s => s.automaticChecking?.result === AutomaticExerciseCheckingResult.RightAnswer).length > 0 || isSkipped;
+}
+
 export {
 	SubmissionColor,
 	ReviewInfoWithMarker,
@@ -279,4 +283,5 @@ export {
 	getSelectedReviewIdByCursor,
 	loadLanguageStyles,
 	replaceReviewMarker,
+	isAcceptedSolutionsWillNotDiscardScore
 };

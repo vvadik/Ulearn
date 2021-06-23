@@ -31,6 +31,7 @@ import {
 	ReviewInfoWithMarker,
 	SubmissionColor,
 	submissionIsLast,
+	isAcceptedSolutionsWillNotDiscardScore
 } from "./ExerciseUtils";
 
 import { Language, } from "src/consts/languages";
@@ -422,8 +423,7 @@ class Exercise extends React.Component<Props, State> {
 		const hasOutput = currentSubmission
 			&& HasOutput(visibleCheckingResponse?.message, currentSubmission.automaticChecking,
 				expectedOutput);
-		const isAcceptedSolutionsWillNotDiscardScore = submissions.filter(
-			s => s.automaticChecking?.result === AutomaticExerciseCheckingResult.RightAnswer).length > 0 || slideProgress.isSkipped;
+		const isSafeShowAcceptedSolutions = isAcceptedSolutionsWillNotDiscardScore(submissions, slideProgress.isSkipped);
 		const outputMessage = visibleCheckingResponse?.message || visibleCheckingResponse?.submission?.automaticChecking?.output;
 
 		return (
@@ -474,11 +474,11 @@ class Exercise extends React.Component<Props, State> {
 						onShowOutputButtonClicked={ this.toggleOutput }
 					/> }
 					{ attemptsStatistics && <Controls.StatisticsHint attemptsStatistics={ attemptsStatistics }/> }
-					{ (!hideSolutions && (isAllHintsShowed || isAcceptedSolutionsWillNotDiscardScore))
+					{ (!hideSolutions && (isAllHintsShowed || isSafeShowAcceptedSolutions))
 					&& <Controls.AcceptedSolutionsButton
 						acceptedSolutionsUrl={ constructPathToAcceptedSolutions(courseId, slideId) }
 						onVisitAcceptedSolutions={ this.openAcceptedSolutionsModal }
-						isShowAcceptedSolutionsAvailable={ isAcceptedSolutionsWillNotDiscardScore }
+						isShowAcceptedSolutionsAvailable={ isSafeShowAcceptedSolutions }
 					/> }
 					{ this.isVisualizerEnabled() &&
 					<Controls.VisualizerButton
@@ -680,9 +680,9 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	openAcceptedSolutionsModal = (): void => {
-		const { courseId, slideId, skipExercise, slideProgress } = this.props;
+		const { courseId, slideId, skipExercise, submissions, slideProgress } = this.props;
 
-		if(slideProgress.isSkipped || slideProgress.score > 0) {
+		if(isAcceptedSolutionsWillNotDiscardScore(submissions, slideProgress.isSkipped)) {
 			this.openModal({ type: ModalType.acceptedSolutions });
 		} else {
 			skipExercise(courseId, slideId, () => {
