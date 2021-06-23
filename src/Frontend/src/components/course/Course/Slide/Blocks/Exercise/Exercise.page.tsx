@@ -30,7 +30,7 @@ const mapStateToProps = (state: RootState, { courseId, slideId, }: MatchParams) 
 		submissions,
 		submissionError,
 		lastCheckingResponse: !(lastCheckingResponse && lastCheckingResponse.courseId === courseId && lastCheckingResponse.slideId === slideId) ? null : lastCheckingResponse,
-		userId: account.id,
+		user: account,
 		slideProgress,
 		deviceType: device.deviceType,
 	};

@@ -18,6 +18,7 @@ import moment from "moment";
 
 import { exerciseSolutions, loadFromCache, saveToCache, } from "src/utils/localStorageManager";
 import { convertDefaultTimezoneToLocal } from "src/utils/momentUtils";
+import { isInstructor } from "src/utils/courseRoles";
 import {
 	getLastSuccessSubmission,
 	getReviewsWithoutDeleted,
@@ -46,6 +47,7 @@ import {
 import { SubmissionInfoRedux } from "src/models/reduxState";
 import { SlideUserProgress } from "src/models/userProgress";
 import { ExerciseBlockProps } from "src/models/slide";
+import { AccountState } from "src/redux/account";
 
 import CodeMirror, { Doc, Editor, EditorChange, EditorConfiguration, } from "codemirror";
 import 'codemirror/lib/codemirror.css';
@@ -81,7 +83,7 @@ interface FromSlideProps {
 interface FromMapStateToProps {
 	isAuthenticated: boolean;
 	lastCheckingResponse: RunSolutionResponse | null;
-	userId?: string | null;
+	user?: AccountState | null;
 	slideProgress: SlideUserProgress;
 	submissionError: string | null;
 	deviceType: DeviceType;
@@ -388,7 +390,7 @@ class Exercise extends React.Component<Props, State> {
 
 	renderControlledCodeMirror = (opts: EditorConfiguration): React.ReactElement => {
 		const {
-			expectedOutput, submissions, userId,
+			expectedOutput, submissions, user,
 			slideProgress, maxScore, languages,
 			courseId, slideId, hideSolutions, renderedHints,
 			attemptsStatistics, isAuthenticated,
@@ -447,7 +449,7 @@ class Exercise extends React.Component<Props, State> {
 					/>
 					{ exerciseCodeDoc && isReview &&
 					<Review
-						userId={ userId }
+						userId={ user?.id }
 						addReviewComment={ this.addReviewComment }
 						deleteReviewComment={ this.deleteReviewComment }
 						selectedReviewId={ selectedReviewId }
@@ -770,7 +772,7 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	renderModal = (modalData: ModalData<ModalType>): React.ReactNode => {
-		const { hideSolutions, courseId, slideId, } = this.props;
+		const { hideSolutions, courseId, slideId, user } = this.props;
 
 		switch (modalData.type) {
 			case ModalType.congrats: {
@@ -797,10 +799,17 @@ class Exercise extends React.Component<Props, State> {
 			case ModalType.studentsSubmissions:
 				break;
 			case ModalType.acceptedSolutions: {
+				const instructor = isInstructor(
+					{
+						isSystemAdministrator: user!.isSystemAdministrator,
+						courseRole: user!.roleByCourse[courseId]
+					});
 				return (
 					<AcceptedSolutionsModal
 						courseId={ courseId }
 						slideId={ slideId }
+						userId={ user!.id! }
+						isInstructor={ instructor }
 						onClose={ this.closeModal }
 					/>
 				);
