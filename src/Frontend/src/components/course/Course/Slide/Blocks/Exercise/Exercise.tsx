@@ -1,14 +1,14 @@
 import React, { createRef, RefObject } from 'react';
 
 import { Controlled, } from "react-codemirror2";
-import { Checkbox, FLAT_THEME, Modal, Select, ThemeContext, Toast, Tooltip, } from "ui";
+import { Checkbox, FLAT_THEME, Select, ThemeContext, Toast, Tooltip, } from "ui";
 import { Review } from "./Review/Review";
 import { CongratsModal } from "./CongratsModal/CongratsModal";
 import { ExerciseOutput, HasOutput } from "./ExerciseOutput/ExerciseOutput";
 import { ExerciseFormHeader } from "./ExerciseFormHeader/ExerciseFormHeader";
 import Controls from "./Controls/Controls";
 import LoginForContinue from "src/components/notificationModal/LoginForContinue";
-import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent.js";
+import { AcceptedSolutionsModal } from "./AcceptedSolutions/AcceptedSolutions";
 import { Info } from 'icons';
 
 import { darkFlat } from "src/uiTheme";
@@ -423,7 +423,8 @@ class Exercise extends React.Component<Props, State> {
 		const hasOutput = currentSubmission
 			&& HasOutput(visibleCheckingResponse?.message, currentSubmission.automaticChecking,
 				expectedOutput);
-		const isSafeShowAcceptedSolutions = isAcceptedSolutionsWillNotDiscardScore(submissions, slideProgress.isSkipped);
+		const isSafeShowAcceptedSolutions = isAcceptedSolutionsWillNotDiscardScore(submissions,
+			slideProgress.isSkipped);
 		const outputMessage = visibleCheckingResponse?.message || visibleCheckingResponse?.submission?.automaticChecking?.output;
 
 		return (
@@ -797,19 +798,12 @@ class Exercise extends React.Component<Props, State> {
 				break;
 			case ModalType.acceptedSolutions: {
 				return (
-					<DownloadedHtmlContent
-						url={ constructPathToAcceptedSolutions(courseId, slideId) }
-						injectInWrapperAfterContentReady={ (html: React.ReactNode) =>
-							<Modal onClose={ this.closeModal }>
-								<Modal.Header>
-									{ texts.acceptedSolutions.title }
-								</Modal.Header>
-								<Modal.Body>
-									{ texts.acceptedSolutions.content }
-									{ html }
-								</Modal.Body>
-							</Modal> }
-					/>);
+					<AcceptedSolutionsModal
+						courseId={ courseId }
+						slideId={ slideId }
+						onClose={ this.closeModal }
+					/>
+				);
 			}
 		}
 	};
