@@ -171,6 +171,7 @@ namespace Ulearn.Web.Api.Controllers
 		/// </summary>
 		/// <returns></returns>
 		[HttpPost("{courseId}/visit/{slideId}")]
+		[HttpPut("{courseId}/{slideId}/visit")]
 		[Authorize]
 		public async Task<ActionResult<UsersProgressResponse>> Visit([FromRoute] Course course, [FromRoute] Guid slideId)
 		{
@@ -192,7 +193,7 @@ namespace Ulearn.Web.Api.Controllers
 		/// <summary>
 		/// Пропустить задачу. Это позволит увидеть чужие решения. Но не даст получить баллы за задачу, если их еще нет
 		/// </summary>
-		[HttpPut("{courseId}/exercise/{slideId}/skip")]
+		[HttpPut("{courseId}/{slideId}/exercise/skip")]
 		[Authorize]
 		public async Task<IActionResult> SkipExercise([FromRoute] Course course, [FromRoute] Guid slideId)
 		{
