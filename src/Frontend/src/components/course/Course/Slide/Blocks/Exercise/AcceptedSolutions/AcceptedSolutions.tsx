@@ -8,7 +8,7 @@ import {
 	LikedAcceptedSolutionsResponse
 } from "src/models/acceptedSolutions";
 import StaticCode from "../StaticCode";
-import { AcceptedSolutionsApiInterface } from "src/api/acceptedSolutions";
+import { AcceptedSolutionsApi } from "src/api/acceptedSolutions";
 
 interface AcceptedSolutionsProps {
 	courseId: string,
@@ -16,7 +16,7 @@ interface AcceptedSolutionsProps {
 	userId: string,
 	isInstructor: boolean,
 	onClose: () => void,
-	acceptedSolutionsApi: AcceptedSolutionsApiInterface,
+	acceptedSolutionsApi: AcceptedSolutionsApi,
 }
 
 enum TabsType {

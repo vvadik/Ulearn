@@ -2,7 +2,7 @@
 import api from "./index";
 import { buildQuery } from "../utils";
 
-export interface AcceptedSolutionsApiInterface {
+export interface AcceptedSolutionsApi {
 	getAcceptedSolutions: (courseId: string, slideId: string) => Promise<AcceptedSolutionsResponse>,
 	getLikedAcceptedSolutions: (courseId: string, slideId: string, offset: number,
 		count: number
