@@ -2,20 +2,21 @@
 import { Modal, Tabs } from "@skbkontur/react-ui";
 
 import texts from "./AcceptedSolutions.texts";
-import { getAcceptedSolutions, getLikedAcceptedSolutions } from "src/api/acceptedSolutions";
 import {
 	AcceptedSolution,
 	AcceptedSolutionsResponse,
 	LikedAcceptedSolutionsResponse
 } from "src/models/acceptedSolutions";
 import StaticCode from "../StaticCode";
+import { AcceptedSolutionsApiInterface } from "src/api/acceptedSolutions";
 
 interface AcceptedSolutionsProps {
 	courseId: string,
 	slideId: string,
 	userId: string,
 	isInstructor: boolean,
-	onClose: () => void
+	onClose: () => void,
+	acceptedSolutionsApi: AcceptedSolutionsApiInterface,
 }
 
 enum TabsType {
@@ -50,14 +51,14 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 	}
 
 	fetchContentFromServer() {
-		const { courseId, slideId, isInstructor, } = this.props;
-		const getAcceptedSolutionsPromise = getAcceptedSolutions(courseId, slideId);
+		const { courseId, slideId, isInstructor, acceptedSolutionsApi } = this.props;
+		const getAcceptedSolutionsPromise = acceptedSolutionsApi.getAcceptedSolutions(courseId, slideId);
 		if(!isInstructor) {
 			getAcceptedSolutionsPromise
 				.then(acceptedSolutionsResponse => this.setState({ acceptedSolutionsResponse, loading: false }))
 				.catch(this.processError.bind(this));
 		} else {
-			const getLikedAcceptedSolutionsPromise = getLikedAcceptedSolutions(courseId, slideId, 0,
+			const getLikedAcceptedSolutionsPromise = acceptedSolutionsApi.getLikedAcceptedSolutions(courseId, slideId, 0,
 				LikedAcceptedSolutionsCount);
 			Promise.all([getAcceptedSolutionsPromise, getLikedAcceptedSolutionsPromise])
 				.then(result => {
@@ -69,7 +70,8 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 	}
 
 	processError(error: any): void {
-		this.setState({ loading: false, error: `Ошибка с кодом ${ error.status }` });
+		error.showToast();
+		this.props.onClose();
 	}
 
 	handleTabChange(value: string): void {
@@ -80,7 +82,7 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 		const { onClose, isInstructor } = this.props;
 		const { error, loading, activeTab } = this.state;
 
-		if(loading) {
+		if(loading || error) {
 			return null;
 		}
 		return (
@@ -89,15 +91,14 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 					{ texts.title }
 				</Modal.Header>
 				<Modal.Body>
-					{ error }
-					{ !error && isInstructor &&
+					{ isInstructor &&
 					<Tabs value={ activeTab } onValueChange={ s => this.handleTabChange(s) }>
 						<Tabs.Tab id={ TabsType.instructorTab }>{ texts.instructorTabName }</Tabs.Tab>
 						<Tabs.Tab id={ TabsType.studentTab }>{ texts.studentTabName }</Tabs.Tab>
 					</Tabs>
 					}
-					{ !error && activeTab === TabsType.instructorTab && this.renderInstructorTab() }
-					{ !error && activeTab === TabsType.studentTab && this.renderStudentTab() }
+					{ activeTab === TabsType.instructorTab && this.renderInstructorTab() }
+					{ activeTab === TabsType.studentTab && this.renderStudentTab() }
 				</Modal.Body>
 			</Modal>);
 	}
@@ -129,7 +130,7 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 	renderSolution(solution: AcceptedSolution) {
 		const { isInstructor, } = this.props;
 		return <div key={ solution.submissionId }>
-			<StaticCode code={solution.code} language={solution.language} />
+			<StaticCode code={ solution.code } language={ solution.language }/>
 		</div>;
 	}
 }

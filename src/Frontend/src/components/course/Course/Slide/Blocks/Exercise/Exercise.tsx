@@ -16,6 +16,7 @@ import { darkFlat } from "src/uiTheme";
 import classNames from 'classnames';
 import moment from "moment";
 
+import * as acceptedSolutionsApi from "src/api/acceptedSolutions";
 import { exerciseSolutions, loadFromCache, saveToCache, } from "src/utils/localStorageManager";
 import { convertDefaultTimezoneToLocal } from "src/utils/momentUtils";
 import { isInstructor } from "src/utils/courseRoles";
@@ -811,6 +812,7 @@ class Exercise extends React.Component<Props, State> {
 						userId={ user!.id! }
 						isInstructor={ instructor }
 						onClose={ this.closeModal }
+						acceptedSolutionsApi={ acceptedSolutionsApi }
 					/>
 				);
 			}
