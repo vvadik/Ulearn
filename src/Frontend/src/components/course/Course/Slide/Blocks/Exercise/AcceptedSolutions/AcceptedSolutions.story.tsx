@@ -10,6 +10,7 @@ import {
 } from "src/models/acceptedSolutions";
 import { Language } from "src/consts/languages";
 import { returnPromiseAfterDelay } from "src/utils/storyMock";
+import { getMockedShortUser } from "../../../../../../comments/storiesData";
 
 const Template: Story<AcceptedSolutionsProps> = (args: AcceptedSolutionsProps) =>
 	<AcceptedSolutionsModal { ...args } />;
@@ -41,15 +42,16 @@ const getAcceptedSolutionsApi = (promotedSolutions: AcceptedSolution[], randomLi
 
 const as: AcceptedSolution = {
 	submissionId: 1,
-	code: "var a = 1\nvar a = 1",
+	code: "var a = 1\nvar a = 1\nvar a = 1\nvar a = 1",
 	language: Language.cSharp,
 	likesCount: 1,
 	likedByMe: true,
+	promotedBy: getMockedShortUser({})
 };
 
 const as2: AcceptedSolution = {
 	submissionId: 2,
-	code: "var a = 2\nvar a = 2",
+	code: "var a = 2\nvar a = 2\nvar a = 2\nvar a = 2",
 	language: Language.cSharp,
 	likesCount: 0,
 	likedByMe: false,

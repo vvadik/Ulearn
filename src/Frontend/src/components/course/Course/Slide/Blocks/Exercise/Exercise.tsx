@@ -774,7 +774,7 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	renderModal = (modalData: ModalData<ModalType>): React.ReactNode => {
-		const { hideSolutions, courseId, slideId, user } = this.props;
+		const { hideSolutions, courseId, slideId, user, forceInitialCode } = this.props;
 
 		switch (modalData.type) {
 			case ModalType.congrats: {
@@ -810,7 +810,7 @@ class Exercise extends React.Component<Props, State> {
 					<AcceptedSolutionsModal
 						courseId={ courseId }
 						slideId={ slideId }
-						isInstructor={ instructor }
+						isInstructor={ instructor && !forceInitialCode }
 						onClose={ this.closeModal }
 						acceptedSolutionsApi={ acceptedSolutionsApi }
 					/>

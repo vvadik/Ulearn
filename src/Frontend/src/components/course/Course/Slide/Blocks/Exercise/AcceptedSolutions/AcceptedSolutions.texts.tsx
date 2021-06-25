@@ -1,14 +1,26 @@
 ﻿import React from "react";
+import getPluralForm from "src/utils/getPluralForm";
+import { ShortUserInfo } from "src/models/users";
 
 const texts = {
-	title: 'Решения',
-	instructorTabName: 'Страница преподавателя',
-	studentTabName: 'Видит студент',
+	title: 'Чужие решения',
+	instructorTabName: 'Как преподаватель',
+	studentTabName: 'Как студент',
 	studentInstructions: 'Проголосуйте за решения, в которых вы нашли что-то новое для себя',
-	instructorInstructions: 'Проголосуйте за решения, которые будут покзываться студентам в «Выбранные преподавателем решения». Список решений один на весь курс.',
+	instructorInstructions: <>
+		Выберите решения, которые будут покзываться студентам в списке «Выбранные
+		преподавателями».
+		Список рекомендованных решений один на весь курс, т.е. вы редактируете глобальный список.
+	</>,
 	noSubmissions: 'Никто еще не решил задачу',
-	promotedSolutionsHeader: 'Выбранные преподавателем решения',
-	solutionsHeader: 'Последние решения',
+	promotedSolutionsHeader: 'Выбранные преподавателями',
+	solutionsHeader: 'Новые решения',
+	likedSolutionsHeader: 'Последние полайканные студентами решения',
+	promoteHint: 'Рекомендовать',
+	unpromoteHint: 'Убрать из рекомендованных',
+	getPromotedByText: (promotedBy: ShortUserInfo) => <>Рекомендовал <i>{promotedBy.visibleName}</i></>,
+	getDisabledLikesHint: (count: number): string =>
+		count + ' ' + getPluralForm(count, 'студент лайкнул', 'студента лайкнули', 'студентов лайкнули')
 };
 
 export default texts;

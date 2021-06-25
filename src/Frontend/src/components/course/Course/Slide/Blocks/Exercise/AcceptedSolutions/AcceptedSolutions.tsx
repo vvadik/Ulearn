@@ -1,5 +1,5 @@
 ﻿import React from "react";
-import { Modal, Tabs, Button } from "@skbkontur/react-ui";
+import { Modal, Tabs, Button, Hint } from "@skbkontur/react-ui";
 
 import texts from "./AcceptedSolutions.texts";
 import {
@@ -9,6 +9,9 @@ import {
 } from "src/models/acceptedSolutions";
 import StaticCode from "../StaticCode";
 import { AcceptedSolutionsApi } from "src/api/acceptedSolutions";
+
+import { Heart, Star } from 'icons';
+import styles from './AcceptedSolutions.less';
 
 interface AcceptedSolutionsProps {
 	courseId: string,
@@ -57,12 +60,17 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 		this.fetchContentFromServer();
 	}
 
-	fetchContentFromServer() {
+	fetchContentFromServer(afterLoad?: () => void) {
 		const { courseId, slideId, isInstructor, acceptedSolutionsApi } = this.props;
 		const getAcceptedSolutionsPromise = acceptedSolutionsApi.getAcceptedSolutions(courseId, slideId);
 		if(!isInstructor) {
 			getAcceptedSolutionsPromise
-				.then(acceptedSolutionsResponse => this.updateStateWithData(acceptedSolutionsResponse, null))
+				.then(acceptedSolutionsResponse => {
+					this.updateStateWithData(acceptedSolutionsResponse, null);
+					if(afterLoad != null) {
+						afterLoad();
+					}
+				})
 				.catch(this.processErrorAndClose);
 		} else {
 			const getLikedAcceptedSolutionsPromise
@@ -71,6 +79,9 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 				.then(result => {
 					const [acceptedSolutionsResponse, likedAcceptedSolutionsResponse] = result;
 					this.updateStateWithData(acceptedSolutionsResponse, likedAcceptedSolutionsResponse);
+					if(afterLoad != null) {
+						afterLoad();
+					}
 				})
 				.catch(this.processErrorAndClose);
 		}
@@ -87,7 +98,8 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 			solutions = likedSolutions.concat(solutions);
 		}
 		const _solutions: _AcceptedSolution[]
-			= solutions.map(s => ({ ...s, promoted: promotedSolutions.some(ss => ss.submissionId !== s.submissionId) }));
+			= solutions.map(
+			s => ({ ...s, promoted: promotedSolutions.some(ss => ss.submissionId === s.submissionId) }));
 		const solutionsDict = Object.assign({}, ..._solutions.map((x) => ({ [x.submissionId]: x })));
 		const stateUpdates: State = {
 			...this.state,
@@ -137,9 +149,12 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 		const { promotedSolutions, likedAcceptedSolutions, solutions } = this.state;
 
 		return <div key={ TabsType.instructorTab }>
+			<h4>{ texts.likedSolutionsHeader }</h4>
 			<p>{ texts.instructorInstructions }</p>
-			{ promotedSolutions.map(s => this.renderSolution(solutions[s])) }
-			{ likedAcceptedSolutions!.map(s => this.renderSolution(solutions[s])) }
+			<div className={ styles.solutionsList }>
+				{ promotedSolutions.map(s => this.renderSolution(solutions[s])) }
+				{ likedAcceptedSolutions!.map(s => this.renderSolution(solutions[s])) }
+			</div>
 		</div>;
 	}
 
@@ -150,15 +165,19 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 		return <div key={ TabsType.studentTab }>
 			{ promotedSolutions.length > 0 &&
 			<>
-				<h3>{ texts.promotedSolutionsHeader }</h3>
-				{ promotedSolutions.map(s => this.renderSolution(solutions[s])) }
+				<h4>{ texts.promotedSolutionsHeader }</h4>
+				<div className={ styles.solutionsList }>
+					{ promotedSolutions.map(s => this.renderSolution(solutions[s])) }
+				</div>
 			</>
 			}
 			{ randomAndNewestSolutions.length > 0 &&
 			<>
-				<h3>{ texts.solutionsHeader }</h3>
+				<h4>{ texts.solutionsHeader }</h4>
 				<p>{ texts.studentInstructions }</p>
-				{ randomAndNewestSolutions.map(s => this.renderSolution(solutions[s])) }
+				<div className={ styles.solutionsList }>
+					{ randomAndNewestSolutions.map(s => this.renderSolution(solutions[s])) }
+				</div>
 			</>
 			}
 		</div>;
@@ -166,29 +185,41 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 
 	renderSolution(solution: _AcceptedSolution) {
 		const { isInstructor, } = this.props;
-		return <div key={ solution.submissionId }>
-			{ !solution.promoted &&
-			<Button
-				use={ solution.likedByMe && !isInstructor ? "primary" : "default" }
-				disabled={ isInstructor }
-				onClick={ () => this.like(solution.submissionId) }>
-				Число лайков: { solution.likesCount }
-			</Button>
-			}
-			{ isInstructor &&
-			<Button
-				use={ solution.promoted ? "primary" : "default" }
-				onClick={ () => this.promote(solution.submissionId) }>
-				{ solution.promoted ? 'Рекомендовано' : 'Не рекомендовано' }
-			</Button>
-			}
-			<StaticCode code={ solution.code } language={ solution.language }/>
+		const { activeTab, } = this.state;
+		const asInstructor = isInstructor && activeTab === TabsType.instructorTab;
+		return <div key={ solution.submissionId } className={ styles.solution }>
+			<div className={ styles.controls }>
+				{ asInstructor &&
+				<Hint text={ solution.promoted ? texts.unpromoteHint : texts.promoteHint }>
+					<Button
+						className={ styles.button }
+						use={ solution.promoted ? "primary" : "default" }
+						onClick={ () => this.promote(solution.submissionId) }>
+						<Star/>
+					</Button>
+				</Hint>
+				}
+				{ !solution.promoted &&
+				<Hint text={ asInstructor && solution.likesCount !== null ? texts.getDisabledLikesHint(solution.likesCount) : null }>
+					<Button
+						className={ styles.button }
+						use={ solution.likedByMe && !asInstructor ? "primary" : "default" }
+						disabled={ asInstructor }
+						onClick={ () => this.like(solution.submissionId) }>
+						<Heart/> { solution.likesCount }
+					</Button>
+				</Hint>
+				}
+			</div>
+			<div className={ styles.codeCell }>
+				{ asInstructor && solution.promoted && solution.promotedBy && <div>{texts.getPromotedByText(solution.promotedBy!)}</div> }
+				<StaticCode code={ solution.code } language={ solution.language }/>
+			</div>
 		</div>;
 	}
 
 	handleTabChange = (value: string): void => {
-		this.fetchContentFromServer();
-		this.setState({ activeTab: TabsType[value as keyof typeof TabsType] });
+		this.fetchContentFromServer(() => this.setState({ activeTab: TabsType[value as keyof typeof TabsType] }));
 	};
 
 	like = (submissionId: number): void => {
