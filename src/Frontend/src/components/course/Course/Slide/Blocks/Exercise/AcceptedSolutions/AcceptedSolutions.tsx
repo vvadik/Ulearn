@@ -1,5 +1,5 @@
 ﻿import React from "react";
-import { Modal, Tabs } from "@skbkontur/react-ui";
+import { Modal, Tabs, Button } from "@skbkontur/react-ui";
 
 import texts from "./AcceptedSolutions.texts";
 import {
@@ -13,7 +13,6 @@ import { AcceptedSolutionsApi } from "src/api/acceptedSolutions";
 interface AcceptedSolutionsProps {
 	courseId: string,
 	slideId: string,
-	userId: string,
 	isInstructor: boolean,
 	onClose: () => void,
 	acceptedSolutionsApi: AcceptedSolutionsApi,
@@ -24,11 +23,17 @@ enum TabsType {
 	studentTab = 'studentTab',
 }
 
+interface _AcceptedSolution extends AcceptedSolution {
+	promoted: boolean
+}
+
 interface State {
 	loading: boolean,
-	error: string | null,
-	acceptedSolutionsResponse: AcceptedSolutionsResponse | null,
-	likedAcceptedSolutionsResponse: LikedAcceptedSolutionsResponse | null,
+	solutions: { [id: number]: _AcceptedSolution },
+	promotedSolutions: number[],
+	randomLikedSolutions: number[],
+	newestSolutions: number[],
+	likedAcceptedSolutions: number[] | null,
 	activeTab: TabsType;
 }
 
@@ -39,9 +44,11 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 		super(props);
 		this.state = {
 			loading: true,
-			error: null,
-			acceptedSolutionsResponse: null,
-			likedAcceptedSolutionsResponse: null,
+			solutions: {},
+			promotedSolutions: [],
+			randomLikedSolutions: [],
+			newestSolutions: [],
+			likedAcceptedSolutions: [],
 			activeTab: props.isInstructor ? TabsType.instructorTab : TabsType.studentTab
 		};
 	}
@@ -55,38 +62,61 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 		const getAcceptedSolutionsPromise = acceptedSolutionsApi.getAcceptedSolutions(courseId, slideId);
 		if(!isInstructor) {
 			getAcceptedSolutionsPromise
-				.then(acceptedSolutionsResponse => this.setState({ acceptedSolutionsResponse, loading: false }))
-				.catch(this.processError.bind(this));
+				.then(acceptedSolutionsResponse => this.updateStateWithData(acceptedSolutionsResponse, null))
+				.catch(this.processErrorAndClose);
 		} else {
-			const getLikedAcceptedSolutionsPromise = acceptedSolutionsApi.getLikedAcceptedSolutions(courseId, slideId, 0,
-				LikedAcceptedSolutionsCount);
+			const getLikedAcceptedSolutionsPromise
+				= acceptedSolutionsApi.getLikedAcceptedSolutions(courseId, slideId, 0, LikedAcceptedSolutionsCount);
 			Promise.all([getAcceptedSolutionsPromise, getLikedAcceptedSolutionsPromise])
 				.then(result => {
 					const [acceptedSolutionsResponse, likedAcceptedSolutionsResponse] = result;
-					this.setState({ acceptedSolutionsResponse, likedAcceptedSolutionsResponse, loading: false });
+					this.updateStateWithData(acceptedSolutionsResponse, likedAcceptedSolutionsResponse);
 				})
-				.catch(this.processError.bind(this));
+				.catch(this.processErrorAndClose);
 		}
 	}
 
-	processError(error: any): void {
-		error.showToast();
-		this.props.onClose();
+	updateStateWithData(acceptedSolutionsResponse: AcceptedSolutionsResponse,
+		likedAcceptedSolutionsResponse: LikedAcceptedSolutionsResponse | null
+	) {
+		const { promotedSolutions, randomLikedSolutions, newestSolutions } = acceptedSolutionsResponse;
+		let solutions = newestSolutions.concat(randomLikedSolutions).concat(promotedSolutions);
+		const likedSolutions = likedAcceptedSolutionsResponse?.likedSolutions
+			.filter(s => promotedSolutions.every(ss => ss.submissionId !== s.submissionId));
+		if(likedSolutions) {
+			solutions = likedSolutions.concat(solutions);
+		}
+		const _solutions: _AcceptedSolution[]
+			= solutions.map(s => ({ ...s, promoted: promotedSolutions.some(ss => ss.submissionId !== s.submissionId) }));
+		const solutionsDict = Object.assign({}, ..._solutions.map((x) => ({ [x.submissionId]: x })));
+		const stateUpdates: State = {
+			...this.state,
+			promotedSolutions: promotedSolutions.map(s => s.submissionId),
+			randomLikedSolutions: randomLikedSolutions.map(s => s.submissionId),
+			newestSolutions: newestSolutions.map(s => s.submissionId),
+			likedAcceptedSolutions: likedSolutions?.map(s => s.submissionId) ?? null,
+			solutions: solutionsDict,
+			loading: false
+		};
+		this.setState(stateUpdates);
 	}
 
-	handleTabChange(value: string): void {
-		this.setState({ activeTab: TabsType[value as keyof typeof TabsType] });
+	processErrorAndClose = (error: any): void => {
+		error.showToast();
+		this.props.onClose();
 	};
 
 	render(): React.ReactNode {
 		const { onClose, isInstructor } = this.props;
-		const { error, loading, activeTab } = this.state;
+		const { loading, activeTab } = this.state;
 
-		if(loading || error) {
+		if(loading) {
 			return null;
 		}
+		const maxModalWidth = window.innerWidth - 40;
+		const modalWidth: undefined | number = maxModalWidth > 880 ? 880 : maxModalWidth; //TODO пока что это мок, в будущем width будет другой
 		return (
-			<Modal onClose={ onClose }>
+			<Modal width={ modalWidth } onClose={ onClose }>
 				<Modal.Header>
 					{ texts.title }
 				</Modal.Header>
@@ -104,35 +134,96 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 	}
 
 	renderInstructorTab() {
-		const { acceptedSolutionsResponse, likedAcceptedSolutionsResponse } = this.state;
-		const { promotedSolutions, } = acceptedSolutionsResponse!;
-		const likedSolutions = likedAcceptedSolutionsResponse!.likedSolutions.filter(
-			s => promotedSolutions.every(ss => ss.submissionId !== s.submissionId));
+		const { promotedSolutions, likedAcceptedSolutions, solutions } = this.state;
 
 		return <div key={ TabsType.instructorTab }>
-			{
-				promotedSolutions.concat(likedSolutions).map(s => this.renderSolution(s))
-			}
+			<p>{ texts.instructorInstructions }</p>
+			{ promotedSolutions.map(s => this.renderSolution(solutions[s])) }
+			{ likedAcceptedSolutions!.map(s => this.renderSolution(solutions[s])) }
 		</div>;
 	}
 
 	renderStudentTab() {
-		const { acceptedSolutionsResponse } = this.state;
-		const { promotedSolutions, randomLikedSolutions, newestSolutions } = acceptedSolutionsResponse!;
+		const { promotedSolutions, randomLikedSolutions, newestSolutions, solutions } = this.state;
+		const randomAndNewestSolutions = randomLikedSolutions.concat(newestSolutions);
 
 		return <div key={ TabsType.studentTab }>
-			{
-				promotedSolutions.concat(randomLikedSolutions).concat(newestSolutions).map(s => this.renderSolution(s))
+			{ promotedSolutions.length > 0 &&
+			<>
+				<h3>{ texts.promotedSolutionsHeader }</h3>
+				{ promotedSolutions.map(s => this.renderSolution(solutions[s])) }
+			</>
+			}
+			{ randomAndNewestSolutions.length > 0 &&
+			<>
+				<h3>{ texts.solutionsHeader }</h3>
+				<p>{ texts.studentInstructions }</p>
+				{ randomAndNewestSolutions.map(s => this.renderSolution(solutions[s])) }
+			</>
 			}
 		</div>;
 	}
 
-	renderSolution(solution: AcceptedSolution) {
+	renderSolution(solution: _AcceptedSolution) {
 		const { isInstructor, } = this.props;
 		return <div key={ solution.submissionId }>
+			{ !solution.promoted &&
+			<Button
+				use={ solution.likedByMe && !isInstructor ? "primary" : "default" }
+				disabled={ isInstructor }
+				onClick={ () => this.like(solution.submissionId) }>
+				Число лайков: { solution.likesCount }
+			</Button>
+			}
+			{ isInstructor &&
+			<Button
+				use={ solution.promoted ? "primary" : "default" }
+				onClick={ () => this.promote(solution.submissionId) }>
+				{ solution.promoted ? 'Рекомендовано' : 'Не рекомендовано' }
+			</Button>
+			}
 			<StaticCode code={ solution.code } language={ solution.language }/>
 		</div>;
 	}
+
+	handleTabChange = (value: string): void => {
+		this.fetchContentFromServer();
+		this.setState({ activeTab: TabsType[value as keyof typeof TabsType] });
+	};
+
+	like = (submissionId: number): void => {
+		const isLike = !this.state.solutions[submissionId].likedByMe;
+		const action = isLike
+			? this.props.acceptedSolutionsApi.likeAcceptedSolution
+			: this.props.acceptedSolutionsApi.dislikeAcceptedSolution;
+		action(submissionId)
+			.then(() => {
+				const s = this.state.solutions[submissionId];
+				const solutions = {
+					...this.state.solutions,
+					[submissionId]: { ...s, likedByMe: isLike, likesCount: s.likesCount! + (isLike ? 1 : -1) }
+				};
+				this.setState({ solutions });
+			})
+			.catch(error => error.showToast());
+	};
+
+	promote = (submissionId: number): void => {
+		const isPromote = !this.state.solutions[submissionId].promoted;
+		const action = isPromote
+			? this.props.acceptedSolutionsApi.promoteAcceptedSolution
+			: this.props.acceptedSolutionsApi.unpromoteAcceptedSolution;
+		action(this.props.courseId, submissionId)
+			.then(() => {
+				const s = this.state.solutions[submissionId];
+				const solutions: { [id: number]: _AcceptedSolution } = {
+					...this.state.solutions,
+					[submissionId]: { ...s, promoted: isPromote }
+				};
+				this.setState({ solutions });
+			})
+			.catch(error => error.showToast());
+	};
 }
 
 export { AcceptedSolutionsModal, AcceptedSolutionsProps, };

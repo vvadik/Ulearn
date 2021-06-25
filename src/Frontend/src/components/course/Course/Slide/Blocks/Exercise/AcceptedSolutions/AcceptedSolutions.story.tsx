@@ -9,49 +9,68 @@ import {
 	LikedAcceptedSolutionsResponse
 } from "src/models/acceptedSolutions";
 import { Language } from "src/consts/languages";
+import { returnPromiseAfterDelay } from "src/utils/storyMock";
 
 const Template: Story<AcceptedSolutionsProps> = (args: AcceptedSolutionsProps) =>
 	<AcceptedSolutionsModal { ...args } />;
 
 const getAcceptedSolutionsApi = (promotedSolutions: AcceptedSolution[], randomLikedSolutions: AcceptedSolution[],
-	newestSolutions: AcceptedSolution[], likedSolutions: AcceptedSolution[]
+	newestSolutions: AcceptedSolution[], likedSolutions: AcceptedSolution[] | null
 ): AcceptedSolutionsApi => {
 	return {
 		getAcceptedSolutions: (courseId: string, slideId: string) => {
 			const acceptedSolutionsResponse: AcceptedSolutionsResponse = {
-				promotedSolutions: [],
-				randomLikedSolutions: [],
-				newestSolutions: [],
+				promotedSolutions: promotedSolutions,
+				randomLikedSolutions: randomLikedSolutions,
+				newestSolutions: newestSolutions,
 			};
-			return Promise.resolve(acceptedSolutionsResponse);
+			return returnPromiseAfterDelay(500, acceptedSolutionsResponse);
 		},
 		getLikedAcceptedSolutions: (courseId: string, slideId: string, offset: number, count: number) => {
-			const likedSolutionsResponse: LikedAcceptedSolutionsResponse = { likedSolutions: [] };
-			return Promise.resolve(likedSolutionsResponse);
+			if (likedSolutions == null)
+				throw new Error();
+			const likedSolutionsResponse: LikedAcceptedSolutionsResponse = { likedSolutions: likedSolutions };
+			return returnPromiseAfterDelay(500, likedSolutionsResponse);
 		},
-		likeAcceptedSolution: (solutionId: string) => Promise.resolve({} as Response),
-		dislikeAcceptedSolution: (solutionId: string) => Promise.resolve({} as Response),
-		promoteAcceptedSolution: (courseId: string, solutionId: string) => Promise.resolve({} as Response),
-		unpromoteAcceptedSolution: (courseId: string, solutionId: string) => Promise.resolve({} as Response),
+		likeAcceptedSolution: (solutionId: number) => returnPromiseAfterDelay(200, {} as Response),
+		dislikeAcceptedSolution: (solutionId: number) => returnPromiseAfterDelay(200, {} as Response),
+		promoteAcceptedSolution: (courseId: string, solutionId: number) => returnPromiseAfterDelay(200, {} as Response),
+		unpromoteAcceptedSolution: (courseId: string, solutionId: number) => returnPromiseAfterDelay(200, {} as Response),
 	};
 };
 
-const acceptedSolution: AcceptedSolution = {
+const as: AcceptedSolution = {
 	submissionId: 1,
-	code: "var a = 1\nvar a = 1\n",
+	code: "var a = 1\nvar a = 1",
 	language: Language.cSharp,
-	likesCount: null,
-	likedByMe: null,
+	likesCount: 1,
+	likedByMe: true,
 };
 
-export const emptyAcceptedSolutions = Template.bind({});
-emptyAcceptedSolutions.args = {
+const as2: AcceptedSolution = {
+	submissionId: 2,
+	code: "var a = 2\nvar a = 2",
+	language: Language.cSharp,
+	likesCount: 0,
+	likedByMe: false,
+};
+
+export const instructor = Template.bind({});
+instructor.args = {
 	courseId: "",
 	slideId: "",
-	userId: "",
 	isInstructor: true,
 	onClose: () => {},
-	acceptedSolutionsApi: getAcceptedSolutionsApi([], [], [], []),
+	acceptedSolutionsApi: getAcceptedSolutionsApi([as], [], [as2], [as2]),
+}
+
+export const student = Template.bind({});
+student.args = {
+	courseId: "",
+	slideId: "",
+	isInstructor: false,
+	onClose: () => {},
+	acceptedSolutionsApi: getAcceptedSolutionsApi([as2], [], [as], null),
 }
 
 export default {

@@ -7,10 +7,10 @@ export interface AcceptedSolutionsApi {
 	getLikedAcceptedSolutions: (courseId: string, slideId: string, offset: number,
 		count: number
 	) => Promise<LikedAcceptedSolutionsResponse>,
-	likeAcceptedSolution: (solutionId: string) => Promise<Response>,
-	dislikeAcceptedSolution: (solutionId: string) => Promise<Response>,
-	promoteAcceptedSolution: (courseId: string, solutionId: string) => Promise<Response>,
-	unpromoteAcceptedSolution: (courseId: string, solutionId: string) => Promise<Response>
+	likeAcceptedSolution: (solutionId: number) => Promise<Response>,
+	dislikeAcceptedSolution: (solutionId: number) => Promise<Response>,
+	promoteAcceptedSolution: (courseId: string, solutionId: number) => Promise<Response>,
+	unpromoteAcceptedSolution: (courseId: string, solutionId: number) => Promise<Response>
 }
 
 export function getAcceptedSolutions(courseId: string, slideId: string): Promise<AcceptedSolutionsResponse> {
@@ -24,18 +24,18 @@ export function getLikedAcceptedSolutions(courseId: string, slideId: string, off
 	return api.get(`accepted-solutions/liked` + query);
 }
 
-export function likeAcceptedSolution(solutionId: string): Promise<Response> {
+export function likeAcceptedSolution(solutionId: number): Promise<Response> {
 	return api.put(`accepted-solutions/like?solutionId=${ solutionId }`);
 }
 
-export function dislikeAcceptedSolution(solutionId: string): Promise<Response> {
+export function dislikeAcceptedSolution(solutionId: number): Promise<Response> {
 	return api.delete(`accepted-solutions/like?solutionId=${ solutionId }`);
 }
 
-export function promoteAcceptedSolution(courseId: string, solutionId: string): Promise<Response> {
+export function promoteAcceptedSolution(courseId: string, solutionId: number): Promise<Response> {
 	return api.put(`accepted-solutions/promote?courseId=${ courseId }&solutionId=${ solutionId }`);
 }
 
-export function unpromoteAcceptedSolution(courseId: string, solutionId: string): Promise<Response> {
+export function unpromoteAcceptedSolution(courseId: string, solutionId: number): Promise<Response> {
 	return api.delete(`accepted-solutions/promote?courseId=${ courseId }&solutionId=${ solutionId }`);
 }

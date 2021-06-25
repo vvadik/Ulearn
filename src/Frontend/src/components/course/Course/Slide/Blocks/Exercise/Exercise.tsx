@@ -478,7 +478,8 @@ class Exercise extends React.Component<Props, State> {
 						onShowOutputButtonClicked={ this.toggleOutput }
 					/> }
 					{ attemptsStatistics && <Controls.StatisticsHint attemptsStatistics={ attemptsStatistics }/> }
-					{ (!hideSolutions && (isAllHintsShowed || isSafeShowAcceptedSolutions))
+					{ (!hideSolutions && (isAllHintsShowed || isSafeShowAcceptedSolutions)
+						&& attemptsStatistics && attemptsStatistics.usersWithRightAnswerCount > 0)
 					&& <Controls.AcceptedSolutionsButton
 						acceptedSolutionsUrl={ constructPathToAcceptedSolutions(courseId, slideId) }
 						onVisitAcceptedSolutions={ this.openAcceptedSolutionsModal }
@@ -809,7 +810,6 @@ class Exercise extends React.Component<Props, State> {
 					<AcceptedSolutionsModal
 						courseId={ courseId }
 						slideId={ slideId }
-						userId={ user!.id! }
 						isInstructor={ instructor }
 						onClose={ this.closeModal }
 						acceptedSolutionsApi={ acceptedSolutionsApi }
