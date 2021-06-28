@@ -61,17 +61,17 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			if (!isSkippedOrPassed)
 				return StatusCode((int)HttpStatusCode.NotAcceptable, new { status = "error", message = "You must solve exercise or agree to lose points" });
 
-			var promotedSolutions = (await acceptedSolutionsRepo.GetPromotedSubmissions(course.Id, slideId))
-				.Select(s => new AcceptedSolution(s.SubmissionId, s.Code, s.Language, null, null, isInstructor ? BuildShortUserInfo(s.UserWhoPromote) : null))
-				.ToList();
+			var submissionsLikedByMe = await acceptedSolutionsRepo.GetSubmissionsLikedByMe(course.Id, slideId, UserId);
 
-			var submissionsLikedByMe = isInstructor ? null : await acceptedSolutionsRepo.GetSubmissionsLikedByMe(course.Id, slideId, UserId);
+			var promotedSolutions = (await acceptedSolutionsRepo.GetPromotedSubmissions(course.Id, slideId))
+				.Select(s => new AcceptedSolution(s.SubmissionId, s.Code, s.Language, s.LikesCount, submissionsLikedByMe.Contains(s.SubmissionId), isInstructor ? BuildShortUserInfo(s.UserWhoPromote) : null))
+				.ToList();
 
 			var randomLikedSolution = await acceptedSolutionsRepo.GetRandomLikedSubmission(course.Id, slideId);
 			if (randomLikedSolution != null && promotedSolutions.Any(s => s.SubmissionId == randomLikedSolution.Value.SubmissionId || s.Code == randomLikedSolution.Value.Code))
 				randomLikedSolution = null;
 			var randomLikedSolutions = Enumerable.Repeat(randomLikedSolution, 1).Where(s => s.HasValue)
-				.Select(s => new AcceptedSolution(s.Value.SubmissionId, s.Value.Code, s.Value.Language, s.Value.LikesCount, submissionsLikedByMe?.Contains(s.Value.SubmissionId), null))
+				.Select(s => new AcceptedSolution(s.Value.SubmissionId, s.Value.Code, s.Value.Language, s.Value.LikesCount, submissionsLikedByMe.Contains(s.Value.SubmissionId), null))
 				.ToList();
 
 			const int newestSolutionsCount = 5;
@@ -79,7 +79,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				.Where(s => !promotedSolutions.Concat(randomLikedSolutions)
 					.Any(existing => s.SubmissionId == existing.SubmissionId || s.Code == existing.Code))
 				.Take(newestSolutionsCount)
-				.Select(s => new AcceptedSolution(s.SubmissionId, s.Code, s.Language, s.LikesCount, submissionsLikedByMe?.Contains(s.SubmissionId), null))
+				.Select(s => new AcceptedSolution(s.SubmissionId, s.Code, s.Language, s.LikesCount, submissionsLikedByMe.Contains(s.SubmissionId), null))
 				.ToList();
 
 			return new AcceptedSolutionsResponse
@@ -97,8 +97,10 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		[Authorize(Policy = "Instructors")]
 		public async Task<ActionResult<LikedAcceptedSolutionsResponse>> GetLikedAcceptedSolutions([FromQuery] LikedAcceptedSolutionsParameters p)
 		{
+			var submissionsLikedByMe = await acceptedSolutionsRepo.GetSubmissionsLikedByMe(p.CourseId, p.SlideId, UserId);
+
 			var likedSolutions = (await acceptedSolutionsRepo.GetLikedAcceptedSolutions(p.CourseId, p.SlideId, p.Offset, p.Count))
-				.Select(s => new AcceptedSolution(s.SubmissionId, s.Code, s.Language, s.LikesCount, null, null))
+				.Select(s => new AcceptedSolution(s.SubmissionId, s.Code, s.Language, s.LikesCount, submissionsLikedByMe.Contains(s.SubmissionId), null))
 				.ToList();
 			return new LikedAcceptedSolutionsResponse
 			{
@@ -161,7 +163,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			if (!await acceptedSolutionsRepo.HasSubmissionBeenPromoted(solutionId))
 				return Ok(new SuccessResponseWithMessage($"You don't have promoted for the solution {solutionId}"));
 
-			await acceptedSolutionsRepo.TryUnlikeSubmission(solutionId, UserId);
+			await acceptedSolutionsRepo.TryUnpromoteSubmission(solutionId, UserId);
 
 			return Ok(new SuccessResponseWithMessage($"You have unpromoted the solution {solutionId}"));
 		}

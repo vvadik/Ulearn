@@ -206,8 +206,8 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 				</Hint>
 				}
 				{ !solution.promoted &&
-				<Hint text={ asInstructor && solution.likesCount !== null ? texts.getDisabledLikesHint(
-					solution.likesCount) : null }>
+				<Hint text={ asInstructor && solution.likesCount !== null
+					? texts.getDisabledLikesHint(solution.likesCount) : null }>
 					<Button
 						className={ styles.button }
 						use={ solution.likedByMe && !asInstructor ? "primary" : "default" }

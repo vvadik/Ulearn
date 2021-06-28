@@ -14,7 +14,7 @@ namespace Database.Repos
 	public interface IAcceptedSolutionsRepo
 	{
 		Task<List<(int SubmissionId, string Code, Language Language, int LikesCount)>> GetNewestSubmissions(string courseId, Guid slideId, int count);
-		Task<List<(int SubmissionId, string Code, Language Language, ApplicationUser UserWhoPromote)>> GetPromotedSubmissions(string courseId, Guid slideId);
+		Task<List<(int SubmissionId, string Code, Language Language, int LikesCount, ApplicationUser UserWhoPromote)>> GetPromotedSubmissions(string courseId, Guid slideId);
 		Task<(int SubmissionId, string Code, Language Language, int LikesCount)?> GetRandomLikedSubmission(string courseId, Guid slideId);
 		Task<List<(int SubmissionId, string Code, Language Language, int LikesCount)>> GetLikedAcceptedSolutions(string courseId, Guid slideId, int offset, int count);
 		Task<HashSet<int>> GetSubmissionsLikedByMe(string courseId, Guid slideId, string userId);
@@ -56,12 +56,12 @@ namespace Database.Repos
 				.ToList();
 		}
 
-		public async Task<List<(int SubmissionId, string Code, Language Language, ApplicationUser UserWhoPromote)>> GetPromotedSubmissions(string courseId, Guid slideId)
+		public async Task<List<(int SubmissionId, string Code, Language Language, int LikesCount, ApplicationUser UserWhoPromote)>> GetPromotedSubmissions(string courseId, Guid slideId)
 		{
 			return (await db.AcceptedSolutionsPromotes.Where(p => p.Submission.CourseId == courseId && p.Submission.SlideId == slideId)
-				.Select(s => new { s.SubmissionId, Code = s.Submission.SolutionCode.Text, s.Submission.Language, UserWhoPromote = s.User })
+				.Select(s => new { s.SubmissionId, Code = s.Submission.SolutionCode.Text, s.Submission.Language, Likes = s.Submission.Likes.Count, UserWhoPromote = s.User })
 				.ToListAsync())
-				.Select(s => (s.SubmissionId, s.Code, s.Language, s.UserWhoPromote))
+				.Select(s => (s.SubmissionId, s.Code, s.Language, LikesCount: s.Likes, s.UserWhoPromote))
 				.ToList();
 		}
 
