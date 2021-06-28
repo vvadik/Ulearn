@@ -28,15 +28,17 @@ const getAcceptedSolutionsApi = (promotedSolutions: AcceptedSolution[], randomLi
 			return returnPromiseAfterDelay(500, acceptedSolutionsResponse);
 		},
 		getLikedAcceptedSolutions: (courseId: string, slideId: string, offset: number, count: number) => {
-			if (likedSolutions == null)
+			if(likedSolutions == null) {
 				throw new Error();
+			}
 			const likedSolutionsResponse: LikedAcceptedSolutionsResponse = { likedSolutions: likedSolutions };
 			return returnPromiseAfterDelay(500, likedSolutionsResponse);
 		},
 		likeAcceptedSolution: (solutionId: number) => returnPromiseAfterDelay(200, {} as Response),
 		dislikeAcceptedSolution: (solutionId: number) => returnPromiseAfterDelay(200, {} as Response),
 		promoteAcceptedSolution: (courseId: string, solutionId: number) => returnPromiseAfterDelay(200, {} as Response),
-		unpromoteAcceptedSolution: (courseId: string, solutionId: number) => returnPromiseAfterDelay(200, {} as Response),
+		unpromoteAcceptedSolution: (courseId: string, solutionId: number) => returnPromiseAfterDelay(200,
+			{} as Response),
 	};
 };
 
@@ -57,15 +59,24 @@ const as2: AcceptedSolution = {
 	likedByMe: false,
 };
 
+const longLinesSolution: AcceptedSolution = {
+	submissionId: 4,
+	code: "var a=2;a=2;a=2;a=2;a=2;a=2;a=2;a=2;a=2;a=2;a=2;a=2;a=2;a=2;a=2;a=2;a=2;a=2;a=2;a=2;a=2;a=2;a=2;a=2;a=2;a=2;a=2;a=2;a=2;a=2;a=2;a=2;",
+	language: Language.javaScript,
+	likesCount: 3,
+	likedByMe: false,
+};
+
 export const instructor = Template.bind({});
 instructor.args = {
 	courseId: "",
 	slideId: "",
 	isInstructor: true,
 	userVisibleName: getMockedShortUser({}).visibleName,
-	onClose: () => {},
-	acceptedSolutionsApi: getAcceptedSolutionsApi([as], [], [as2], [as2]),
-}
+	onClose: () => {
+	},
+	acceptedSolutionsApi: getAcceptedSolutionsApi([as], [longLinesSolution], [as2], [as2]),
+};
 
 export const student = Template.bind({});
 student.args = {
@@ -73,9 +84,10 @@ student.args = {
 	slideId: "",
 	isInstructor: false,
 	userVisibleName: getMockedShortUser({}).visibleName,
-	onClose: () => {},
-	acceptedSolutionsApi: getAcceptedSolutionsApi([as2], [], [as], null),
-}
+	onClose: () => {
+	},
+	acceptedSolutionsApi: getAcceptedSolutionsApi([as2], [longLinesSolution], [as], null),
+};
 
 export default {
 	title: "Exercise/AcceptedSolutions",

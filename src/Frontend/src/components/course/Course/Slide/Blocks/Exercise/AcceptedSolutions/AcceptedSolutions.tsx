@@ -157,9 +157,11 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 		return <div key={ TabsType.instructorTab }>
 			<h4>{ texts.likedSolutionsHeader }</h4>
 			<p>{ texts.instructorInstructions }</p>
-			<div className={ styles.solutionsList }>
-				{ promotedSolutions.map(s => this.renderSolution(solutions[s])) }
-				{ likedAcceptedSolutions!.map(s => this.renderSolution(solutions[s])) }
+			<div className={ styles.solutionsListWrapper }>
+				<div className={ styles.solutionsList }>
+					{ promotedSolutions.map(s => this.renderSolution(solutions[s])) }
+					{ likedAcceptedSolutions!.map(s => this.renderSolution(solutions[s])) }
+				</div>
 			</div>
 		</div>;
 	}
@@ -172,8 +174,10 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 			{ promotedSolutions.length > 0 &&
 			<>
 				<h4>{ texts.promotedSolutionsHeader }</h4>
-				<div className={ styles.solutionsList }>
-					{ promotedSolutions.map(s => this.renderSolution(solutions[s])) }
+				<div className={ styles.solutionsListWrapper }>
+					<div className={ styles.solutionsList }>
+						{ promotedSolutions.map(s => this.renderSolution(solutions[s])) }
+					</div>
 				</div>
 			</>
 			}
@@ -181,8 +185,10 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 			<>
 				<h4>{ texts.solutionsHeader }</h4>
 				<p>{ texts.studentInstructions }</p>
-				<div className={ styles.solutionsList }>
-					{ randomAndNewestSolutions.map(s => this.renderSolution(solutions[s])) }
+				<div className={ styles.solutionsListWrapper }>
+					<div className={ styles.solutionsList }>
+						{ randomAndNewestSolutions.map(s => this.renderSolution(solutions[s])) }
+					</div>
 				</div>
 			</>
 			}
