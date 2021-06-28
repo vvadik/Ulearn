@@ -16,6 +16,7 @@ import styles from './AcceptedSolutions.less';
 interface AcceptedSolutionsProps {
 	courseId: string,
 	slideId: string,
+	userVisibleName: string,
 	isInstructor: boolean,
 	onClose: () => void,
 	acceptedSolutionsApi: AcceptedSolutionsApi,
@@ -27,7 +28,8 @@ enum TabsType {
 }
 
 interface _AcceptedSolution extends AcceptedSolution {
-	promoted: boolean
+	promoted: boolean,
+	promotedByVisibleName: string | null
 }
 
 interface State {
@@ -99,7 +101,11 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 		}
 		const _solutions: _AcceptedSolution[]
 			= solutions.map(
-			s => ({ ...s, promoted: promotedSolutions.some(ss => ss.submissionId === s.submissionId) }));
+			s => ({
+				...s,
+				promoted: promotedSolutions.some(ss => ss.submissionId === s.submissionId),
+				promotedByVisibleName: s.promotedBy?.visibleName ?? null
+			}));
 		const solutionsDict = Object.assign({}, ..._solutions.map((x) => ({ [x.submissionId]: x })));
 		const stateUpdates: State = {
 			...this.state,
@@ -200,7 +206,8 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 				</Hint>
 				}
 				{ !solution.promoted &&
-				<Hint text={ asInstructor && solution.likesCount !== null ? texts.getDisabledLikesHint(solution.likesCount) : null }>
+				<Hint text={ asInstructor && solution.likesCount !== null ? texts.getDisabledLikesHint(
+					solution.likesCount) : null }>
 					<Button
 						className={ styles.button }
 						use={ solution.likedByMe && !asInstructor ? "primary" : "default" }
@@ -212,7 +219,8 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 				}
 			</div>
 			<div className={ styles.codeCell }>
-				{ asInstructor && solution.promoted && solution.promotedBy && <div>{texts.getPromotedByText(solution.promotedBy!)}</div> }
+				{ asInstructor && solution.promoted && solution.promotedByVisibleName &&
+				<div>{ texts.getPromotedByText(solution.promotedByVisibleName) }</div> }
 				<StaticCode code={ solution.code } language={ solution.language }/>
 			</div>
 		</div>;
@@ -249,7 +257,11 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 				const s = this.state.solutions[submissionId];
 				const solutions: { [id: number]: _AcceptedSolution } = {
 					...this.state.solutions,
-					[submissionId]: { ...s, promoted: isPromote }
+					[submissionId]: {
+						...s,
+						promoted: isPromote,
+						promotedByVisibleName: isPromote ? this.props.userVisibleName : null
+					}
 				};
 				this.setState({ solutions });
 			})

@@ -811,6 +811,7 @@ class Exercise extends React.Component<Props, State> {
 						courseId={ courseId }
 						slideId={ slideId }
 						isInstructor={ instructor && !forceInitialCode }
+						userVisibleName={ user!.visibleName! }
 						onClose={ this.closeModal }
 						acceptedSolutionsApi={ acceptedSolutionsApi }
 					/>

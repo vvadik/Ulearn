@@ -62,6 +62,7 @@ instructor.args = {
 	courseId: "",
 	slideId: "",
 	isInstructor: true,
+	userVisibleName: getMockedShortUser({}).visibleName,
 	onClose: () => {},
 	acceptedSolutionsApi: getAcceptedSolutionsApi([as], [], [as2], [as2]),
 }
@@ -71,6 +72,7 @@ student.args = {
 	courseId: "",
 	slideId: "",
 	isInstructor: false,
+	userVisibleName: getMockedShortUser({}).visibleName,
 	onClose: () => {},
 	acceptedSolutionsApi: getAcceptedSolutionsApi([as2], [], [as], null),
 }

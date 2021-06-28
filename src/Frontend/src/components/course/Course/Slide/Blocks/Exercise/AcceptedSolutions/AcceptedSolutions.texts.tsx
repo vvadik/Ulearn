@@ -18,7 +18,7 @@ const texts = {
 	likedSolutionsHeader: 'Последние полайканные студентами решения',
 	promoteHint: 'Рекомендовать',
 	unpromoteHint: 'Убрать из рекомендованных',
-	getPromotedByText: (promotedBy: ShortUserInfo) => <>Рекомендовал <i>{promotedBy.visibleName}</i></>,
+	getPromotedByText: (visibleName: string) => <>Рекомендовал <i>{ visibleName }</i></>,
 	getDisabledLikesHint: (count: number): string =>
 		count + ' ' + getPluralForm(count, 'студент лайкнул', 'студента лайкнули', 'студентов лайкнули')
 };
