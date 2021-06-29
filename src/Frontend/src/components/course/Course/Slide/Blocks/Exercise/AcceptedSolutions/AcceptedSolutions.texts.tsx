@@ -17,9 +17,9 @@ const texts = {
 	promotedSolutionsHeader: 'Выбранные преподавателями',
 	solutionsHeader: 'Новые решения',
 	promoteHint: 'Рекомендовать',
-	unpromoteHint: 'Убрать из рекомендованных',
-	getPromotedByText: (user: ShortUserInfo) => <>{ getGenderForm(user.gender, "Рекомендовала ", "Рекомендовал ") }
-		<i>{ user.visibleName }</i></>,
+	getPromotedByText: (user: ShortUserInfo) => <>
+		{ getGenderForm(user.gender, "Рекомендовала", "Рекомендовал") }<br/>{ user.visibleName }
+	</>,
 	getDisabledLikesHint: (count: number): string =>
 		count + ' ' + getPluralForm(count, 'студент лайкнул', 'студента лайкнули', 'студентов лайкнули')
 };

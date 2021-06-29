@@ -55,7 +55,7 @@ const as2: AcceptedSolution = {
 	submissionId: 2,
 	code: "var a = 2\nvar a = 2\nvar a = 2\nvar a = 2",
 	language: Language.cSharp,
-	likesCount: 0,
+	likesCount: 10000,
 	likedByMe: false,
 };
 

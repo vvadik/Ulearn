@@ -1,5 +1,6 @@
 ﻿import React from "react";
-import { Modal, Tabs, Button, Hint } from "@skbkontur/react-ui";
+import classnames from "classnames";
+import { Modal, Tabs, Hint } from "@skbkontur/react-ui";
 
 import texts from "./AcceptedSolutions.texts";
 import {
@@ -11,7 +12,7 @@ import { ShortUserInfo } from "src/models/users";
 import StaticCode from "../StaticCode";
 import { AcceptedSolutionsApi } from "src/api/acceptedSolutions";
 
-import { Heart, Star } from 'icons';
+import { Heart, HeartLite, Star, Star2 } from 'icons';
 import styles from './AcceptedSolutions.less';
 
 interface AcceptedSolutionsProps {
@@ -155,11 +156,9 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 
 		return <div key={ TabsType.instructorTab }>
 			<p>{ texts.instructorInstructions }</p>
-			<div className={ styles.solutionsListWrapper }>
-				<div className={ styles.solutionsList }>
-					{ promotedSolutions.map(s => this.renderSolution(solutions[s])) }
-					{ likedAcceptedSolutions!.map(s => this.renderSolution(solutions[s])) }
-				</div>
+			<div className={ styles.solutions }>
+				{ promotedSolutions.map(s => this.renderSolution(solutions[s])) }
+				{ likedAcceptedSolutions!.map(s => this.renderSolution(solutions[s])) }
 			</div>
 		</div>;
 	}
@@ -172,10 +171,8 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 			{ promotedSolutions.length > 0 &&
 			<>
 				<h4>{ texts.promotedSolutionsHeader }</h4>
-				<div className={ styles.solutionsListWrapper }>
-					<div className={ styles.solutionsList }>
-						{ promotedSolutions.map(s => this.renderSolution(solutions[s])) }
-					</div>
+				<div className={ styles.solutions }>
+					{ promotedSolutions.map(s => this.renderSolution(solutions[s])) }
 				</div>
 			</>
 			}
@@ -183,10 +180,8 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 			<>
 				{ promotedSolutions.length > 0 && <h4>{ texts.solutionsHeader }</h4> }
 				<p>{ texts.studentInstructions }</p>
-				<div className={ styles.solutionsListWrapper }>
-					<div className={ styles.solutionsList }>
-						{ randomAndNewestSolutions.map(s => this.renderSolution(solutions[s])) }
-					</div>
+				<div className={ styles.solutions }>
+					{ randomAndNewestSolutions.map(s => this.renderSolution(solutions[s])) }
 				</div>
 			</>
 			}
@@ -197,37 +192,46 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 		const { isInstructor, } = this.props;
 		const { activeTab, } = this.state;
 		const asInstructor = isInstructor && activeTab === TabsType.instructorTab;
-		return <div key={ solution.submissionId } className={ styles.solution }>
-			<div className={ styles.controls }>
-				{ asInstructor &&
-				<Hint text={ solution.promoted ? texts.unpromoteHint : texts.promoteHint }>
-					<Button
-						className={ styles.button }
-						use={ solution.promoted ? "primary" : "default" }
-						onClick={ () => this.promote(solution.submissionId) }>
-						<Star/>
-					</Button>
-				</Hint>
-				}
-				{ !solution.promoted &&
-				<Hint text={ asInstructor && solution.likesCount !== null
-					? texts.getDisabledLikesHint(solution.likesCount) : null }>
-					<Button
-						className={ styles.button }
-						use={ solution.likedByMe && !asInstructor ? "primary" : "default" }
-						disabled={ asInstructor }
-						onClick={ () => this.like(solution.submissionId) }>
-						<Heart/> { solution.likesCount }
-					</Button>
-				</Hint>
-				}
-			</div>
-			<div className={ styles.codeCell }>
-				{ asInstructor && solution.promoted && solution.promotedBy &&
-				<div>{ texts.getPromotedByText(solution.promotedBy) }</div> }
-				<StaticCode code={ solution.code } language={ solution.language }/>
+		return <div key={ solution.submissionId }>
+			<StaticCode className={ styles.code } code={ solution.code } language={ solution.language }/>
+			<div className={ styles.controlsWrapper }>
+				<div className={ styles.controls }>
+					{ asInstructor && this.renderPromoteButton(solution) }
+					{ !solution.promoted && this.renderLikeButton(solution, asInstructor) }
+				</div>
 			</div>
 		</div>;
+	}
+
+	renderLikeButton(solution: _AcceptedSolution, asInstructor: boolean) {
+		const className = classnames(styles.button,
+			{ [styles.liked]: solution.likedByMe, [styles.disabled]: asInstructor });
+		return (
+			<Hint text={ asInstructor && solution.likesCount !== null
+				? texts.getDisabledLikesHint(solution.likesCount) : null }><span
+					className={ className }
+					onClick={ () => !asInstructor && this.like(solution.submissionId) }>
+					{ solution.likesCount } { solution.likedByMe
+						? <Heart className={ styles.icon }/>
+					 	: <HeartLite className={ styles.icon }/> }
+				</span>
+			</Hint>
+		);
+	}
+
+	renderPromoteButton(solution: _AcceptedSolution) {
+		const className = classnames(styles.button, { [styles.promoted]: solution.promoted });
+		return (
+			<Hint text={ solution.promoted ? texts.getPromotedByText(solution.promotedBy!) : texts.promoteHint }>
+				<span
+					className={ className }
+					onClick={ () => this.promote(solution.submissionId) }>
+						{ solution.promoted
+							? <Star className={ styles.icon }/>
+							: <Star2 className={ styles.icon }/> }
+				</span>
+			</Hint>
+		);
 	}
 
 	handleTabChange = (value: string): void => {
