@@ -1,6 +1,7 @@
 ﻿import React from "react";
 import getPluralForm from "src/utils/getPluralForm";
 import { ShortUserInfo } from "src/models/users";
+import getGenderForm from "src/utils/getGenderForm";
 
 const texts = {
 	title: 'Чужие решения',
@@ -18,7 +19,8 @@ const texts = {
 	likedSolutionsHeader: 'Последние полайканные студентами решения',
 	promoteHint: 'Рекомендовать',
 	unpromoteHint: 'Убрать из рекомендованных',
-	getPromotedByText: (visibleName: string) => <>Рекомендовал <i>{ visibleName }</i></>,
+	getPromotedByText: (user: ShortUserInfo) => <>{ getGenderForm(user.gender, "Рекомендовала ", "Рекомендовал ") }
+		<i>{ user.visibleName }</i></>,
 	getDisabledLikesHint: (count: number): string =>
 		count + ' ' + getPluralForm(count, 'студент лайкнул', 'студента лайкнули', 'студентов лайкнули')
 };

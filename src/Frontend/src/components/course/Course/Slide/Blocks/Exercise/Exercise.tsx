@@ -48,6 +48,7 @@ import {
 import { SubmissionInfoRedux } from "src/models/reduxState";
 import { SlideUserProgress } from "src/models/userProgress";
 import { ExerciseBlockProps } from "src/models/slide";
+import { ShortUserInfo } from "src/models/users";
 import { AccountState } from "src/redux/account";
 
 import CodeMirror, { Doc, Editor, EditorChange, EditorConfiguration, } from "codemirror";
@@ -62,7 +63,6 @@ import registerCodeMirrorHelpers from "./CodeMirrorAutocompleteExtension";
 import styles from './Exercise.less';
 
 import texts from './Exercise.texts';
-
 
 interface DispatchFunctionsProps {
 	sendCode: (courseId: string, slideId: string, value: string, language: Language,) => unknown;
@@ -811,7 +811,7 @@ class Exercise extends React.Component<Props, State> {
 						courseId={ courseId }
 						slideId={ slideId }
 						isInstructor={ instructor && !forceInitialCode }
-						userVisibleName={ user!.visibleName! }
+						user={ user as ShortUserInfo }
 						onClose={ this.closeModal }
 						acceptedSolutionsApi={ acceptedSolutionsApi }
 					/>

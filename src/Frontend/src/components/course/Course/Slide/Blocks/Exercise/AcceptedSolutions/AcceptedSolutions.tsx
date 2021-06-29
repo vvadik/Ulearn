@@ -7,6 +7,7 @@ import {
 	AcceptedSolutionsResponse,
 	LikedAcceptedSolutionsResponse
 } from "src/models/acceptedSolutions";
+import { ShortUserInfo } from "src/models/users";
 import StaticCode from "../StaticCode";
 import { AcceptedSolutionsApi } from "src/api/acceptedSolutions";
 
@@ -16,7 +17,7 @@ import styles from './AcceptedSolutions.less';
 interface AcceptedSolutionsProps {
 	courseId: string,
 	slideId: string,
-	userVisibleName: string,
+	user: ShortUserInfo,
 	isInstructor: boolean,
 	onClose: () => void,
 	acceptedSolutionsApi: AcceptedSolutionsApi,
@@ -28,8 +29,7 @@ enum TabsType {
 }
 
 interface _AcceptedSolution extends AcceptedSolution {
-	promoted: boolean,
-	promotedByVisibleName: string | null
+	promoted: boolean
 }
 
 interface State {
@@ -103,8 +103,7 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 			= solutions.map(
 			s => ({
 				...s,
-				promoted: promotedSolutions.some(ss => ss.submissionId === s.submissionId),
-				promotedByVisibleName: s.promotedBy?.visibleName ?? null
+				promoted: promotedSolutions.some(ss => ss.submissionId === s.submissionId)
 			}));
 		const solutionsDict = Object.assign({}, ..._solutions.map((x) => ({ [x.submissionId]: x })));
 		const stateUpdates: State = {
@@ -225,8 +224,8 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 				}
 			</div>
 			<div className={ styles.codeCell }>
-				{ asInstructor && solution.promoted && solution.promotedByVisibleName &&
-				<div>{ texts.getPromotedByText(solution.promotedByVisibleName) }</div> }
+				{ asInstructor && solution.promoted && solution.promotedBy &&
+				<div>{ texts.getPromotedByText(solution.promotedBy) }</div> }
 				<StaticCode code={ solution.code } language={ solution.language }/>
 			</div>
 		</div>;
@@ -266,7 +265,7 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 					[submissionId]: {
 						...s,
 						promoted: isPromote,
-						promotedByVisibleName: isPromote ? this.props.userVisibleName : null
+						promotedBy: isPromote ? this.props.user : undefined
 					}
 				};
 				this.setState({ solutions });
