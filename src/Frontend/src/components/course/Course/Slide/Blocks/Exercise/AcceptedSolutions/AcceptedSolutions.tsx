@@ -207,30 +207,33 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 		const className = classnames(styles.button,
 			{ [styles.liked]: solution.likedByMe, [styles.disabled]: asInstructor });
 		return (
-			<Hint text={ asInstructor && solution.likesCount !== null
-				? texts.getDisabledLikesHint(solution.likesCount) : null }><span
-					className={ className }
-					onClick={ () => !asInstructor && this.like(solution.submissionId) }>
-					{ solution.likesCount } { solution.likedByMe
-						? <Heart className={ styles.icon }/>
-					 	: <HeartLite className={ styles.icon }/> }
-				</span>
-			</Hint>
+			<span className={ className } onClick={ () => !asInstructor && this.like(solution.submissionId) }>
+				<Hint text={ asInstructor && solution.likesCount !== null
+					? texts.getDisabledLikesHint(solution.likesCount) : null }>
+					<span className={ styles.buttonContent }>
+						{ solution.likesCount } {
+						solution.likedByMe
+							? <Heart className={ styles.icon }/>
+							: <HeartLite className={ styles.icon }/>
+						}
+					</span>
+				</Hint>
+			</span>
 		);
 	}
 
 	renderPromoteButton(solution: _AcceptedSolution) {
 		const className = classnames(styles.button, { [styles.promoted]: solution.promoted });
 		return (
-			<Hint text={ solution.promoted ? texts.getPromotedByText(solution.promotedBy!) : texts.promoteHint }>
-				<span
-					className={ className }
-					onClick={ () => this.promote(solution.submissionId) }>
-						{ solution.promoted
-							? <Star className={ styles.icon }/>
-							: <Star2 className={ styles.icon }/> }
-				</span>
-			</Hint>
+			<span className={ className } onClick={ () => this.promote(solution.submissionId) }>
+				<Hint text={ solution.promoted ? texts.getPromotedByText(solution.promotedBy!) : texts.promoteHint }>
+					<span className={ styles.buttonContent }>
+					{ solution.promoted
+						? <Star className={ styles.icon }/>
+						: <Star2 className={ styles.icon }/> }
+					</span>
+				</Hint>
+			</span>
 		);
 	}
 
