@@ -139,7 +139,7 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 				</Modal.Header>
 				<Modal.Body>
 					{ isInstructor &&
-					<Tabs value={ activeTab } onValueChange={ s => this.handleTabChange(s) }>
+					<Tabs className={ styles.tabs } value={ activeTab } onValueChange={ s => this.handleTabChange(s) }>
 						<Tabs.Tab id={ TabsType.instructorTab }>{ texts.instructorTabName }</Tabs.Tab>
 						<Tabs.Tab id={ TabsType.studentTab }>{ texts.studentTabName }</Tabs.Tab>
 					</Tabs>
@@ -154,7 +154,6 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 		const { promotedSolutions, likedAcceptedSolutions, solutions } = this.state;
 
 		return <div key={ TabsType.instructorTab }>
-			<h4>{ texts.likedSolutionsHeader }</h4>
 			<p>{ texts.instructorInstructions }</p>
 			<div className={ styles.solutionsListWrapper }>
 				<div className={ styles.solutionsList }>
@@ -182,7 +181,7 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 			}
 			{ randomAndNewestSolutions.length > 0 &&
 			<>
-				<h4>{ texts.solutionsHeader }</h4>
+				{ promotedSolutions.length > 0 && <h4>{ texts.solutionsHeader }</h4> }
 				<p>{ texts.studentInstructions }</p>
 				<div className={ styles.solutionsListWrapper }>
 					<div className={ styles.solutionsList }>
@@ -272,6 +271,6 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 			})
 			.catch(error => error.showToast());
 	};
-}
+};
 
-export { AcceptedSolutionsModal, AcceptedSolutionsProps, };
+export { AcceptedSolutionsModal, AcceptedSolutionsProps };

@@ -78,6 +78,17 @@ instructor.args = {
 	acceptedSolutionsApi: getAcceptedSolutionsApi([as], [longLinesSolution], [as2], [as2]),
 };
 
+export const studentWithPromoted = Template.bind({});
+studentWithPromoted.args = {
+	courseId: "",
+	slideId: "",
+	isInstructor: false,
+	user: getMockedShortUser({}),
+	onClose: () => {
+	},
+	acceptedSolutionsApi: getAcceptedSolutionsApi([as2], [longLinesSolution], [as], null),
+};
+
 export const student = Template.bind({});
 student.args = {
 	courseId: "",
@@ -86,7 +97,7 @@ student.args = {
 	user: getMockedShortUser({}),
 	onClose: () => {
 	},
-	acceptedSolutionsApi: getAcceptedSolutionsApi([as2], [longLinesSolution], [as], null),
+	acceptedSolutionsApi: getAcceptedSolutionsApi([], [longLinesSolution], [as], null),
 };
 
 export default {
