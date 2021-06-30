@@ -84,7 +84,7 @@ namespace Ulearn.Web.Api.Controllers
 			var scoringGroupsWithScores = scores.Select(kvp => kvp.Key.ScoringGroup).ToHashSet();
 			var scoringGroups = course.Settings.Scoring.Groups.Values.Where(sg => scoringGroupsWithScores.Contains(sg.Id)).ToList();
 
-			var headers = new List<string> { "Id", "Login", "Email", "FirstName", "LastName", "VisibleName", "Gender", "LastVisit", "IpAddress" };
+			var headers = new List<string> { "Id", "Login", "Email", "VkUrl", "Telegram", "FirstName", "LastName", "VisibleName", "Gender", "LastVisit", "IpAddress" };
 			if (questions != null)
 				headers = headers.Concat(questions).ToList();
 			if (scoringGroups.Count > 0)
@@ -93,7 +93,7 @@ namespace Ulearn.Web.Api.Controllers
 			var rows = new List<List<string>> { headers };
 			foreach (var i in users)
 			{
-				var row = new List<string> { i.Id, i.Login, i.Email, i.FirstName, i.LastName, i.VisibleName, i.Gender.ToString(), i.LastVisit.ToSortableDate(), i.IpAddress };
+				var row = new List<string> { i.Id, i.Login, i.Email, i.VkUrl, i.Telegram, i.FirstName, i.LastName, i.VisibleName, i.Gender.ToString(), i.LastVisit.ToSortableDate(), i.IpAddress };
 				if (i.Answers != null)
 					row = row.Concat(i.Answers).ToList();
 				row.AddRange(scoringGroups.Select(scoringGroup => (scores.ContainsKey((i.Id, scoringGroup.Id)) ? scores[(i.Id, scoringGroup.Id)] : 0).ToString()));
@@ -117,6 +117,8 @@ namespace Ulearn.Web.Api.Controllers
 					Id = user.Id,
 					Login = user.UserName,
 					Email = user.Email,
+					VkUrl = GetVk(user),
+					Telegram = user.TelegramChatTitle,
 					FirstName = user.FirstName,
 					LastName = user.LastName,
 					VisibleName = user.VisibleName,
@@ -132,12 +134,20 @@ namespace Ulearn.Web.Api.Controllers
 			}
 			return result;
 		}
-		
+
+		private string GetVk(ApplicationUser user)
+		{
+			var vkLogin = db.UserLogins.FirstOrDefault(l => l.LoginProvider == "ВКонтакте" && l.UserId == user.Id);
+			return vkLogin != null ? $"https://vk.com/id{vkLogin.ProviderKey}" : null;
+		}
+
 		private class ExtendedUserInfo : ShortUserInfo
 		{
 			public DateTime LastVisit;
 			public string IpAddress;
 			public List<string> Answers;
+			public string VkUrl;
+			public string Telegram;
 		}
 
 		private async Task<(List<string> questions, List<List<string>> values)> GetQuizAnswers(IEnumerable<string> userIds, string courseId, QuizSlide slide)
