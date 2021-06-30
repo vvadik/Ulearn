@@ -40,7 +40,7 @@ namespace Database.Repos
 
 	public interface ILastVisitsRepo
 	{
-		Task<Dictionary<string, Visit>> FindLastVisit(List<string> userIds);
+		Task<Dictionary<string, Visit>> FindLastVisitsInGroup(int groupId);
 		Task<Dictionary<Guid, LastVisit>> GetLastVisitsInCourse(string courseId, string userId);
 
 		Task<Dictionary<string, DateTime>> GetLastVisitsForCourses(HashSet<string> courseIds, string userId);

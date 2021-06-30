@@ -49,18 +49,17 @@ namespace Ulearn.Web.Api.Controllers
 		[Authorize]
 		public async Task<ActionResult> ExportGroupMembersAsTsv([Required]int groupId, Guid? quizSlideId = null)
 		{
-			var group = await groupsRepo.FindGroupByIdAsync(groupId).ConfigureAwait(false);
+			var group = await groupsRepo.FindGroupByIdAsync(groupId);
 			if (group == null)
 				return StatusCode((int)HttpStatusCode.NotFound, "Group not found");
 
-			var isSystemAdministrator = await IsSystemAdministratorAsync().ConfigureAwait(false);
-			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourse(UserId, group.CourseId, CourseRoleType.CourseAdmin).ConfigureAwait(false);
+			var isSystemAdministrator = await IsSystemAdministratorAsync();
+			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourse(UserId, group.CourseId, CourseRoleType.CourseAdmin);
 
 			if (!(isSystemAdministrator || isCourseAdmin))
 				return StatusCode((int)HttpStatusCode.Forbidden, "You should be course or system admin");
 
-			var users = await groupMembersRepo.GetGroupMembersAsUsersAsync(groupId).ConfigureAwait(false);
-			var extendedUserInfo = await GetExtendedUserInfo(users).ConfigureAwait(false);
+			var users = await GetExtendedUserInfo(groupId);
 
 			List<string> questions = null;
 			var courseId = group.CourseId;
@@ -76,8 +75,8 @@ namespace Ulearn.Web.Api.Controllers
 					return StatusCode((int)HttpStatusCode.NotFound, $"Slide is not quiz slide in course {courseId}");
 
 				List<List<string>> answers;
-				(questions, answers) = await GetQuizAnswers(users, courseId, quizSlide).ConfigureAwait(false);
-				extendedUserInfo = extendedUserInfo.Zip(answers, (u, a) => { u.Answers = a; return u; }).ToList();
+				(questions, answers) = await GetQuizAnswers(users.Select(s => s.Id), courseId, quizSlide);
+				users = users.Zip(answers, (u, a) => { u.Answers = a; return u; }).ToList();
 			}
 
 			var slides = course.GetSlides(false, visibleUnits).Where(s => s.ShouldBeSolved).Select(s => s.Id).ToList();
@@ -92,7 +91,7 @@ namespace Ulearn.Web.Api.Controllers
 				headers = headers.Concat(scoringGroups.Select(s => s.Abbreviation)).ToList();
 
 			var rows = new List<List<string>> { headers };
-			foreach (var i in extendedUserInfo)
+			foreach (var i in users)
 			{
 				var row = new List<string> { i.Id, i.Login, i.Email, i.FirstName, i.LastName, i.VisibleName, i.Gender.ToString(), i.LastVisit.ToSortableDate(), i.IpAddress };
 				if (i.Answers != null)
@@ -105,9 +104,10 @@ namespace Ulearn.Web.Api.Controllers
 			return Content(content, "application/octet-stream");
 		}
 		
-		private async Task<List<ExtendedUserInfo>> GetExtendedUserInfo(List<ApplicationUser> users)
+		private async Task<List<ExtendedUserInfo>> GetExtendedUserInfo(int groupId)
 		{
-			var visits = await visitsRepo.FindLastVisit(users.Select(m => m.Id).ToList()).ConfigureAwait(false);
+			var users = await groupMembersRepo.GetGroupMembersAsUsersAsync(groupId);
+			var visits = await visitsRepo.FindLastVisitsInGroup(groupId);
 
 			var result = new List<ExtendedUserInfo>();
 			foreach (var user in users)
@@ -140,14 +140,14 @@ namespace Ulearn.Web.Api.Controllers
 			public List<string> Answers;
 		}
 
-		private async Task<(List<string> questions, List<List<string>> values)> GetQuizAnswers(List<ApplicationUser> users, string courseId, QuizSlide slide)
+		private async Task<(List<string> questions, List<List<string>> values)> GetQuizAnswers(IEnumerable<string> userIds, string courseId, QuizSlide slide)
 		{
 			var questionBlocks = slide.Blocks.OfType<AbstractQuestionBlock>().ToList();
 			var questions = questionBlocks.Select(q => q.Text.TruncateWithEllipsis(50)).ToList();
 			var rows = new List<List<string>>();
-			foreach (var user in users)
+			foreach (var userId in userIds)
 			{
-				var answers = await userQuizzesRepo.GetAnswersForShowingOnSlideAsync(courseId, slide, user.Id).ConfigureAwait(false);
+				var answers = await userQuizzesRepo.GetAnswersForShowingOnSlideAsync(courseId, slide, userId);
 				var answerStrings = questionBlocks
 					.Select(q
 						=> answers.ContainsKey(q.Id)
