@@ -36,7 +36,6 @@ function StaticCode(props: Props): React.ReactElement<Props> {
 		disableStyles,
 	} = props;
 
-
 	const lines = code.split('\n');
 	const [collapseEditor, showAllCode] = useState(hide && lines.length > 20);
 

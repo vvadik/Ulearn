@@ -45,6 +45,7 @@ import {
 import { SubmissionInfoRedux } from "src/models/reduxState";
 import { SlideUserProgress } from "src/models/userProgress";
 import { ExerciseBlockProps } from "src/models/slide";
+import { SlideContext } from "../../Slide";
 
 import CodeMirror, { Doc, Editor, EditorChange, EditorConfiguration, } from "codemirror";
 import 'codemirror/lib/codemirror.css';
@@ -61,7 +62,7 @@ import texts from './Exercise.texts';
 import { UserInfo } from "src/utils/courseRoles";
 
 
-interface DispatchFunctionsProps {
+export interface FromReduxDispatch {
 	sendCode: (courseId: string, slideId: string, value: string, language: Language,) => unknown;
 	addReviewComment: (courseId: string, slideId: string, submissionId: number, reviewId: number,
 		text: string
@@ -71,24 +72,21 @@ interface DispatchFunctionsProps {
 	visitAcceptedSolutions: (courseId: string, slideId: string) => unknown;
 }
 
-interface FromSlideProps {
-	courseId: string;
-	slideId: string;
-	maxScore: number;
-	forceInitialCode: boolean;
-}
-
-interface FromMapStateToProps {
+export interface FromReduxProps {
 	isAuthenticated: boolean;
 	lastCheckingResponse: RunSolutionResponse | null;
 	user?: UserInfo;
 	slideProgress: SlideUserProgress;
 	submissionError: string | null;
 	deviceType: DeviceType;
+	submissions: SubmissionInfoRedux[];
+	maxScore: number;
+	forceInitialCode: boolean;
 }
 
-interface Props extends ExerciseBlockProps, DispatchFunctionsProps, FromSlideProps, FromMapStateToProps {
+export interface Props extends ExerciseBlockProps, FromReduxDispatch, FromReduxProps {
 	className?: string;
+	slideContext: SlideContext;
 }
 
 enum ModalType {
@@ -207,7 +205,7 @@ class Exercise extends React.Component<Props, State> {
 	}
 
 	loadSlideSubmission = (): void => {
-		const { slideId, submissions, } = this.props;
+		const { slideContext: { slideId, }, submissions, } = this.props;
 
 		if(submissions.length > 0) {
 			this.loadSubmissionToState(submissions[this.lastSubmissionIndex]);
@@ -219,8 +217,7 @@ class Exercise extends React.Component<Props, State> {
 	componentDidUpdate(prevProps: Props): void {
 		const {
 			lastCheckingResponse,
-			courseId,
-			slideId,
+			slideContext: { courseId, slideId, },
 			submissions,
 			forceInitialCode,
 			submissionError,
@@ -243,11 +240,11 @@ class Exercise extends React.Component<Props, State> {
 			return;
 		}
 
-		if(courseId !== prevProps.courseId || slideId !== prevProps.slideId || isAuthenticated && isAuthenticated !== prevProps.isAuthenticated) {
+		if(courseId !== prevProps.slideContext.courseId || slideId !== prevProps.slideContext.slideId || isAuthenticated && isAuthenticated !== prevProps.isAuthenticated) {
 			this.setState({
 				submissionLoading: false,
 			});
-			this.saveCodeDraftToCache(prevProps.slideId, value);
+			this.saveCodeDraftToCache(prevProps.slideContext.slideId, value);
 			this.loadSlideSubmission();
 			return;
 		}
@@ -325,12 +322,12 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	saveCodeDraftToCache = (slideId?: string, value?: string, language?: Language): void => {
-		const { forceInitialCode, isAuthenticated } = this.props;
+		const { forceInitialCode, isAuthenticated, slideContext, } = this.props;
 		const { valueChanged, } = this.state;
 
 		if(valueChanged && !forceInitialCode && isAuthenticated) {
 			saveExerciseCodeToCache(
-				slideId || this.props.slideId,
+				slideId || slideContext.slideId,
 				value || this.state.value,
 				moment().format(),
 				language || this.state.language);
@@ -390,7 +387,8 @@ class Exercise extends React.Component<Props, State> {
 		const {
 			expectedOutput, submissions, user,
 			slideProgress, maxScore, languages,
-			courseId, slideId, hideSolutions, renderedHints,
+			slideContext: { courseId, slideId, },
+			hideSolutions, renderedHints,
 			attemptsStatistics, isAuthenticated,
 		} = this.props;
 		const {
@@ -447,7 +445,7 @@ class Exercise extends React.Component<Props, State> {
 					/>
 					{ exerciseCodeDoc && isReview &&
 					<Review
-						editReviewOrComment={()=>({})}
+						editReviewOrComment={ () => ({}) }
 						user={ user }
 						addReviewComment={ this.addReviewComment }
 						deleteReviewOrComment={ this.deleteReviewComment }
@@ -682,7 +680,7 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	openAcceptedSolutionsModal = (): void => {
-		const { courseId, slideId, visitAcceptedSolutions, submissions, } = this.props;
+		const { slideContext: { courseId, slideId, }, visitAcceptedSolutions, submissions, } = this.props;
 
 		if(!hasSuccessSubmission(submissions)) {
 			visitAcceptedSolutions(courseId, slideId);
@@ -768,7 +766,7 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	renderModal = (modalData: ModalData<ModalType>): React.ReactNode => {
-		const { hideSolutions, courseId, slideId, } = this.props;
+		const { hideSolutions, slideContext: { courseId, slideId, }, } = this.props;
 
 		switch (modalData.type) {
 			case ModalType.congrats: {
@@ -856,7 +854,7 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	resetCodeAndCache = (): void => {
-		const { slideId, exerciseInitialCode, } = this.props;
+		const { slideContext: { slideId, }, exerciseInitialCode, } = this.props;
 
 		this.resetCode();
 		this.saveCodeDraftToCache(slideId, exerciseInitialCode);
@@ -909,7 +907,7 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	loadNewTry = (): void => {
-		const { slideId } = this.props;
+		const { slideContext: { slideId, }, } = this.props;
 		this.resetCode();
 		this.loadLatestCode(slideId);
 	};
@@ -930,7 +928,7 @@ class Exercise extends React.Component<Props, State> {
 
 	sendExercise = (): void => {
 		const { value, language } = this.state;
-		const { courseId, slideId, sendCode, } = this.props;
+		const { slideContext: { courseId, slideId, }, sendCode, } = this.props;
 
 		this.setState({
 			submissionLoading: true,
@@ -941,7 +939,7 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	addReviewComment = (reviewId: number, text: string): void => {
-		const { addReviewComment, courseId, slideId, } = this.props;
+		const { addReviewComment, slideContext: { courseId, slideId, }, } = this.props;
 		const { currentSubmission, } = this.state;
 
 		if(currentSubmission) {
@@ -950,7 +948,7 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	deleteReviewComment = (reviewId: number, commentId?: number,): void => {
-		const { deleteReviewComment, courseId, slideId, } = this.props;
+		const { deleteReviewComment, slideContext: { courseId, slideId, }, } = this.props;
 		const { currentSubmission, } = this.state;
 
 		if(currentSubmission) {

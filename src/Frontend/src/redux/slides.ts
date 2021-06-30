@@ -132,7 +132,6 @@ export default function slides(state = initialCoursesSlidesState, action: SlideA
 						}
 					},
 				};
-				submission.manualCheckingReviews;
 				newState.submissionsByCourses[courseId][slideId] = {
 					...newState.submissionsByCourses[courseId][slideId],
 					[submission.id]: submission,

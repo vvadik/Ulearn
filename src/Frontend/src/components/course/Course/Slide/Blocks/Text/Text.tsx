@@ -9,6 +9,7 @@ import styles from "./Text.less";
 interface Props {
 	className?: string;
 	content?: string;
+	lines?: string[];
 	disableAnchorsScrollHandlers?: boolean;
 	disableTranslatingTex?: boolean;
 	children?: React.ReactElement;
@@ -20,13 +21,13 @@ function Text(props: Props): React.ReactElement {
 	const history = useHistory();
 
 	useEffect(() => {
-		const { disableTranslatingTex = true, disableAnchorsScrollHandlers = true, content, children, } = props;
+		const { disableTranslatingTex, disableAnchorsScrollHandlers, content, children, } = props;
 		if(!prevProps || prevProps.content !== content || prevProps.children?.key !== children?.key) {
-			if(disableTranslatingTex) {
+			if(!disableTranslatingTex) {
 				translateTex();
 			}
 
-			if(disableAnchorsScrollHandlers) {
+			if(!disableAnchorsScrollHandlers) {
 				addScrollHandlersToAnchors();
 			}
 		}
@@ -99,7 +100,7 @@ function Text(props: Props): React.ReactElement {
 		return ref.current;
 	}
 
-	const { content, className, children, } = props;
+	const { content, className, children, lines, } = props;
 	if(content) {
 		return (
 			<div
@@ -109,6 +110,16 @@ function Text(props: Props): React.ReactElement {
 			/>
 		);
 	}
+
+	if(lines) {
+		return (
+			<div
+				ref={ textContainer }
+				className={ classNames(styles.text, className) }>
+				{ getContentFromTexLines(lines) }
+			</div>
+		);
+	}
 	return (
 		<div
 			ref={ textContainer }
@@ -116,6 +127,10 @@ function Text(props: Props): React.ReactElement {
 			{ children }
 		</div>
 	);
+
+	function getContentFromTexLines(lines: string[]): React.ReactNode {
+		return lines.map((line, index) => (<p key={ index } className={ "tex" }>{ line }</p>));
+	}
 }
 
 

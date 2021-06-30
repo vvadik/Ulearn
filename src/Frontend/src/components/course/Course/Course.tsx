@@ -13,7 +13,7 @@ import PreviewUnitPageFromAllCourse from "src/components/flashcards/UnitPage/Pre
 import SlideHeader from "./Slide/SlideHeader/SlideHeader";
 import { BlocksWrapper } from "src/components/course/Course/Slide/Blocks";
 import CommentsView from "src/components/comments/CommentsView";
-import Slide from './Slide/Slide';
+import Slide from './Slide/Slide.redux';
 
 import { UrlError } from "src/components/common/Error/NotFoundErrorBoundary";
 import Error404 from "src/components/common/Error/Error404";
@@ -310,7 +310,7 @@ class Course extends Component<Props, State> {
 
 		if(slideType &&
 			(slideType === SlideType.Lesson
-				|| (slideType === SlideType.Exercise && !pageInfo.isReview && !pageInfo.isAcceptedAlert))) {
+				|| (slideType === SlideType.Exercise && !pageInfo.isAcceptedAlert))) {
 			return Slide;
 		}
 
@@ -375,7 +375,7 @@ class Course extends Component<Props, State> {
 
 	renderSlide(): React.ReactElement {
 		const { pageInfo: { isNavigationVisible, isReview, isLti, }, user, courseId, isStudentMode, } = this.props;
-		const { currentSlideInfo, currentSlideId, currentCourseId, Page, title, openedUnit, } = this.state;
+		const { currentSlideInfo, currentSlideId, Page, title, openedUnit, } = this.state;
 
 		const wrapperClassName = classnames(
 			styles.rootWrapper,
@@ -401,23 +401,23 @@ class Course extends Component<Props, State> {
 					{ slideInfo && slideInfo.gitEditLink && this.renderGitEditLink(slideInfo) }
 				</h1> }
 				<div className={ styles.slide }>
-					{ isNavigationVisible && !isStudentMode && <SlideHeader
+					{ isNavigationVisible && !isStudentMode &&
+					<SlideHeader
 						courseId={ courseId }
 						slideId={ currentSlideId || '' }
 						isHiddenSlide={ slideInfo && slideInfo.hide || false }
 						slideType={ currentSlideInfo?.slideType }
 						userRoles={ userRoles }
 						openUnitId={ openedUnit?.id }
+						isReview={ isReview }
 					/> }
 					{
 						Page === Slide
 							?
 							slideInfo && <Slide
-								slideId={ currentSlideId }
-								courseId={ currentCourseId }
-								showHiddenBlocks={ !isStudentMode }
 								slideInfo={ slideInfo }
 								isLti={ isLti }
+								isReview={ isReview }
 							/>
 							: <BlocksWrapper>
 								{/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */ }
@@ -509,7 +509,7 @@ class Course extends Component<Props, State> {
 			isSystemAdministrator,
 			courseRole: roleByCourse[courseId],
 			courseAccesses,
-			systemAccesses
+			systemAccesses,
 		};
 
 		return (

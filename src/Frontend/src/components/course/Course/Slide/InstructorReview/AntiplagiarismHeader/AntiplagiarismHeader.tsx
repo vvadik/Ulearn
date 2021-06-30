@@ -1,12 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { Button, } from "ui";
+
+import cn from "classnames";
+
+import { SuspicionLevel } from "src/models/instructor";
 
 import styles from './AntiplagiarismHeader.less';
 import texts from './AntiplagiarismHeader.texts';
-import { Button, } from "ui";
-import cn from "classnames";
 
-export type SuspicionLevel = 'notChecking' | 'accepted' | 'warning' | 'strongWarning' | 'running';
 
 export interface AntiplagiarismInfo {
 	suspicionLevel: SuspicionLevel;

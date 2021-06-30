@@ -4,7 +4,7 @@ import { FLAT_THEME, Select, Tabs, ThemeContext, Toggle } from "ui";
 import { Controlled, } from "react-codemirror2";
 
 import { Review } from "../Blocks/Exercise/Review/Review";
-import { BlocksWrapper, StaticCode } from "../Blocks";
+import { BlocksWrapper, } from "../Blocks";
 import ScoreControls from "./ScoreControls/ScoreControls";
 import diff_match_patch from 'diff-match-patch';
 import 'codemirror/addon/selection/mark-selection.js';
@@ -34,20 +34,34 @@ import AddCommentForm, { FavouriteComment } from "./AddCommentForm/AddCommentFor
 import AntiplagiarismHeader, { AntiplagiarismInfo } from "./AntiplagiarismHeader/AntiplagiarismHeader";
 import StickyWrapper from "./AntiplagiarismHeader/StickyWrapper";
 import { KeyboardEventCodes } from "@skbkontur/react-ui/lib/events/keyboard/KeyboardEventCodes";
-import { UserInfo } from "../../../../../utils/courseRoles";
+import { UserInfo } from "src/utils/courseRoles";
+import { AntiplagiarismStatusResponse, FavouriteReviewResponse } from "src/models/instructor";
+import { GroupsInfoResponse } from "src/models/groups";
 
-export interface Props {
-	authorSolution: {
-		code: string;
-		language: Language;
-	}
-	formulation: React.ReactNode;
-	studentSubmissions: SubmissionInfo[];
-	comments: FavouriteComment[];
+export interface PropsFromRedux {
+	user?: UserInfo;
+	groups?: ShortGroupInfo[];
 
-	student: ShortUserInfo;
-	group?: ShortGroupInfo;
-	user: UserInfo;
+	comments?: FavouriteComment[];
+
+	student?: ShortUserInfo;
+	studentSubmissions?: SubmissionInfo[];
+}
+
+export interface ApiFromRedux {
+	getStudentInfo: (studentId: string,) => Promise<ShortUserInfo | string>;
+	getStudentSubmissions: (studentId: string, courseId: string,
+		slideId: string,
+	) => Promise<SubmissionInfo[] | string>;
+	getAntiplagiarismStatus: (submissionId: string,) => Promise<AntiplagiarismStatusResponse | string>;
+	getFavouriteReviews: (courseId: string, slideId: string,) => Promise<FavouriteReviewResponse | string>;
+	getCourseGroups: (courseId: string, userId: string,) => Promise<GroupsInfoResponse | string>;
+}
+
+export interface Props extends PropsFromRedux, ApiFromRedux {
+	authorSolution?: React.ReactNode;
+	formulation?: React.ReactNode;
+
 
 	prevReviewScore?: number;
 	currentScore?: number;
@@ -144,7 +158,15 @@ class InstructorReview extends React.Component<Props, State> {
 	}
 
 	render(): React.ReactNode {
-		const { student, group, studentSubmissions, prevReviewScore, currentScore, } = this.props;
+		const {
+			student,
+			group,
+			studentSubmissions,
+			prevReviewScore,
+			currentScore,
+			authorSolution,
+			formulation,
+		} = this.props;
 		const { currentTab, } = this.state;
 
 		return (
@@ -160,19 +182,23 @@ class InstructorReview extends React.Component<Props, State> {
 						<Tabs.Tab key={ InstructorReviewTabs.Review } id={ InstructorReviewTabs.Review }>
 							{ texts.getTabName(InstructorReviewTabs.Review) }
 						</Tabs.Tab>
-						<Tabs.Tab key={ InstructorReviewTabs.Formulation } id={ InstructorReviewTabs.Formulation }>
-							{ texts.getTabName(InstructorReviewTabs.Formulation) }
-						</Tabs.Tab>
-						<Tabs.Tab key={ InstructorReviewTabs.AuthorSolution }
-								  id={ InstructorReviewTabs.AuthorSolution }>
-							{ texts.getTabName(InstructorReviewTabs.AuthorSolution) }
-						</Tabs.Tab>
+						{
+							formulation &&
+							<Tabs.Tab key={ InstructorReviewTabs.Formulation } id={ InstructorReviewTabs.Formulation }>
+								{ texts.getTabName(InstructorReviewTabs.Formulation) }
+							</Tabs.Tab>
+						}
+						{
+							authorSolution &&
+							<Tabs.Tab key={ InstructorReviewTabs.AuthorSolution }
+									  id={ InstructorReviewTabs.AuthorSolution }>
+								{ texts.getTabName(InstructorReviewTabs.AuthorSolution) }
+							</Tabs.Tab>
+						}
 					</Tabs>
 				</BlocksWrapper>
 				<div className={ styles.separator }/>
-				<BlocksWrapper>
-					{ this.renderCurrentTab() }
-				</BlocksWrapper>
+				{ this.renderCurrentTab() }
 			</>
 		);
 	}
@@ -182,7 +208,7 @@ class InstructorReview extends React.Component<Props, State> {
 	};
 
 	renderCurrentTab(): React.ReactNode {
-		const { formulation, } = this.props;
+		const { formulation, authorSolution, } = this.props;
 		const { currentTab, } = this.state;
 
 
@@ -194,14 +220,9 @@ class InstructorReview extends React.Component<Props, State> {
 				return formulation;
 			}
 			case InstructorReviewTabs.AuthorSolution: {
-				return this.renderAuthorSolution();
+				return authorSolution;
 			}
 		}
-	}
-
-	renderAuthorSolution(): React.ReactElement {
-		const { authorSolution } = this.props;
-		return <StaticCode language={ authorSolution.language } code={ authorSolution.code }/>;
 	}
 
 	renderSubmissions(): React.ReactElement {
@@ -216,7 +237,7 @@ class InstructorReview extends React.Component<Props, State> {
 		} = this.props;
 
 		return (
-			<>
+			<BlocksWrapper>
 				{ this.renderTopControls() }
 				<StickyWrapper
 					stickerClass={ styles.wrapperStickerStopper }
@@ -238,7 +259,7 @@ class InstructorReview extends React.Component<Props, State> {
 					onToggleChange={ onProhibitFurtherReviewToggleChange }
 					toggleChecked={ prohibitFurtherManualChecking }
 				/>
-			</>
+			</BlocksWrapper>
 		);
 	}
 

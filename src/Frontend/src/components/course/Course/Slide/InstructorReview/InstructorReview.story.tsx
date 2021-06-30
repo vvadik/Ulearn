@@ -171,7 +171,7 @@ const addIdToReview = (review: any): ReviewInfo => ({
 	...review, id: extra.reviewId++,
 });
 
-const args: Partial<Props> = {
+export const args: Partial<Props> = {
 	studentSubmissions: [
 		{
 			code: `\t\t\t\tif (course == null || tempCourse.LastUpdateTime < tempCourse.LoadingTime)

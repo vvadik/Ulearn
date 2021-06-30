@@ -6,7 +6,7 @@ import {
 	SLIDES_SLIDE_READY,
 	SlideAction,
 } from "src/actions/slides.types";
-import { Block, BlockTypes } from "src/models/slide";
+import { Block, } from "src/models/slide";
 import { Dispatch } from "redux";
 
 export const loadSlideStartAction = (): SlideAction => ({
@@ -14,7 +14,7 @@ export const loadSlideStartAction = (): SlideAction => ({
 });
 
 export const loadSlideSuccessAction = (courseId: string, slideId: string,
-	slideBlocks: Block<BlockTypes>[]
+	slideBlocks: Block[]
 ): SlideAction => ({
 	type: SLIDE_LOAD_SUCCESS,
 	courseId,

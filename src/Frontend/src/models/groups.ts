@@ -33,6 +33,10 @@ export interface GroupStudentInfo {
 	addingTime: string,
 }
 
+export interface GroupsInfoResponse {
+	groups: GroupInfo[]
+}
+
 export interface GroupScoringGroupsResponse {
 	scores: GroupScoringGroupInfo[],
 }

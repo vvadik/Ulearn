@@ -1,7 +1,7 @@
 import { connect } from "react-redux";
 import { Dispatch } from "redux";
 
-import Exercise from './Exercise';
+import Exercise, { FromReduxDispatch, FromReduxProps, Props } from './Exercise';
 
 import { AutomaticExerciseCheckingResult as CheckingResult } from "src/models/exercise";
 import { RootState } from "src/models/reduxState";
@@ -9,11 +9,15 @@ import { RootState } from "src/models/reduxState";
 import { userProgressUpdateAction } from "src/actions/userProgress";
 import { sendCode, addReviewComment, deleteReviewComment, } from "src/actions/exercise";
 import { Language } from "src/consts/languages";
-import { MatchParams } from "src/models/router";
+import { buildUserInfo } from "src/utils/courseRoles";
+import { getSlideInfoById } from "../../../CourseUtils";
 
-const mapStateToProps = (state: RootState, { courseId, slideId, }: MatchParams) => {
-	const { slides, account, userProgress, device, } = state;
+const mapStateToProps = (state: RootState,
+	{ slideContext: { slideId, courseId, }, }: Pick<Props, 'slideContext'>
+): FromReduxProps => {
+	const { slides, account, userProgress, device, instructor, courses, } = state;
 	const { submissionsByCourses, submissionError, lastCheckingResponse, } = slides;
+	const slideInfo = getSlideInfoById(slideId, courses.fullCoursesInfo[courseId])!.current;
 	const slideProgress = userProgress?.progress[courseId]?.[slideId] || {};
 
 	const submissions = Object.values(submissionsByCourses[courseId][slideId])
@@ -29,13 +33,15 @@ const mapStateToProps = (state: RootState, { courseId, slideId, }: MatchParams) 
 		submissions,
 		submissionError,
 		lastCheckingResponse: !(lastCheckingResponse && lastCheckingResponse.courseId === courseId && lastCheckingResponse.slideId === slideId) ? null : lastCheckingResponse,
-		userId: account.id,
+		user: buildUserInfo(account, courseId),
 		slideProgress,
 		deviceType: device.deviceType,
+		maxScore: slideInfo!.maxScore,
+		forceInitialCode: !instructor.isStudentMode,
 	};
 };
 
-const mapDispatchToProps = (dispatch: Dispatch) => ({
+const mapDispatchToProps = (dispatch: Dispatch): FromReduxDispatch => ({
 	sendCode: (courseId: string, slideId: string, code: string, language: Language,
 	) => sendCode(courseId, slideId, code, language)(dispatch),
 

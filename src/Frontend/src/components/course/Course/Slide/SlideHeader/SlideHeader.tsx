@@ -13,19 +13,27 @@ import texts from './SlideHeader.texts';
 import styles from "../SlideHeader/SlideHeader.less";
 
 interface SlideHeaderProps {
-	courseId: string,
-	slideId: string,
-	isHiddenSlide: boolean,
-	userRoles: UserRoles,
-	slideType?: SlideType | null,
-	openUnitId?: string | null,
+	courseId: string;
+	slideId: string;
+	slideType?: SlideType | null;
+	openUnitId?: string | null;
+
+	userRoles: UserRoles;
+
+	isHiddenSlide: boolean;
+	isReview: boolean;
 }
 
 const SlideHeader: React.FC<SlideHeaderProps> = (props) => {
-	const { courseId, slideId, isHiddenSlide, slideType, userRoles, openUnitId, } = props;
+	const { courseId, slideId, isHiddenSlide, slideType, userRoles, openUnitId, isReview, } = props;
 	if(isHiddenSlide) {
 		return <HiddenSlideHeader/>;
 	}
+
+	if(isReview) {
+
+	}
+
 	if(slideType === SlideType.Exercise || slideType === SlideType.Quiz) {
 		return <ScoreHeader courseId={ courseId } slideId={ slideId }/>;
 	}
