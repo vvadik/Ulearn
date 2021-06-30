@@ -19,7 +19,7 @@ namespace uLearn.Web.Models
 		public List<string> SelectedGroupsIds { get; set; }
 		public string SelectedGroupsIdsJoined => string.Join(",", SelectedGroupsIds);
 		public List<Group> Groups { get; set; }
-		public Dictionary<int, List<string>> UsersIdsWithGroupsAccess { get; set; }
+		public Dictionary<int, List<GroupAccess>> GroupsAccesses { get; set; }
 
 		public DateTime PeriodStart { get; set; }
 		public DateTime PeriodFinish { get; set; }

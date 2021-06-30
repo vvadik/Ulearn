@@ -61,7 +61,7 @@
 				CourseId = Model.CourseId,
 				SelectedGroupsIds = Model.SelectedGroupsIds,
 				Groups = Model.Groups,
-				UsersIdsWithGroupsAccess = Model.UsersIdsWithGroupsAccess,
+				UsersIdsWithGroupsAccess = Model.GroupsAccesses.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Select(s => s.UserId).ToList()),
 			})
 
 			<div class="form-group">
@@ -260,7 +260,20 @@
 </thead>
 <tbody>
 @{
-	var groupsNames = Model.Groups.ToDictionary(g => g.Id, g => g.Name);
+	IEnumerable<ApplicationUser> GetInstructors(Group group, List<GroupAccess> accesses)
+		=> Enumerable.Repeat(group.Owner, 1).Concat(accesses.EmptyIfNull().Select(a => a.User));
+
+	var groupsNames = Model.Groups.ToDictionary(g => g.Id,
+		g =>
+		{
+			if (Model.IsInstructor)
+			{
+				var instructors = GetInstructors(g, Model.GroupsAccesses.GetOrDefault(g.Id));
+				var joinedInstructors = string.Join(", ", instructors.Select(u => u.VisibleName).ToList());
+				return $"{g.Name} ({joinedInstructors})";
+			}
+			return g.Name;
+		});
 	var differentGroupsIds = new HashSet<int>(
 		Model.VisitedUsersGroups
 			.SelectMany(pair => pair.Value)

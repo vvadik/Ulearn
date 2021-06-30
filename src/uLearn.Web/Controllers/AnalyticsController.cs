@@ -93,7 +93,7 @@ namespace uLearn.Web.Controllers
 			var slidesIds = slides.Select(s => s.Id).ToList();
 
 			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
-			var usersIdsWithGroupsAccess = groupsRepo.GetUsersIdsWithGroupsAccess(groups.Select(g => g.Id));
+			var groupsAccesses = groupsRepo.GetGroupsAccesses(groups.Select(g => g.Id));
 			var filterOptions = ControllerUtils.GetFilterOptionsByGroup<VisitsFilterOptions>(groupsRepo, User, courseId, groupsIds);
 			filterOptions.SlidesIds = slidesIds;
 			filterOptions.PeriodStart = periodStart;
@@ -135,7 +135,7 @@ namespace uLearn.Web.Controllers
 				Unit = selectedUnit,
 				SelectedGroupsIds = groupsIds,
 				Groups = groups,
-				UsersIdsWithGroupsAccess = usersIdsWithGroupsAccess,
+				GroupsAccesses = groupsAccesses,
 				ShowStatisticsLink = User.HasAccessFor(courseId, CourseRole.CourseAdmin),
 
 				PeriodStart = periodStart,
@@ -189,7 +189,7 @@ namespace uLearn.Web.Controllers
 			var slidesIds = slides.Select(s => s.Id).ToList();
 
 			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
-			var usersIdsWithGroupsAccess = groupsRepo.GetUsersIdsWithGroupsAccess(groups.Select(g => g.Id));
+			var groupsAccesses = groupsRepo.GetGroupsAccesses(groups.Select(g => g.Id));
 			var filterOptions = ControllerUtils.GetFilterOptionsByGroup<VisitsFilterOptions>(groupsRepo, User, courseId, groupsIds);
 			filterOptions.SlidesIds = slidesIds;
 			filterOptions.PeriodStart = periodStart;
@@ -208,7 +208,7 @@ namespace uLearn.Web.Controllers
 				Unit = selectedUnit,
 				SelectedGroupsIds = groupsIds,
 				Groups = groups,
-				UsersIdsWithGroupsAccess = usersIdsWithGroupsAccess,
+				GroupsAccesses = groupsAccesses,
 
 				PeriodStart = periodStart,
 				PeriodFinish = periodFinish,
@@ -570,11 +570,11 @@ namespace uLearn.Web.Controllers
 				.ToSortedDictionary();
 
 			List<Group> groups;
-			Dictionary<int, List<string>> usersIdsWithGroupsAccess = null;
+			Dictionary<int, List<GroupAccess>> groupsAccesses = null;
 			if (isInstructor)
 			{
 				groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
-				usersIdsWithGroupsAccess = groupsRepo.GetUsersIdsWithGroupsAccess(groups.Select(g => g.Id));
+				groupsAccesses = groupsRepo.GetGroupsAccesses(groups.Select(g => g.Id));
 			}
 			else
 				groups = groupsRepo.GetUserGroups(courseId, currentUserId);
@@ -586,7 +586,7 @@ namespace uLearn.Web.Controllers
 				Units = visibleUnits,
 				SelectedGroupsIds = groupsIds,
 				Groups = groups,
-				UsersIdsWithGroupsAccess = usersIdsWithGroupsAccess,
+				GroupsAccesses = groupsAccesses,
 				PeriodStart = periodStart,
 				PeriodFinish = periodFinish,
 				VisitedUsers = visitedUsers,
