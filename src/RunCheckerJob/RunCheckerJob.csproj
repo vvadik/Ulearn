@@ -7,6 +7,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Kontur.IDevOps.Tools.GitCommit2AssemblyTitle" Version="2.0.25">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="NUnit" Version="3.10.0" />
 		<PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
 		<PackageReference Include="System.Net.NameResolution" Version="4.3.0" />

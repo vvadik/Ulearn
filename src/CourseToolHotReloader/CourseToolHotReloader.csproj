@@ -8,6 +8,10 @@
       <PackageReference Include="Autofac" Version="6.1.0" />
       <PackageReference Include="DotNetZip" Version="1.15.0" />
       <PackageReference Include="JetBrains.Annotations" Version="2020.3.0" />
+      <PackageReference Include="Kontur.IDevOps.Tools.GitCommit2AssemblyTitle" Version="2.0.25">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
       <PackageReference Include="OctoPack" Version="3.6.5">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

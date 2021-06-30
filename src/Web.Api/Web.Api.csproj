@@ -8,6 +8,10 @@
 		<PackageReference Include="AngleSharp" Version="0.14.0" />
 		<PackageReference Include="Community.AspNetCore.ExceptionHandling.Mvc" Version="2.2.0" />
 		<PackageReference Include="EntityFrameworkProfiler.Appender" Version="6.0.6020" />
+		<PackageReference Include="Kontur.IDevOps.Tools.GitCommit2AssemblyTitle" Version="2.0.25">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="LtiLibrary.Core" Version="1.6.2" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.3" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.3" />

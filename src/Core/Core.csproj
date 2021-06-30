@@ -8,6 +8,10 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="JetBrains.Annotations" Version="2020.3.0" />
+		<PackageReference Include="Kontur.IDevOps.Tools.GitCommit2AssemblyTitle" Version="2.0.25">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="MarkdownDeep.NET.Core" Version="1.5.0.4" />
 		<PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.3" />
 		<PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.7" />
