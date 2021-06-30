@@ -15,7 +15,7 @@ import { courseStatistics } from "src/consts/routes";
 
 import styles from './NavigationHeader.less';
 
-interface Props {
+export interface Props {
 	className?: string;
 	title: string;
 	courseProgress: Progress;
@@ -63,11 +63,12 @@ function NavigationHeader({
 	);
 
 	function renderCourseProgress() {
-		const percentage = courseProgress.current / courseProgress.max;
+		const value = courseProgress.current / courseProgress.max;
+		const inProgressValue = courseProgress.inProgress / courseProgress.max;
 
 		return (
 			<div className={ styles.progressBarWrapper }>
-				<ProgressBar value={ percentage }/>
+				<ProgressBar value={ value } inProgressValue={ inProgressValue }/>
 			</div>
 		);
 	}
@@ -121,13 +122,13 @@ function NavigationHeader({
 	}
 
 	function renderUnitProgress(unitProgress: UnitProgress) {
-		if(unitProgress.inProgressSlidesCount > 0 || unitProgress.doneSlidesCount > 0) {
+		if(unitProgress.inProgress > 0 || unitProgress.current > 0) {
 			return (
 				<span className={ styles.circleProgressBarWrapper }>
 					<ProgressBarCircle
 						big={ deviceType !== DeviceType.mobile }
-						successValue={ unitProgress.doneSlidesCount / unitProgress.slidesCount }
-						inProgressValue={ unitProgress.inProgressSlidesCount / unitProgress.slidesCount }
+						successValue={ unitProgress.current / unitProgress.max }
+						inProgressValue={ unitProgress.inProgress / unitProgress.max }
 					/>
 				</span>
 			);

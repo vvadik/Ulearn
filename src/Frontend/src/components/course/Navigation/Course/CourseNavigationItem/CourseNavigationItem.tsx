@@ -56,12 +56,12 @@ function CourseNavigationItem({
 	);
 
 	function renderProgress(progress: UnitProgress) {
-		if(progress.inProgressSlidesCount > 0 || progress.doneSlidesCount > 0) {
+		if(progress.inProgress > 0 || progress.current > 0) {
 			return (
 				<span className={ styles.progressWrapper }>
 					<ProgressBarCircle
-						successValue={ progress.doneSlidesCount / progress.slidesCount }
-						inProgressValue={ progress.inProgressSlidesCount / progress.slidesCount }
+						successValue={ progress.current / progress.max }
+						inProgressValue={ progress.inProgress / progress.max }
 						active={ isActive }
 					/>
 				</span>

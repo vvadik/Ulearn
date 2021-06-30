@@ -8,6 +8,7 @@ const ModuleNavigation = (): React.ReactNode => (
 		courseProgress={ {
 			current: 15,
 			max: 25,
+			inProgress: 5,
 		} }
 		flashcardsStatistics={ {
 			count: 0,
@@ -19,12 +20,10 @@ const ModuleNavigation = (): React.ReactNode => (
 		courseTitle="Основы программирования"
 		unitTitle="Первое знакомство с C#"
 		unitProgress={ {
-			doneSlidesCount: 50,
-			inProgressSlidesCount: 25,
-			slidesCount: 100,
+			current: 50,
+			inProgress: 25,
+			max: 100,
 			statusesBySlides: {},
-			current: 10,
-			max: 20,
 		} }
 		unitItems={ getModuleNavigationProps() }
 		nextUnit={ null }
