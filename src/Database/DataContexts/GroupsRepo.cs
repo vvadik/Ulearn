@@ -717,13 +717,14 @@ namespace Database.DataContexts
 			return db.GroupAccesses.Include(a => a.User).Where(a => a.GroupId == groupId && a.IsEnabled && !a.User.IsDeleted).ToList();
 		}
 
-		public DefaultDictionary<int, List<GroupAccess>> GetGroupsAccesses(IEnumerable<int> groupsIds)
+		public DefaultDictionary<int, List<string>> GetUsersIdsWithGroupsAccess(IEnumerable<int> groupsIds)
 		{
-			return db.GroupAccesses.Include(a => a.User)
+			return db.GroupAccesses
 				.Where(a => groupsIds.Contains(a.GroupId) && a.IsEnabled && !a.User.IsDeleted)
+				.Select(a => new {a.UserId, a.GroupId})
 				.AsEnumerable()
 				.GroupBy(a => a.GroupId)
-				.ToDictionary(g => g.Key, g => g.ToList())
+				.ToDictionary(g => g.Key, g => g.Select(t => t.UserId).ToList())
 				.ToDefaultDictionary();
 		}
 
@@ -736,9 +737,9 @@ namespace Database.DataContexts
 				.Select(m => m.Group)
 				.ToList();
 			var ownersIds = groupsWhereUserIsStudent.Select(g => g.OwnerId).ToList();
-			var accesses = GetGroupsAccesses(groupsWhereUserIsStudent.Select(g => g.Id));
+			var accesses = GetUsersIdsWithGroupsAccess(groupsWhereUserIsStudent.Select(g => g.Id));
 			return accesses
-				.SelectMany(kvp => kvp.Value.Select(a => a.User.Id))
+				.SelectMany(kvp => kvp.Value)
 				.Concat(ownersIds)
 				.Distinct();
 		}

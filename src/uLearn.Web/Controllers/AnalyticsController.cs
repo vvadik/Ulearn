@@ -93,6 +93,7 @@ namespace uLearn.Web.Controllers
 			var slidesIds = slides.Select(s => s.Id).ToList();
 
 			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
+			var usersIdsWithGroupsAccess = groupsRepo.GetUsersIdsWithGroupsAccess(groups.Select(g => g.Id));
 			var filterOptions = ControllerUtils.GetFilterOptionsByGroup<VisitsFilterOptions>(groupsRepo, User, courseId, groupsIds);
 			filterOptions.SlidesIds = slidesIds;
 			filterOptions.PeriodStart = periodStart;
@@ -134,6 +135,7 @@ namespace uLearn.Web.Controllers
 				Unit = selectedUnit,
 				SelectedGroupsIds = groupsIds,
 				Groups = groups,
+				UsersIdsWithGroupsAccess = usersIdsWithGroupsAccess,
 				ShowStatisticsLink = User.HasAccessFor(courseId, CourseRole.CourseAdmin),
 
 				PeriodStart = periodStart,
@@ -187,6 +189,7 @@ namespace uLearn.Web.Controllers
 			var slidesIds = slides.Select(s => s.Id).ToList();
 
 			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
+			var usersIdsWithGroupsAccess = groupsRepo.GetUsersIdsWithGroupsAccess(groups.Select(g => g.Id));
 			var filterOptions = ControllerUtils.GetFilterOptionsByGroup<VisitsFilterOptions>(groupsRepo, User, courseId, groupsIds);
 			filterOptions.SlidesIds = slidesIds;
 			filterOptions.PeriodStart = periodStart;
@@ -205,6 +208,7 @@ namespace uLearn.Web.Controllers
 				Unit = selectedUnit,
 				SelectedGroupsIds = groupsIds,
 				Groups = groups,
+				UsersIdsWithGroupsAccess = usersIdsWithGroupsAccess,
 
 				PeriodStart = periodStart,
 				PeriodFinish = periodFinish,
@@ -565,8 +569,14 @@ namespace uLearn.Web.Controllers
 				.ToDictionary(kv => kv.Key, kv => kv.Value)
 				.ToSortedDictionary();
 
-			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
-			if (!isInstructor)
+			List<Group> groups;
+			Dictionary<int, List<string>> usersIdsWithGroupsAccess = null;
+			if (isInstructor)
+			{
+				groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
+				usersIdsWithGroupsAccess = groupsRepo.GetUsersIdsWithGroupsAccess(groups.Select(g => g.Id));
+			}
+			else
 				groups = groupsRepo.GetUserGroups(courseId, currentUserId);
 			var model = new CourseStatisticPageModel
 			{
@@ -576,6 +586,7 @@ namespace uLearn.Web.Controllers
 				Units = visibleUnits,
 				SelectedGroupsIds = groupsIds,
 				Groups = groups,
+				UsersIdsWithGroupsAccess = usersIdsWithGroupsAccess,
 				PeriodStart = periodStart,
 				PeriodFinish = periodFinish,
 				VisitedUsers = visitedUsers,

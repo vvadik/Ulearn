@@ -586,7 +586,8 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("CheckingQueue", new { courseId, group = string.Join(",", groupsIds) });
 
 			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
-			
+			var usersIdsWithGroupsAccess = groupsRepo.GetUsersIdsWithGroupsAccess(groups.Select(g => g.Id));
+
 			var alreadyChecked = done;
 			Dictionary<int, List<ExerciseCodeReview>> reviews = null;
 			Dictionary<int, string> solutions = null;
@@ -620,6 +621,7 @@ namespace uLearn.Web.Controllers
 					};
 				}).ToList(),
 				Groups = groups,
+				UsersIdsWithGroupsAccess = usersIdsWithGroupsAccess,
 				SelectedGroupsIds = groupsIds,
 				Message = message,
 				AlreadyChecked = alreadyChecked,
@@ -1715,6 +1717,7 @@ namespace uLearn.Web.Controllers
 		public List<ManualCheckingQueueItemViewModel> Checkings { get; set; }
 		public string Message { get; set; }
 		public List<Group> Groups { get; set; }
+		public Dictionary<int, List<string>> UsersIdsWithGroupsAccess { get; set; }
 		public List<string> SelectedGroupsIds { get; set; }
 		public string SelectedGroupsIdsJoined => string.Join(",", SelectedGroupsIds);
 		public bool AlreadyChecked { get; set; }
