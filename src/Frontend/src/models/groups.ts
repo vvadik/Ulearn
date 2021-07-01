@@ -1,22 +1,22 @@
 import { ShortUserInfo } from "./users";
 
 export interface GroupAsStudentInfo {
-	id: number,
-	courseId: string,
-	name: string,
-	isArchived: boolean,
-	apiUrl: string,
+	id: number;
+	courseId: string;
+	name: string;
+	isArchived: boolean;
+	apiUrl: string;
 }
 
 export interface GroupAccessesResponse {
-	accesses: GroupAccessesInfo[],
+	accesses: GroupAccessesInfo[];
 }
 
 export interface GroupAccessesInfo {
-	user: ShortUserInfo,
-	accessType: GroupAccessType,
-	grantedBy: ShortUserInfo,
-	grantTime: string,
+	user: ShortUserInfo;
+	accessType: GroupAccessType;
+	grantedBy: ShortUserInfo;
+	grantTime: string;
 }
 
 export enum GroupAccessType {
@@ -25,12 +25,12 @@ export enum GroupAccessType {
 }
 
 export interface GroupStudentsResponse {
-	students: GroupStudentInfo[],
+	students: GroupStudentInfo[];
 }
 
 export interface GroupStudentInfo {
-	user: ShortUserInfo,
-	addingTime: string,
+	user: ShortUserInfo;
+	addingTime: string;
 }
 
 export interface GroupsInfoResponse {
@@ -38,34 +38,34 @@ export interface GroupsInfoResponse {
 }
 
 export interface GroupScoringGroupsResponse {
-	scores: GroupScoringGroupInfo[],
+	scores: GroupScoringGroupInfo[];
 }
 
 export interface GroupScoringGroupInfo {
-	areAdditionalScoresEnabledForAllGroups: boolean,
-	canInstructorSetAdditionalScoreInSomeUnit: boolean,
-	areAdditionalScoresEnabledInThisGroup?: boolean,
+	areAdditionalScoresEnabledForAllGroups: boolean;
+	canInstructorSetAdditionalScoreInSomeUnit: boolean;
+	areAdditionalScoresEnabledInThisGroup?: boolean;
 }
 
 export interface GroupInfo {
-	id: number,
-	createTime?: string | null,
-	name: string,
-	isArchived: boolean,
-	owner: ShortUserInfo,
-	inviteHash: string,
-	isInviteLinkEnabled: boolean,
-	areYouStudent: boolean,
-	isManualCheckingEnabled: boolean,
-	isManualCheckingEnabledForOldSolutions: boolean,
-	defaultProhibitFurtherReview: boolean,
-	canStudentsSeeGroupProgress: boolean,
-	studentsCount: number,
-	accesses: GroupAccessesInfo[],
-	apiUrl: string,
+	id: number;
+	createTime?: string | null;
+	name: string;
+	isArchived: boolean;
+	owner: ShortUserInfo;
+	inviteHash: string;
+	isInviteLinkEnabled: boolean;
+	areYouStudent: boolean;
+	isManualCheckingEnabled: boolean;
+	isManualCheckingEnabledForOldSolutions: boolean;
+	defaultProhibitFurtherReview: boolean;
+	canStudentsSeeGroupProgress: boolean;
+	studentsCount: number;
+	accesses: GroupAccessesInfo[];
+	apiUrl: string;
 }
 
 export interface CopyGroupResponse {
-	id: string,
-	apiUrl: string,
+	id: string;
+	apiUrl: string;
 }

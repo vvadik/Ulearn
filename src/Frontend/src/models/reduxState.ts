@@ -7,8 +7,8 @@ import {
 import { RootState } from "src/redux/reducers";
 
 interface ReviewCommentResponseRedux extends ReviewCommentResponse {
-	isDeleted?: boolean,
-	isLoading?: boolean,
+	isDeleted?: boolean;
+	isLoading?: boolean;
 }
 
 interface ReviewInfoRedux extends ReviewInfo {

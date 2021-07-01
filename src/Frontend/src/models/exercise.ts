@@ -2,12 +2,12 @@ import { ShortUserInfo } from "src/models/users";
 import { Language } from "src/consts/languages";
 
 export interface RunSolutionResponse extends ProgressUpdate {
-	courseId?: string,
-	slideId?: string,
+	courseId?: string;
+	slideId?: string;
 	solutionRunStatus: SolutionRunStatus;
 	message: string | null; // Сообщение от проверяющей системы в случае ошибок на сервере и в случае некоторых ошибок компиляции.
 	submission: SubmissionInfo | null; // Если submission создан, он лежит в Submission, иначе null. Не создан в случае некоторых ошибок на сервере и иногда в случае ошибок компиляции.
-	automaticChecking?: ExerciseAutomaticCheckingResponse,
+	automaticChecking?: ExerciseAutomaticCheckingResponse;
 	// Ответ сервера содержит поля из ProgressUpdate
 }
 
@@ -30,7 +30,7 @@ export enum SolutionRunStatus {
 export interface SubmissionInfo {
 	id: number;
 	code: string;
-	language: Language,
+	language: Language;
 	timestamp: string;
 	automaticChecking: ExerciseAutomaticCheckingResponse | null; // null если задача не имеет автоматических тестов, это не отменяет возможности ревью.
 	manualCheckingPassed: boolean;
@@ -84,7 +84,7 @@ export interface ReviewCommentResponse {
 }
 
 export interface AttemptsStatistics {
-	attemptedUsersCount: number,
-	usersWithRightAnswerCount: number,
-	lastSuccessAttemptDate?: string,
+	attemptedUsersCount: number;
+	usersWithRightAnswerCount: number;
+	lastSuccessAttemptDate?: string;
 }
