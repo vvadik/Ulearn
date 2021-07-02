@@ -37,7 +37,6 @@ import {
 } from "./ExerciseUtils";
 
 import { Language, } from "src/consts/languages";
-import { constructPathToAcceptedSolutions, } from "src/consts/routes";
 import { DeviceType } from "src/consts/deviceType";
 import {
 	AutomaticExerciseCheckingResult as CheckingResult,
@@ -481,7 +480,6 @@ class Exercise extends React.Component<Props, State> {
 					{ (!hideSolutions && (isAllHintsShowed || isSafeShowAcceptedSolutions)
 						&& attemptsStatistics && attemptsStatistics.usersWithRightAnswerCount > 0)
 					&& <Controls.AcceptedSolutionsButton
-						acceptedSolutionsUrl={ constructPathToAcceptedSolutions(courseId, slideId) }
 						onVisitAcceptedSolutions={ this.openAcceptedSolutionsModal }
 						isShowAcceptedSolutionsAvailable={ isSafeShowAcceptedSolutions }
 					/> }

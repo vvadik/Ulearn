@@ -2,7 +2,7 @@ import { connect } from "react-redux";
 import { Dispatch } from "redux";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 
-import Course from 'src/components/course/Course';
+import { Course, CourseProps } from 'src/components/course/Course/Course';
 
 import { loadCourse, loadCourseErrors, changeCurrentCourseAction } from "src/actions/course";
 import { loadUserProgress, userProgressUpdate } from "src/actions/userProgress";
@@ -12,7 +12,7 @@ import getSlideInfo from "src/utils/getSlideInfo";
 
 import { RootState } from "src/redux/reducers";
 import { MatchParams } from "src/models/router";
-import { CourseInfo, UnitInfo } from "src/models/course";
+import { CourseInfo, PageInfo, UnitInfo } from "src/models/course";
 import { FlashcardsStatistics } from "src/components/course/Navigation/types";
 
 const mapStateToProps = (state: RootState, { match, location, }: RouteComponentProps<MatchParams>) => {
@@ -36,12 +36,10 @@ const mapStateToProps = (state: RootState, { match, location, }: RouteComponentP
 		loadedCourseIds[courseId] = true;
 	}
 	const isNavigationVisible = slideInfo && !slideInfo.isLti && !slideInfo.isReview && (courseInfo == null || courseInfo.tempCourseError == null);
-	const pageInfo = {
+	const pageInfo : PageInfo = {
 		isNavigationVisible: isNavigationVisible || false,
 		isReview: slideInfo?.isReview || false,
 		isLti: slideInfo?.isLti || false,
-		isAcceptedSolutions: slideInfo?.isAcceptedSolutions || false,
-		isAcceptedAlert: slideInfo?.isAcceptedAlert || false,
 	};
 
 	return {
