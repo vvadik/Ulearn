@@ -50,7 +50,6 @@ import reactRenderer from './scripts/react-renderer.js'; // рендер реа�
 import smoothScroll from './scripts/smoothScroll.js'; //скролл к фильтрам + показ/скрытие
 
 //scripts used in cshtml by backend renderer
-import likeSolution from './scripts/slide-solutions-like.js'; // лайк для чужих решений
 import loginForContinue from './scripts/slide-guest.js'; //модалка для логина не авторизованных пользователей, TODO reuse react modal
 import {
 	openPopup,
@@ -114,7 +113,6 @@ window.legacy = {
 	...window.legacy,
 	documentReadyFunctions,
 	loginForContinue,
-	likeSolution,
 	ToggleSystemRoleOrAccess,
 	ToggleButtonClass,
 	ToggleDropDownClass,

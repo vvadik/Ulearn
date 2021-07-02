@@ -1,6 +1,9 @@
 import getPluralForm from './getPluralForm';
 
 describe('getPluralForm', () => {
+	test('для нуля', () => {
+		expect(getPluralForm(0, 'студент', 'студента', 'студентов')).toBe('студентов');
+	});
 	test('для единицы', () => {
 		expect(getPluralForm(1, 'студент', 'студента', 'студентов')).toBe('студент');
 	});

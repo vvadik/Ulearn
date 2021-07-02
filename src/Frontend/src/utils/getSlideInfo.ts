@@ -1,4 +1,4 @@
-import { acceptedAlert, acceptedSolutions, coursePath, ltiSlide } from "src/consts/routes";
+import { coursePath, ltiSlide } from "src/consts/routes";
 
 import queryString from "query-string";
 
@@ -6,8 +6,6 @@ export interface SlideInfo {
 	slideId: string,
 	isReview: boolean,
 	isLti: boolean,
-	isAcceptedAlert: boolean,
-	isAcceptedSolutions: boolean,
 }
 
 export default function getSlideInfo(location: { pathname: string, search: string },): null | SlideInfo {
@@ -25,26 +23,21 @@ export default function getSlideInfo(location: { pathname: string, search: strin
 
 	let slideId;
 	let isLti = false;
-	let isAcceptedAlert = false;
 	if(slideSlugOrAction) {
 		if(slideIdInQuery) {
 			const action = slideSlugOrAction;
 			slideId = slideIdInQuery;
-			isAcceptedAlert = action.toLowerCase() === acceptedAlert;
-			isLti = (action.toLowerCase() === ltiSlide || isAcceptedAlert || params.isLti) as boolean;
+			isLti = (action.toLowerCase() === ltiSlide || params.isLti) as boolean;
 		} else {
 			slideId = slideSlugOrAction.split('_').pop();
 		}
 
 		const isReview = params.CheckQueueItemId !== undefined;
-		const isAcceptedSolutions = slideSlugOrAction.toLowerCase() === acceptedSolutions;
 
 		return {
 			slideId: slideId as string,
 			isReview,
 			isLti,
-			isAcceptedAlert,
-			isAcceptedSolutions,
 		};
 	}
 

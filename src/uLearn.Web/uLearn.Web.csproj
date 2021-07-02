@@ -848,7 +848,6 @@
     <Compile Include="Kontur.Passport\PassportClient.cs" />
     <Compile Include="Kontur.Passport\Provider\KonturPassportReturnEndpointContext.cs" />
     <Compile Include="Kontur.Passport\SigningKeysProvider.cs" />
-    <Compile Include="Models\AcceptedSolutionsPageModel.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AnalyticsTablePageModel.cs" />
     <Compile Include="Models\BlockRenderContext.cs" />
@@ -899,11 +898,6 @@
     <Compile Include="LTI\LtiUtils.cs" />
     <Compile Include="LTI\SecurityHandler.cs" />
     <Compile Include="CreateListOfUsedTokens.cs" />
-    <Compile Include="Views\Course\AcceptedSolutionsHtml.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>AcceptedSolutionsHtml.cshtml</DependentUpon>
-    </Compile>
     <Compile Include="Views\Course\SlideHtml.generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -1032,7 +1026,6 @@
     <Content Include="Views\Account\Manage.cshtml" />
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Course\Slide.cshtml" />
-    <Content Include="Views\Course\AcceptedSolutions.cshtml" />
     <Content Include="Views\Account\List.cshtml" />
     <Content Include="Views\Admin\Units.cshtml" />
     <Content Include="Views\Analytics\UnitSheet.cshtml" />
@@ -1048,11 +1041,6 @@
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>SlideHtml.generated.cs</LastGenOutput>
     </Content>
-    <Content Include="Views\Course\AcceptedSolutionsHtml.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>AcceptedSolutionsHtml.generated.cs</LastGenOutput>
-    </Content>
-    <Content Include="Views\Course\AcceptedAlert.cshtml" />
     <Content Include="Views\Sandbox\Index.cshtml" />
     <Content Include="Views\Sandbox\GetDetails.cshtml" />
     <Content Include="Views\Course\LtiQuizSlide.cshtml" />

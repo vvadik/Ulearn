@@ -6,8 +6,9 @@ import Exercise from './Exercise';
 import { AutomaticExerciseCheckingResult as CheckingResult } from "src/models/exercise";
 import { RootState } from "src/models/reduxState";
 
-import { userProgressUpdateAction } from "src/actions/userProgress";
 import { sendCode, addReviewComment, deleteReviewComment, } from "src/actions/exercise";
+import { skipExercise } from "src/actions/userProgress";
+
 import { Language } from "src/consts/languages";
 import { MatchParams } from "src/models/router";
 
@@ -29,7 +30,7 @@ const mapStateToProps = (state: RootState, { courseId, slideId, }: MatchParams) 
 		submissions,
 		submissionError,
 		lastCheckingResponse: !(lastCheckingResponse && lastCheckingResponse.courseId === courseId && lastCheckingResponse.slideId === slideId) ? null : lastCheckingResponse,
-		userId: account.id,
+		user: account,
 		slideProgress,
 		deviceType: device.deviceType,
 	};
@@ -47,8 +48,8 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
 		commentId: number
 	) => deleteReviewComment(courseId, slideId, submissionId, reviewId, commentId)(dispatch),
 
-	visitAcceptedSolutions: (courseId: string, slideId: string,
-	) => dispatch(userProgressUpdateAction(courseId, slideId, { isSkipped: true })),
+	skipExercise: (courseId: string, slideId: string, onSuccess: () => void,
+	) => skipExercise(courseId, slideId, onSuccess)(dispatch),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Exercise);

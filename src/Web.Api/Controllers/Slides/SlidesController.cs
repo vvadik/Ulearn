@@ -52,7 +52,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			if (course == null)
 				return NotFound(new { status = "error", message = "Course not found" });
 
-			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(User.GetUserId(), course.Id, CourseRoleType.Instructor);
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, course.Id, CourseRoleType.Instructor);
 			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIds(course, UserId);
 			var slide = course.FindSlideById(slideId, isInstructor, visibleUnitsIds);
 			if (slide == null)
