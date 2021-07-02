@@ -90,7 +90,7 @@ namespace uLearn.Web.Controllers
 			if (course == null)
 				return HttpNotFound();
 
-			var visibleUnitIds = unitsRepo.GetVisibleUnitIds(course, User);
+			var visibleUnitIds = unitsRepo.GetVisibleUnitIds(course, User).ToList();
 			var visibleUnits = course.GetUnits(visibleUnitIds);
 			var isGuest = !User.Identity.IsAuthenticated;
 			var isInstructor = !isGuest && User.HasAccessFor(course.Id, CourseRole.Instructor);
@@ -370,97 +370,6 @@ namespace uLearn.Web.Controllers
 			{
 				VersionId = exerciseSubmissionId
 			};
-		}
-
-		public async Task<ActionResult> AcceptedSolutions(string courseId, Guid slideId, bool isLti = false)
-		{
-			var course = courseManager.GetCourse(courseId);
-			var isInstructor = User.HasAccessFor(course.Id, CourseRole.Instructor);
-			var visibleUnits = unitsRepo.GetVisibleUnitIds(course, User);
-			var slide = course.GetSlideById(slideId, isInstructor, visibleUnits) as ExerciseSlide;
-			if (slide == null)
-				return HttpNotFound();
-
-			// Test redirect to SlideId if disabled
-			if (slide.Exercise.HideShowSolutionsButton)
-				return RedirectToRoute("Course.SlideById", new { courseId = course.Id, slideId = slide.Url });
-			var model = await CreateAcceptedSolutionsModel(course, slide, isLti);
-			return View("AcceptedSolutions", model);
-		}
-
-		private async Task<AcceptedSolutionsPageModel> CreateAcceptedSolutionsModel(Course course, ExerciseSlide slide, bool isLti)
-		{
-			var userId = User.Identity.GetUserId();
-			var isPassed = visitsRepo.IsPassed(course.Id, slide.Id, userId);
-			if (!isPassed)
-				await visitsRepo.SkipSlide(course.Id, slide.Id, userId);
-			var submissions = solutionsRepo.GetBestTrendingAndNewAcceptedSolutions(course.Id, slide.Id);
-			foreach (var submission in submissions)
-			{
-				submission.LikedAlready = submission.UsersWhoLike.Any(u => u == userId);
-			}
-
-			var model = new AcceptedSolutionsPageModel
-			{
-				CourseId = course.Id,
-				CourseTitle = course.Title,
-				Slide = slide,
-				AcceptedSolutions = submissions,
-				User = User,
-				LikeSolutionUrl = Url.Action("LikeSolution"),
-				IsLti = isLti,
-				IsPassed = isPassed
-			};
-			return model;
-		}
-
-		[AllowAnonymous]
-		public async Task<ActionResult> AcceptedAlert(string courseId, Guid slideId)
-		{
-			var owinRequest = Request.GetOwinContext().Request;
-			if (await owinRequest.IsAuthenticatedLtiRequestAsync())
-			{
-				var ltiRequest = await owinRequest.ParseLtiRequestAsync();
-				/* Substitute http(s) scheme with real scheme from header */
-				var uriBuilder = new UriBuilder(ltiRequest.Url)
-				{
-					Scheme = owinRequest.GetRealRequestScheme(),
-					Port = owinRequest.GetRealRequestPort()
-				};
-				return Redirect(uriBuilder.Uri.AbsoluteUri);
-			}
-
-			/* For now user should be authenticated */
-			if (!User.Identity.IsAuthenticated)
-				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
-
-			var course = courseManager.GetCourse(courseId);
-			var isInstructor = User.HasAccessFor(course.Id, CourseRole.Instructor);
-			var visibleUnits = unitsRepo.GetVisibleUnitIds(course, User);
-			var slide = (ExerciseSlide)course.GetSlideById(slideId, isInstructor, visibleUnits);
-			var model = CreateAcceptedAlertModel(slide, course);
-			return View(model);
-		}
-
-		private ExerciseBlockData CreateAcceptedAlertModel(ExerciseSlide slide, Course course)
-		{
-			var userId = User.Identity.GetUserId();
-			var isSkippedOrPassed = visitsRepo.IsSkippedOrPassed(course.Id, slide.Id, userId);
-			/* TODO: It's not necessary to create ExerciseBlockData here */
-			var model = new ExerciseBlockData(course.Id, slide, isSkippedOrPassed)
-			{
-				CourseId = course.Id,
-				IsGuest = !User.Identity.IsAuthenticated,
-				Url = Url,
-			};
-			return model;
-		}
-
-		[HttpPost]
-		public async Task<JsonResult> LikeSolution(int solutionId)
-		{
-			var res = await solutionsRepo.Like(solutionId, User.Identity.GetUserId());
-			return Json(new { likesCount = res.Item1, liked = res.Item2 });
 		}
 
 		public async Task<Visit> VisitSlide(string courseId, Guid slideId, string userId)

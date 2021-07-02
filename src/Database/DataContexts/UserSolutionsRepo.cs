@@ -3,12 +3,9 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using Database.Models;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
-using Ulearn.Core;
-using Ulearn.Core.Extensions;
 
 namespace Database.DataContexts
 {
@@ -21,41 +18,6 @@ namespace Database.DataContexts
 		{
 			this.db = db;
 			textsRepo = new TextsRepo(db);
-		}
-
-		///<returns>(likesCount, isLikedByThisUsed)</returns>
-		public async Task<Tuple<int, bool>> Like(int solutionId, string userId)
-		{
-			return await FuncUtils.TrySeveralTimesAsync(() => TryLike(solutionId, userId), 3);
-		}
-
-		private async Task<Tuple<int, bool>> TryLike(int solutionId, string userId)
-		{
-			using (var transaction = db.Database.BeginTransaction())
-			{
-				var solutionForLike = db.UserExerciseSubmissions.Find(solutionId);
-				if (solutionForLike == null)
-					throw new Exception("Solution " + solutionId + " not found");
-				var hisLike = db.SolutionLikes.FirstOrDefault(like => like.UserId == userId && like.SubmissionId == solutionId);
-				var votedAlready = hisLike != null;
-				var likesCount = solutionForLike.Likes.Count;
-				if (votedAlready)
-				{
-					db.SolutionLikes.Remove(hisLike);
-					likesCount--;
-				}
-				else
-				{
-					db.SolutionLikes.Add(new Like { SubmissionId = solutionId, Timestamp = DateTime.Now, UserId = userId });
-					likesCount++;
-				}
-
-				await db.SaveChangesAsync();
-
-				transaction.Commit();
-
-				return Tuple.Create(likesCount, !votedAlready);
-			}
 		}
 
 		public IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId)
@@ -130,43 +92,7 @@ namespace Database.DataContexts
 			return query;
 		}
 
-		public List<AcceptedSolutionInfo> GetBestTrendingAndNewAcceptedSolutions(string courseId, Guid slidesId)
-		{
-			var ulearnBotId = db.Users.FirstOrDefault(u => u.UserName == UsersRepo.UlearnBotUsername).Id;
-			var prepared = db.UserExerciseSubmissions
-				.Where(x => x.CourseId == courseId && x.SlideId == slidesId && x.AutomaticCheckingIsRightAnswer)
-				.Where(x => x.Reviews.All(r => r.AuthorId != ulearnBotId))
-				.Select(x => new { x.Id, likes = x.Likes.Count, x.Timestamp, x.UserId, x.CodeHash })
-				.ToList();
-
-			var best = prepared
-				.GroupBy(x => x.CodeHash)
-				.Select(x => x.MaxBy(c => c.likes))
-				.OrderByDescending(x => x.likes);
-			var timeNow = DateTime.Now;
-			var trending = prepared
-				.GroupBy(x => x.CodeHash)
-				.Select(x => x.MaxBy(c => (c.likes + 1) / timeNow.Subtract(c.Timestamp).TotalMilliseconds))
-				.OrderByDescending(x => (x.likes + 1) / timeNow.Subtract(x.Timestamp).TotalMilliseconds);
-			var newest = prepared
-				.GroupBy(x => x.UserId)
-				.Select(x => x.MaxBy(c => c.Timestamp))
-				.GroupBy(x => x.CodeHash)
-				.Select(x => x.MaxBy(c => c.Timestamp))
-				.OrderByDescending(x => x.Timestamp);
-			var selectedSubmissionsIds = best.Take(3).Concat(trending.Take(3)).Concat(newest).Distinct().Take(10).Select(x => x.Id);
-
-			var selectedSubmissions = db.UserExerciseSubmissions
-				.Where(s => selectedSubmissionsIds.Contains(s.Id))
-				.Select(s => new { s.Id, Code = s.SolutionCode.Text, Likes = s.Likes.Select(y => y.UserId) })
-				.ToList();
-			return selectedSubmissions
-				.Select(s => new AcceptedSolutionInfo(s.Code, s.Id, s.Likes))
-				.OrderByDescending(info => info.UsersWhoLike.Count)
-				.ToList();
-		}
-
-		public int GetAcceptedSolutionsCount(string courseId, Guid slideId)
+	public int GetAcceptedSolutionsCount(string courseId, Guid slideId)
 		{
 			return GetAllAcceptedSubmissions(courseId, new List<Guid> { slideId }).Select(x => x.UserId).Distinct().Count();
 		}
