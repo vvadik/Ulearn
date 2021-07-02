@@ -16,12 +16,12 @@ import { Heart, HeartLite, Star, Star2 } from 'icons';
 import styles from './AcceptedSolutions.less';
 
 interface AcceptedSolutionsProps {
-	courseId: string,
-	slideId: string,
-	user: ShortUserInfo,
-	isInstructor: boolean,
-	onClose: () => void,
-	acceptedSolutionsApi: AcceptedSolutionsApi,
+	courseId: string;
+	slideId: string;
+	user: ShortUserInfo;
+	isInstructor: boolean;
+	onClose: () => void;
+	acceptedSolutionsApi: AcceptedSolutionsApi;
 }
 
 enum TabsType {
@@ -34,12 +34,12 @@ interface _AcceptedSolution extends AcceptedSolution {
 }
 
 interface State {
-	loading: boolean,
-	solutions: { [id: number]: _AcceptedSolution },
-	promotedSolutions: number[],
-	randomLikedSolutions: number[],
-	newestSolutions: number[],
-	likedAcceptedSolutions: number[] | null,
+	loading: boolean;
+	solutions: { [id: number]: _AcceptedSolution };
+	promotedSolutions: number[];
+	randomLikedSolutions: number[];
+	newestSolutions: number[];
+	likedAcceptedSolutions: number[] | null;
 	activeTab: TabsType;
 }
 
@@ -70,9 +70,7 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 			getAcceptedSolutionsPromise
 				.then(acceptedSolutionsResponse => {
 					this.updateStateWithData(acceptedSolutionsResponse, null);
-					if(afterLoad != null) {
-						afterLoad();
-					}
+					afterLoad?.();
 				})
 				.catch(this.processErrorAndClose);
 		} else {
@@ -82,9 +80,7 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 				.then(result => {
 					const [acceptedSolutionsResponse, likedAcceptedSolutionsResponse] = result;
 					this.updateStateWithData(acceptedSolutionsResponse, likedAcceptedSolutionsResponse);
-					if(afterLoad != null) {
-						afterLoad();
-					}
+					afterLoad?.();
 				})
 				.catch(this.processErrorAndClose);
 		}
@@ -140,10 +136,12 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 				</Modal.Header>
 				<Modal.Body>
 					{ isInstructor &&
-					<Tabs className={ styles.tabs } value={ activeTab } onValueChange={ s => this.handleTabChange(s) }>
-						<Tabs.Tab id={ TabsType.instructorTab }>{ texts.instructorTabName }</Tabs.Tab>
-						<Tabs.Tab id={ TabsType.studentTab }>{ texts.studentTabName }</Tabs.Tab>
-					</Tabs>
+					<div className={ styles.tabs }>
+						<Tabs value={ activeTab } onValueChange={ this.handleTabChange }>
+							<Tabs.Tab id={ TabsType.instructorTab }>{ texts.instructorTabName }</Tabs.Tab>
+							<Tabs.Tab id={ TabsType.studentTab }>{ texts.studentTabName }</Tabs.Tab>
+						</Tabs>
+					</div>
 					}
 					{ activeTab === TabsType.instructorTab && this.renderInstructorTab() }
 					{ activeTab === TabsType.studentTab && this.renderStudentTab() }
@@ -215,7 +213,7 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 						solution.likedByMe
 							? <Heart className={ styles.icon }/>
 							: <HeartLite className={ styles.icon }/>
-						}
+					}
 					</span>
 				</Hint>
 			</span>

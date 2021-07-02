@@ -13,6 +13,7 @@ export const userSolutions = analytics + '/userSolutions';
 export const slides = "slides";
 export const ltiSlide = "ltislide";
 export const resetStudentsLimits = "/students/reset-limits";
+export const acceptedSolutions = "accepted-solutions";
 export const signalrWS = 'ws';
 export const login = 'login';
 export const account = 'account';

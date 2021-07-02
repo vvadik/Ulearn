@@ -2,20 +2,20 @@
 import { Language } from "src/consts/languages";
 
 export interface AcceptedSolutionsResponse {
-	promotedSolutions: AcceptedSolution[],
-	randomLikedSolutions: AcceptedSolution[],
-	newestSolutions: AcceptedSolution[],
+	promotedSolutions: AcceptedSolution[];
+	randomLikedSolutions: AcceptedSolution[];
+	newestSolutions: AcceptedSolution[];
 }
 
 export interface LikedAcceptedSolutionsResponse {
-	likedSolutions: AcceptedSolution[],
+	likedSolutions: AcceptedSolution[];
 }
 
 export interface AcceptedSolution {
-	submissionId: number,
-	code: string,
-	language: Language,
-	likesCount: number | null,
-	likedByMe: boolean | null,
-	promotedBy?: ShortUserInfo,
+	submissionId: number;
+	code: string;
+	language: Language;
+	likesCount: number | null;
+	likedByMe: boolean | null;
+	promotedBy?: ShortUserInfo;
 }
