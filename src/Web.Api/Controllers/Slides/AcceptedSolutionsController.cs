@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -67,16 +68,19 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				.Select(s => new AcceptedSolution(s.SubmissionId, s.Code, s.Language, s.LikesCount, submissionsLikedByMe.Contains(s.SubmissionId), isInstructor ? BuildShortUserInfo(s.UserWhoPromote) : null))
 				.ToList();
 
-			var randomLikedSolution = await acceptedSolutionsRepo.GetRandomLikedSubmission(course.Id, slideId);
+			/*
+			 TODO GetRandomLikedSubmission медленно работает
+			 var randomLikedSolution = await acceptedSolutionsRepo.GetRandomLikedSubmission(course.Id, slideId);
 			if (randomLikedSolution != null && promotedSolutions.Any(s => s.SubmissionId == randomLikedSolution.Value.SubmissionId || s.Code == randomLikedSolution.Value.Code))
 				randomLikedSolution = null;
 			var randomLikedSolutions = Enumerable.Repeat(randomLikedSolution, 1).Where(s => s.HasValue)
 				.Select(s => new AcceptedSolution(s.Value.SubmissionId, s.Value.Code, s.Value.Language, s.Value.LikesCount, submissionsLikedByMe.Contains(s.Value.SubmissionId), null))
 				.ToList();
+			*/
 
 			const int newestSolutionsCount = 5;
-			var newestSolutions = (await acceptedSolutionsRepo.GetNewestSubmissions(course.Id, slideId, newestSolutionsCount + promotedSolutions.Count + randomLikedSolutions.Count))
-				.Where(s => !promotedSolutions.Concat(randomLikedSolutions)
+			var newestSolutions = (await acceptedSolutionsRepo.GetNewestSubmissions(course.Id, slideId, newestSolutionsCount + promotedSolutions.Count))
+				.Where(s => !promotedSolutions//.Concat(randomLikedSolutions)
 					.Any(existing => s.SubmissionId == existing.SubmissionId || s.Code == existing.Code))
 				.Take(newestSolutionsCount)
 				.Select(s => new AcceptedSolution(s.SubmissionId, s.Code, s.Language, s.LikesCount, submissionsLikedByMe.Contains(s.SubmissionId), null))
@@ -85,7 +89,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			return new AcceptedSolutionsResponse
 			{
 				PromotedSolutions = promotedSolutions,
-				RandomLikedSolutions = randomLikedSolutions,
+				RandomLikedSolutions = new List<AcceptedSolution>(), //randomLikedSolutions,
 				NewestSolutions = newestSolutions,
 			};
 		}
