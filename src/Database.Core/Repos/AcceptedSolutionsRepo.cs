@@ -67,12 +67,14 @@ namespace Database.Repos
 
 		public async Task<(int SubmissionId, string Code, Language Language, int LikesCount)?> GetRandomLikedSubmission(string courseId, Guid slideId)
 		{
-			var allAcceptedSubmissions = userSolutionsRepo.GetAllAcceptedSubmissions(courseId, slideId);
-			var submissionIds = await allAcceptedSubmissions.Where(s => s.Likes.Count > 0)
+			var submissionIds = (await db.SolutionLikes
+				.Where(l => l.Submission.CourseId == courseId && l.Submission.SlideId == slideId && l.Submission.AutomaticCheckingIsRightAnswer)
 				.OrderByDescending(s => s.Timestamp)
-				.Take(300)
-				.Select(s => s.Id)
-				.ToListAsync();
+				.Select(l => l.SubmissionId)
+				.Take(100)
+				.ToListAsync())
+				.Distinct()
+				.ToList();
 			if (submissionIds.Count == 0)
 				return null;
 			var rnd = new Random();
@@ -87,7 +89,7 @@ namespace Database.Repos
 		public async Task<List<(int SubmissionId, string Code, Language Language, int LikesCount)>> GetLikedAcceptedSolutions(string courseId, Guid slideId, int offset, int count)
 		{
 			var allAcceptedSubmissions = userSolutionsRepo.GetAllAcceptedSubmissions(courseId, slideId);
-			return (await allAcceptedSubmissions.Where(s => s.Likes.Count > 0)
+			return (await allAcceptedSubmissions.Where(s => s.Likes.Any())
 				.OrderByDescending(s => s.Timestamp)
 				.Select(s =>  new { SubmissionId = s.Id, Code = s.SolutionCode.Text, s.Language, Likes = s.Likes.Count })
 				.Skip(offset)
