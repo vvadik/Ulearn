@@ -97,6 +97,7 @@ namespace ManualUtils
 			//ConvertZipsToCourseXmlInRoot();
 			//await UploadStagingToDb(serviceProvider);
 			//await UploadStagingFromDbAndExtractToCourses(serviceProvider);
+			await SetCourseIdAndSlideIdInLikesAndPromotes(db);
 		}
 
 		private static void GenerateUpdateSequences()
@@ -482,6 +483,29 @@ namespace ManualUtils
 						f.Attributes &= ~FileAttributes.ReadOnly;
 				}
 			}
+		}
+
+		private static async Task SetCourseIdAndSlideIdInLikesAndPromotes(UlearnDb db)
+		{
+			var likes = await db.SolutionLikes.Include(s => s.Submission).ToListAsync();
+			var i = 0;
+			foreach (var like in likes)
+			{
+				i++;
+				like.CourseId = like.Submission.CourseId;
+				like.SlideId = like.Submission.SlideId;
+				if (i % 1000 == 0)
+					db.SaveChanges();
+			}
+			db.SaveChanges();
+
+			var promotes = await db.AcceptedSolutionsPromotes.Include(s => s.Submission).ToListAsync();
+			foreach (var promote in promotes)
+			{
+				promote.CourseId = promote.Submission.CourseId;
+				promote.SlideId = promote.Submission.SlideId;
+			}
+			db.SaveChanges();
 		}
 	}
 }
