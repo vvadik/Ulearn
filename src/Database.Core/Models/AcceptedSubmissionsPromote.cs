@@ -19,5 +19,12 @@ namespace Database.Models
 
 		[Required]
 		public DateTime Timestamp { get; set; }
+
+		[StringLength(100)]
+		[Required]
+		public string CourseId { get; set; }
+
+		[Required]
+		public Guid SlideId { get; set; }
 	}
 }

@@ -19,10 +19,10 @@ namespace Database.Repos
 		Task<List<(int SubmissionId, string Code, Language Language, int LikesCount)>> GetLikedAcceptedSolutions(string courseId, Guid slideId, int offset, int count);
 		Task<HashSet<int>> GetSubmissionsLikedByMe(string courseId, Guid slideId, string userId);
 		Task<bool> DidUserLikeSubmission(int submissionId, string userId);
-		Task TryLikeSubmission(int submissionId, string userId);
+		Task TryLikeSubmission(string courseId, Guid slideId, int submissionId, string userId);
 		Task TryUnlikeSubmission(int submissionId, string userId);
 		Task<bool> HasSubmissionBeenPromoted(int submissionId);
-		Task TryPromoteSubmission(int submissionId, string userId);
+		Task TryPromoteSubmission(string courseId, Guid slideId, int submissionId, string userId);
 		Task TryUnpromoteSubmission(int submissionId, string userId);
 	}
 
@@ -112,7 +112,7 @@ namespace Database.Repos
 			return await db.SolutionLikes.Where(like => like.UserId == userId && like.SubmissionId == submissionId).AnyAsync();
 		}
 
-		public async Task TryLikeSubmission(int submissionId, string userId)
+		public async Task TryLikeSubmission(string courseId, Guid slideId, int submissionId, string userId)
 		{
 			await db.SolutionLikes.Where(like => like.UserId == userId && like.SubmissionId == submissionId).DeleteAsync();
 
@@ -120,6 +120,8 @@ namespace Database.Repos
 			{
 				UserId = userId,
 				SubmissionId = submissionId,
+				CourseId = courseId,
+				SlideId = slideId,
 				Timestamp = DateTime.Now,
 			});
 
@@ -143,7 +145,7 @@ namespace Database.Repos
 			return await db.AcceptedSolutionsPromotes.Where(like => like.SubmissionId == submissionId).AnyAsync();
 		}
 
-		public async Task TryPromoteSubmission(int submissionId, string userId)
+		public async Task TryPromoteSubmission(string courseId, Guid slideId, int submissionId, string userId)
 		{
 			await db.AcceptedSolutionsPromotes.Where(like => like.SubmissionId == submissionId).DeleteAsync();
 
@@ -151,6 +153,8 @@ namespace Database.Repos
 			{
 				UserId = userId,
 				SubmissionId = submissionId,
+				CourseId = courseId,
+				SlideId = slideId,
 				Timestamp = DateTime.Now
 			});
 

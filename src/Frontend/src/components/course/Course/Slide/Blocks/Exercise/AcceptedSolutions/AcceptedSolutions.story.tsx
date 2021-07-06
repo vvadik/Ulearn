@@ -36,9 +36,8 @@ const getAcceptedSolutionsApi = (promotedSolutions: AcceptedSolution[], randomLi
 		},
 		likeAcceptedSolution: (solutionId: number) => returnPromiseAfterDelay(200, {} as Response),
 		dislikeAcceptedSolution: (solutionId: number) => returnPromiseAfterDelay(200, {} as Response),
-		promoteAcceptedSolution: (courseId: string, solutionId: number) => returnPromiseAfterDelay(200, {} as Response),
-		unpromoteAcceptedSolution: (courseId: string, solutionId: number) => returnPromiseAfterDelay(200,
-			{} as Response),
+		promoteAcceptedSolution: (solutionId: number) => returnPromiseAfterDelay(200, {} as Response),
+		unpromoteAcceptedSolution: (solutionId: number) => returnPromiseAfterDelay(200, {} as Response),
 	};
 };
 
@@ -103,4 +102,4 @@ student.args = {
 export default {
 	title: "Exercise/AcceptedSolutions",
 	component: AcceptedSolutionsModal,
-}
+};

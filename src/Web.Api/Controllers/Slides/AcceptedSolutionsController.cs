@@ -24,15 +24,17 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IUnitsRepo unitsRepo;
 		private readonly IVisitsRepo visitsRepo;
+		private readonly IUserSolutionsRepo userSolutionsRepo;
 
 		public AcceptedSolutionsController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
-			IAcceptedSolutionsRepo acceptedSolutionsRepo, ICourseRolesRepo courseRolesRepo, IUnitsRepo unitsRepo, IVisitsRepo visitsRepo)
+			IAcceptedSolutionsRepo acceptedSolutionsRepo, ICourseRolesRepo courseRolesRepo, IUnitsRepo unitsRepo, IVisitsRepo visitsRepo, IUserSolutionsRepo userSolutionsRepo)
 			: base(courseManager, db, usersRepo)
 		{
 			this.acceptedSolutionsRepo = acceptedSolutionsRepo;
 			this.courseRolesRepo = courseRolesRepo;
 			this.unitsRepo = unitsRepo;
 			this.visitsRepo = visitsRepo;
+			this.userSolutionsRepo = userSolutionsRepo;
 		}
 
 		/// <summary>
@@ -119,10 +121,14 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		[Authorize]
 		public async Task<IActionResult> Like(int solutionId)
 		{
+			var submission = await userSolutionsRepo.FindSubmissionByIdNoTracking(solutionId);
+			var courseId = submission.CourseId;
+			var slideId = submission.SlideId;
+
 			if (await acceptedSolutionsRepo.DidUserLikeSubmission(solutionId, UserId))
 				return Ok(new SuccessResponseWithMessage($"You have liked the solution {solutionId} already"));
 
-			await acceptedSolutionsRepo.TryLikeSubmission(solutionId, UserId);
+			await acceptedSolutionsRepo.TryLikeSubmission(courseId, slideId, solutionId, UserId);
 
 			return Ok(new SuccessResponseWithMessage($"You have liked the solution {solutionId}"));
 		}
@@ -146,13 +152,21 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		/// Рекомендовать решение от имени преподавателей курса
 		/// </summary>
 		[HttpPut("promote")]
-		[Authorize(Policy = "Instructors")]
-		public async Task<IActionResult> Promote(string courseId, int solutionId) // courseId для проверки прав
+		[Authorize]
+		public async Task<IActionResult> Promote(int solutionId) // courseId для проверки прав
 		{
+			var submission = await userSolutionsRepo.FindSubmissionByIdNoTracking(solutionId);
+			var courseId = submission.CourseId;
+			var slideId = submission.SlideId;
+
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
+			if (!isInstructor)
+				return StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse("You have no instructor access to this course"));
+
 			if (await acceptedSolutionsRepo.HasSubmissionBeenPromoted(solutionId))
 				return Ok(new SuccessResponseWithMessage($"You have promoted the solution {solutionId} already"));
 
-			await acceptedSolutionsRepo.TryPromoteSubmission(solutionId, UserId);
+			await acceptedSolutionsRepo.TryPromoteSubmission(courseId, slideId, solutionId, UserId);
 
 			return Ok(new SuccessResponseWithMessage($"You have promoted the solution {solutionId}"));
 		}
@@ -161,9 +175,16 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		/// Убрать решение из рекомендаций от имени преподавателей курса
 		/// </summary>
 		[HttpDelete("promote")]
-		[Authorize(Policy = "Instructors")]
-		public async Task<IActionResult> Unpromote(string courseId, int solutionId) // courseId для проверки прав
+		[Authorize]
+		public async Task<IActionResult> Unpromote(int solutionId) // courseId для проверки прав
 		{
+			var submission = await userSolutionsRepo.FindSubmissionByIdNoTracking(solutionId);
+			var courseId = submission.CourseId;
+
+			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
+			if (!isInstructor)
+				return StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse("You have no instructor access to this course"));
+
 			if (!await acceptedSolutionsRepo.HasSubmissionBeenPromoted(solutionId))
 				return Ok(new SuccessResponseWithMessage($"You don't have promoted for the solution {solutionId}"));
 

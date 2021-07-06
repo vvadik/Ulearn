@@ -296,6 +296,9 @@ namespace Database
 
 			AddIndex<Like>(modelBuilder, c => c.SubmissionId);
 			AddIndex<Like>(modelBuilder, c => new { c.UserId, c.SubmissionId });
+			AddIndex<Like>(modelBuilder, c => new { c.CourseId, c.SlideId, c.SubmissionId });
+
+			AddIndex<AcceptedSolutionsPromote>(modelBuilder, c => new { c.CourseId, c.SlideId });
 
 			AddIndex<LtiConsumer>(modelBuilder, c => c.Key);
 

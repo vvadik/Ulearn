@@ -262,7 +262,7 @@ class AcceptedSolutionsModal extends React.Component<AcceptedSolutionsProps, Sta
 		const action = isPromote
 			? this.props.acceptedSolutionsApi.promoteAcceptedSolution
 			: this.props.acceptedSolutionsApi.unpromoteAcceptedSolution;
-		action(this.props.courseId, submissionId)
+		action(submissionId)
 			.then(() => {
 				const s = this.state.solutions[submissionId];
 				const solutions: { [id: number]: _AcceptedSolution } = {
