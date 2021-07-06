@@ -246,6 +246,7 @@ namespace Ulearn.Web.Api
 		protected override void ConfigureBackgroundWorkers(IVostokAspNetCoreApplicationBuilder builder)
 		{
 			builder.AddHostedServiceFromApplication<ArchiveGroupsWorker>();
+			builder.AddHostedServiceFromApplication<RefreshMaterializedViewsWorker>();
 		}
 
 		public void ConfigureAuthServices(IServiceCollection services, WebApiConfiguration configuration)

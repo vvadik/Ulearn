@@ -3,15 +3,17 @@ using System;
 using Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Database.Migrations
 {
     [DbContext(typeof(UlearnDb))]
-    partial class UlearnDbModelSnapshot : ModelSnapshot
+    [Migration("20210706060919_AddExerciseStatisticsViews")]
+    partial class AddExerciseStatisticsViews
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -751,21 +753,6 @@ namespace Database.Migrations
                     b.ToTable("EnabledAdditionalScoringGroups");
                 });
 
-            modelBuilder.Entity("Database.Models.ExerciseAttemptedUsersCount", b =>
-                {
-                    b.Property<int>("AttemptedUsersCount")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("CourseId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("SlideId")
-                        .HasColumnType("uuid");
-
-                    b.ToView("ExerciseAttemptedUsersCounts");
-                });
-
             modelBuilder.Entity("Database.Models.ExerciseCodeReview", b =>
                 {
                     b.Property<int>("Id")
@@ -880,21 +867,6 @@ namespace Database.Migrations
                     b.HasIndex("SubmissionId");
 
                     b.ToTable("ExerciseSolutionByGraders");
-                });
-
-            modelBuilder.Entity("Database.Models.ExerciseUsersWithRightAnswerCount", b =>
-                {
-                    b.Property<string>("CourseId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("SlideId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("UsersWithRightAnswerCount")
-                        .HasColumnType("integer");
-
-                    b.ToView("ExerciseUsersWithRightAnswerCounts");
                 });
 
             modelBuilder.Entity("Database.Models.FeedViewTimestamp", b =>

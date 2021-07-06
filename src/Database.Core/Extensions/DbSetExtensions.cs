@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -26,6 +27,11 @@ namespace Database.Extensions
 			entry.CurrentValues.SetValues(entity);
 			entry.State = EntityState.Modified;
 			return entry;
+		}
+
+		public static async Task RefreshMaterializedView(this DbContext dbContext, string name)
+		{
+			await dbContext.Database.ExecuteSqlRawAsync(@$"REFRESH MATERIALIZED VIEW CONCURRENTLY public.""{name}""");
 		}
 	}
 }

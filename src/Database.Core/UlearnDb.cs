@@ -216,6 +216,14 @@ namespace Database
 
 			SetDeleteBehavior<SystemAccess, ApplicationUser>(modelBuilder, c => c.GrantedBy, c => c.GrantedById);
 
+			modelBuilder.Entity<ExerciseAttemptedUsersCount>()
+				.ToView(ExerciseAttemptedUsersCount.ViewName)
+				.HasNoKey();
+
+			modelBuilder.Entity<ExerciseUsersWithRightAnswerCount>()
+				.ToView(ExerciseUsersWithRightAnswerCount.ViewName)
+				.HasNoKey();
+
 			CreateIndexes(modelBuilder);
 		}
 
@@ -498,5 +506,8 @@ namespace Database
 		public DbSet<WorkQueueItem> WorkQueueItems { get; set; }
 
 		public DbSet<AcceptedSolutionsPromote> AcceptedSolutionsPromotes { get; set; }
+
+		public DbSet<ExerciseAttemptedUsersCount> ExerciseAttemptedUsersCounts { get; set; }
+		public DbSet<ExerciseUsersWithRightAnswerCount> ExerciseUsersWithRightAnswerCounts { get; set; }
 	}
 }

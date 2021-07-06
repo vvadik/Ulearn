@@ -55,5 +55,6 @@ namespace Database.Repos
 		Task<DateTime?> GetExerciseLastRightAnswerDate(string courseId, Guid slideId);
 		Task<int> GetExerciseUsersCount(string courseId, Guid slideId);
 		Task<int> GetExerciseUsersWithRightAnswerCount(string courseId, Guid slideId);
+		Task RefreshExerciseStatisticsMaterializedViews();
 	}
 }

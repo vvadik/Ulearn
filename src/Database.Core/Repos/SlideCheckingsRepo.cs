@@ -622,20 +622,24 @@ namespace Database.Repos
 
 		public async Task<int> GetExerciseUsersCount(string courseId, Guid slideId)
 		{
-			return await db.AutomaticExerciseCheckings
+			return await db.ExerciseAttemptedUsersCounts
 				.Where(c => c.CourseId == courseId && c.SlideId == slideId)
-				.Select(c => c.UserId)
-				.Distinct()
-				.CountAsync();
+				.Select(c => c.AttemptedUsersCount)
+				.FirstOrDefaultAsync();
 		}
 
 		public async Task<int> GetExerciseUsersWithRightAnswerCount(string courseId, Guid slideId)
 		{
-			return await db.AutomaticExerciseCheckings
-				.Where(c => c.CourseId == courseId && c.SlideId == slideId && c.IsRightAnswer)
-				.Select(c => c.UserId)
-				.Distinct()
-				.CountAsync();
+			return await db.ExerciseUsersWithRightAnswerCounts
+				.Where(c => c.CourseId == courseId && c.SlideId == slideId)
+				.Select(c => c.UsersWithRightAnswerCount)
+				.FirstOrDefaultAsync();
+		}
+
+		public async Task RefreshExerciseStatisticsMaterializedViews()
+		{
+			await db.RefreshMaterializedView(ExerciseAttemptedUsersCount.ViewName);
+			await db.RefreshMaterializedView(ExerciseUsersWithRightAnswerCount.ViewName);
 		}
 	}
 }
