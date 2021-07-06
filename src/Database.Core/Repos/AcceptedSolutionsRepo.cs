@@ -59,8 +59,8 @@ namespace Database.Repos
 		public async Task<List<(int SubmissionId, string Code, Language Language, int LikesCount, ApplicationUser UserWhoPromote)>> GetPromotedSubmissions(string courseId, Guid slideId)
 		{
 			return (await db.AcceptedSolutionsPromotes.Where(p => p.Submission.CourseId == courseId && p.Submission.SlideId == slideId)
-				.Select(s => new { s.SubmissionId, Code = s.Submission.SolutionCode.Text, s.Submission.Language, Likes = s.Submission.Likes.Count, UserWhoPromote = s.User })
-				.ToListAsync())
+					.Select(s => new { s.SubmissionId, Code = s.Submission.SolutionCode.Text, s.Submission.Language, Likes = s.Submission.Likes.Count, UserWhoPromote = s.User })
+					.ToListAsync())
 				.Select(s => (s.SubmissionId, s.Code, s.Language, LikesCount: s.Likes, s.UserWhoPromote))
 				.ToList();
 		}
@@ -68,11 +68,11 @@ namespace Database.Repos
 		public async Task<(int SubmissionId, string Code, Language Language, int LikesCount)?> GetRandomLikedSubmission(string courseId, Guid slideId)
 		{
 			var submissionIds = (await db.SolutionLikes
-				.Where(l => l.Submission.CourseId == courseId && l.Submission.SlideId == slideId && l.Submission.AutomaticCheckingIsRightAnswer)
-				.OrderByDescending(s => s.Timestamp)
-				.Select(l => l.SubmissionId)
-				.Take(100)
-				.ToListAsync())
+					.Where(l => l.CourseId == courseId && l.SlideId == slideId)
+					.OrderByDescending(s => s.Timestamp)
+					.Select(l => l.SubmissionId)
+					.Take(100)
+					.ToListAsync())
 				.Distinct()
 				.ToList();
 			if (submissionIds.Count == 0)
@@ -88,13 +88,20 @@ namespace Database.Repos
 
 		public async Task<List<(int SubmissionId, string Code, Language Language, int LikesCount)>> GetLikedAcceptedSolutions(string courseId, Guid slideId, int offset, int count)
 		{
-			var allAcceptedSubmissions = userSolutionsRepo.GetAllAcceptedSubmissions(courseId, slideId);
-			return (await allAcceptedSubmissions.Where(s => s.Likes.Any())
-				.OrderByDescending(s => s.Timestamp)
-				.Select(s =>  new { SubmissionId = s.Id, Code = s.SolutionCode.Text, s.Language, Likes = s.Likes.Count })
+			var lastLikedSubmissions = await db.SolutionLikes
+				.Where(l => l.CourseId == courseId && l.SlideId == slideId)
+				.GroupBy(l => l.SubmissionId)
+				.Select(g => new { SubmissionId = g.Key, Timestamp = g.Max(e => e.Timestamp) })
+				.OrderByDescending(e => e.Timestamp)
+				.Select(e => e.SubmissionId)
 				.Skip(offset)
 				.Take(count)
-				.ToListAsync())
+				.ToListAsync();
+			var allAcceptedSubmissions = userSolutionsRepo.GetAllAcceptedSubmissions(courseId, slideId);
+			return (await allAcceptedSubmissions.Where(s => lastLikedSubmissions.Contains(s.Id))
+					.OrderByDescending(s => s.Timestamp)
+					.Select(s => new { SubmissionId = s.Id, Code = s.SolutionCode.Text, s.Language, Likes = s.Likes.Count })
+					.ToListAsync())
 				.Select(s => (s.SubmissionId, s.Code, s.Language, s.Likes))
 				.ToList();
 		}
@@ -102,8 +109,8 @@ namespace Database.Repos
 		public async Task<HashSet<int>> GetSubmissionsLikedByMe(string courseId, Guid slideId, string userId)
 		{
 			return (await db.SolutionLikes.Where(s => s.Submission.CourseId == courseId && s.Submission.SlideId == slideId && s.UserId == userId)
-				.Select(l => l.SubmissionId)
-				.ToListAsync())
+					.Select(l => l.SubmissionId)
+					.ToListAsync())
 				.ToHashSet();
 		}
 
