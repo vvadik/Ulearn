@@ -11,16 +11,30 @@ interface Props<T> {
 	enableLogger?: boolean;
 }
 
-interface State {
+interface State<T> {
 	version: number;
+	args: T;
 }
+
+export function renderMd(text: string): string {
+	const regexBold = /\*\*(\S(.*?\S)?)\*\*/gm;
+	const regexItalic = /__(\S(.*?\S)?)__/gm;
+	const regexCode = /```(\S(.*?\S)?)```/gm;
+	text = text.replace(regexBold, '<b>$1</b>');
+	text = text.replace(regexItalic, '<i>$1</i>');
+	text = text.replace(regexCode, '<code>$1</code>');
+	return (text.replace('**', '<b>'));
+}
+
 
 /*const Template: Story<Test> = args => {
 	return <StoryUpdater args={ args } childrenBuilder={ (args) => <TestComponent { ...args }/> }/>;
 };*/
 
 //Special class which updating all fields within args function calls. Providing args as this inside functions
-export class StoryUpdater<T> extends React.Component<Props<T>, State> {
+export class StoryUpdater<T> extends React.Component<Props<T>, State<T>> {
+	private version = 0;
+
 	constructor(props: Props<T>) {
 		super(props);
 		const { args, enableLogger, } = this.props;
@@ -39,26 +53,30 @@ export class StoryUpdater<T> extends React.Component<Props<T>, State> {
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
 				args[key] = ((...funcArgs: unknown[]) => {
-					this.setState({ ...this.state, version: this.state.version + 1, });
-
-					if(enableLogger) {
-						console.log(`UPDATER: get new version ${ this.state.version }`);
-					}
-
 					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 					// @ts-ignore
-					return base.bind(args)(...funcArgs);
+					const res = base.bind(args)(...funcArgs);
+					this.version++;
+					if(enableLogger) {
+						console.log(`UPDATER: get new version ${ this.version }`);
+					}
+					this.setState({
+						version: this.version,
+					});
+					return res;
 				});
 			}
 		}
 
 		this.state = {
 			version: 0,
+			args,
 		};
 	}
 
 	render(): React.ReactElement {
-		const { childrenBuilder, args, } = this.props;
+		const { childrenBuilder, } = this.props;
+		const { args, } = this.state;
 
 		return childrenBuilder(args);
 	}

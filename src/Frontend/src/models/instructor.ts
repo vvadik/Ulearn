@@ -6,16 +6,21 @@ export interface StudentSubmissionsResponse {
 
 export type SuspicionLevel = 'notChecking' | 'accepted' | 'warning' | 'strongWarning' | 'running';
 
-export interface AntiplagiarismStatusResponse {
-	status: "notChecked" | "checked";
+export interface AntiplagiarismInfo {
 	suspicionLevel: SuspicionLevel;
 	suspiciousAuthorsCount: number;
 }
 
+export interface AntiplagiarismStatusResponse extends AntiplagiarismInfo {
+	status: "notChecked" | "checked";
+}
+
 export interface FavouriteReview {
 	isFavourite: boolean;
-	renderedComment: string;
+	renderedText: string;
+	text: string;
 	id: number;
+	useCount: number;
 }
 
 

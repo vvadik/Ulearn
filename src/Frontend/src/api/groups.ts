@@ -19,15 +19,15 @@ export function getCourseGroups(courseId: string, userId?: string,): Promise<{ g
 
 export function getCourseGroupsRedux(courseId: string, userId: string,) {
 	return (dispatch: Dispatch): Promise<GroupsInfoResponse | string> => {
-		dispatch(groupLoadStartAction(courseId, userId));
+		dispatch(groupLoadStartAction(userId));
 		const url = groups + buildQuery({ courseId, userId, });
 		return api.get<GroupsInfoResponse>(url)
 			.then(json => {
-				dispatch(groupLoadSuccessAction(courseId, userId, json));
+				dispatch(groupLoadSuccessAction(userId, json));
 				return json;
 			})
 			.catch(error => {
-				dispatch(groupLoadFailAction(courseId, userId, error));
+				dispatch(groupLoadFailAction(userId, error));
 				return error;
 			});
 	};

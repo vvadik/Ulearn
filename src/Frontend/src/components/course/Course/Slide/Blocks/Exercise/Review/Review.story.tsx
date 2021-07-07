@@ -61,7 +61,7 @@ const props: ReviewProps = {
 	reviews,
 	selectedReviewId: -1,
 	user: { ...author, id: '-1' },
-	onSelectComment: () => void (0),
+	onReviewClick: () => void (0),
 	addReviewComment: () => void (0),
 	addOrRemoveCommentToFavourite: () => void (0),
 	deleteReviewOrComment: () => void (0),

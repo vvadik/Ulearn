@@ -7,6 +7,7 @@ import { StoryUpdater } from "src/storiesUtils";
 const Template: Story<Props> = (args) => {
 	return (<StoryUpdater args={ args } childrenBuilder={ (args) => <AddCommentForm  { ...args } /> }/>);
 };
+
 const comments = [
 	{
 		text: 'Вот это выглядит довольно непонятно: зачем делать цикл <=, а потом ка каждом (!) шаге проверять не превысило ли i допустимое значение. Постарайтесь обойтись без этого, если что-то непонятно - задавайте вопросы ',
@@ -39,8 +40,8 @@ const addCommentToFavourite = (comment: string) => {
 	return returnPromiseAfterDelay(100, newComment);
 };
 
-function toggleCommentFavourite(commentText: string) {
-	const comment = comments.find(c => c.text === commentText);
+function toggleCommentFavourite(commentId: number) {
+	const comment = comments.find(c => c.id === commentId);
 	if(!comment) {
 		return;
 	}

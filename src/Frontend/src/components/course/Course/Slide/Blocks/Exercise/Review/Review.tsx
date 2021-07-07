@@ -1,19 +1,21 @@
 import React from "react";
-import classNames from "classnames";
+import cn from "classnames";
 
 import Avatar from "src/components/common/Avatar/Avatar";
-import { DropdownMenu, MenuItem, MenuSeparator, Textarea, ThemeContext, } from "ui";
+import { DropdownMenu, MenuItem, MenuSeparator, Textarea, ThemeContext, Button, Gapped, } from "ui";
 import { Send3, Trash, MenuKebab, Star2, Edit, Star, } from "icons";
+import { getDataFromReviewToCompareChanges } from "../../../InstructorReview/utils";
 
 import { textareaHidden } from "src/uiTheme";
 
+import { isInstructor, UserInfo, } from "src/utils/courseRoles";
+import { clone } from "src/utils/jsonExtensions";
+
 import { ReviewCommentResponse, ReviewInfo } from "src/models/exercise";
+import { Editor } from "codemirror";
 
 import styles from "./Review.less";
 import texts from "./Review.texts";
-import { Editor } from "codemirror";
-import cn from "classnames";
-import { isInstructor, UserInfo, } from "src/utils/courseRoles";
 
 
 interface CommentReplies {
@@ -22,18 +24,18 @@ interface CommentReplies {
 
 interface RenderedReview {
 	margin: number;
-	review: InstructorReviewInfo;
+	review: ReviewInfo;
 	ref: React.RefObject<HTMLLIElement>;
 }
 
-export interface InstructorReviewInfo extends ReviewInfo {
-	outdated?: boolean;
-}
-
 interface ReviewState {
-	reviews: RenderedReview[];
+	renderedReviews: RenderedReview[];
 	replies: CommentReplies;
 	marginsAdded: boolean;
+
+	editingParentReviewId?: number;
+	editingReviewId?: number;
+	editingCommentValue?: string;
 }
 
 interface ReviewProps {
@@ -42,24 +44,27 @@ interface ReviewProps {
 	selectedReviewId: number;
 	user?: UserInfo;
 
-	reviewBackgroundColor?: 'orange' | 'gray';
-	disableLineNumbers?: boolean;
-
-	onSelectComment: (e: React.MouseEvent | React.FocusEvent, id: number,) => void;
+	isReviewCanBeAdded: (reviewText: string) => boolean;
+	onReviewClick: (e: React.MouseEvent | React.FocusEvent, id: number,) => void;
 	addReviewComment: (reviewId: number, comment: string) => void;
-	deleteReviewOrComment: (reviewId: number, commentId?: number) => void;
-	editReviewOrComment: (value: string, reviewId: number, commentId?: number) => void;
-	addOrRemoveCommentToFavourite?: (commentText: string,) => void;
+	deleteReviewOrComment: (id: number, reviewId?: number) => void;
+	editReviewOrComment: (text: string, id: number, reviewId?: number) => void;
+
+	backgroundColor?: 'orange' | 'gray';
+
+	toggleReviewFavourite?: (id: number,) => void;
+	isReviewFavourite?: (reviewText: string) => boolean;
+	isReviewOutdated?: (reviewId: number) => boolean;
 }
 
-const botUser = { visibleName: 'Ulearn bot', id: 'bot', };
-
 class Review extends React.Component<ReviewProps, ReviewState> {
+	private botUser = { visibleName: 'Ulearn bot', id: 'bot', };
+
 	constructor(props: ReviewProps) {
 		super(props);
 
 		this.state = {
-			reviews: this.getCommentsOrderByStart([...props.reviews])
+			renderedReviews: this.getCommentsOrderByStart(clone(props.reviews))
 				.map(r => ({
 					margin: 0,
 					review: r,
@@ -99,57 +104,33 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 
 	componentDidUpdate(prevProps: ReviewProps): void {
 		const { reviews, selectedReviewId, } = this.props;
+		const { replies, marginsAdded, } = this.state;
 
-		let sameReviews = reviews.length === prevProps.reviews.length;
-		if(sameReviews) {
-			const newReviews = reviews.map(r => ({
-				id: r.id,
-				innerCommentsIds: r.comments.map(c => c.id),
-			}));
-			const oldReviews = prevProps.reviews.map(r => ({
-				id: r.id,
-				innerCommentsIds: r.comments.map(c => c.id),
-			}));
+		const sameReviews = JSON.stringify(this.getCommentsOrderByStart(reviews).map(getDataFromReviewToCompareChanges))
+			=== JSON.stringify( this.getCommentsOrderByStart(prevProps.reviews).map(getDataFromReviewToCompareChanges));
 
-			for (const { id, innerCommentsIds } of newReviews.values()) {
-				const oldReview = oldReviews.find(or => or.id === id);
-				if(!oldReview) {
-					sameReviews = false;
-					break;
-				}
-
-				if(oldReview.id !== id || innerCommentsIds.length !== oldReview.innerCommentsIds.length) {
-					sameReviews = false;
-					break;
-				}
-				if(innerCommentsIds[innerCommentsIds.length - 1] !== oldReview.innerCommentsIds[oldReview.innerCommentsIds.length - 1]) {
-					sameReviews = false;
-					break;
-				}
-			}
-		}
 		if(!sameReviews) {
 			this.setState({
-				reviews: this.getCommentsOrderByStart(reviews)
+				renderedReviews: this.getCommentsOrderByStart(reviews)
 					.map(r => ({
 						margin: 0,
 						review: r,
 						ref: React.createRef<HTMLLIElement>(),
 					})),
-				replies: this.buildCommentsReplies(reviews, this.state.replies),
+				replies: this.buildCommentsReplies(reviews, replies),
 				marginsAdded: false,
-			});
-		} else if(!this.state.marginsAdded
+			}, this.addMarginsToComments);
+		} else if(!marginsAdded
 			|| (selectedReviewId !== prevProps.selectedReviewId && selectedReviewId >= 0)) {
 			this.addMarginsToComments();
 		}
 	}
 
 	addMarginsToComments = (): void => {
-		const { reviews, } = this.state;
+		const { renderedReviews, } = this.state;
 		const { selectedReviewId, editor, } = this.props;
 
-		const commentsWithMargin = [...reviews];
+		const commentsWithMargin = [...renderedReviews];
 		const selectedReviewIndex = commentsWithMargin.findIndex(c => c.review.id === selectedReviewId);
 		let lastReviewBottomHeight = 0;
 
@@ -196,7 +177,7 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 		}
 
 		this.setState({
-			reviews: commentsWithMargin,
+			renderedReviews: commentsWithMargin,
 		}, () => {
 			this.setState({
 				marginsAdded: true,
@@ -205,36 +186,42 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 	};
 
 	render = (): React.ReactNode => {
-		const { reviews, } = this.state;
-		const { reviewBackgroundColor = 'orange', } = this.props;
+		const { renderedReviews, } = this.state;
+		const { backgroundColor = 'orange', } = this.props;
 
 		return (
 			<ol className={ cn(styles.reviewsContainer,
-				reviewBackgroundColor === 'orange' ? styles.reviewOrange : styles.reviewGray) }>
-				{ reviews.map(this.renderTopLevelComment) }
+				backgroundColor === 'orange'
+					? styles.reviewOrange
+					: styles.reviewGray) }
+			>
+				{ renderedReviews.map(this.renderTopLevelComment) }
 			</ol>
 		);
 	};
 
 	renderTopLevelComment = ({ review, margin, ref, }: RenderedReview, i: number,): React.ReactNode => {
 		const { id, comments, } = review;
-		const { selectedReviewId, onSelectComment, } = this.props;
-		const { replies, marginsAdded, } = this.state;
-		const className = classNames(
+		const { selectedReviewId, isReviewOutdated, } = this.props;
+		const { replies, marginsAdded, editingReviewId, } = this.state;
+
+		const outdated = isReviewOutdated && isReviewOutdated(id) || false;
+
+		const className = cn(
 			styles.comment,
-			{ [styles.outdatedComment]: review.outdated },
+			{ [styles.outdatedComment]: outdated },
 			{ [styles.commentMounted]: marginsAdded },
 			{ [styles.selectedReviewCommentWrapper]: selectedReviewId === id },
 		);
 
-		const authorToRender = review.author ?? botUser;
+		const authorToRender = review.author ?? this.botUser;
 
-		const selectComment = (e: React.MouseEvent | React.FocusEvent) => onSelectComment(e, id);
 		return (
 			<li key={ i }
 				className={ className }
 				ref={ ref }
-				onClick={ selectComment }
+				data-tid={ id }
+				onClick={ this.selectComment }
 				style={ {
 					marginTop: `${ margin }px`,
 				} }
@@ -245,108 +232,145 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 					<ol className={ styles.commentRepliesList }>
 						{ comments.map((c, i) =>
 							<li className={ styles.commentReply } key={ i }>
-								{ this.renderComment(c, id, review.outdated) }
+								{ this.renderComment(c, id, outdated) }
 							</li>)
 						}
 					</ol>
 				}
-				{ selectedReviewId === id && !review.outdated && (authorToRender.id !== botUser.id || comments.length > 0)
-				&& this.renderAddReviewComment(selectComment, replies[id]) }
+				{ editingReviewId !== id
+				&& comments.every(c => c.id !== editingReviewId)
+				&& selectedReviewId === id
+				&& !outdated
+				&& (authorToRender.id !== this.botUser.id || comments.length > 0)
+				&& this.renderAddReviewComment(replies[id], id) }
 			</li>
 		);
 	};
 
-	renderComment(review: InstructorReviewInfo): React.ReactNode;
+	renderComment(review: ReviewInfo): React.ReactNode;
 	renderComment(reviewComment: ReviewCommentResponse, reviewId: number, reviewOutdated?: boolean): React.ReactNode;
 	renderComment(
-		review: InstructorReviewInfo & ReviewCommentResponse,
+		review: ReviewInfo & ReviewCommentResponse,
 		reviewId: number | null = null,
-		reviewOutdated = false,
+		reviewOutdated = undefined,
 	): React.ReactNode {
 		const {
 			author,
-			startLine,
-			finishLine,
 			addingTime,
 			publishTime,
 			renderedText,
+			text,
+			comment,
 			renderedComment,
+			id,
 		} = review;
-		const authorToRender = author ?? botUser;
+		const {
+			editingReviewId,
+			editingParentReviewId,
+			editingCommentValue,
+		} = this.state;
+		const {
+			isReviewOutdated,
+		} = this.props;
+		const authorToRender = author ?? this.botUser;
 
 		const time = addingTime || publishTime;
+		const content = text || comment;
+		const outdated = reviewOutdated ?? (isReviewOutdated && isReviewOutdated(id) || false);
 
 		return (
 			<React.Fragment>
 				<div className={ styles.authorWrapper }>
-					<Avatar user={ authorToRender } size="big" className={ styles.commentAvatar }/>
+					<Avatar user={ authorToRender } size={ "big" } className={ styles.commentAvatar }/>
 					<div className={ styles.commentInfoWrapper }>
 						<span className={ styles.commentInfo }>
 							<span className={ styles.authorName }>
 								{ authorToRender.visibleName }
 							</span>
-							{ this.renderLineNumbers(startLine, finishLine,) }
-							{ this.renderCommentControls(review, reviewId, reviewOutdated) }
+							{ this.renderCommentControls(review, reviewId, outdated) }
 						</span>
 						{ time &&
 						<p className={ styles.commentAddingTime }>{ texts.getAddingTime(time) }</p>
 						}
 					</div>
 				</div>
-				<p
-					className={ styles.commentText }
-					dangerouslySetInnerHTML={ { __html: renderedText ?? renderedComment } }
-				/>
+				{ editingReviewId !== id && editingParentReviewId !== reviewId
+					? <p
+						className={ styles.commentText }
+						dangerouslySetInnerHTML={ { __html: renderedText ?? renderedComment } }
+					/>
+					: <Gapped gap={ 12 } vertical className={ styles.commentEditTextArea }>
+						<Textarea
+							autoFocus
+							width={ 210 } //if this number < 250, then this number should be equal to .commentEditTextArea min-width
+							rows={ 2 }
+							autoResize
+							placeholder={ texts.sendButton }
+							onValueChange={ this.onEditingTextareaValueChange }
+							value={ editingCommentValue }
+						/>
+						<Gapped gap={ 14 }>
+							<Button
+								use={ 'primary' }
+								disabled={ content === editingCommentValue }
+								onClick={ this.saveReviewOrComment }>
+								{ texts.editing.save }
+							</Button>
+							<Button
+								onClick={ this.stopEditingComment }>
+								{ texts.editing.cancel }
+							</Button>
+						</Gapped>
+					</Gapped> }
 			</React.Fragment>
 		);
 	}
 
-	renderLineNumbers = (startLine: number, finishLine: number,): React.ReactNode => {
-		const { disableLineNumbers, } = this.props;
-
-		return (
-			!disableLineNumbers && startLine >= 0 &&
-			<span className={ styles.commentLineNumber }>
-				{ texts.getLineCapture(startLine, finishLine) }
-			</span>
-		);
-	};
-
 	renderCommentControls = ({
 			id,
-			outdated,
 			author,
-			addedToFavourite,
-		}: InstructorReviewInfo & ReviewCommentResponse,
+			comment,
+			text,
+		}: ReviewInfo & ReviewCommentResponse,
 		reviewId: number | null = null,
 		reviewOutdated = false,
 	): React.ReactNode => {
 		const {
 			user,
 			selectedReviewId,
-			addOrRemoveCommentToFavourite,
+			toggleReviewFavourite,
+			isReviewFavourite,
 		} = this.props;
-		const authorToRender = author ?? botUser;
+		const authorToRender = author ?? this.botUser;
 		const shouldRenderControls = authorToRender.id === user?.id
-			&& !outdated
 			&& !reviewOutdated
 			&& (selectedReviewId === id || selectedReviewId === reviewId);
+		if(!shouldRenderControls) {
+			return null;
+		}
 
 		const actionsMarkup: React.ReactElement[] = [];
-		if(addOrRemoveCommentToFavourite && selectedReviewId === id) {
+		if(toggleReviewFavourite && isReviewFavourite && selectedReviewId === id && !reviewId) {
 			actionsMarkup.push(
-				<MenuItem onClick={ this.addOrRemoveCommentToFavourite } key={ 'favourite' }>
-					{ addedToFavourite
-						? <span><Star color={ 'yellow' }/> Убрать из Избранных</span>
-						: <span><Star2/> Добавить в Избранные</span> }
+				<MenuItem
+					data-id={ id }
+					onClick={ this.toggleReviewToFavourite }
+					key={ 'favourite' }>
+					{ texts.getToggleFavouriteMarkup(isReviewFavourite(text || comment)) }
 				</MenuItem>,
-				<MenuSeparator/>
+				<MenuSeparator key={ 'separator' }/>
 			);
 		}
 		if(authorToRender.id === user?.id) {
 			actionsMarkup.push(
-				<MenuItem key={ 'edit' }>
-					<Edit/> Редактировать
+				<MenuItem
+					key={ 'edit' }
+					onClick={ this.startEditingComment }
+					data-id={ id }
+					data-reviewid={ reviewId }
+					data-text={ text ?? comment }
+				>
+					{ texts.editButton }
 				</MenuItem>);
 		}
 		if(authorToRender.id === user?.id || user && isInstructor(user)) {
@@ -356,56 +380,55 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 					data-id={ id }
 					data-reviewid={ reviewId }
 					onClick={ this.deleteReviewOrComment }>
-					<Trash/> Удалить
+					{ texts.deleteButton }
 				</MenuItem>
 			);
 		}
 
-		return shouldRenderControls &&
-			<DropdownMenu
-				className={ styles.kebabMenu }
-				caption={ <MenuKebab
-					className={ styles.kebabMenuIcon }
-					size={ 18 }
-				/> }
-				positions={ ['left top'] }
-				menuWidth={ 216 }
-			>
-				{ actionsMarkup }
-			</DropdownMenu>;
+		return <DropdownMenu
+			className={ styles.kebabMenu }
+			caption={ <MenuKebab
+				className={ styles.kebabMenuIcon }
+				size={ 18 }
+			/> }
+			positions={ ['left top'] }
+			menuWidth={ 216 }
+		>
+			{ actionsMarkup }
+		</DropdownMenu>;
+	};
+
+	startEditingComment = (event: React.MouseEvent | React.SyntheticEvent): void => {
+		const { id, reviewId, } = this.parseCommentData(event);
+		const text = (event.currentTarget as HTMLElement).dataset.text;
+
+		this.setState({
+			editingReviewId: id,
+			editingParentReviewId: reviewId,
+			editingCommentValue: text,
+		});
 	};
 
 	parseCommentData = (event: React.MouseEvent | React.SyntheticEvent): { id: number, reviewId?: number, } => {
-		const data = (event.currentTarget as HTMLElement).dataset;
+		const { id, reviewid, } = (event.currentTarget as HTMLElement).dataset;
+
 		return {
-			id: parseInt(data.id!),
-			reviewId: data.reviewid ? parseInt(data.reviewid) : undefined,
+			id: parseInt(id || '-1'),
+			reviewId: reviewid ? parseInt(reviewid) : undefined,
 		};
 	};
 
-	addOrRemoveCommentToFavourite = (event: React.MouseEvent | React.SyntheticEvent): void => {
-		const { addOrRemoveCommentToFavourite, } = this.props;
-		const { reviews, } = this.state;
-		const { id, reviewId } = this.parseCommentData(event);
+	toggleReviewToFavourite = (event: React.MouseEvent | React.SyntheticEvent): void => {
+		const { toggleReviewFavourite, } = this.props;
+		const { id, } = this.parseCommentData(event);
 
-		if(!addOrRemoveCommentToFavourite) {
+		if(!toggleReviewFavourite) {
 			return;
 		}
 
-		const comment = reviews.find(c => c.review.id === (reviewId ? reviewId : id));
-
-		if(!comment) {
-			return;
-		}
-
-		if(reviewId) {
-			const reply = comment.review.comments.find(c => c.id === id);
-			if(reply) {
-				addOrRemoveCommentToFavourite(reply.text);
-			}
-		} else {
-			addOrRemoveCommentToFavourite(comment.review.comment);
-		}
+		toggleReviewFavourite(id);
+		event.preventDefault();
+		event.stopPropagation();
 	};
 
 	deleteReviewOrComment = (event: React.MouseEvent | React.SyntheticEvent): void => {
@@ -424,31 +447,45 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 	};
 
 	renderAddReviewComment = (
-		selectComment: (e: React.MouseEvent | React.FocusEvent) => void,
-		commentReply: string
+		commentReply: string,
+		id: number,
 	): React.ReactNode => {
+		const isReviewCanBeAdded = this.props.isReviewCanBeAdded(commentReply);
 		return (
 			<ThemeContext.Provider value={ textareaHidden }>
 				<div className={ styles.commentReplyTextArea }>
 					<Textarea
-						width={ 200 }
+						width={ 230 }//fix of overlapping send button
 						rows={ 1 }
 						autoResize
 						placeholder={ texts.sendButton }
 						onValueChange={ this.onTextareaValueChange }
-						onFocus={ selectComment }
+						data-tid={ id.toString() }
+						onFocus={ this.selectComment }
 						value={ commentReply }
 					/>
 				</div>
 				<button
-					disabled={ commentReply === '' }
-					className={ commentReply ? styles.commentReplyButtonActive : styles.commentReplyButton }
+					disabled={ !isReviewCanBeAdded }
+					className={ isReviewCanBeAdded ? styles.commentReplyButtonActive : styles.commentReplyButton }
 					onClick={ this.sendComment }
-					onFocus={ selectComment }>
+					data-tid={ id }
+					onFocus={ this.selectComment }>
 					<Send3/>
 				</button>
 			</ThemeContext.Provider>
 		);
+	};
+
+	selectComment = (e: React.MouseEvent | React.FocusEvent): void => {
+		const { selectedReviewId, } = this.props;
+		const element = e.currentTarget as HTMLElement;
+		const id = parseInt(element.dataset.tid
+			|| element.parentElement?.parentElement?.parentElement?.dataset.tid
+			|| '-1');
+		if(selectedReviewId !== id) {
+			this.props.onReviewClick(e, id);
+		}
 	};
 
 	onTextareaValueChange = (value: string): void => {
@@ -461,6 +498,40 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 
 		this.setState({
 			replies: newCommentsReplies,
+		});
+	};
+
+	onEditingTextareaValueChange = (value: string): void => {
+		this.setState({
+			editingCommentValue: value,
+		});
+	};
+
+	saveReviewOrComment = (): void => {
+		const {
+			editReviewOrComment,
+		} = this.props;
+		const {
+			editingReviewId,
+			editingCommentValue,
+			editingParentReviewId,
+		} = this.state;
+
+
+		if(!editingCommentValue || editingReviewId === undefined) {
+			return;
+		}
+
+		editReviewOrComment(editingCommentValue, editingReviewId, editingParentReviewId,);
+
+		this.stopEditingComment();
+	};
+
+	stopEditingComment = (): void => {
+		this.setState({
+			editingCommentValue: undefined,
+			editingReviewId: undefined,
+			editingParentReviewId: undefined,
 		});
 	};
 

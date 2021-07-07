@@ -9,7 +9,6 @@ export const GROUPS_LOAD_FAIL = groups + loadFail;
 
 
 interface GroupsLoadAction<T> extends Action<T> {
-	courseId: string;
 	userId: string;
 }
 

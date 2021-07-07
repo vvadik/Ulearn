@@ -34,7 +34,7 @@ export interface GroupStudentInfo {
 }
 
 export interface GroupsInfoResponse {
-	groups: GroupInfo[]
+	groups: GroupInfo[];
 }
 
 export interface GroupScoringGroupsResponse {

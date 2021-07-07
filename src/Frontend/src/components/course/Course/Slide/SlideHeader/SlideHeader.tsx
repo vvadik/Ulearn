@@ -21,17 +21,12 @@ interface SlideHeaderProps {
 	userRoles: UserRoles;
 
 	isHiddenSlide: boolean;
-	isReview: boolean;
 }
 
 const SlideHeader: React.FC<SlideHeaderProps> = (props) => {
-	const { courseId, slideId, isHiddenSlide, slideType, userRoles, openUnitId, isReview, } = props;
+	const { courseId, slideId, isHiddenSlide, slideType, userRoles, openUnitId, } = props;
 	if(isHiddenSlide) {
 		return <HiddenSlideHeader/>;
-	}
-
-	if(isReview) {
-
 	}
 
 	if(slideType === SlideType.Exercise || slideType === SlideType.Quiz) {

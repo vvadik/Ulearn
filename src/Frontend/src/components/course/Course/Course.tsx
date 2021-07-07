@@ -409,12 +409,12 @@ class Course extends Component<Props, State> {
 						slideType={ currentSlideInfo?.slideType }
 						userRoles={ userRoles }
 						openUnitId={ openedUnit?.id }
-						isReview={ isReview }
 					/> }
 					{
 						Page === Slide
 							?
 							slideInfo && <Slide
+								courseId={ courseId }
 								slideInfo={ slideInfo }
 								isLti={ isLti }
 								isReview={ isReview }

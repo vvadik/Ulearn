@@ -80,7 +80,6 @@ export interface ReviewCommentResponse {
 	renderedText: string;
 	publishTime: string;
 	author: ShortUserInfo;
-	addedToFavourite?: boolean;
 }
 
 export interface AttemptsStatistics {

@@ -445,12 +445,13 @@ class Exercise extends React.Component<Props, State> {
 					/>
 					{ exerciseCodeDoc && isReview &&
 					<Review
+						isReviewCanBeAdded={ () => true }
 						editReviewOrComment={ () => ({}) }
 						user={ user }
 						addReviewComment={ this.addReviewComment }
 						deleteReviewOrComment={ this.deleteReviewComment }
 						selectedReviewId={ selectedReviewId }
-						onSelectComment={ this.selectComment }
+						onReviewClick={ this.selectComment }
 						reviews={ getReviewsWithoutDeleted(currentReviews) }
 						editor={ editor }
 					/>

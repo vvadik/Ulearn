@@ -1,20 +1,15 @@
 import { RootState } from "src/redux/reducers";
-import { MatchParams } from "src/models/router";
 import { Dispatch } from "redux";
 import { loadSlide } from "src/actions/slides";
 import { connect } from "react-redux";
-import Slide, { DispatchFromRedux, PropsFromRedux } from "./Slide";
-import { RouteComponentProps, withRouter } from "react-router-dom";
+import Slide, { DispatchFromRedux, Props, PropsFromRedux } from "./Slide";
 
-const mapStateToProps = (state: RootState, { match, }: RouteComponentProps<MatchParams>) => {
+const mapStateToProps = (state: RootState, { courseId, slideInfo, }: Props
+): PropsFromRedux => {
 	const { slides, instructor, } = state;
 	const { slidesByCourses, slideLoading, slideError, } = slides;
-	const slideId = match.params.slideSlugOrAction.split('_').pop()!;
-	const courseId = match.params.courseId.toLowerCase();
 
 	const props: PropsFromRedux = {
-		slideId,
-		courseId,
 		slideLoading,
 		slideBlocks: [],
 		slideError,
@@ -24,7 +19,7 @@ const mapStateToProps = (state: RootState, { match, }: RouteComponentProps<Match
 	const coursesSlides = slidesByCourses[courseId];
 
 	if(coursesSlides) {
-		props.slideBlocks = coursesSlides[slideId] || [];
+		props.slideBlocks = coursesSlides[slideInfo.id] || [];
 	}
 
 	return props;
@@ -34,4 +29,5 @@ const mapDispatchToProps = (dispatch: Dispatch): DispatchFromRedux => ({
 	loadSlide: (courseId: string, slideId: string) => loadSlide(courseId, slideId)(dispatch),
 });
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Slide));
+const Connected = connect(mapStateToProps, mapDispatchToProps)(Slide);
+export default Connected;

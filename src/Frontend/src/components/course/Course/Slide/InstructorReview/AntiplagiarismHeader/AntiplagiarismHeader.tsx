@@ -4,18 +4,13 @@ import { Button, } from "ui";
 
 import cn from "classnames";
 
-import { SuspicionLevel } from "src/models/instructor";
+import { AntiplagiarismStatusResponse, SuspicionLevel } from "src/models/instructor";
 
 import styles from './AntiplagiarismHeader.less';
 import texts from './AntiplagiarismHeader.texts';
 
 
-export interface AntiplagiarismInfo {
-	suspicionLevel: SuspicionLevel;
-	suspicionCount: number;
-}
-
-interface State extends AntiplagiarismInfo {
+interface State extends AntiplagiarismStatusResponse {
 	loadingInfo: boolean;
 }
 
@@ -23,12 +18,12 @@ export interface Props {
 	shouldCheck: boolean;
 	fixed: boolean;
 
-	getAntiPlagiarismStatus: () => Promise<AntiplagiarismInfo>;
+	getAntiplagiarismStatus: () => Promise<AntiplagiarismStatusResponse | string>;
 	onZeroScoreButtonPressed: () => void;
 }
 
 function AntiplagiarismHeader({
-	getAntiPlagiarismStatus,
+	getAntiplagiarismStatus,
 	shouldCheck,
 	onZeroScoreButtonPressed,
 	fixed,
@@ -36,13 +31,19 @@ function AntiplagiarismHeader({
 	const [state, setState] = React.useState<State>(
 		{
 			suspicionLevel: shouldCheck ? 'running' : 'notChecking',
-			suspicionCount: 0,
+			suspiciousAuthorsCount: 0,
 			loadingInfo: false,
+			status: 'notChecked',
 		});
 
 	if(shouldCheck && !state.loadingInfo && state.suspicionLevel === 'running') {
 		setState({ ...state, loadingInfo: true });
-		getAntiPlagiarismStatus().then(c => setState({ ...state, loadingInfo: false, ...c }));
+		getAntiplagiarismStatus().then(c => {
+			const repsonse = c as AntiplagiarismStatusResponse;
+			if(repsonse) {
+				setState({ ...state, loadingInfo: false, ...repsonse });
+			}
+		});
 	}
 
 	let text: React.ReactNode;
@@ -59,12 +60,12 @@ function AntiplagiarismHeader({
 			break;
 		}
 		case "strongWarning": {
-			text = texts.getSuspicionText(state.suspicionCount, true);
+			text = texts.getSuspicionText(state.suspiciousAuthorsCount, true);
 			color = styles.strongSuspicionColor;
 			break;
 		}
 		case "warning": {
-			text = texts.getSuspicionText(state.suspicionCount);
+			text = texts.getSuspicionText(state.suspiciousAuthorsCount);
 			color = styles.suspicionColor;
 			break;
 		}

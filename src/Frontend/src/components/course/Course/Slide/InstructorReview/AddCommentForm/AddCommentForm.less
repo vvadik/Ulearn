@@ -72,7 +72,7 @@
 }
 
 .addCommentTextArea {
-  margin-bottom: 10px;//18px is actual margin to next component, 8px is added by footer
+  margin-bottom: 10px; //18px is actual margin to next component, 8px is added by footer
   font-size: 14px;
   line-height: 20px;
 }
@@ -130,12 +130,12 @@
   margin-bottom: 0;
 }
 
-.commentsList li:hover {
-  cursor: pointer;
+.commentsList li:hover .notSelectedFavouriteIcon {
+  opacity: initial;
+}
 
-  .notSelectedFavouriteIcon {
-    opacity: initial;
-  }
+.commentsList li span:hover {
+  cursor: pointer;
 }
 
 .commentTextElapsed {
