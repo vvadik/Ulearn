@@ -9,10 +9,10 @@ namespace Ulearn.Core.GoogleSheet
 		private static double? GetDateValue(DateTime dateTimeInUtc)
 		{
 			const int secondInDay = 60 * 60 * 24;
-			var dateTime = TimeZoneInfo.ConvertTimeToUtc(dateTimeInUtc, TimeZoneInfo.Local);
+			var dateTime = TimeZoneInfo.ConvertTimeFromUtc(dateTimeInUtc, TimeZoneInfo.FindSystemTimeZoneById(
+				"West Asia Standard Time")); // Время по Екатеринбургу
 			var startTime = new DateTime(1899, 11, 30, 0, 0, 0, 0, DateTimeKind.Utc);
-			var deltaToEkbTime = new TimeSpan(5, 0, 0);
-			var tsInterval = dateTime.Subtract(startTime) + deltaToEkbTime;
+			var tsInterval = dateTime.Subtract(startTime);
 			var time = Convert.ToDouble(tsInterval.TotalSeconds) / secondInDay;
 			return time;
 		}

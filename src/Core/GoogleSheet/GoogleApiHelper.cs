@@ -16,13 +16,12 @@ namespace Ulearn.Core.GoogleSheet
 		{
 			using var stream =
 				new FileStream("credentials.json", FileMode.Open, FileAccess.Read);
-			const string path = "token.json";
 			return GoogleWebAuthorizationBroker.AuthorizeAsync(
 				GoogleClientSecrets.FromStream(stream).Secrets,
 				scopes,
 				"user",
 				CancellationToken.None,
-				new FileDataStore(path, true)).Result;
+				new LocalDataStore()).Result;
 			// Console.WriteLine("Credential file saved to: " + path);
 		}
 
