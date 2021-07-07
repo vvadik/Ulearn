@@ -453,16 +453,12 @@ namespace Database.DataContexts
 		public List<string> GetTopUserReviewComments(string courseId, Guid slideId, string userId, int count)
 		{
 			var sw = Stopwatch.StartNew();
-			var result = db.ExerciseCodeReviews.Include(r => r.ExerciseChecking)
-				.Where(r => r.ExerciseChecking.CourseId == courseId &&
-							r.ExerciseChecking.SlideId == slideId &&
-							r.AuthorId == userId &&
-							!r.HiddenFromTopComments &&
-							!r.IsDeleted)
+			var result = db.ExerciseCodeReviews
+				.Where(r => r.CourseId == courseId && r.SlideId == slideId && r.AuthorId == userId && !r.HiddenFromTopComments && !r.IsDeleted)
 				.ToList()
 				.GroupBy(r => r.Comment)
 				.OrderByDescending(g => g.Count())
-				.ThenByDescending(g => g.Max(r => r.ExerciseChecking.Timestamp))
+				.ThenByDescending(g => g.Max(r => r.AddingTime))
 				.Take(count)
 				.Select(g => g.Key)
 				.ToList();
@@ -473,13 +469,9 @@ namespace Database.DataContexts
 		public List<string> GetTopOtherUsersReviewComments(string courseId, Guid slideId, string userId, int count, List<string> excludeComments)
 		{
 			var sw = Stopwatch.StartNew();
-			var excludeCommentsSet = excludeComments.ToImmutableHashSet();
-			var result = db.ExerciseCodeReviews.Include(r => r.ExerciseChecking)
-				.Where(r => r.ExerciseChecking.CourseId == courseId &&
-							r.ExerciseChecking.SlideId == slideId &&
-							r.AuthorId != userId &&
-							!r.HiddenFromTopComments &&
-							!r.IsDeleted)
+			var excludeCommentsSet = excludeComments.ToHashSet();
+			var result = db.ExerciseCodeReviews
+				.Where(r => r.CourseId == courseId && r.SlideId == slideId && r.AuthorId != userId && !r.HiddenFromTopComments && !r.IsDeleted)
 				.GroupBy(r => r.Comment)
 				.OrderByDescending(g => g.Count())
 				.Take(count * 2)
@@ -494,13 +486,9 @@ namespace Database.DataContexts
 
 		public async Task HideFromTopCodeReviewComments(string courseId, Guid slideId, string userId, string comment)
 		{
-			var reviews = db.ExerciseCodeReviews.Include(r => r.ExerciseChecking)
-				.Where(r => r.ExerciseChecking.CourseId == courseId &&
-							r.ExerciseChecking.SlideId == slideId &&
-							r.AuthorId == userId &&
-							r.Comment == comment &&
-							!r.IsDeleted);
-
+			var reviews = db.ExerciseCodeReviews
+				.Where(r => r.CourseId == courseId && r.SlideId == slideId && r.AuthorId == userId && r.Comment == comment && !r.IsDeleted)
+				.ToList();
 			foreach (var review in reviews)
 				review.HiddenFromTopComments = true;
 			await db.SaveChangesAsync().ConfigureAwait(false);
@@ -510,12 +498,9 @@ namespace Database.DataContexts
 		{
 			var sw = Stopwatch.StartNew();
 			var lastYear = DateTime.Today.AddYears(-1);
-			var result = db.ExerciseCodeReviews.Where(
-				r => r.ExerciseChecking.CourseId == courseId &&
-					r.ExerciseChecking.SlideId == slideId &&
-					!r.IsDeleted &&
-					r.ExerciseChecking.Timestamp > lastYear
-			).ToList();
+			var result = db.ExerciseCodeReviews
+				.Where(r => r.CourseId == courseId && r.SlideId == slideId && !r.IsDeleted && r.AddingTime > lastYear)
+				.ToList();
 			log.Info("GetLastYearReviewComments " + sw.ElapsedMilliseconds + " ms");
 			return result;
 		}
