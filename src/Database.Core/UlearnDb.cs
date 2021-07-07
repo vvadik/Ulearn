@@ -34,7 +34,9 @@ namespace Database
 
 		public void MigrateToLatestVersion()
 		{
+			Database.SetCommandTimeout(TimeSpan.FromMinutes(5));
 			Database.Migrate();
+			Database.SetCommandTimeout(TimeSpan.FromSeconds(30));
 		}
 
 		public Task CreateInitialDataAsync(InitialDataCreator creator)
