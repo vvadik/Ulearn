@@ -269,6 +269,7 @@ namespace Database
 			AddIndex<EnabledAdditionalScoringGroup>(modelBuilder, c => c.GroupId);
 
 			AddIndex<ExerciseCodeReview>(modelBuilder, c => c.ExerciseCheckingId);
+			AddIndex<ExerciseCodeReview>(modelBuilder, c => new { c.CourseId, c.SlideId, c.SubmissionAuthorId });
 
 			AddIndex<FeedViewTimestamp>(modelBuilder, c => c.UserId);
 			AddIndex<FeedViewTimestamp>(modelBuilder, c => c.Timestamp);

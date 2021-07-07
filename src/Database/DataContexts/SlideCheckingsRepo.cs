@@ -395,6 +395,9 @@ namespace Database.DataContexts
 		{
 			var review = db.ExerciseCodeReviews.Add(new ExerciseCodeReview
 			{
+				CourseId = submission?.CourseId ?? checking?.CourseId,
+				SlideId = (submission?.SlideId ?? checking?.SlideId)!.Value,
+				SubmissionAuthorId = submission?.UserId ?? checking?.UserId,
 				AuthorId = userId,
 				Comment = comment,
 				ExerciseCheckingId = checking?.Id,

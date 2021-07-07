@@ -53,6 +53,19 @@ namespace Database.Models
 
 		public virtual IList<ExerciseCodeReviewComment> Comments { get; set; }
 
+		[Required]
+		[StringLength(100)]
+		public string CourseId { get; set; }
+
+		[Required]
+		public Guid SlideId { get; set; }
+
+		//[Required]
+		[StringLength(64)]
+		public string SubmissionAuthorId { get; set; }
+
+		public virtual ApplicationUser SubmissionAuthor { get; set; }
+
 		[NotMapped]
 		public List<ExerciseCodeReviewComment> NotDeletedComments => Comments.Where(r => !r.IsDeleted).ToList();
 	}
