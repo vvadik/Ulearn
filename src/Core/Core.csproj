@@ -7,6 +7,8 @@
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 	</PropertyGroup>
 	<ItemGroup>
+		<PackageReference Include="Google.Apis" Version="1.52.0" />
+		<PackageReference Include="Google.Apis.Sheets.v4" Version="1.52.0.2338" />
 		<PackageReference Include="JetBrains.Annotations" Version="2020.3.0" />
 		<PackageReference Include="Kontur.IDevOps.Tools.GitCommit2AssemblyTitle" Version="2.0.25">
 		  <PrivateAssets>all</PrivateAssets>
