@@ -8,21 +8,28 @@ using Ulearn.Core.Configuration;
 namespace Ulearn.Core.GoogleSheet
 {
     public class LocalDataStore : IDataStore
-    {
-		public LocalDataStore()
+	{
+		private readonly bool writeTokenToConsole;
+		private readonly string accessToken;
+
+		public LocalDataStore(bool writeTokenToConsole, string accessToken)
 		{
+			this.writeTokenToConsole = writeTokenToConsole;
+			this.accessToken = accessToken;
 		}
-		
+
 		public Task StoreAsync<T>(string key, T value)
-        {
+		{
+			if (!writeTokenToConsole)
+				return Task.FromResult(0);
 			var serialized = NewtonsoftJsonSerializer.Instance.Serialize(value);
 			Console.WriteLine(serialized);
 			return Task.FromResult(0);
 		}
 
-        public Task DeleteAsync<T>(string key)
+		public Task DeleteAsync<T>(string key)
         {
-            throw new NotImplementedException();
+			return Task.FromResult(0);
         }
 
 		public Task<T> GetAsync<T>(string key)
@@ -32,8 +39,7 @@ namespace Ulearn.Core.GoogleSheet
 				throw new ArgumentException("Key MUST have a value");
 			}
 			var tcs = new TaskCompletionSource<T>();
-			var str = ApplicationConfiguration.Read<UlearnConfiguration>().GoogleAccessToken;
-			tcs.SetResult(NewtonsoftJsonSerializer.Instance.Deserialize<T>(str));
+			tcs.SetResult(NewtonsoftJsonSerializer.Instance.Deserialize<T>(accessToken));
 			return tcs.Task;
 		}
 

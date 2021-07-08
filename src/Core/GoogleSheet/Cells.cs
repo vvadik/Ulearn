@@ -2,35 +2,35 @@
 
 namespace Ulearn.Core.GoogleSheet
 {
-	public interface ISheetTableCell
+	public interface IGoogleSheetCell
 	{
 	}
 
-	public class StringSheetTableCell : ISheetTableCell
+	public class StringGoogleSheetCell : IGoogleSheetCell
 	{
 		public readonly string Value;
 
-		public StringSheetTableCell(string value)
+		public StringGoogleSheetCell(string value)
 		{
 			Value = value;
 		}
 	}
 
-	public class DateSheetTableCell : ISheetTableCell
+	public class DateGoogleSheetCell : IGoogleSheetCell
 	{
 		public readonly DateTime Value;
 
-		public DateSheetTableCell(DateTime value)
+		public DateGoogleSheetCell(DateTime value)
 		{
 			Value = value;
 		}
 	}
 
-	public class NumberSheetTableCell : ISheetTableCell
+	public class NumberGoogleSheetCell : IGoogleSheetCell
 	{
 		public readonly double Value;
 
-		public NumberSheetTableCell(double value)
+		public NumberGoogleSheetCell(double value)
 		{
 			Value = value;
 		}

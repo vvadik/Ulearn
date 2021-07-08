@@ -139,9 +139,9 @@ namespace Ulearn.Core.Configuration
 		
 		public bool DisableKonturServices { get; set; }
 
-		public string GoogleAccessToken = "{\"access_token\":\"ya29.a0ARrdaM9E5dD4_2MwVDlydwaNwwTLD-Eynuuo92oN7uyvPlj0rLvYmezW1r1GJmUDtJMiI-5NPgEHsAzzOu8gApHX9UvjbVItlil4un0V35hIlkZwOpPnGA0pMruJBapAaGQgAWMhdPVLvQaILGLgZT8IbYxp\"," +
-										"\"token_type\":\"Bearer\",\"expires_in\":3599,\"refresh_token\":\"1//0cjxKvf4VkZ4fCgYIARAAGAwSNwF-L9IryPAbmaHgtceNjP-8aa4nLdAlEaM7i52Ku1kI06bnNpQwzsxN0QW_3BJXvmmE9RWmhvk\"," +
-										"\"scope\":\"https://www.googleapis.com/auth/spreadsheets\",\"Issued\":\"2021-07-05T12:34:43.100+05:00\",\"IssuedUtc\":\"2021-07-05T07:34:43.100Z\"}";
+		public string GoogleAccessToken { get; set; }
+		
+		public string GoogleAccessCredentials { get; set; }
 	}
 
 	public class VideoAnnotationsClientConfiguration
