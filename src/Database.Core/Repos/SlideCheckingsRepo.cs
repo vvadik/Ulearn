@@ -620,8 +620,10 @@ namespace Database.Repos
 
 		public async Task RefreshExerciseStatisticsMaterializedViews()
 		{
+			db.Database.SetCommandTimeout(TimeSpan.FromMinutes(2));
 			await db.RefreshMaterializedView(ExerciseAttemptedUsersCount.ViewName);
 			await db.RefreshMaterializedView(ExerciseUsersWithRightAnswerCount.ViewName);
+			db.Database.SetCommandTimeout(TimeSpan.FromSeconds(30));
 		}
 	}
 }
