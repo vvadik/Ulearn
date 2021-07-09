@@ -10,13 +10,14 @@ namespace Ulearn.Core.Tests
 	public class GoogleSheetTests
 	{
 		private const string spreadsheetId = "1dlMITgyLknv-cRd0SleTTGetiNsSfdXAprjKGHU-FNI";
-		private const bool writeTokenToConsole = false;
+		private const bool writeTokenToConsole = true;
 		private readonly string accessToken = ApplicationConfiguration.Read<UlearnConfiguration>().GoogleAccessToken;
+		private readonly string credentialsJson = ApplicationConfiguration.Read<UlearnConfiguration>().GoogleAccessCredentials;
 
 		[Test, Explicit]
 		public void FillingTest()
 		{
-			var client = new GoogleApiClient(writeTokenToConsole, accessToken);
+			var client = new GoogleApiClient(writeTokenToConsole, accessToken, credentialsJson);
 			var sheet = new GoogleSheet.GoogleSheet(2, 2,  0);
 			var date = DateTime.UtcNow;
 			sheet.AddCell(0, 0, date);

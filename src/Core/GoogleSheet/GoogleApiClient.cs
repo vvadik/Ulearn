@@ -16,19 +16,18 @@ namespace Ulearn.Core.GoogleSheet
 		private readonly bool writeTokenToConsole;
 		private readonly string accessToken;
 		
-		public GoogleApiClient(bool writeTokenToConsole, string accessToken)
+		public GoogleApiClient(bool writeTokenToConsole, string accessToken, string credentialsJson)
 		{
 			this.writeTokenToConsole = writeTokenToConsole;
 			this.accessToken = accessToken;
-			var credentials = GetCredentials();
+			var credentials = GetCredentials(credentialsJson);
 			service = GetService(credentials);
 		}
 
-		private UserCredential GetCredentials()
+		private UserCredential GetCredentials(string credentialsJson)
 		{
 			var scopes = new[] { SheetsService.Scope.Spreadsheets };
-			var credentials = ApplicationConfiguration.Read<UlearnConfiguration>().GoogleAccessCredentials;
-			var secrets = JsonConvert.DeserializeObject<ClientSecrets>(credentials);
+			var secrets = JsonConvert.DeserializeObject<ClientSecrets>(credentialsJson);
 			return GoogleWebAuthorizationBroker.AuthorizeAsync(
 				secrets,
 				scopes,
