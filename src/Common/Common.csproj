@@ -3,6 +3,7 @@
 		<RootNamespace>Ulearn.Common</RootNamespace>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<TargetFrameworks>net472;net5.0</TargetFrameworks>
+		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="DotNetZip" Version="1.15.0" />

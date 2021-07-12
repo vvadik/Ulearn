@@ -2,9 +2,9 @@
 
 	<PropertyGroup>
 		<TargetFramework>net5.0</TargetFramework>
-
 		<IsPackable>false</IsPackable>
 		<RootNamespace>Ulearn.Core.Tests</RootNamespace>
+		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 	</PropertyGroup>
 
 	<ItemGroup>

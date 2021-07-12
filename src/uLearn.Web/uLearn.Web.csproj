@@ -37,6 +37,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Use64BitIISExpress />
     <LangVersion>default</LangVersion>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
   <PropertyGroup>
     <GeneratedMSBuildEditorConfigFile>$(IntermediateOutputPath)$(MSBuildProjectName).GeneratedMSBuildEditorConfig.editorconfig</GeneratedMSBuildEditorConfigFile>

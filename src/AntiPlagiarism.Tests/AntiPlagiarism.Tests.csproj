@@ -2,6 +2,7 @@
 	<PropertyGroup>
 		<TargetFramework>net5.0</TargetFramework>
 		<IsPackable>false</IsPackable>
+		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Kontur.IDevOps.Tools.GitCommit2AssemblyTitle" Version="2.0.25">

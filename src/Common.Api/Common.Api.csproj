@@ -3,6 +3,7 @@
 	<PropertyGroup>
 		<RootNamespace>Ulearn.Common.Api</RootNamespace>
 		<TargetFrameworks>net472;net5.0</TargetFrameworks>
+		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 	</PropertyGroup>
 
 	<ItemGroup>
