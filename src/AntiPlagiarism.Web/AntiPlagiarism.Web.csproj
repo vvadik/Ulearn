@@ -6,10 +6,6 @@
 	<ItemGroup>
 		<PackageReference Include="Accord.Statistics" Version="3.8.0" />
 		<PackageReference Include="JetBrains.Annotations" Version="2020.3.0" />
-		<PackageReference Include="Kontur.IDevOps.Tools.GitCommit2AssemblyTitle" Version="2.0.25">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="5.0.3">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
