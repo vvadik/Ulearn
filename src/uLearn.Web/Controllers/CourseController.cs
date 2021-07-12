@@ -388,7 +388,7 @@ namespace uLearn.Web.Controllers
 			if (slide == null)
 				return HttpNotFound("No instructor note for this unit");
 			var gitEditUrl = GetGitEditLink(course, slide.SlideFilePathRelativeToCourse);
-			return View(new InstructorNoteModel(slide, gitEditUrl, new (baseUrlApi, baseUrlWeb, courseId, slide.Unit.UnitDirectoryRelativeToCourse)));
+			return View(new InstructorNoteModel(slide, gitEditUrl, new MarkdownRenderContext(baseUrlApi, baseUrlWeb, courseId, slide.Unit.UnitDirectoryRelativeToCourse)));
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Tester)]
