@@ -45,10 +45,15 @@ namespace Ulearn.Common.Extensions
 
 		public static string GetRelativePath(this FileSystemInfo file, string folder)
 		{
-			var pathUri = new Uri(file.FullName);
+			var fileOrDirectoryPath = file.FullName;
+			if (file is DirectoryInfo && !fileOrDirectoryPath.EndsWith(Path.DirectorySeparatorChar.ToString()))
+				fileOrDirectoryPath += Path.DirectorySeparatorChar;
+			var pathUri = new Uri(fileOrDirectoryPath);
 			if (!folder.EndsWith(Path.DirectorySeparatorChar.ToString()))
 				folder += Path.DirectorySeparatorChar;
 			var folderUri = new Uri(folder);
+			if (folderUri.Equals(pathUri))
+				return "";
 			return Uri.UnescapeDataString(folderUri.MakeRelativeUri(pathUri).ToString().Replace('/', Path.DirectorySeparatorChar));
 		}
 

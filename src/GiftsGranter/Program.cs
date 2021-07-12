@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,6 +7,7 @@ using System.Threading;
 using Database.DataContexts;
 using Vostok.Logging.Abstractions;
 using Newtonsoft.Json.Linq;
+using Telegram.Bot.Types.Enums;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Logging;
 using Vostok.Logging.File;
@@ -152,22 +153,39 @@ namespace GiftsGranter
 
 		private bool GrantGiftsIfNone(RatingEntry entry, CourseSettings courseSettings, string courseId)
 		{
-			var sid = entry.User.Logins.First(login => login.LoginProvider == "Контур.Паспорт").ProviderKey;
-			var staffUserId = staffClient.GetUser(sid)["id"].Value<int>();
-			var gifts = staffClient.GetUserGifts(staffUserId);
-			var giftImagePath = courseSettings.giftImagePath;
-
-			var hasComplexityGift = gifts["gifts"].Children().Any(gift => gift["imagePath"].Value<string>() == giftImagePath);
-			if (!hasComplexityGift)
+			try
 			{
-				log.Info($"NoGiftYet\t{entry.Score}\t{entry.User.VisibleName}");
-				staffClient.GrantGift(staffUserId, entry.Score, courseSettings);
-				log.Info($"ComplexityGiftGrantedFor\t{entry.User.VisibleName}\t{entry.User.KonturLogin}");
-				telegramBot.PostToChannel($"Granted gift for course {courseId}\n{entry.Score} points for user {entry.User.VisibleName} {entry.User.KonturLogin}");
-				return true;
-			}
+				var sid = entry.User.Logins.First(login => login.LoginProvider == "Контур.Паспорт").ProviderKey;
+				var staffUserId = GetUserId(sid);
+				var gifts = staffClient.GetUserGifts(staffUserId);
+				var giftImagePath = courseSettings.giftImagePath;
 
-			return false;
+				var hasComplexityGift = gifts["gifts"].Children().Any(gift => gift["imagePath"].Value<string>() == giftImagePath);
+				if (!hasComplexityGift)
+				{
+					log.Info($"NoGiftYet\t{entry.Score}\t{entry.User.VisibleName}");
+					staffClient.GrantGift(staffUserId, entry.Score, courseSettings);
+					log.Info($"ComplexityGiftGrantedFor\t{entry.User.VisibleName}\t{entry.User.KonturLogin}");
+					telegramBot.PostToChannel($"Granted gift for course {courseId}\n{entry.Score} points for user {entry.User.VisibleName} {entry.User.KonturLogin}");
+					return true;
+				}
+
+				return false;
+			}
+			catch (Exception e)
+			{
+				var message = $"Can't grant gift to {entry.User.VisibleName} (kontur-login: {entry.User.KonturLogin} ulearn-username: {entry.User.UserName})";
+				log.Error(e, message);
+				telegramBot.PostToChannel(message);
+				telegramBot.PostToChannel($"```{e}```", ParseMode.Markdown);
+				return false;
+			}
+		}
+
+		private int GetUserId(string sid)
+		{
+			// TODO Use https://staff.skbkontur.ru/api/users/getbylogin?login=kontur\<konturlogin> if not succeeded
+			return staffClient.GetUser(sid)["id"]!.Value<int>();
 		}
 	}
 }

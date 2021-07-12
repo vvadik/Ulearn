@@ -53,13 +53,6 @@ const texts = {
 
 	compilationText: 'Как компилируется код?',
 
-	acceptedSolutions: {
-		title: 'Решения',
-		content: <p>Изучите решения ваших коллег. Проголосуйте за решения, в которых вы нашли что-то новое для
-			себя.</p>,
-
-	},
-
 	checkups: {
 		showReview: 'Посмотреть',
 

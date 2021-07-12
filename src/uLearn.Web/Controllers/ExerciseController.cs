@@ -611,7 +611,7 @@ namespace uLearn.Web.Controllers
 
 			var cookie = Request.Headers.Get("Cookie");
 			IWebApiClient webApiClient = new WebApiClient(new ApiClientSettings(baseUrlApi));
-			var response = await webApiClient.GetStudentZipFile(courseId, slideId, studentZipName, cookie == null ? null : new Header("Cookie", cookie));
+			var response = await webApiClient.GetStudentZipFile(courseId, slideId, studentZipName, cookie == null ? (Header?)null : new Header("Cookie", cookie));
 
 			if (response == null)
 				return new HttpStatusCodeResult(500);

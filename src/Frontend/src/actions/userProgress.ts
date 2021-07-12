@@ -1,6 +1,10 @@
 import { Dispatch } from "redux";
 
-import { getUserProgressInCourse, updateUserProgressInCourse } from 'src/api/userProgress';
+import {
+	getUserProgressInCourse,
+	skipExercise as apiSkipExercise,
+	updateUserProgressInCourse
+} from 'src/api/userProgress';
 
 import { SlideUserProgress, UsersProgressResponse } from "src/models/userProgress";
 import {
@@ -73,6 +77,23 @@ export const loadUserProgress = (courseId: string, userId: string
 			})
 			.catch(() => {
 				dispatch(loadUserProgressFail());
+			});
+	};
+};
+
+export const skipExercise = (
+	courseId: string,
+	slideId: string,
+	onSuccess: () => void
+) => {
+	return (dispatch: Dispatch): void => {
+		apiSkipExercise(courseId, slideId,)
+			.then(() => {
+				dispatch(userProgressUpdateAction(courseId, slideId, { isSkipped: true }));
+				onSuccess();
+			})
+			.catch(err => {
+				console.error(err); // TODO rozentor handle error
 			});
 	};
 };

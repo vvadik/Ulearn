@@ -34,7 +34,9 @@ namespace Database
 
 		public void MigrateToLatestVersion()
 		{
+			Database.SetCommandTimeout(TimeSpan.FromMinutes(5));
 			Database.Migrate();
+			Database.SetCommandTimeout(TimeSpan.FromSeconds(30));
 		}
 
 		public Task CreateInitialDataAsync(InitialDataCreator creator)
@@ -216,6 +218,14 @@ namespace Database
 
 			SetDeleteBehavior<SystemAccess, ApplicationUser>(modelBuilder, c => c.GrantedBy, c => c.GrantedById);
 
+			modelBuilder.Entity<ExerciseAttemptedUsersCount>()
+				.ToView(ExerciseAttemptedUsersCount.ViewName)
+				.HasNoKey();
+
+			modelBuilder.Entity<ExerciseUsersWithRightAnswerCount>()
+				.ToView(ExerciseUsersWithRightAnswerCount.ViewName)
+				.HasNoKey();
+
 			CreateIndexes(modelBuilder);
 		}
 
@@ -261,6 +271,7 @@ namespace Database
 			AddIndex<EnabledAdditionalScoringGroup>(modelBuilder, c => c.GroupId);
 
 			AddIndex<ExerciseCodeReview>(modelBuilder, c => c.ExerciseCheckingId);
+			AddIndex<ExerciseCodeReview>(modelBuilder, c => new { c.CourseId, c.SlideId, c.SubmissionAuthorId });
 
 			AddIndex<FeedViewTimestamp>(modelBuilder, c => c.UserId);
 			AddIndex<FeedViewTimestamp>(modelBuilder, c => c.Timestamp);
@@ -288,6 +299,9 @@ namespace Database
 
 			AddIndex<Like>(modelBuilder, c => c.SubmissionId);
 			AddIndex<Like>(modelBuilder, c => new { c.UserId, c.SubmissionId });
+			AddIndex<Like>(modelBuilder, c => new { c.CourseId, c.SlideId, c.SubmissionId });
+
+			AddIndex<AcceptedSolutionsPromote>(modelBuilder, c => new { c.CourseId, c.SlideId });
 
 			AddIndex<LtiConsumer>(modelBuilder, c => c.Key);
 
@@ -496,5 +510,10 @@ namespace Database
 		public DbSet<StyleErrorSettings> StyleErrorSettings { get; set; }
 
 		public DbSet<WorkQueueItem> WorkQueueItems { get; set; }
+
+		public DbSet<AcceptedSolutionsPromote> AcceptedSolutionsPromotes { get; set; }
+
+		public DbSet<ExerciseAttemptedUsersCount> ExerciseAttemptedUsersCounts { get; set; }
+		public DbSet<ExerciseUsersWithRightAnswerCount> ExerciseUsersWithRightAnswerCounts { get; set; }
 	}
 }

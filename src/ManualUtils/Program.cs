@@ -97,6 +97,8 @@ namespace ManualUtils
 			//ConvertZipsToCourseXmlInRoot();
 			//await UploadStagingToDb(serviceProvider);
 			//await UploadStagingFromDbAndExtractToCourses(serviceProvider);
+			//await SetCourseIdAndSlideIdInLikesAndPromotes(db);
+			await SetNewFieldsInReview(db, serviceProvider);
 		}
 
 		private static void GenerateUpdateSequences()
@@ -481,6 +483,59 @@ namespace ManualUtils
 					foreach (var f in unpackDirectory.GetFiles("*", SearchOption.AllDirectories).Cast<FileSystemInfo>().Concat(unpackDirectory.GetDirectories("*", SearchOption.AllDirectories)))
 						f.Attributes &= ~FileAttributes.ReadOnly;
 				}
+			}
+		}
+
+		private static async Task SetCourseIdAndSlideIdInLikesAndPromotes(UlearnDb db)
+		{
+			var likes = await db.SolutionLikes.Include(s => s.Submission).ToListAsync();
+			var i = 0;
+			foreach (var like in likes)
+			{
+				i++;
+				like.CourseId = like.Submission.CourseId;
+				like.SlideId = like.Submission.SlideId;
+				if (i % 1000 == 0)
+					db.SaveChanges();
+			}
+			db.SaveChanges();
+
+			var promotes = await db.AcceptedSolutionsPromotes.Include(s => s.Submission).ToListAsync();
+			foreach (var promote in promotes)
+			{
+				promote.CourseId = promote.Submission.CourseId;
+				promote.SlideId = promote.Submission.SlideId;
+			}
+			db.SaveChanges();
+		}
+
+		private static async Task SetNewFieldsInReview(UlearnDb db, IServiceProvider serviceProvider)
+		{
+			var reviewsIds = await db.ExerciseCodeReviews.Where(r=> r.CourseId == "").Select(r => r.Id).ToListAsync();
+			Console.WriteLine("Count " + reviewsIds.Count);
+			var i = 0;
+			foreach (var group in reviewsIds.GroupBy(r => r / 2000))
+			{
+				using (var scope = serviceProvider.CreateScope())
+				{
+					var scopedDb = (UlearnDb)scope.ServiceProvider.GetService(typeof(UlearnDb));
+					var ids = group.ToList();
+					i += ids.Count;
+					var reviews = await scopedDb.ExerciseCodeReviews
+						.Include(s => s.ExerciseChecking)
+						.Include(s => s.Submission)
+						.Where(s => ids.Contains(s.Id))
+						.ToListAsync();
+					foreach (var review in reviews)
+					{
+						review.CourseId = review.Submission?.CourseId ?? review.ExerciseChecking?.CourseId ?? "";
+						review.SlideId = (review.Submission?.SlideId ?? review.ExerciseChecking?.SlideId) ?? default;
+						review.SubmissionAuthorId = review.Submission?.UserId ?? review.ExerciseChecking?.UserId;
+					}
+
+					scopedDb.SaveChanges();
+				}
+				Console.WriteLine($"{i} / {reviewsIds.Count}");
 			}
 		}
 	}

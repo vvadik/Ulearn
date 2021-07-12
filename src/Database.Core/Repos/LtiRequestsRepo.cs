@@ -25,7 +25,6 @@ namespace Database.Repos
 		private async Task TryUpdate(string courseId, Guid slideId, string userId, string ltiRequestJson)
 		{
 			var ltiRequestModel = await FindElement(courseId, slideId, userId);
-
 			if (ltiRequestModel == null)
 			{
 				ltiRequestModel = new LtiSlideRequest

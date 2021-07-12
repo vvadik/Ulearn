@@ -190,7 +190,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			if (buildResult.HasStyleErrors)
 			{
 				var styleErrors = await ConvertStyleErrors(buildResult);
-				submissionNoTracking.Reviews = await styleErrorsResultObserver.CreateStyleErrorsReviewsForSubmission(submissionId, styleErrors, exerciseMetricId);
+				submissionNoTracking.Reviews = await styleErrorsResultObserver.CreateStyleErrorsReviewsForSubmission(submissionNoTracking, styleErrors, exerciseMetricId);
 			}
 
 			var score = await visitsRepo.GetScore(courseId, exerciseSlide.Id, userId);

@@ -12,9 +12,8 @@ export const courseStatistics = analytics + '/courseStatistics';
 export const userSolutions = analytics + '/userSolutions';
 export const slides = "slides";
 export const ltiSlide = "ltislide";
-export const acceptedAlert = "acceptedalert";
-export const acceptedSolutions = "acceptedsolutions";
 export const resetStudentsLimits = "/students/reset-limits";
+export const acceptedSolutions = "accepted-solutions";
 export const signalrWS = 'ws';
 export const login = 'login';
 export const account = 'account';
@@ -31,10 +30,6 @@ export const groups = 'groups';
 
 export function constructPathToSlide(courseId: string, slideId: string): string {
 	return `/${ coursePath }/${ courseId }/${ slideId }`;
-}
-
-export function constructPathToAcceptedSolutions(courseId: string, slideId: string): string {
-	return `/${ coursePath }/${ courseId }/${ acceptedSolutions }?slideId=${ slideId }`;
 }
 
 export function constructPathToComment(commentId: number, isLike?: boolean): string {

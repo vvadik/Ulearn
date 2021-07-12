@@ -21,6 +21,35 @@ namespace Database.Migrations
                 .HasAnnotation("ProductVersion", "5.0.3")
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+            modelBuilder.Entity("Database.Models.AcceptedSolutionsPromote", b =>
+                {
+                    b.Property<int>("SubmissionId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CourseId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<Guid>("SlideId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("SubmissionId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("CourseId", "SlideId");
+
+                    b.ToTable("AcceptedSolutionsPromotes");
+                });
+
             modelBuilder.Entity("Database.Models.AdditionalScore", b =>
                 {
                     b.Property<int>("Id")
@@ -732,6 +761,21 @@ namespace Database.Migrations
                     b.ToTable("EnabledAdditionalScoringGroups");
                 });
 
+            modelBuilder.Entity("Database.Models.ExerciseAttemptedUsersCount", b =>
+                {
+                    b.Property<int>("AttemptedUsersCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CourseId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("SlideId")
+                        .HasColumnType("uuid");
+
+                    b.ToView("ExerciseAttemptedUsersCounts");
+                });
+
             modelBuilder.Entity("Database.Models.ExerciseCodeReview", b =>
                 {
                     b.Property<int>("Id")
@@ -751,6 +795,11 @@ namespace Database.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("CourseId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
                     b.Property<int?>("ExerciseCheckingId")
                         .HasColumnType("integer");
 
@@ -766,11 +815,18 @@ namespace Database.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<Guid>("SlideId")
+                        .HasColumnType("uuid");
+
                     b.Property<int>("StartLine")
                         .HasColumnType("integer");
 
                     b.Property<int>("StartPosition")
                         .HasColumnType("integer");
+
+                    b.Property<string>("SubmissionAuthorId")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
 
                     b.Property<int?>("SubmissionId")
                         .HasColumnType("integer");
@@ -781,7 +837,11 @@ namespace Database.Migrations
 
                     b.HasIndex("ExerciseCheckingId");
 
+                    b.HasIndex("SubmissionAuthorId");
+
                     b.HasIndex("SubmissionId");
+
+                    b.HasIndex("CourseId", "SlideId", "SubmissionAuthorId");
 
                     b.ToTable("ExerciseCodeReviews");
                 });
@@ -846,6 +906,21 @@ namespace Database.Migrations
                     b.HasIndex("SubmissionId");
 
                     b.ToTable("ExerciseSolutionByGraders");
+                });
+
+            modelBuilder.Entity("Database.Models.ExerciseUsersWithRightAnswerCount", b =>
+                {
+                    b.Property<string>("CourseId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("SlideId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("UsersWithRightAnswerCount")
+                        .HasColumnType("integer");
+
+                    b.ToView("ExerciseUsersWithRightAnswerCounts");
                 });
 
             modelBuilder.Entity("Database.Models.FeedViewTimestamp", b =>
@@ -1133,6 +1208,14 @@ namespace Database.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<string>("CourseId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<Guid>("SlideId")
+                        .HasColumnType("uuid");
+
                     b.Property<int>("SubmissionId")
                         .HasColumnType("integer");
 
@@ -1149,6 +1232,8 @@ namespace Database.Migrations
                     b.HasIndex("SubmissionId");
 
                     b.HasIndex("UserId", "SubmissionId");
+
+                    b.HasIndex("CourseId", "SlideId", "SubmissionId");
 
                     b.ToTable("Likes");
                 });
@@ -2715,6 +2800,25 @@ namespace Database.Migrations
                     b.HasDiscriminator().HasValue("RepliedToYourCommentNotification");
                 });
 
+            modelBuilder.Entity("Database.Models.AcceptedSolutionsPromote", b =>
+                {
+                    b.HasOne("Database.Models.UserExerciseSubmission", "Submission")
+                        .WithMany()
+                        .HasForeignKey("SubmissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Database.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Submission");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Database.Models.AdditionalScore", b =>
                 {
                     b.HasOne("Database.Models.ApplicationUser", "Instructor")
@@ -2920,6 +3024,10 @@ namespace Database.Migrations
                         .WithMany("Reviews")
                         .HasForeignKey("ExerciseCheckingId");
 
+                    b.HasOne("Database.Models.ApplicationUser", "SubmissionAuthor")
+                        .WithMany()
+                        .HasForeignKey("SubmissionAuthorId");
+
                     b.HasOne("Database.Models.UserExerciseSubmission", "Submission")
                         .WithMany("Reviews")
                         .HasForeignKey("SubmissionId");
@@ -2929,6 +3037,8 @@ namespace Database.Migrations
                     b.Navigation("ExerciseChecking");
 
                     b.Navigation("Submission");
+
+                    b.Navigation("SubmissionAuthor");
                 });
 
             modelBuilder.Entity("Database.Models.ExerciseCodeReviewComment", b =>
