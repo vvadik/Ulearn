@@ -295,7 +295,7 @@ for (var i = 0; i < 2*1000*1000*1000; ++i) a[i % memory] = (byte)i;
 		[Test]
 		public void SimpleProjTest()
 		{
-			var dir = new DirectoryInfo(@"..\..\..\test");
+			var dir = new DirectoryInfo(@"test");
 			var buildingResult = MsBuildRunner.BuildProject(
 				new MsBuildSettings(),
 				"test.csproj",
