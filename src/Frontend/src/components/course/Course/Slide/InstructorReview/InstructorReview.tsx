@@ -9,24 +9,23 @@ import ScoreControls from "./ScoreControls/ScoreControls";
 import 'codemirror/addon/selection/mark-selection.js';
 
 import {
-	addTextMarkerToReviews,
+	getTextMarkersByReviews,
 	createTextMarker,
 	getAllReviewsFromSubmission,
 	getPreviousManualCheckingInfo,
 	getSelectedReviewIdByCursor,
 	loadLanguageStyles,
 	buildRange,
-	replaceReviewMarker,
-	ReviewInfoWithMarker,
+	PreviousManualCheckingInfo, TextMarkersByReviewId,
 } from "../Blocks/Exercise/ExerciseUtils";
 
 import { InstructorReviewTabs } from "./InstructorReviewTabs";
 import { Language } from "src/consts/languages";
-import { SubmissionInfo } from "src/models/exercise";
-import CodeMirror, { Editor, EditorConfiguration, TextMarker, } from "codemirror";
+import { ReviewInfo, SubmissionInfo } from "src/models/exercise";
+import CodeMirror, { Editor, EditorConfiguration, MarkerRange, TextMarker, } from "codemirror";
 import { clone } from "src/utils/jsonExtensions";
-import { DiffInfo, getDataFromReviewToCompareChanges, getDiffInfo } from "./utils";
-import { Props, State } from "./InstructorReview.types";
+import { DiffInfo, getDataFromReviewToCompareChanges, getDiffInfo, getReviewAnchorTop } from "./utils";
+import { InstructorReviewInfo, InstructorReviewInfoWithAnchor, Props, State } from "./InstructorReview.types";
 
 import AddCommentForm from "./AddCommentForm/AddCommentForm";
 import AntiplagiarismHeader from "./AntiplagiarismHeader/AntiplagiarismHeader";
@@ -55,45 +54,46 @@ class InstructorReview extends React.Component<Props, State> {
 	constructor(props: Props) {
 		super(props);
 
-		const { favouriteReviews, studentSubmissions } = props;
-
-		let submission: SubmissionInfo | undefined = undefined;
-		let prevSubmissionInfo = undefined;
-		let favouriteReviewsSet = new Set<string>();
-		let favouriteByUserSet = new Set<string>();
-		let outdatedReviewsSet = new Set<number>();
+		const { studentSubmissions, favouriteReviews, } = props;
+		let currentSubmission: SubmissionInfo | undefined = undefined;
+		let diffInfo: DiffInfo | undefined = undefined;
+		let reviews: InstructorReviewInfo[] | undefined = [];
+		let outdatedReviews: InstructorReviewInfo[] | undefined = [];
+		const favReviewsByUser = favouriteReviews?.filter(r => r.isFavourite);
+		const favReviews = favouriteReviews?.filter(r => !r.isFavourite);
+		const favouriteReviewsSet = new Set(favReviews?.map(r => r.text));
+		const favouriteByUserSet = new Set(favReviewsByUser?.map(r => r.text));
 
 		if(studentSubmissions) {
-			submission = JSON.parse(JSON.stringify(studentSubmissions[0]));
-			prevSubmissionInfo = getPreviousManualCheckingInfo(studentSubmissions, 0);
-			favouriteReviewsSet = new Set(favouriteReviews?.filter(r => !r.isFavourite).map(r => r.text));
-			favouriteByUserSet = new Set(favouriteReviews?.filter(r => r.isFavourite).map(r => r.text));
-			outdatedReviewsSet = new Set(prevSubmissionInfo?.submission?.manualCheckingReviews
-				.map(r => r.id)
-				.concat(prevSubmissionInfo?.submission?.automaticChecking?.reviews?.map(r => r.id) || []));
+			const submissionInfo = this.getSubmissionInfo(studentSubmissions, 0);
+			currentSubmission = submissionInfo.submission;
+			diffInfo = submissionInfo.diffInfo;
+
+			const allReviews = this.getReviewsFromSubmission(currentSubmission, diffInfo, false,);
+			reviews = allReviews.reviews;
+			outdatedReviews = allReviews.outdatedReviews;
 		}
 
 		this.state = {
 			selectedReviewId: -1,
-			reviewsWithTextMarkers: [],
+			reviews,
+			outdatedReviews,
+			markers: {},
 			currentTab: InstructorReviewTabs.Review,
-			currentSubmission: submission,
+			currentSubmission,
 			editor: null,
-			commentValue: '',
+			addCommentValue: '',
 			showDiff: false,
-			diffInfo: prevSubmissionInfo && submission
-				? getDiffInfo(submission, prevSubmissionInfo.submission)
-				: undefined,
+			diffInfo: diffInfo,
 			favouriteReviewsSet,
 			favouriteByUserSet,
-			outdatedReviewsSet,
 		};
 	}
 
 	componentDidMount(): void {
 		const {
 			student,
-			groups,
+			studentGroups,
 			studentSubmissions,
 			getStudentInfo,
 			getStudentSubmissions,
@@ -103,6 +103,9 @@ class InstructorReview extends React.Component<Props, State> {
 			getFavouriteReviews,
 			slideContext: { courseId, slideId, },
 		} = this.props;
+		const {
+			currentSubmission,
+		} = this.state;
 
 		if(!student) {
 			getStudentInfo(studentId);
@@ -110,43 +113,168 @@ class InstructorReview extends React.Component<Props, State> {
 		if(!studentSubmissions) {
 			getStudentSubmissions(studentId, courseId, slideId);
 		}
-		if(!groups) {
+		if(!studentGroups) {
 			getStudentGroups(courseId, studentId);
 		}
 		if(!favouriteReviews) {
 			getFavouriteReviews(courseId, studentId);
 		}
+
+		if(currentSubmission) {
+			this.addMarkers();
+		}
 	}
 
-	componentDidUpdate = (prevProps: Props): void => {
-		const { studentSubmissions, favouriteReviews, } = this.props;
-		const { currentSubmission, } = this.state;
+	componentDidUpdate = (prevProps: Readonly<Props>, prevState: Readonly<State>): void => {
+		const { studentSubmissions, } = this.props;
+		const { currentSubmission, reviews, diffInfo, showDiff, } = this.state;
 
-		if(studentSubmissions && studentSubmissions.length > 0) {
-			let submissionInPropsIndex = studentSubmissions.findIndex(s => s.id === currentSubmission?.id);
-			if(submissionInPropsIndex < 0) {
-				submissionInPropsIndex = 0;
-			}
-			const submissionInProps = studentSubmissions[submissionInPropsIndex];
-			const submissionInPropsClone = clone(submissionInProps);
-			if(!currentSubmission) {
-				const prevSubmissionInfo = getPreviousManualCheckingInfo(studentSubmissions, submissionInPropsIndex);
+		if(!currentSubmission && studentSubmissions && studentSubmissions.length > 0) {
+			this.loadSubmission(studentSubmissions, 0);
+			return;
+		}
+
+		if(currentSubmission && studentSubmissions) {
+			if(prevState.showDiff !== showDiff) {
+				const newReviews = this.getReviewsFromSubmission(
+					currentSubmission,
+					diffInfo,
+					showDiff,
+				);
 				this.setState({
-					currentSubmission: submissionInPropsClone,
-					diffInfo: prevSubmissionInfo && submissionInPropsClone
-						? getDiffInfo(submissionInPropsClone, prevSubmissionInfo.submission)
-						: undefined,
+					reviews: newReviews.reviews,
+					outdatedReviews: newReviews.outdatedReviews,
 				}, this.resetMarkers);
-			} else {
-				const newReviews = submissionInProps.manualCheckingReviews.map(getDataFromReviewToCompareChanges);
-				const oldReviews = currentSubmission.manualCheckingReviews.map(getDataFromReviewToCompareChanges);
+				return;
+			}
 
-				if(JSON.stringify(newReviews) !== JSON.stringify(oldReviews)
-					|| JSON.stringify(favouriteReviews) !== JSON.stringify(prevProps.favouriteReviews)) {
+			const submissionIndex = studentSubmissions.findIndex(s => s.id === currentSubmission.id);
+			const submission = clone(studentSubmissions[submissionIndex]);
+			if(submission) {
+				const newReviews = this.getReviewsFromSubmission(
+					submission,
+					diffInfo,
+					showDiff,
+				);
+				const reviewsCompare = reviews.map(
+					r => getDataFromReviewToCompareChanges(r));
+				const newReviewsCompare = newReviews.reviews.map(
+					r => getDataFromReviewToCompareChanges(r));
 
+				// outdated should not be changed
+				//	const newOutdatedReviewsCompare = newReviews.outdatedReviews.map(r => getDataFromReviewToCompareChanges(r));
+				//  const outdatedReviewsCompare = outdatedReviews.map(r => getDataFromReviewToCompareChanges(r));
+				//  if(JSON.stringify(outdatedReviewsCompare) !== JSON.stringify(newOutdatedReviewsCompare)) {}
+
+				if(JSON.stringify(newReviewsCompare) !== JSON.stringify(reviewsCompare)) {
 					this.setState({
-						currentSubmission: submissionInPropsClone,
+						currentSubmission: submission,
+						reviews: newReviews.reviews,
+						outdatedReviews: newReviews.outdatedReviews,
 					}, this.resetMarkers);
+				}
+			}
+		}
+	};
+
+	loadSubmission = (studentSubmissions: SubmissionInfo[], index: number,): void => {
+		const { showDiff, } = this.state;
+		const { submission, diffInfo } = this.getSubmissionInfo(studentSubmissions, index);
+		const { reviews, outdatedReviews } = this.getReviewsFromSubmission(submission, diffInfo, showDiff);
+		this.setState({
+			currentSubmission: submission,
+			diffInfo,
+			selectedReviewId: -1,
+			markers: {},
+			addCommentFormCoords: undefined,
+			reviews,
+			outdatedReviews,
+		}, this.resetMarkers);
+	};
+
+	getSubmissionInfo = (studentSubmissions: SubmissionInfo[],
+		index: number,
+	): { submission: SubmissionInfo; diffInfo: DiffInfo | undefined; } => {
+		const submission = clone(studentSubmissions[index]);
+		const prevSubmissionInfo = getPreviousManualCheckingInfo(studentSubmissions, index);
+		const diffInfo = prevSubmissionInfo
+			? getDiffInfo(submission, prevSubmissionInfo.submission)
+			: undefined;
+
+		return { submission, diffInfo, };
+	};
+
+	getReviewsFromSubmission = (
+		submission: SubmissionInfo,
+		diffInfo: DiffInfo | undefined,
+		showDiff: boolean,
+	): { reviews: ReviewInfo[]; outdatedReviews: ReviewInfo[]; } => {
+		const reviews: ReviewInfo[] = getAllReviewsFromSubmission(submission)
+			.map(r => ({
+				...r,
+				startLine: showDiff && diffInfo ? diffInfo.newCodeNewLineIndex[r.startLine] : r.startLine,
+				finishLine: showDiff && diffInfo ? diffInfo.newCodeNewLineIndex[r.finishLine] : r.finishLine,
+			}));
+		const outdatedReviews: ReviewInfo[] = diffInfo
+			? getAllReviewsFromSubmission(diffInfo.prevReviewedSubmission,)
+				.map(r => ({
+					...r,
+					startLine: showDiff && diffInfo ? diffInfo.oldCodeNewLineIndex[r.startLine] : r.startLine,
+					finishLine: showDiff && diffInfo ? diffInfo.oldCodeNewLineIndex[r.finishLine] : r.finishLine,
+				}))
+			: [];
+
+		return { reviews, outdatedReviews, };
+	};
+
+	resetMarkers = (): void => {
+		const {
+			markers,
+			editor,
+			diffInfo,
+			showDiff,
+		} = this.state;
+
+		if(!editor) {
+			return;
+		}
+
+		Object.values(markers)
+			?.forEach((markers: TextMarker[]) => markers
+				.forEach((m: TextMarker) => m.clear()));
+
+		this.addMarkers();
+		if(showDiff && diffInfo) {
+			this.addLineClasses(editor, diffInfo);
+		}
+	};
+
+	addLineClasses = (editor: Editor, diffInfo: DiffInfo,): void => {
+		//addding a line class via addLineClass triggers rerender on each method call, it cause perfomance issues
+		//instead of it we can add class directly to line wrappers
+		const linesWrapper = editor.getWrapperElement().getElementsByClassName('CodeMirror-code')[0];
+		for (let i = 0; i < diffInfo.diffByBlocks.length; i++) {
+			const { type, } = diffInfo.diffByBlocks[i];
+			if(type) {
+				const lineWrapper = linesWrapper.children[i];
+				if(!lineWrapper) {
+					return;
+				}
+				const lineNumberWrapper = document.createElement('div');
+
+				lineWrapper.prepend(lineNumberWrapper);
+
+				switch (type) {
+					case "added": {
+						lineWrapper.classList.add(styles.addedLinesCodeMirror);
+						lineNumberWrapper.classList.add(styles.addedLinesGutter);
+						break;
+					}
+					case "removed": {
+						lineWrapper.classList.add(styles.removedLinesCodeMirror);
+						lineNumberWrapper.classList.add(styles.removedLinesGutter);
+						break;
+					}
 				}
 			}
 		}
@@ -154,21 +282,24 @@ class InstructorReview extends React.Component<Props, State> {
 
 	static getDerivedStateFromProps(props: Readonly<Props>, state: Readonly<State>): Partial<State> | null {
 		const { favouriteReviews, } = props;
-		const prevReviewedSubmission = state.diffInfo?.prevReviewedSubmission;
+		const { favouriteReviewsSet, favouriteByUserSet, } = state;
+		const favReviewsByUser = favouriteReviews?.filter(r => r.isFavourite);
+		const favReviews = favouriteReviews?.filter(r => !r.isFavourite);
 
-		return {
-			favouriteReviewsSet: new Set(favouriteReviews?.filter(r => !r.isFavourite).map(r => r.text)),
-			favouriteByUserSet: new Set(favouriteReviews?.filter(r => r.isFavourite).map(r => r.text)),
-			outdatedReviewsSet: new Set(prevReviewedSubmission?.manualCheckingReviews
-				.map(r => r.id)
-				.concat(prevReviewedSubmission?.automaticChecking?.reviews?.map(r => r.id) || [])),
-		};
+		if(favReviewsByUser?.length !== favouriteByUserSet?.size || favReviews?.length !== favouriteReviewsSet?.size) {
+			return {
+				favouriteReviewsSet: new Set(favReviews?.map(r => r.text)),
+				favouriteByUserSet: new Set(favReviewsByUser?.map(r => r.text)),
+			};
+		}
+
+		return null;
 	}
 
 	render(): React.ReactNode {
 		const {
 			student,
-			groups,
+			studentGroups,
 			studentSubmissions,
 			authorSolution,
 			formulation,
@@ -181,7 +312,7 @@ class InstructorReview extends React.Component<Props, State> {
 			currentScore,
 		} = this.state;
 
-		if(!student || !studentSubmissions || !groups || !favouriteReviews || !currentSubmission) {
+		if(!student || !studentSubmissions || !studentGroups || !favouriteReviews || !currentSubmission) {
 			return <CourseLoader/>;
 		}
 
@@ -190,7 +321,7 @@ class InstructorReview extends React.Component<Props, State> {
 				<BlocksWrapper withoutBottomPaddings>
 					<h3 className={ styles.reviewHeader }>
 						<span className={ styles.reviewStudentName }>
-							{ texts.getStudentInfo(student.visibleName, groups[0].name) }
+							{ texts.getStudentInfo(student.visibleName, studentGroups[0].name) }
 						</span>
 						{ texts.getReviewInfo(studentSubmissions, prevReviewScore, currentScore) }
 					</h3>
@@ -342,13 +473,11 @@ class InstructorReview extends React.Component<Props, State> {
 		} = this.props;
 		const {
 			currentSubmission,
-			editor,
 			selectedReviewId,
 			diffInfo,
 			showDiff,
 			addCommentFormCoords,
-			reviewsWithTextMarkers,
-			commentValue,
+			addCommentValue,
 		} = this.state;
 
 		if(!favouriteReviews || !currentSubmission) {
@@ -371,10 +500,8 @@ class InstructorReview extends React.Component<Props, State> {
 						}
 						onCursorActivity={ this.onCursorActivity }
 					/>
-					{ reviewsWithTextMarkers.length > 0 &&
 					<Review
 						backgroundColor={ 'gray' }
-						editor={ editor }
 						user={ user }
 						addReviewComment={ this.onAddReviewComment }
 						toggleReviewFavourite={ this.onToggleReviewFavouriteByReviewId }
@@ -382,17 +509,13 @@ class InstructorReview extends React.Component<Props, State> {
 						editReviewOrComment={ this.editReviewOrComment }
 						selectedReviewId={ selectedReviewId }
 						onReviewClick={ this.selectComment }
-						reviews={ reviewsWithTextMarkers.map(r => ({ ...r, markers: undefined, })) }
-
+						reviews={ this.getAllReviewsAsInstructorReviews() }
 						isReviewCanBeAdded={ this.isReviewCanBeAdded }
-						isReviewFavourite={ this.isReviewFavourite }
-						isReviewOutdated={ this.isReviewOutdated }
 					/>
-					}
 				</div>
 				{ addCommentFormCoords &&
 				<AddCommentForm
-					value={ commentValue }
+					value={ addCommentValue }
 					valueCanBeAddedToFavourite={ this.isCommentCanBeAddedToFavourite() }
 					onValueChange={ this.onCommentFormValueChange }
 					addComment={ this.onFormAddComment }
@@ -404,6 +527,41 @@ class InstructorReview extends React.Component<Props, State> {
 				/> }
 			</div>
 		);
+	};
+
+	getAllReviewsAsInstructorReviews = (): InstructorReviewInfoWithAnchor[] => {
+		const {
+			reviews,
+			outdatedReviews,
+			diffInfo,
+			favouriteByUserSet,
+			editor,
+			showDiff,
+		} = this.state;
+
+		if(!editor) {
+			return [];
+		}
+
+		const allReviews: InstructorReviewInfoWithAnchor[] = reviews.map(r => ({
+			...r,
+			instructor: {
+				isFavourite: favouriteByUserSet.has(r.comment),
+			},
+			anchor: getReviewAnchorTop(r, editor,),
+		}));
+
+		if(showDiff && diffInfo) {
+			return allReviews.concat(outdatedReviews.map(r => ({
+				...r,
+				instructor: {
+					outdated: true,
+				},
+				anchor: getReviewAnchorTop(r, editor,),
+			})));
+		}
+
+		return allReviews;
 	};
 
 	mock = (): void => {
@@ -438,22 +596,10 @@ class InstructorReview extends React.Component<Props, State> {
 	};
 
 	isCommentCanBeAddedToFavourite = (): boolean => {
-		const { commentValue, favouriteByUserSet, } = this.state;
-		const trimmed = this.removeWhiteSpaces(commentValue);
+		const { addCommentValue, favouriteByUserSet, favouriteReviewsSet, } = this.state;
+		const trimmed = this.removeWhiteSpaces(addCommentValue);
 
-		return trimmed.length > 0 && !favouriteByUserSet.has(trimmed);
-	};
-
-	isReviewFavourite = (reviewText: string): boolean => {
-		const { favouriteByUserSet, } = this.state;
-		const trimmed = this.removeWhiteSpaces(reviewText);
-
-		return favouriteByUserSet.has(trimmed);
-	};
-
-	isReviewOutdated = (reviewId: number): boolean => {
-		const { outdatedReviewsSet, } = this.state;
-		return outdatedReviewsSet.has(reviewId);
+		return trimmed.length > 0 && !favouriteByUserSet?.has(trimmed) && !favouriteReviewsSet?.has(trimmed);
 	};
 
 	editReviewOrComment = (text: string, id: number, reviewId?: number,): void => {
@@ -465,13 +611,15 @@ class InstructorReview extends React.Component<Props, State> {
 		} = this.state;
 
 		if(currentSubmission) {
-			editReviewOrComment(text, currentSubmission.id, id, reviewId);
+			const trimmed = this.removeWhiteSpaces(text);
+
+			editReviewOrComment(trimmed, currentSubmission.id, id, reviewId);
 		}
 	};
 
 	onCommentFormValueChange = (comment: string): void => {
 		this.setState({
-			commentValue: comment,
+			addCommentValue: comment,
 		});
 	};
 
@@ -529,149 +677,75 @@ class InstructorReview extends React.Component<Props, State> {
 	};
 
 	onDiffToggleValueChanged = (value: boolean): void => {
+		const {
+			currentSubmission,
+			editor,
+		} = this.state;
+
+		if(!currentSubmission || !editor) {
+			return;
+		}
+
 		this.setState({
 			showDiff: value,
 			selectedReviewId: -1,
-			reviewsWithTextMarkers: [],
 			addCommentFormCoords: undefined,
 		}, this.resetMarkers);
 	};
 
 	onSubmissionsSelectValueChange = (id: unknown): void => {
 		const { studentSubmissions, } = this.props;
+		const { editor, } = this.state;
 
-		if(!studentSubmissions) {
+		if(!studentSubmissions || !editor) {
 			return;
 		}
-
 		const currentSubmissionIndex = studentSubmissions.findIndex(s => s.id === id);
-		const currentSubmission = JSON.parse(JSON.stringify(studentSubmissions[currentSubmissionIndex]));
-		const prevSubmission = getPreviousManualCheckingInfo(studentSubmissions, currentSubmissionIndex);
-		const diffInfo: DiffInfo | undefined = prevSubmission
-			? getDiffInfo(currentSubmission, prevSubmission.submission)
-			: undefined;
 
-		this.setState({
-			currentSubmission,
-			diffInfo,
-			selectedReviewId: -1,
-			reviewsWithTextMarkers: [],
-			addCommentFormCoords: undefined,
-		}, this.resetMarkers);
+		this.loadSubmission(studentSubmissions, currentSubmissionIndex);
 	};
 
-	resetMarkers = (): void => {
+	addMarkers = (): void => {
 		const {
-			favouriteReviews,
-		} = this.props;
-		const {
+			reviews,
+			outdatedReviews,
 			editor,
-			currentSubmission,
 			diffInfo,
 			showDiff,
-			reviewsWithTextMarkers,
 			selectedReviewId,
 		} = this.state;
 
-		reviewsWithTextMarkers.forEach(r => r.markers.forEach((m: TextMarker) => m.clear()));
-
-		if(!editor || !currentSubmission || !favouriteReviews) {
+		if(!editor) {
 			return;
 		}
 
-		let newReviewsWithTextMarkers = InstructorReview.getMarkers(
-			editor,
-			currentSubmission,
-			showDiff ? diffInfo : undefined,);
-
-		newReviewsWithTextMarkers = replaceReviewMarker(
-			newReviewsWithTextMarkers,
-			selectedReviewId,
-			selectedReviewId,
-			editor.getDoc(),
-			styles.defaultMarker,
-			styles.selectedMarker,
-		).reviews;
-
-		this.setState({
-			reviewsWithTextMarkers: newReviewsWithTextMarkers,
-		});
-	};
-
-	static getMarkers = (
-		editor: Editor,
-		submission: SubmissionInfo,
-		diffInfo: DiffInfo | undefined,
-	): ReviewInfoWithMarker[] => {
 		const doc = editor.getDoc();
-		let newReviews = getAllReviewsFromSubmission(submission);
-		let reviewsWithTextMarkers: ReviewInfoWithMarker[] = [];
 
-		if(diffInfo) {
-			//reviews from current submission
-			newReviews = newReviews.map(r => ({
-				...r,
-				startLine: diffInfo.newCodeNewLineIndex[r.startLine],
-				finishLine: diffInfo.newCodeNewLineIndex[r.finishLine],
-			}));
-			reviewsWithTextMarkers.push(
-				...addTextMarkerToReviews(
-					newReviews,
-					doc,
-					styles.defaultMarker,
-					diffInfo?.deletedLinesSet,
-				));
-			//reviews from previously reviewed submission
-			const oldReviews = getAllReviewsFromSubmission(diffInfo.prevReviewedSubmission,)
-				.map(r => ({
-					...r,
-					startLine: diffInfo.oldCodeNewLineIndex[r.startLine],
-					finishLine: diffInfo.oldCodeNewLineIndex[r.finishLine],
-				}));
-			reviewsWithTextMarkers.push(
-				...addTextMarkerToReviews(
-					oldReviews,
-					doc,
-					styles.defaultMarker,
-				));
-		} else {
-			reviewsWithTextMarkers = addTextMarkerToReviews(
-				newReviews,
+		let markers = {
+			...getTextMarkersByReviews(
+				reviews,
 				doc,
 				styles.defaultMarker,
-			);
+				showDiff && diffInfo ? diffInfo.deletedLinesSet : undefined,
+			),
+		};
+
+		if(showDiff) {
+			markers = {
+				...markers,
+				...getTextMarkersByReviews(
+					outdatedReviews,
+					doc,
+					styles.defaultMarker,
+				),
+			};
 		}
 
-		if(diffInfo) {
-			//addding a line class via addLineClass triggers rerender on each method call, it cause perfomance issues
-			//instead of it we can add class directly to line wrappers
-			const linesWrapper = editor.getWrapperElement().getElementsByClassName('CodeMirror-code')[0];
-			for (let i = 0; i < diffInfo.diffByBlocks.length; i++) {
-				const { type, } = diffInfo.diffByBlocks[i];
-				if(type) {
-					const lineWrapper = linesWrapper.children[i];
-					const lineNumberWrapper = document.createElement('div');
-
-					lineWrapper.prepend(lineNumberWrapper);
-
-					switch (type) {
-						case "added": {
-							lineWrapper.classList.add(styles.addedLinesCodeMirror);
-							lineNumberWrapper.classList.add(styles.addedLinesGutter);
-							break;
-						}
-						case "removed": {
-							lineWrapper.classList.add(styles.removedLinesCodeMirror);
-							lineNumberWrapper.classList.add(styles.removedLinesGutter);
-							break;
-						}
-					}
-				}
-			}
-		}
-
-		return reviewsWithTextMarkers;
+		this.setState({
+			markers,
+		}, () => selectedReviewId > -1 && this.highlightReview(selectedReviewId, editor,));
 	};
+
 
 	formatLine = (lineNumber: number): string => {
 		const { diffInfo, showDiff, } = this.state;
@@ -686,9 +760,11 @@ class InstructorReview extends React.Component<Props, State> {
 
 	onMouseUp = (): void => {
 		const { editor, addCommentFormCoords, } = this.state;
+
 		if(!editor || addCommentFormCoords) {
 			return;
 		}
+
 		const doc = editor.getDoc();
 
 		const selections = doc.listSelections();
@@ -720,7 +796,7 @@ class InstructorReview extends React.Component<Props, State> {
 
 		this.setState({
 			addCommentFormCoords: coords,
-			ranges: { startRange, endRange, },
+			addCommentRanges: { startRange, endRange, },
 		});
 		document.addEventListener('keydown', this.onEscPressed);
 		document.removeEventListener('mouseup', this.onMouseUp);
@@ -745,18 +821,18 @@ class InstructorReview extends React.Component<Props, State> {
 			editor,
 			diffInfo,
 			showDiff,
-			ranges,
+			addCommentRanges,
 		} = this.state;
 
 		this.setState({
 			addCommentFormCoords: undefined,
-			commentValue: '',
+			addCommentValue: '',
 		});
 
-		if(!editor || !currentSubmission || !ranges) {
+		if(!editor || !currentSubmission || !addCommentRanges) {
 			return;
 		}
-		const { startRange, endRange, } = ranges;
+		const { startRange, endRange, } = addCommentRanges;
 
 		comment = this.removeWhiteSpaces(comment);
 
@@ -892,7 +968,7 @@ class InstructorReview extends React.Component<Props, State> {
 	};
 
 	onCursorActivity = (): void => {
-		const { reviewsWithTextMarkers, editor, selectedReviewId, } = this.state;
+		const { reviews, editor, selectedReviewId, } = this.state;
 
 		if(!editor) {
 			return;
@@ -909,8 +985,7 @@ class InstructorReview extends React.Component<Props, State> {
 			return;
 		}
 
-		const id = getSelectedReviewIdByCursor(reviewsWithTextMarkers, doc, cursor);
-		this.highlightReview(id, editor);
+		this.highlightReview(getSelectedReviewIdByCursor(reviews, doc, cursor), editor);
 	};
 
 	selectComment = (e: React.MouseEvent<Element, MouseEvent> | React.FocusEvent, id: number,): void => {
@@ -924,22 +999,33 @@ class InstructorReview extends React.Component<Props, State> {
 
 	highlightReview = (id: number, editor: Editor): void => {
 		const {
-			reviewsWithTextMarkers,
+			markers,
 			selectedReviewId,
 		} = this.state;
+		const doc = editor.getDoc();
+		const newMarkers = { ...markers };
 
-		const newReviews = replaceReviewMarker(
-			reviewsWithTextMarkers,
-			selectedReviewId,
-			id,
-			editor.getDoc(),
-			styles.defaultMarker,
-			styles.selectedMarker,
-		).reviews;
+		const resetMarkers = (markers: TextMarker[], markerClass: string) =>
+			markers.reduce((pv, marker) => {
+				const position = marker.find() as MarkerRange;
+				if(position) {
+					const { from, to, } = position;
+					marker.clear();
+					pv.push(createTextMarker(to.line, to.ch, from.line, from.ch, markerClass, doc));
+				}
+				return pv;
+			}, [] as TextMarker[]);
 
+		if(newMarkers[selectedReviewId]) {
+			newMarkers[selectedReviewId] = resetMarkers(newMarkers[selectedReviewId], styles.defaultMarker,);
+		}
+
+		if(newMarkers[id]) {
+			newMarkers[id] = resetMarkers(newMarkers[id], styles.selectedMarker,);
+		}
 		this.setState({
 			selectedReviewId: id,
-			reviewsWithTextMarkers: newReviews,
+			markers: newMarkers,
 		});
 	};
 }

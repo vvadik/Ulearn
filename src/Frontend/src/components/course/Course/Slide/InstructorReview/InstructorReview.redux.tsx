@@ -1,6 +1,6 @@
 import { connect } from "react-redux";
 
-import InstructorReview, { ApiFromRedux, PropsFromRedux } from "./InstructorReview";
+import InstructorReview from "./InstructorReview";
 
 import { buildUserInfo } from "src/utils/courseRoles";
 
@@ -19,6 +19,7 @@ import { ShortGroupInfo } from "src/models/comments";
 import { ReviewInfo } from "src/models/exercise";
 import { FavouriteComment } from "./AddCommentForm/AddCommentForm";
 import { AntiplagiarismInfo } from "src/models/instructor";
+import { ApiFromRedux, PropsFromRedux } from "./InstructorReview.types";
 
 const mapStateToProps = (
 	{ instructor, account, groups, }: RootState,
@@ -41,7 +42,7 @@ const mapStateToProps = (
 	return {
 		user: buildUserInfo(account, courseId,),
 		favouriteReviews: [],
-		groups: studentGroups,
+		studentGroups: studentGroups,
 		student,
 		studentSubmissions,
 		antiplagiarismStatus: undefined,

@@ -11,19 +11,20 @@ import { ReviewInfo, SubmissionInfo } from "src/models/exercise";
 import { GroupsInfoResponse } from "src/models/groups";
 import React from "react";
 import { SlideContext } from "../Slide";
-import { ReviewInfoWithMarker } from "../Blocks/Exercise/ExerciseUtils";
+import { ReviewInfoWithMarker, TextMarkersByReviewId } from "../Blocks/Exercise/ExerciseUtils";
 import { InstructorReviewTabs } from "./InstructorReviewTabs";
 import { DiffInfo } from "./utils";
 import CodeMirror, { Editor } from "codemirror";
 
 export interface PropsFromRedux {
 	user?: UserInfo;
-	groups?: ShortGroupInfo[];
 
 	favouriteReviews?: FavouriteReview[];
 
 	student?: ShortUserInfo;
+	studentGroups?: ShortGroupInfo[];
 	studentSubmissions?: SubmissionInfo[];
+	scoresBySubmissionId?: { [submissionId: number]: number; };
 
 	antiplagiarismStatus?: AntiplagiarismInfo;
 	prohibitFurtherManualChecking: boolean;
@@ -72,11 +73,17 @@ export interface InstructorExtraFields {
 export interface ReviewCompare {
 	comment: string;
 	comments: string[];
+	startLine: number;
+	anchor?: number;
 	instructor?: InstructorExtraFields;
 }
 
 export interface InstructorReviewInfo extends ReviewInfo {
 	instructor?: InstructorExtraFields;
+}
+
+export interface InstructorReviewInfoWithAnchor extends InstructorReviewInfo {
+	anchor: number;
 }
 
 export type InstructorReviewInfoWithMarker = InstructorReviewInfo & ReviewInfoWithMarker;
@@ -86,23 +93,24 @@ export interface State {
 
 	currentSubmission: SubmissionInfo | undefined;
 
+	showDiff: boolean;
 	diffInfo?: DiffInfo;
+
 	selectedReviewId: number;
-	reviewsWithTextMarkers: InstructorReviewInfoWithMarker[];
+	reviews: ReviewInfo[];
+	outdatedReviews: ReviewInfo[];
+	markers: TextMarkersByReviewId;
 
 	editor: null | Editor;
 
-	commentValue: string;
+	addCommentValue: string;
 	addCommentFormCoords?: { left: number; top: number; bottom: number };
-	ranges?: { startRange: CodeMirror.Position; endRange: CodeMirror.Position; };
+	addCommentRanges?: { startRange: CodeMirror.Position; endRange: CodeMirror.Position; };
 
-	showDiff: boolean;
 	initialCode?: string;
-
 	prevReviewScore?: number;
 	currentScore?: number;
 
 	favouriteReviewsSet: Set<string>;
 	favouriteByUserSet: Set<string>;
-	outdatedReviewsSet: Set<number>;
 }

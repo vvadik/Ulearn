@@ -2,6 +2,7 @@ import { SubmissionInfo, } from "./exercise";
 
 export interface StudentSubmissionsResponse {
 	submissions: SubmissionInfo[];
+	submissionsScores: { [submissionId: number]: number; };
 }
 
 export type SuspicionLevel = 'notChecking' | 'accepted' | 'warning' | 'strongWarning' | 'running';

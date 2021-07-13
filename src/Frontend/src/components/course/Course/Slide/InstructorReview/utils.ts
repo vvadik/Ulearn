@@ -1,12 +1,46 @@
-import { SubmissionInfo } from "src/models/exercise";
+import { ReviewInfo, SubmissionInfo } from "src/models/exercise";
 import diff_match_patch from "diff-match-patch";
-import { InstructorReviewInfo, ReviewCompare } from "./InstructorReview.types";
+import { InstructorReviewInfo, InstructorReviewInfoWithAnchor, ReviewCompare } from "./InstructorReview.types";
+import { Editor } from "codemirror";
 
-export const getDataFromReviewToCompareChanges = (review: InstructorReviewInfo): ReviewCompare => ({
-	comment: review.comment,
-	instructor: review.instructor,
-	comments: review.comments.map(c => c.text),
-});
+export const getDataFromReviewToCompareChanges = (review: InstructorReviewInfoWithAnchor | InstructorReviewInfo | ReviewInfo): ReviewCompare => {
+	const reviewWithAnchor = (review as InstructorReviewInfoWithAnchor);
+	if(reviewWithAnchor.anchor) {
+		return {
+			comment: reviewWithAnchor.comment,
+			anchor: reviewWithAnchor.anchor,
+			instructor: reviewWithAnchor.instructor,
+			comments: reviewWithAnchor.comments.map(c => c.text),
+			startLine: reviewWithAnchor.startLine,
+		};
+	}
+	const instructorReview = (review as InstructorReviewInfo);
+	if(instructorReview.instructor) {
+		return {
+			comment: instructorReview.comment,
+			instructor: instructorReview.instructor,
+			comments: instructorReview.comments.map(c => c.text),
+			startLine: instructorReview.startLine,
+		};
+	}
+
+	return {
+		comment: review.comment,
+		comments: review.comments.map(c => c.text),
+		startLine: review.startLine,
+	};
+};
+
+export const getReviewAnchorTop = (review: ReviewInfo, editor: Editor | null,): number => {
+	if(!editor) {
+		return -1;
+	}
+
+	return editor.charCoords({
+		line: review.startLine,
+		ch: review.startPosition,
+	}, 'local').top;
+};
 
 
 export interface BlockDiff {

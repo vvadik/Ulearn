@@ -1,7 +1,11 @@
 import { loadFail, loadStart, loadSuccess, } from "src/consts/actions";
 import { ShortUserInfo } from "src/models/users";
 import { SubmissionInfo } from "src/models/exercise";
-import { AntiplagiarismStatusResponse, FavouriteReviewResponse } from "src/models/instructor";
+import {
+	AntiplagiarismStatusResponse,
+	FavouriteReviewResponse,
+	StudentSubmissionsResponse
+} from "src/models/instructor";
 
 const instructor = 'INSTRUCTOR__';
 const student = 'STUDENT_';
@@ -61,7 +65,7 @@ export interface StudentSubmissionsLoadSuccessAction {
 	studentId: string;
 	courseId: string;
 	slideId: string;
-	submissions: SubmissionInfo[];
+	response: StudentSubmissionsResponse;
 }
 
 export interface StudentSubmissionsLoadFailAction {

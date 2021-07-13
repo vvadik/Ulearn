@@ -215,23 +215,12 @@ const submissions = [
 			},
 			{
 				author: user,
-				startLine: 2,
-				startPosition: 0,
-				finishLine: 2,
-				finishPosition: 100,
-				comment: "var",
-				renderedComment: "var",
-				addingTime: "2020-08-04 23:04",
-				comments: [],
-			},
-			{
-				author: user,
 				startLine: 5,
 				startPosition: 0,
 				finishLine: 5,
 				finishPosition: 100,
-				comment: "var",
-				renderedComment: "var",
+				comment: "var 1",
+				renderedComment: "var 1",
 				addingTime: "2020-08-04 23:04",
 				comments: [],
 			},
@@ -241,8 +230,8 @@ const submissions = [
 				startPosition: 0,
 				finishLine: 6,
 				finishPosition: 100,
-				comment: "var",
-				renderedComment: "var",
+				comment: "var 2",
+				renderedComment: "var 2",
 				addingTime: "2020-08-04 23:04",
 				comments: [],
 			},
@@ -252,8 +241,8 @@ const submissions = [
 				startPosition: 0,
 				finishLine: 7,
 				finishPosition: 100,
-				comment: "var",
-				renderedComment: "var",
+				comment: "var 3",
+				renderedComment: "var 3",
 				addingTime: "2020-08-04 23:04",
 				comments: [],
 			},
@@ -447,8 +436,10 @@ const args: Props = {
 				const review = submission.manualCheckingReviews.find(c => c.id === id);
 				if(review) {
 					review.comments = review.comments.filter(c => c.id !== reviewId);
-					submission.manualCheckingReviews = [...submission.manualCheckingReviews.slice(0,
-						submission.manualCheckingReviews.length - 2), { ...review }];
+					submission.manualCheckingReviews = [
+						...submission.manualCheckingReviews.slice(0, submission.manualCheckingReviews.length - 2),
+						{ ...review }
+					];
 					return;
 				}
 			}
@@ -476,10 +467,12 @@ const args: Props = {
 			addingTime: new Date().toDateString(),
 			comments: [],
 		};
-		if(submission) {
-			submission.manualCheckingReviews.push(review);
-		}
-		return returnPromiseAfterDelay(loadingTimes.addReview, review);
+
+		return returnPromiseAfterDelay(loadingTimes.addReview, review, () => {
+			if(submission) {
+				submission.manualCheckingReviews = [...submission.manualCheckingReviews, review];
+			}
+		});
 	},
 	editReviewOrComment(text, submissionId, id, reviewId) {
 		const review = this.studentSubmissions
@@ -503,7 +496,7 @@ const args: Props = {
 		const review = submission?.manualCheckingReviews.find(r => r.id === reviewId);
 		if(review && this.user) {
 			const comment: ReviewCommentResponse = {
-				id: review.comments.length,
+				id: extra.reviewId++,
 				text: commentText,
 				renderedText: renderMd(commentText),
 				publishTime: new Date().toDateString(),
@@ -539,7 +532,7 @@ const args: Props = {
 	},
 	getStudentGroups(courseId: string, userId: string): Promise<GroupsInfoResponse | string> {
 		return returnPromiseAfterDelay(loadingTimes.groups, { groups: studentGroups }, () => {
-			this.groups = studentGroups.map(g => ({ ...g, courseId, }));
+			this.studentGroups = studentGroups.map(g => ({ ...g, courseId, }));
 		});
 	},
 	getFavouriteReviews(courseId: string, slideId: string): Promise<FavouriteReviewResponse | string> {

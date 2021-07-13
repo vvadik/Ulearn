@@ -5,6 +5,7 @@ import Avatar from "src/components/common/Avatar/Avatar";
 import { DropdownMenu, MenuItem, MenuSeparator, Textarea, ThemeContext, Button, Gapped, } from "ui";
 import { Send3, Trash, MenuKebab, Star2, Edit, Star, } from "icons";
 import { getDataFromReviewToCompareChanges } from "../../../InstructorReview/utils";
+import { InstructorReviewInfo, InstructorReviewInfoWithAnchor } from "../../../InstructorReview/InstructorReview.types";
 
 import { textareaHidden } from "src/uiTheme";
 
@@ -12,7 +13,6 @@ import { isInstructor, UserInfo, } from "src/utils/courseRoles";
 import { clone } from "src/utils/jsonExtensions";
 
 import { ReviewCommentResponse, ReviewInfo } from "src/models/exercise";
-import { Editor } from "codemirror";
 
 import styles from "./Review.less";
 import texts from "./Review.texts";
@@ -24,7 +24,7 @@ interface CommentReplies {
 
 interface RenderedReview {
 	margin: number;
-	review: ReviewInfo;
+	review: InstructorReviewInfoWithAnchor;
 	ref: React.RefObject<HTMLLIElement>;
 }
 
@@ -39,9 +39,9 @@ interface ReviewState {
 }
 
 interface ReviewProps {
-	editor: Editor | null;
-	reviews: ReviewInfo[];
+	reviews: InstructorReviewInfoWithAnchor[];
 	selectedReviewId: number;
+	forceMarginUpdate?: boolean;
 	user?: UserInfo;
 
 	isReviewCanBeAdded: (reviewText: string) => boolean;
@@ -53,8 +53,6 @@ interface ReviewProps {
 	backgroundColor?: 'orange' | 'gray';
 
 	toggleReviewFavourite?: (id: number,) => void;
-	isReviewFavourite?: (reviewText: string) => boolean;
-	isReviewOutdated?: (reviewId: number) => boolean;
 }
 
 class Review extends React.Component<ReviewProps, ReviewState> {
@@ -62,20 +60,21 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 
 	constructor(props: ReviewProps) {
 		super(props);
+		const reviews = clone(props.reviews);
 
 		this.state = {
-			renderedReviews: this.getCommentsOrderByStart(clone(props.reviews))
+			renderedReviews: this.getCommentsOrderByStart(reviews)
 				.map(r => ({
 					margin: 0,
 					review: r,
 					ref: React.createRef<HTMLLIElement>(),
 				})),
-			replies: this.buildCommentsReplies(props.reviews),
+			replies: this.buildCommentsReplies(reviews),
 			marginsAdded: false,
 		};
 	}
 
-	getCommentsOrderByStart = (reviews: ReviewInfo[]): ReviewInfo[] => {
+	getCommentsOrderByStart = (reviews: InstructorReviewInfoWithAnchor[]): InstructorReviewInfoWithAnchor[] => {
 		return reviews.sort((r1, r2) => {
 			if(r1.startLine < r2.startLine || (r1.startLine === r2.startLine && r1.startPosition < r2.startPosition)) {
 				return -1;
@@ -105,21 +104,21 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 	componentDidUpdate(prevProps: ReviewProps): void {
 		const { reviews, selectedReviewId, } = this.props;
 		const { replies, marginsAdded, } = this.state;
-
-		const sameReviews = JSON.stringify(this.getCommentsOrderByStart(reviews).map(getDataFromReviewToCompareChanges))
-			=== JSON.stringify( this.getCommentsOrderByStart(prevProps.reviews).map(getDataFromReviewToCompareChanges));
-
+		const cloneReviews = this.getCommentsOrderByStart(clone(reviews));
+		const sameReviews = JSON.stringify(cloneReviews.map(getDataFromReviewToCompareChanges))
+			=== JSON.stringify(
+				this.getCommentsOrderByStart(clone(prevProps.reviews)).map(getDataFromReviewToCompareChanges));
 		if(!sameReviews) {
 			this.setState({
-				renderedReviews: this.getCommentsOrderByStart(reviews)
+				renderedReviews: cloneReviews
 					.map(r => ({
 						margin: 0,
 						review: r,
 						ref: React.createRef<HTMLLIElement>(),
 					})),
-				replies: this.buildCommentsReplies(reviews, replies),
+				replies: this.buildCommentsReplies(cloneReviews, replies),
 				marginsAdded: false,
-			}, this.addMarginsToComments);
+			});
 		} else if(!marginsAdded
 			|| (selectedReviewId !== prevProps.selectedReviewId && selectedReviewId >= 0)) {
 			this.addMarginsToComments();
@@ -128,15 +127,17 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 
 	addMarginsToComments = (): void => {
 		const { renderedReviews, } = this.state;
-		const { selectedReviewId, editor, } = this.props;
-
+		const { selectedReviewId, } = this.props;
 		const commentsWithMargin = [...renderedReviews];
+		if(commentsWithMargin.length === 0) {
+			return;
+		}
 		const selectedReviewIndex = commentsWithMargin.findIndex(c => c.review.id === selectedReviewId);
 		let lastReviewBottomHeight = 0;
 
 		if(selectedReviewIndex >= 0) {
 			const selectedComment = commentsWithMargin[selectedReviewIndex];
-			const anchorTop = this.getReviewAnchorTop(selectedComment.review, editor);
+			const anchorTop = selectedComment.review.anchor;
 			const height = selectedComment.ref.current?.offsetHeight || 0;
 			const offset = Math.max(5, anchorTop);
 
@@ -145,7 +146,7 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 			lastReviewBottomHeight = offset + height;
 
 			if(selectedReviewIndex > 0) {
-				let totalCommentsHeight = 5;
+				let totalCommentsHeight = 0;
 				for (let i = 0; i < selectedReviewIndex; i++) {
 					const comment = commentsWithMargin[i];
 					const height = comment.ref.current?.offsetHeight || 0;
@@ -154,21 +155,21 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 
 				for (let i = 0; i <= selectedReviewIndex; i++) {
 					const comment = commentsWithMargin[i];
-					const anchorTop = this.getReviewAnchorTop(comment.review, editor);
+					const anchorTop = comment.review.anchor;
 					const height = comment.ref.current?.offsetHeight || 0;
-					comment.margin = Math.min(anchorTop, spaceToSelectedReview - totalCommentsHeight);
+					comment.margin = Math.min(Math.max(5, anchorTop), spaceToSelectedReview - totalCommentsHeight);
 					if(i > 0) {
 						comment.margin = Math.max(5, comment.margin);
 					}
 					spaceToSelectedReview -= (height + comment.margin);
-					totalCommentsHeight -= (height);
+					totalCommentsHeight -= (height + 5);
 				}
 			}
 		}
 
 		for (let i = selectedReviewIndex + 1; i < commentsWithMargin.length; i++) {
 			const comment = commentsWithMargin[i];
-			const anchorTop = this.getReviewAnchorTop(comment.review, editor);
+			const anchorTop = comment.review.anchor;
 			const height = comment.ref.current?.offsetHeight || 0;
 			const offset = Math.max(5, anchorTop - lastReviewBottomHeight);
 
@@ -201,11 +202,11 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 	};
 
 	renderTopLevelComment = ({ review, margin, ref, }: RenderedReview, i: number,): React.ReactNode => {
-		const { id, comments, } = review;
-		const { selectedReviewId, isReviewOutdated, } = this.props;
+		const { id, comments, instructor, } = review;
+		const { selectedReviewId, } = this.props;
 		const { replies, marginsAdded, editingReviewId, } = this.state;
 
-		const outdated = isReviewOutdated && isReviewOutdated(id) || false;
+		const outdated = instructor?.outdated;
 
 		const className = cn(
 			styles.comment,
@@ -247,10 +248,10 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 		);
 	};
 
-	renderComment(review: ReviewInfo): React.ReactNode;
+	renderComment(review: InstructorReviewInfo): React.ReactNode;
 	renderComment(reviewComment: ReviewCommentResponse, reviewId: number, reviewOutdated?: boolean): React.ReactNode;
 	renderComment(
-		review: ReviewInfo & ReviewCommentResponse,
+		review: InstructorReviewInfo & ReviewCommentResponse,
 		reviewId: number | null = null,
 		reviewOutdated = undefined,
 	): React.ReactNode {
@@ -263,20 +264,18 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 			comment,
 			renderedComment,
 			id,
+			instructor,
 		} = review;
 		const {
 			editingReviewId,
 			editingParentReviewId,
 			editingCommentValue,
 		} = this.state;
-		const {
-			isReviewOutdated,
-		} = this.props;
 		const authorToRender = author ?? this.botUser;
 
 		const time = addingTime || publishTime;
 		const content = text || comment;
-		const outdated = reviewOutdated ?? (isReviewOutdated && isReviewOutdated(id) || false);
+		const outdated = reviewOutdated ?? (instructor?.outdated || false);
 
 		return (
 			<React.Fragment>
@@ -312,7 +311,7 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 						<Gapped gap={ 14 }>
 							<Button
 								use={ 'primary' }
-								disabled={ content === editingCommentValue }
+								disabled={ content === editingCommentValue?.trim() }
 								onClick={ this.saveReviewOrComment }>
 								{ texts.editing.save }
 							</Button>
@@ -331,7 +330,8 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 			author,
 			comment,
 			text,
-		}: ReviewInfo & ReviewCommentResponse,
+			instructor,
+		}: InstructorReviewInfo & ReviewCommentResponse,
 		reviewId: number | null = null,
 		reviewOutdated = false,
 	): React.ReactNode => {
@@ -339,7 +339,6 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 			user,
 			selectedReviewId,
 			toggleReviewFavourite,
-			isReviewFavourite,
 		} = this.props;
 		const authorToRender = author ?? this.botUser;
 		const shouldRenderControls = authorToRender.id === user?.id
@@ -350,13 +349,13 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 		}
 
 		const actionsMarkup: React.ReactElement[] = [];
-		if(toggleReviewFavourite && isReviewFavourite && selectedReviewId === id && !reviewId) {
+		if(toggleReviewFavourite && selectedReviewId === id && !reviewId) {
 			actionsMarkup.push(
 				<MenuItem
 					data-id={ id }
 					onClick={ this.toggleReviewToFavourite }
 					key={ 'favourite' }>
-					{ texts.getToggleFavouriteMarkup(isReviewFavourite(text || comment)) }
+					{ texts.getToggleFavouriteMarkup(instructor?.isFavourite || false) }
 				</MenuItem>,
 				<MenuSeparator key={ 'separator' }/>
 			);
@@ -543,17 +542,6 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 		this.setState({
 			replies: { ...replies, [selectedReviewId]: '' },
 		});
-	};
-
-	getReviewAnchorTop = (review: ReviewInfo, editor: Editor | null,): number => {
-		if(!editor) {
-			return -1;
-		}
-
-		return editor.charCoords({
-			line: review.startLine,
-			ch: review.startPosition,
-		}, 'local').top;
 	};
 }
 

@@ -14,6 +14,10 @@ import { ShortUserInfo } from "src/models/users";
 import { FavouriteReview } from "src/models/instructor";
 import { ReduxData } from "./index";
 
+export interface SubmissionInfoRedux extends SubmissionInfo {
+	score?: number;
+}
+
 export interface InstructorState {
 	isStudentMode: boolean;
 
@@ -26,7 +30,7 @@ export interface InstructorState {
 			bySlideId: {
 				[slideId: string]: {
 					byStudentId: {
-						[studentId: string]: SubmissionInfo[] | ReduxData;
+						[studentId: string]: SubmissionInfoRedux[] | ReduxData;
 					}
 				} | undefined;
 			}

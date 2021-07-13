@@ -60,6 +60,7 @@ import styles from './Exercise.less';
 
 import texts from './Exercise.texts';
 import { UserInfo } from "src/utils/courseRoles";
+import { getReviewAnchorTop } from "../../InstructorReview/utils";
 
 
 export interface FromReduxDispatch {
@@ -452,8 +453,8 @@ class Exercise extends React.Component<Props, State> {
 						deleteReviewOrComment={ this.deleteReviewComment }
 						selectedReviewId={ selectedReviewId }
 						onReviewClick={ this.selectComment }
-						reviews={ getReviewsWithoutDeleted(currentReviews) }
-						editor={ editor }
+						reviews={ getReviewsWithoutDeleted(currentReviews).map(
+							r => ({ ...r, anchor: getReviewAnchorTop(r, editor,), })) }
 					/>
 					}
 				</div>

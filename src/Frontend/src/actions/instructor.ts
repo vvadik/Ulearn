@@ -28,7 +28,11 @@ import {
 } from 'src/actions/instructor.types';
 import { ShortUserInfo } from "src/models/users";
 import { SubmissionInfo } from "../models/exercise";
-import { AntiplagiarismStatusResponse, FavouriteReviewResponse } from "../models/instructor";
+import {
+	AntiplagiarismStatusResponse,
+	FavouriteReviewResponse,
+	StudentSubmissionsResponse
+} from "../models/instructor";
 
 export const studentModeToggleAction = (isStudentMode: boolean): StudentModeAction => ({
 	type: INSTRUCTOR__STUDENT_MODE_TOGGLE,
@@ -72,13 +76,13 @@ export const studentSubmissionsLoadSuccessAction = (
 	studentId: string,
 	courseId: string,
 	slideId: string,
-	submissions: SubmissionInfo[],
+	response: StudentSubmissionsResponse,
 ): StudentSubmissionsLoadSuccessAction => ({
 	type: INSTRUCTOR__STUDENT_SUBMISSIONS_LOAD_SUCCESS,
 	studentId,
 	courseId,
 	slideId,
-	submissions,
+	response,
 });
 
 export const studentSubmissionsLoadFailAction = (

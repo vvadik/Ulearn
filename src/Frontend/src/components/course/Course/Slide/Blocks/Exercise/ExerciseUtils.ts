@@ -16,7 +16,11 @@ enum SubmissionColor {
 }
 
 interface ReviewInfoWithMarker extends ReviewInfoRedux {
-	markers: TextMarker[],
+	markers: TextMarker[];
+}
+
+export interface TextMarkersByReviewId {
+	[reviewId: number]: TextMarker[];
 }
 
 function getSubmissionColor(
@@ -133,13 +137,13 @@ function getReviewsWithTextMarkers(
 	return reviewsWithTextMarkers;
 }
 
-export function addTextMarkerToReviews(
+export function getTextMarkersByReviews(
 	reviews: ReviewInfo[],
 	exerciseCodeDoc: Doc,
 	markerClassName: string,
 	escapeLines?: Set<number>,
-): ReviewInfoWithMarker[] {
-	const reviewsWithTextMarkers: ReviewInfoWithMarker[] = [];
+): TextMarkersByReviewId {
+	const textMarkersByReviewId: TextMarkersByReviewId = {};
 
 	for (const review of reviews) {
 		const {
@@ -199,7 +203,7 @@ export function addTextMarkerToReviews(
 				}, []);
 		}
 
-		const markers = positions
+		textMarkersByReviewId[review.id] = positions
 			.map(({ start, finish }) => (
 				createTextMarker(
 					finish.line,
@@ -210,14 +214,9 @@ export function addTextMarkerToReviews(
 					exerciseCodeDoc,
 				))
 			);
-
-		reviewsWithTextMarkers.push({
-			markers,
-			...review
-		});
 	}
 
-	return reviewsWithTextMarkers;
+	return textMarkersByReviewId;
 }
 
 export function buildRange(size: number, startAt = 0): number[] {
@@ -225,7 +224,7 @@ export function buildRange(size: number, startAt = 0): number[] {
 }
 
 function getSelectedReviewIdByCursor(
-	reviews: ReviewInfoWithMarker[],
+	reviews: ReviewInfo[],
 	exerciseCodeDoc: Doc,
 	cursor: CodeMirror.Position
 ): number {
@@ -258,7 +257,7 @@ function getSelectedReviewIdByCursor(
 	return reviewsUnderCursor[0].id;
 }
 
-const getReviewSelectionLength = (review: ReviewInfoWithMarker, exerciseCodeDoc: Doc): number =>
+const getReviewSelectionLength = (review: ReviewInfo, exerciseCodeDoc: Doc): number =>
 	exerciseCodeDoc.indexFromPos({ line: review.finishLine, ch: review.finishPosition })
 	- exerciseCodeDoc.indexFromPos({ line: review.startLine, ch: review.startPosition });
 
@@ -356,18 +355,23 @@ function replaceReviewMarker(
 	return { reviews: newCurrentReviews, selectedReviewLine: line, };
 }
 
+export interface PreviousManualCheckingInfo {
+	submission: SubmissionInfo;
+	index: number;
+}
+
 //first submission should be newer
 export function getPreviousManualCheckingInfo(
 	orderedSubmissionsByTheTime: SubmissionInfo[],
 	lastReviewIndex: number,
-): { submission: SubmissionInfo, index: number } | null {
+): PreviousManualCheckingInfo | undefined {
 	for (let i = lastReviewIndex + 1; i < orderedSubmissionsByTheTime.length; i++) {
 		const submission = orderedSubmissionsByTheTime[i];
 		if(orderedSubmissionsByTheTime[i].manualCheckingPassed) {
 			return { submission, index: i };
 		}
 	}
-	return null;
+	return undefined;
 }
 
 export {

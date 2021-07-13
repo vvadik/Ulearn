@@ -217,6 +217,7 @@ class AddCommentForm extends React.Component<Props, State> {
 			</span>
 			<MarkdownEditor
 				className={ styles.addCommentTextArea }
+				width={ '230px' }
 				rows={ this.maxRowCount }
 				maxRows={ this.maxRowCount }
 				text={ comment }

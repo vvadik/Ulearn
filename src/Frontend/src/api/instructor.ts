@@ -50,7 +50,7 @@ export function getStudentSubmissions(studentId: string, courseId: string, slide
 		const url = submissions + buildQuery({ studentId, courseId, slideId, });
 		return api.get<StudentSubmissionsResponse>(url)
 			.then(json => {
-				dispatch(studentSubmissionsLoadSuccessAction(studentId, courseId, slideId, json.submissions));
+				dispatch(studentSubmissionsLoadSuccessAction(studentId, courseId, slideId, json));
 				return json.submissions;
 			})
 			.catch(error => {
