@@ -106,6 +106,15 @@ namespace Database.DataContexts
 			var items = dbRef.Where(c => c.CourseId == courseId && c.SlideId == slideId && c.UserId == userId);
 			return items;
 		}
+		
+		private IQueryable<T> GetSlidesCheckingsByUser<T>(string courseId, HashSet<Guid> slideIds, string userId, bool noTracking = true) where T : AbstractSlideChecking
+		{
+			IQueryable<T> dbRef = db.Set<T>();
+			if (noTracking)
+				dbRef = dbRef.AsNoTracking();
+			var items = dbRef.Where(c => c.CourseId == courseId && slideIds.Contains(c.SlideId) && c.UserId == userId);
+			return items;
+		}
 
 		public async Task RemoveAttempts(string courseId, Guid slideId, string userId, bool saveChanges = true)
 		{

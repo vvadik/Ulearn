@@ -197,6 +197,19 @@ namespace Database.Repos
 				.ToList();
 			return checkedScoresAndPercents;
 		}
+		
+		public async Task<Dictionary<int,int?>> GetCheckedPercentsBySubmissions(string courseId, Guid slideId, string userId, DateTime? submissionBefore)
+		{
+			var query = GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId)
+				.Where(c => c.IsChecked);
+			if (submissionBefore != null)
+				query = query.Where(c => c.Submission.Timestamp < submissionBefore);
+			var checkedScoresAndPercents = (await query
+					.Select(c => new { c.Percent, c.SubmissionId})
+					.ToListAsync())
+				.ToDictionary(k=>k.SubmissionId,v=>v.Percent);
+			return checkedScoresAndPercents;
+		}
 
 		public async Task<List<(Guid SlideId, int Score, int Percent)>> GetPassedManualExerciseCheckingsScoresAndPercents(Course course, string userId, IEnumerable<Guid> visibleUnits)
 		{

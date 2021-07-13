@@ -35,8 +35,10 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 		[DataMember]
 		public List<ReviewInfo> ManualCheckingReviews;
 
-		public static SubmissionInfo Build(UserExerciseSubmission submission,
-			[CanBeNull] Dictionary<int, IEnumerable<ExerciseCodeReviewComment>> reviewId2Comments, bool showCheckerLogs)
+		public static SubmissionInfo Build(
+			UserExerciseSubmission submission,
+			[CanBeNull] Dictionary<int, IEnumerable<ExerciseCodeReviewComment>> reviewId2Comments,
+			bool showCheckerLogs)
 		{
 			var botReviews = submission.NotDeletedReviews
 				.Select(r => ToReviewInfo(r, true, reviewId2Comments))
