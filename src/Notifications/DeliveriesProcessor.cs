@@ -53,7 +53,7 @@ namespace Notifications
 			if (deliveries.Count == 1)
 			{
 				var delivery = deliveries[0];
-				var course = await courseStorage.FindCourseAsync(delivery.Notification.CourseId);
+				var course = courseStorage.FindCourse(delivery.Notification.CourseId);
 				if (course == null)
 				{
 					log.Warn($"Can't find course {delivery.Notification.CourseId}");

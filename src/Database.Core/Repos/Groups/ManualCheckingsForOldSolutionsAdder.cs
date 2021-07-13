@@ -39,7 +39,7 @@ namespace Database.Repos.Groups
 		{
 			log.Info($"Создаю ручные проверки для всех решения пользователя {userId} в курсе {courseId}");
 
-			var course = await courseStorage.GetCourseAsync(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIds(course, userId);
 
 			/* For exercises */

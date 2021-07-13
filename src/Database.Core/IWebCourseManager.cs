@@ -11,14 +11,10 @@ namespace Database
 
 	public interface ICourseStorage
 	{
-		Task<Course> GetCourseAsync(string courseId);
 		Course GetCourse(string courseId);
-		Task<IEnumerable<Course>> GetCoursesAsync();
 		IEnumerable<Course> GetCourses();
-		Task<Course> FindCourseAsync(string courseId);
 		Course FindCourse(string courseId);
 		bool HasCourse(string courseId);
-		Task<bool> HasCourseAsync(string courseId);
 		event CourseChangedEventHandler CourseChangedEvent;
 	}
 

@@ -392,7 +392,7 @@ namespace Database.Repos
 			var isWebRunner = checking.CourseId == "web" && checking.SlideId == Guid.Empty;
 			var exerciseSlide = isWebRunner
 				? null
-				: (ExerciseSlide)(await courseStorage.GetCourseAsync(checking.CourseId))
+				: (ExerciseSlide)(courseStorage.GetCourse(checking.CourseId))
 				.GetSlideByIdNotSafe(checking.SlideId);
 
 			var withFullDescription = (exerciseSlide?.Exercise as PolygonExerciseBlock)?.ShowTestDescription ?? false;

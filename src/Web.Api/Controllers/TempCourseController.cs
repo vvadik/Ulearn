@@ -48,7 +48,7 @@ namespace Ulearn.Web.Api.Controllers
 		{
 			var tmpCourseId = GetTmpCourseId(courseId, UserId);
 
-			if (!DontCheckBaseCourseExistsOnCreate && !await courseStorage.HasCourseAsync(courseId))
+			if (!DontCheckBaseCourseExistsOnCreate && !courseStorage.HasCourse(courseId))
 			{
 				return new TempCourseUpdateResponse
 				{

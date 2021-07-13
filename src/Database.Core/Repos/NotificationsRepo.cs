@@ -269,7 +269,7 @@ namespace Database.Repos
 			Course course = null;
 			if (!string.IsNullOrWhiteSpace(notification.CourseId))
 			{
-				course = await courseStorage.FindCourseAsync(notification.CourseId);
+				course = courseStorage.FindCourse(notification.CourseId);
 				if (course == null)
 					return;
 			}
@@ -405,7 +405,7 @@ namespace Database.Repos
 		{
 			if (notification.CourseId != "")
 			{
-				var course = await courseStorage.FindCourseAsync(notification.CourseId);
+				var course = courseStorage.FindCourse(notification.CourseId);
 				if (course != null)
 				{
 					var visibleUnits = await unitsRepo.GetPublishedUnitIds(course);

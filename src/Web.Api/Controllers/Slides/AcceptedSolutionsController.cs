@@ -45,7 +45,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		[SwaggerResponse((int)HttpStatusCode.NotFound, "Course or slide are not found")]
 		public async Task<ActionResult<AcceptedSolutionsResponse>> GetAcceptedSolutions(string courseId, Guid slideId)
 		{
-			var course = await courseStorage.FindCourseAsync(courseId);
+			var course = courseStorage.FindCourse(courseId);
 			if (course == null)
 				return NotFound(new { status = "error", message = "Course not found" });
 

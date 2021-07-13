@@ -203,7 +203,7 @@ namespace Database.Repos.Groups
 			if (await courseRolesRepo.HasUserAccessTo_Any_Course(instructorId, CourseRoleType.CourseAdmin).ConfigureAwait(false))
 				return true;
 
-			var coursesIds = (await courseStorage.GetCoursesAsync()).Select(c => c.Id).ToList();
+			var coursesIds = courseStorage.GetCourses().Select(c => c.Id).ToList();
 			var groups = await GetAvailableForUserGroupsAsync(coursesIds, instructorId, false, actual: true, archived: false).ConfigureAwait(false);
 			var members = await groupMembersRepo.GetGroupsMembersAsync(groups.Select(g => g.Id).ToList()).ConfigureAwait(false);
 			return members.Select(m => m.UserId).Contains(studentId);

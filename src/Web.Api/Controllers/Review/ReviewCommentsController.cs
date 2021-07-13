@@ -59,7 +59,7 @@ namespace Ulearn.Web.Api.Controllers.Review
 
 			if (review.ExerciseCheckingId.HasValue && review.ExerciseChecking.IsChecked)
 			{
-				var course = await courseStorage.FindCourseAsync(submissionCourseId);
+				var course = courseStorage.FindCourse(submissionCourseId);
 				var slideId = review.ExerciseChecking.SlideId;
 				var unit = course?.FindUnitBySlideIdNotSafe(slideId, isInstructor);
 				if (unit != null && await unitsRepo.IsUnitVisibleForStudents(course, unit.Id))

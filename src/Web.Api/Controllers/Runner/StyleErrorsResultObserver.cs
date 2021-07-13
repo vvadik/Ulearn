@@ -40,7 +40,7 @@ namespace Ulearn.Web.Api.Controllers.Runner
 			if (!checking.IsRightAnswer)
 				return;
 
-			var exerciseSlide = (await courseStorage.FindCourseAsync(submission.CourseId))
+			var exerciseSlide = courseStorage.FindCourse(submission.CourseId)
 				?.FindSlideByIdNotSafe(submission.SlideId) as ExerciseSlide;
 			if (exerciseSlide == null)
 				return;

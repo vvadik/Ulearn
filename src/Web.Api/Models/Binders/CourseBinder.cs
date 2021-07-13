@@ -47,7 +47,7 @@ namespace Ulearn.Web.Api.Models.Binders
 			if (string.IsNullOrEmpty(value))
 				return;
 
-			var model = await courseStorage.FindCourseAsync(value);
+			var model = courseStorage.FindCourse(value);
 			if (model == null)
 				bindingContext.ModelState.TryAddModelError(modelName, $"Course {value} not found");
 			bindingContext.Result = model == null ? ModelBindingResult.Failed() : ModelBindingResult.Success(model);

@@ -46,7 +46,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		{
 			var courseId = parameters.CourseId;
 			var slideId = parameters.SlideId;
-			var course = await courseStorage.GetCourseAsync(courseId);
+			var course =  courseStorage.GetCourse(courseId);
 
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
 			var visibleUnits = await unitsRepo.GetVisibleUnitIds(course, UserId).ConfigureAwait(false);
@@ -69,7 +69,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 
 		private async Task<Slide> GetSlide(string courseId, Guid slideId, bool isInstructor, IEnumerable<Guid> visibleUnits)
 		{
-			var course = await courseStorage.GetCourseAsync(courseId);
+			var course =  courseStorage.GetCourse(courseId);
 			var slide = course.FindSlideById(slideId, isInstructor, visibleUnits);
 			if (slide == null)
 			{
@@ -129,7 +129,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 			var slideId = parameters.SlideId;
 			parameters.Text.TrimEnd();
 
-			var course = await courseStorage.GetCourseAsync(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.Instructor).ConfigureAwait(false);
 			var visibleUnits = await unitsRepo.GetVisibleUnitIds(course, UserId).ConfigureAwait(false);
 			var slide = await GetSlide(courseId, slideId, isInstructor, visibleUnits);

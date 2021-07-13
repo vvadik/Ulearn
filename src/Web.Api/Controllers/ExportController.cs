@@ -63,7 +63,7 @@ namespace Ulearn.Web.Api.Controllers
 
 			List<string> questions = null;
 			var courseId = group.CourseId;
-			var course = await courseStorage.GetCourseAsync(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var visibleUnits = await unitsRepo.GetPublishedUnitIds(course);
 			if (quizSlideId != null)
 			{

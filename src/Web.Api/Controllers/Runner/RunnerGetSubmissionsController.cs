@@ -75,7 +75,7 @@ namespace Ulearn.Web.Api.Controllers.Runner
 			ICourseStorage courseStorage, IWebCourseManager courseManager)
 		{
 			log.Info($"Собираю для отправки в RunCsJob решение {submission.Id}");
-			var slide = (await courseStorage.FindCourseAsync(submission.CourseId))?.FindSlideByIdNotSafe(submission.SlideId);
+			var slide = courseStorage.FindCourse(submission.CourseId)?.FindSlideByIdNotSafe(submission.SlideId);
 
 			if (slide is ExerciseSlide exerciseSlide)
 			{

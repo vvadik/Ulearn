@@ -98,7 +98,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.Instructor);
 			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIds(course, UserId);
-			var exerciseSlide = (await courseStorage.FindCourseAsync(courseId))?.FindSlideById(slideId, isInstructor, visibleUnitsIds) as ExerciseSlide;
+			var exerciseSlide = courseStorage.FindCourse(courseId)?.FindSlideById(slideId, isInstructor, visibleUnitsIds) as ExerciseSlide;
 			if (exerciseSlide == null)
 				return NotFound(new ErrorResponse("Slide not found"));
 
@@ -125,7 +125,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			metricSender.SendCount($"exercise.{courseId.ToLower(CultureInfo.InvariantCulture)}.try");
 			metricSender.SendCount($"exercise.{exerciseMetricId}.try");
 
-			var course = await courseStorage.GetCourseAsync(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var exerciseBlock = exerciseSlide.Exercise;
 			var buildResult = exerciseBlock.BuildSolution(userCode);
 
@@ -269,10 +269,10 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		[Authorize(AuthenticationSchemes = "Bearer,Identity.Application")]
 		public async Task<ActionResult<RunSolutionResponse>> GetStudentZip([FromRoute] string courseId, [FromRoute] Guid slideId, [FromRoute] string studentZipName)
 		{
-			var course = await courseStorage.GetCourseAsync(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.Instructor);
 			var visibleUnits = await unitsRepo.GetVisibleUnitIds(course, UserId);
-			var slide = (await courseStorage.FindCourseAsync(courseId))?.FindSlideById(slideId, isInstructor, visibleUnits);
+			var slide = courseStorage.FindCourse(courseId)?.FindSlideById(slideId, isInstructor, visibleUnits);
 			if (slide is not ExerciseSlide exerciseSlide)
 				return NotFound();
 

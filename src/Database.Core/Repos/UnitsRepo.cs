@@ -71,14 +71,14 @@ namespace Database.Repos
 
 		public async Task<bool> IsCourseVisibleForStudents(string courseId)
 		{
-			if (await courseStorage.FindCourseAsync(courseId) == null)
+			if (courseStorage.FindCourse(courseId) == null)
 				return false;
 			var visibleUnitsIds = await db.UnitAppearances
 				.Where(u => u.CourseId == courseId)
 				.Where(u => u.PublishTime <= DateTime.Now)
 				.Select(u => u.UnitId)
 				.ToListAsync();
-			var units = (await courseStorage.GetCourseAsync(courseId)).GetUnitsNotSafe().Select(u => u.Id).ToHashSet();
+			var units = (courseStorage.GetCourse(courseId)).GetUnitsNotSafe().Select(u => u.Id).ToHashSet();
 			units.IntersectWith(visibleUnitsIds);
 			return units.Any();
 		}

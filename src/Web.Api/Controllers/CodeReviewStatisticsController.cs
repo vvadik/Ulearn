@@ -46,7 +46,7 @@ namespace Ulearn.Web.Api.Controllers
 		public async Task<ActionResult<CodeReviewInstructorsStatisticsResponse>> InstructorsStatistics([FromQuery][BindRequired] string courseId,
 			int count = 10000, DateTime? from = null, DateTime? to = null)
 		{
-			var course = await courseStorage.FindCourseAsync(courseId);
+			var course = courseStorage.FindCourse(courseId);
 			if (course == null)
 				return NotFound();
 

@@ -60,9 +60,9 @@ namespace Ulearn.Web.Api.Controllers
 		[Authorize]
 		public async Task<ActionResult<UsersProgressResponse>> UserProgress([FromRoute]string courseId, [FromBody]UserProgressParameters parameters)
 		{
-			if (!await courseStorage.HasCourseAsync(courseId))
+			if (!courseStorage.HasCourse(courseId))
 				return NotFound(new ErrorResponse($"Course {courseId} not found"));
-			var course = await courseStorage.FindCourseAsync(courseId);
+			var course = courseStorage.FindCourse(courseId);
 			var userIds = parameters.UserIds;
 			if (userIds == null || userIds.Count == 0)
 				userIds = new List<string> { UserId };

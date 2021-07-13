@@ -71,7 +71,7 @@ namespace Notifications
 				return;
 
 			var notification = notificationDelivery.Notification;
-			var course = await courseStorage.GetCourseAsync(notification.CourseId);
+			var course =  courseStorage.GetCourse(notification.CourseId);
 
 			var notificationButton = notification.GetNotificationButton(transport, notificationDelivery, course, baseUrl);
 			var htmlMessage = notification.GetHtmlMessageForDelivery(transport, notificationDelivery, course, baseUrl);
@@ -103,7 +103,7 @@ namespace Notifications
 			foreach (var delivery in notificationDeliveries)
 			{
 				var notification = delivery.Notification;
-				var course = await courseStorage.GetCourseAsync(notification.CourseId);
+				var course =  courseStorage.GetCourse(notification.CourseId);
 
 				var htmlMessage = notification.GetHtmlMessageForDelivery(transport, delivery, course, baseUrl);
 				var textMessage = notification.GetTextMessageForDelivery(transport, delivery, course, baseUrl);
@@ -134,7 +134,7 @@ namespace Notifications
 				return;
 
 			var notification = notificationDelivery.Notification;
-			var course = await courseStorage.GetCourseAsync(notification.CourseId);
+			var course = courseStorage.GetCourse(notification.CourseId);
 
 			var notificationButton = notification.GetNotificationButton(transport, notificationDelivery, course, baseUrl);
 
@@ -159,7 +159,7 @@ namespace Notifications
 			foreach (var delivery in notificationDeliveries)
 			{
 				var notification = delivery.Notification;
-				var course = await courseStorage.GetCourseAsync(notification.CourseId);
+				var course = courseStorage.GetCourse(notification.CourseId);
 
 				var htmlMessage = notification.GetHtmlMessageForDelivery(transport, delivery, course, baseUrl);
 				var button = notification.GetNotificationButton(transport, delivery, course, baseUrl);

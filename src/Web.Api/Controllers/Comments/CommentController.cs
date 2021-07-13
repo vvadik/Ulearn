@@ -86,7 +86,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 				return NotFound(new ErrorResponse($"Comment {commentId} not found"));
 			var canUserSeeNotApprovedComments = await CanUserSeeNotApprovedCommentsAsync(UserId, comment.CourseId).ConfigureAwait(false);
 
-			var course = await courseStorage.FindCourseAsync(comment.CourseId);
+			var course = courseStorage.FindCourse(comment.CourseId);
 			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIds(course, UserId);
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(User.GetUserId(), comment.CourseId, CourseRoleType.Instructor).ConfigureAwait(false);
 			var slide = course.FindSlideById(comment.SlideId, isInstructor, visibleUnitsIds);

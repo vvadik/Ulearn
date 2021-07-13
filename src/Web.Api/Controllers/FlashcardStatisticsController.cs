@@ -33,7 +33,7 @@ namespace Ulearn.Web.Api.Controllers
 		[HttpGet]
 		public async Task<ActionResult<FlashcardsStatistics>> FlashcardsStatistics([FromQuery][BindRequired] string courseId)
 		{
-			var course = await courseStorage.FindCourseAsync(courseId);
+			var course = courseStorage.FindCourse(courseId);
 			if (course == null)
 				return NotFound();
 			var hasUserAccessToCourse = await courseRolesRepo.HasUserAccessToCourse(UserId, course.Id, CourseRoleType.Instructor);
