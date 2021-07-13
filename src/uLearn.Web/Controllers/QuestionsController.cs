@@ -20,17 +20,17 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize]
 	public class QuestionsController : Controller
 	{
-		private readonly CourseManager courseManager;
+		private readonly ICourseStorage courseStorage;
 		private readonly ULearnDb db = new ULearnDb();
 
 		public QuestionsController()
-			: this(WebCourseManager.Instance)
+			: this(WebCourseManager.CourseStorageInstance)
 		{
 		}
 
-		public QuestionsController(CourseManager courseManager)
+		public QuestionsController(ICourseStorage courseStorage)
 		{
-			this.courseManager = courseManager;
+			this.courseStorage = courseStorage;
 		}
 
 		[ULearnAuthorize(ShouldBeSysAdmin = true)]
@@ -44,7 +44,7 @@ namespace uLearn.Web.Controllers
 				if (userQuestion.CourseId == null)
 				{
 					var cs =
-						from c in courseManager.GetCourses()
+						from c in courseStorage.GetCourses()
 						from s in c.GetSlidesNotSafe()
 						where s.Title == slideTitle
 						select new { c, s };
@@ -77,7 +77,7 @@ namespace uLearn.Web.Controllers
 				.Select(q => new QuestionViewModel
 				{
 					Question = q,
-					Slide = courseManager.GetCourse(q.CourseId).FindSlideByIdNotSafe(q.SlideId)
+					Slide = courseStorage.GetCourse(q.CourseId).FindSlideByIdNotSafe(q.SlideId)
 				})
 				.Where(m => m.Slide != null)
 				.ToList();

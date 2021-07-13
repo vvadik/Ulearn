@@ -18,7 +18,6 @@ using uLearn.Web.FilterAttributes;
 using uLearn.Web.Helpers;
 using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
-using Ulearn.Core;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
@@ -32,7 +31,7 @@ namespace uLearn.Web.Controllers
 	public class AnalyticsController : JsonDataContractController
 	{
 		private readonly ULearnDb db;
-		private readonly CourseManager courseManager;
+		private readonly ICourseStorage courseStorage;
 
 		private readonly VisitsRepo visitsRepo;
 		private readonly UserSolutionsRepo userSolutionsRepo;
@@ -42,18 +41,18 @@ namespace uLearn.Web.Controllers
 		private readonly AdditionalScoresRepo additionalScoresRepo;
 
 		public AnalyticsController()
-			: this(new ULearnDb(), WebCourseManager.Instance)
+			: this(new ULearnDb(), WebCourseManager.CourseStorageInstance)
 		{
 		}
 
-		public AnalyticsController(ULearnDb db, WebCourseManager courseManager)
+		public AnalyticsController(ULearnDb db, ICourseStorage courseStorage)
 		{
 			this.db = db;
-			this.courseManager = courseManager;
+			this.courseStorage = courseStorage;
 
 			additionalScoresRepo = new AdditionalScoresRepo(db);
 			userSolutionsRepo = new UserSolutionsRepo(db);
-			groupsRepo = new GroupsRepo(db, courseManager);
+			groupsRepo = new GroupsRepo(db, courseStorage);
 			usersRepo = new UsersRepo(db);
 			visitsRepo = new VisitsRepo(db);
 			unitsRepo = new UnitsRepo(db);
@@ -75,7 +74,7 @@ namespace uLearn.Web.Controllers
 
 			var realPeriodFinish = periodFinish.Add(TimeSpan.FromDays(1));
 
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var visibleUnitsIds = unitsRepo.GetVisibleUnitIds(course, User);
 			var visibleUnits = course.GetUnits(visibleUnitsIds);
 			if (!unitId.HasValue)
@@ -170,7 +169,7 @@ namespace uLearn.Web.Controllers
 
 			var realPeriodFinish = periodFinish.Add(TimeSpan.FromDays(1));
 
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var visibleUnitsIds = unitsRepo.GetVisibleUnitIds(course, User);
 			var visibleUnits = course.GetUnits(visibleUnitsIds);
 			if (!unitId.HasValue)
@@ -514,7 +513,7 @@ namespace uLearn.Web.Controllers
 
 			var realPeriodFinish = periodFinish.Add(TimeSpan.FromDays(1));
 
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var visibleUnitsIds = unitsRepo.GetVisibleUnitIds(course, User);
 			var visibleUnits = course.GetUnits(visibleUnitsIds);
 
@@ -666,7 +665,7 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult UserUnitStatistics(string courseId, Guid unitId, string userId)
 		{
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var user = usersRepo.FindUserById(userId);
 			if (user == null)
 				return HttpNotFound();
@@ -715,7 +714,7 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Student)]
 		public ActionResult RatingByPoints(string courseId, Guid slideId, int? groupId = null)
 		{
-			var course = courseManager.FindCourse(courseId);
+			var course = courseStorage.FindCourse(courseId);
 			if (course == null)
 				return HttpNotFound();
 			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
@@ -821,7 +820,7 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult UsersProgress(string courseId, Guid unitId, DateTime periodStart)
 		{
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var unit = course.FindUnitByIdNotSafe(unitId);
 			if (unit == null)
 				return HttpNotFound();
@@ -899,7 +898,7 @@ namespace uLearn.Web.Controllers
 			if (user == null || user.IsDeleted)
 				return HttpNotFound();
 
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var visibleUnits = unitsRepo.GetVisibleUnitIds(course, User);
 			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
 			var slide = course.FindSlideById(slideId, isInstructor, visibleUnits) as ExerciseSlide;

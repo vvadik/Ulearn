@@ -39,7 +39,7 @@ namespace uLearn.Web.Controllers
 		public const int MaxFillInBlockSize = 8 * 1024;
 
 		private readonly ULearnDb db = new ULearnDb();
-		private readonly WebCourseManager courseManager = WebCourseManager.Instance;
+		private readonly ICourseStorage courseStorage = WebCourseManager.CourseStorageInstance;
 		private readonly MetricSender metricSender;
 
 		private readonly UserQuizzesRepo userQuizzesRepo;
@@ -61,7 +61,7 @@ namespace uLearn.Web.Controllers
 
 			userQuizzesRepo = new UserQuizzesRepo(db);
 			visitsRepo = new VisitsRepo(db);
-			groupsRepo = new GroupsRepo(db, courseManager);
+			groupsRepo = new GroupsRepo(db, courseStorage);
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
 			notificationsRepo = new NotificationsRepo(db);
 			unitsRepo = new UnitsRepo(db);
@@ -109,7 +109,7 @@ namespace uLearn.Web.Controllers
 			metricSender.SendCount($"quiz.show.{courseId}");
 			metricSender.SendCount($"quiz.show.{courseId}.{slide.Id}");
 
-			var course = courseManager.FindCourse(courseId);
+			var course = courseStorage.FindCourse(courseId);
 			if (course == null)
 				return HttpNotFound();
 
@@ -199,7 +199,7 @@ namespace uLearn.Web.Controllers
 			metricSender.SendCount($"quiz.submit.{courseId}");
 			metricSender.SendCount($"quiz.submit.{courseId}.{slideId}");
 
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
 			var visibleUnits = unitsRepo.GetVisibleUnitIds(course, User);
 			var slide = course.FindSlideById(slideId, isInstructor, visibleUnits) as QuizSlide;
@@ -326,7 +326,7 @@ namespace uLearn.Web.Controllers
 
 			using (var transaction = db.Database.BeginTransaction())
 			{
-				var course = courseManager.GetCourse(checking.CourseId);
+				var course = courseStorage.GetCourse(checking.CourseId);
 				var unit = course.FindUnitBySlideIdNotSafe(checking.SlideId, true);
 				var slide = course.GetSlideByIdNotSafe(checking.SlideId);
 
@@ -541,7 +541,7 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> RestartQuiz(string courseId, Guid slideId, bool isLti)
 		{
 			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var visibleUnits = unitsRepo.GetVisibleUnitIds(course, User);
 			var slide = course.GetSlideById(slideId, isInstructor, visibleUnits);
 			if (slide is QuizSlide)

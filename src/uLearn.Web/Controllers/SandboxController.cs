@@ -13,7 +13,7 @@ namespace uLearn.Web.Controllers
 	public class SandboxController : Controller
 	{
 		private readonly UserSolutionsRepo solutionsRepo;
-		private readonly WebCourseManager courseManager = WebCourseManager.Instance;
+		private readonly ICourseStorage courseStorage = WebCourseManager.CourseStorageInstance;
 
 		public SandboxController()
 		{
@@ -36,7 +36,7 @@ namespace uLearn.Web.Controllers
 			if (submission == null)
 				return HttpNotFound();
 
-			submission.SolutionCode.Text = ((ExerciseSlide)courseManager
+			submission.SolutionCode.Text = ((ExerciseSlide)courseStorage
 					.GetCourse(submission.CourseId)
 					.GetSlideByIdNotSafe(submission.SlideId))
 				.Exercise

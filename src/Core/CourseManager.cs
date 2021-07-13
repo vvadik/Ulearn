@@ -326,11 +326,6 @@ namespace Ulearn.Core
 			return versionId.GetNormalizedGuid() + ".zip";
 		}
 
-		public DateTime GetLastWriteTime(string courseId)
-		{
-			return stagedDirectory.GetFile(GetPackageName(courseId)).LastWriteTime;
-		}
-
 		public bool TryCreateCourse(string courseId, string courseTitle, Guid firstVersionId)
 		{
 			try

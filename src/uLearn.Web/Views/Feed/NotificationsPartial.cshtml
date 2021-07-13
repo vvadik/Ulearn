@@ -12,7 +12,7 @@
 
 			@try
 			{
-				@Notifications.Notification((dynamic)notification, Model.CourseManager.FindCourse(notification.CourseId), Html, Url)
+				@Notifications.Notification((dynamic)notification, Model.CourseStorage.FindCourse(notification.CourseId), Html, Url)
 			}
 			catch (Exception)
 			{

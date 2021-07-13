@@ -9,7 +9,6 @@ using Database.Extensions;
 using Database.Models;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.Extensions;
-using Ulearn.Core;
 using Ulearn.Core.Courses;
 
 namespace uLearn.Web.Controllers
@@ -18,17 +17,17 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly CertificatesRepo certificatesRepo;
 		private readonly ULearnUserManager userManager;
-		private readonly CourseManager courseManager;
+		private readonly ICourseStorage courseStorage;
 		private readonly CertificateGenerator certificateGenerator;
 
 		public CertificatesController()
-			: this(new ULearnDb(), WebCourseManager.Instance)
+			: this(new ULearnDb(), WebCourseManager.CourseStorageInstance)
 		{
 		}
 
-		public CertificatesController(ULearnDb db, WebCourseManager courseManager)
+		public CertificatesController(ULearnDb db, ICourseStorage courseStorage)
 		{
-			this.courseManager = courseManager;
+			this.courseStorage = courseStorage;
 
 			certificatesRepo = new CertificatesRepo(db);
 			userManager = new ULearnUserManager(db);
@@ -49,7 +48,7 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 
 			var certificates = certificatesRepo.GetUserCertificates(userId);
-			var coursesTitles = courseManager.GetCourses().ToDictionary(c => c.Id.ToLower(), c => c.Title);
+			var coursesTitles = courseStorage.GetCourses().ToDictionary(c => c.Id.ToLower(), c => c.Title);
 
 			return View("List", new UserCertificatesViewModel
 			{
@@ -68,7 +67,7 @@ namespace uLearn.Web.Controllers
 				return HttpNotFound();
 
 			var certificates = certificatesRepo.GetUserCertificates(userId);
-			var coursesTitles = courseManager.GetCourses().ToDictionary(c => c.Id.ToLower(), c => c.Title);
+			var coursesTitles = courseStorage.GetCourses().ToDictionary(c => c.Id.ToLower(), c => c.Title);
 
 			return PartialView("ListPartial", new UserCertificatesViewModel
 			{
@@ -91,7 +90,7 @@ namespace uLearn.Web.Controllers
 			if (certificate.IsPreview && !User.HasAccessFor(certificate.Template.CourseId, CourseRole.Instructor))
 				return HttpNotFound();
 
-			var course = courseManager.GetCourse(certificate.Template.CourseId);
+			var course = courseStorage.GetCourse(certificate.Template.CourseId);
 
 			certificateGenerator.EnsureCertificateTemplateIsUnpacked(certificate.Template);
 

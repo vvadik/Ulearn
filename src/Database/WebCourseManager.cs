@@ -10,13 +10,47 @@ using JetBrains.Annotations;
 using Vostok.Logging.Abstractions;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
 
 namespace Database
 {
-	public class WebCourseManager : CourseManager
+	public interface ICourseStorage
+	{
+		Course GetCourse(string courseId);
+		[CanBeNull] Course FindCourse(string courseId);
+		IEnumerable<Course> GetCourses();
+	}
+	
+	public interface IWebCourseManager
+	{
+		void UpdateCourseVersion(string courseId, Guid versionId);
+		Course GetVersion(Guid versionId);
+		FileInfo GetStagingCourseFile(string courseId);
+		FileInfo GetStagingTempCourseFile(string courseId);
+		DirectoryInfo GetExtractedCourseDirectory(string courseId);
+		DirectoryInfo GetExtractedVersionDirectory(Guid versionId);
+		FileInfo GetCourseVersionFile(Guid versionId);
+		string GetStagingCoursePath(string courseId);
+		string GetPackageName(string courseId);
+		string GetPackageName(Guid versionId);
+		bool TryCreateCourse(string courseId, string courseTitle, Guid firstVersionId);
+		void EnsureVersionIsExtracted(Guid versionId);
+		bool HasPackageFor(string courseId);
+		void WaitWhileCourseIsLocked(string courseId);
+		void MoveCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory);
+		bool TryReloadCourse(string courseId);
+		void ReloadCourseNotSafe(string courseId, bool notifyAboutErrors = true);
+		void ExtractTempCourseChanges(string tempCourseId);
+		bool TryCreateTempCourse(string courseId, string courseTitle, Guid firstVersionId);
+		FileInfo GenerateOrFindStudentZip(string courseId, Slide slide);
+	}
+
+	public class WebCourseManager : CourseManager, ICourseStorage, IWebCourseManager
 	{
 		private static ILog log => LogProvider.Get().ForContext(typeof(WebCourseManager));
-		public static readonly WebCourseManager Instance = new WebCourseManager();
+		private static readonly WebCourseManager courseManagerInstance = new WebCourseManager();
+		public static ICourseStorage CourseStorageInstance => courseManagerInstance;
+		public static IWebCourseManager CourseManagerInstance => courseManagerInstance;
 
 		private readonly Dictionary<string, Guid> loadedCourseVersions = new Dictionary<string, Guid>();
 		private readonly ConcurrentDictionary<string, DateTime> courseVersionFetchTime = new ConcurrentDictionary<string, DateTime>();
