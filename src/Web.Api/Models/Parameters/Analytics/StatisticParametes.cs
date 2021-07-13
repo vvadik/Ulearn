@@ -1,14 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+
 
 namespace Ulearn.Web.Api.Models.Parameters.Analytics
 {
 	public class StatisticsParams
 	{
+		[FromQuery(Name = "courseId")]
 		public string CourseId { get; set; }
 
+		[FromQuery(Name = "periodStart")]
 		public string PeriodStart { get; set; }
+		
+		[FromQuery(Name = "periodFinish")]
 		public string PeriodFinish { get; set; }
 
 		private static readonly string[] dateFormats = { "dd.MM.yyyy" };
@@ -45,13 +52,20 @@ namespace Ulearn.Web.Api.Models.Parameters.Analytics
 		}
 	}
 	
+	
 	public class CourseStatisticsParams : StatisticsParams
 	{
 		/* Course statistics can't be filtered by dates */
+		[BindNever]
 		public new DateTime PeriodStartDate => DateTime.MinValue;
-
+		
+		[BindNever]
 		public new DateTime PeriodFinishDate => DateTime.MaxValue.Subtract(TimeSpan.FromDays(2));
 		
-		public new List<string> GroupsIds { get; set; }
+		[FromRoute(Name = "fileNameWithNoExtension")]
+		public string FileNameWithNoExtension { get; set; }
+		
+		[FromQuery(Name = "groupsIds")]
+		public List<string> GroupsIds { get; set; }
 	}
 }

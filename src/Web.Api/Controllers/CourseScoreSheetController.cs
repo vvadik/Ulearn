@@ -8,9 +8,7 @@ using Database.Models;
 using Database.Repos;
 using Database.Repos.Groups;
 using Database.Repos.Users;
-using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using Telegram.Bot.Types;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
@@ -22,10 +20,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
+using Ulearn.Web.Api.Models.Responses.Analytics;
 
 namespace Ulearn.Web.Api.Controllers
 {
-	public class AnalyticsController : BaseController
+	public class CourseScoreSheetController : BaseController
 	{
 		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IGroupMembersRepo groupMembersRepo;
@@ -36,7 +35,7 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly IAdditionalScoresRepo additionalScoresRepo;
 		private readonly IGroupAccessesRepo groupAccessesRepo;
 
-		public AnalyticsController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo,
+		public CourseScoreSheetController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo,
 			IGroupMembersRepo groupMembersRepo, IUnitsRepo unitsRepo, IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo, ControllerUtils controllerUtils, IVisitsRepo visitsRepo, IAdditionalScoresRepo additionalScoresRepo)
 			: base(courseManager, db, usersRepo)
 		{
@@ -50,7 +49,7 @@ namespace Ulearn.Web.Api.Controllers
 			this.additionalScoresRepo = additionalScoresRepo;
 		}
 		
-		[HttpGet("Json")]
+		[HttpGet("course-score-sheet/export/{fileNameWithNoExtension}.json")]
 		[Authorize(Policy = "Instructors")]
 		public async Task<ActionResult> ExportCourseStatisticsAsJson([FromQuery] CourseStatisticsParams param)
 		{
@@ -58,24 +57,23 @@ namespace Ulearn.Web.Api.Controllers
 				return NotFound();
 
 			var model = await GetCourseStatisticsModel(param, 3000);
-			var serializedModel = model.JsonSerialize();
+			var serializedModel = new CourseStatisticsModel(model).JsonSerialize();
 
-			return File(Encoding.UTF8.GetBytes(serializedModel), "application/json");
+			return File(Encoding.UTF8.GetBytes(serializedModel), "application/json", $"{param.FileNameWithNoExtension}.json");
 		}
 		
-		[HttpGet("Xml")]
+		[HttpGet("course-score-sheet/export/{fileNameWithNoExtension}.xml")]
 		[Authorize(Policy = "Instructors")]
 		public async Task<ActionResult> ExportCourseStatisticsAsXml([FromQuery] CourseStatisticsParams param)
 		{
 			if (param.CourseId == null)
 				return NotFound();
-			var model = await GetCourseStatisticsModel(param, 3000);
-			
-			var serializedModel = model.XmlSerialize();
-			return File(Encoding.UTF8.GetBytes(serializedModel), "text/xml");
+			var model = await GetCourseStatisticsModel(param, 3000); 
+			var serializedModel = new CourseStatisticsModel(model).XmlSerialize();
+			return File(Encoding.UTF8.GetBytes(serializedModel), "text/xml", $"{param.FileNameWithNoExtension}.xml");
 		}
 
-		[HttpGet("Xlxs")]
+		[HttpGet("course-score-sheet/export/{fileNameWithNoExtension}.xlsx")]
 		[Authorize(Policy = "Instructors")]
 		public async Task<ActionResult> ExportCourseStatisticsAsXlsx([FromQuery] CourseStatisticsParams param)
 		{
@@ -83,7 +81,7 @@ namespace Ulearn.Web.Api.Controllers
 				return NotFound();
 
 			var model = await GetCourseStatisticsModel(param, 3000);
-
+			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 			var package = new ExcelPackage();
 			FillCourseStatisticsExcelWorksheet(
 				package.Workbook.Worksheets.Add(model.CourseTitle),
@@ -94,14 +92,12 @@ namespace Ulearn.Web.Api.Controllers
 				model,
 				onlyFullScores: true
 			);
-			await using var stream = StaticRecyclableMemoryStreamManager.Manager.GetStream();
-			var filename = model.CourseId + ".xlsx";
-			// Response.AddHeader("Content-Disposition", "attachment;filename=" + filename);
-			// Response.Charset = "";
-			// Response.Cache.SetCacheability(HttpCacheability.NoCache);
-			// Response.ContentType = "application/vnd.ms-excel";
-			await package.SaveAsAsync(stream);
-			return File(stream, "application/vnd.ms-excel");
+			byte[] bytes;
+			using (var stream = StaticRecyclableMemoryStreamManager.Manager.GetStream()) {
+				await package.SaveAsAsync(stream);
+				bytes = stream.ToArray();
+			}
+			return File(bytes, "application/vnd.ms-excel", $"{param.FileNameWithNoExtension}.xlsx");
 		}
 		
 		private void FillCourseStatisticsExcelWorksheet(ExcelWorksheet worksheet, CourseStatisticPageModel model, bool onlyFullScores = false)
@@ -229,7 +225,7 @@ namespace Ulearn.Web.Api.Controllers
 			var courseId = param.CourseId;
 			var periodStart = param.PeriodStartDate;
 			var periodFinish = param.PeriodFinishDate;
-			var groupsIds = param.GroupsIds;
+			var groupsIds = param.GroupsIds ?? new List<string>();
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.Instructor);
 			var isStudent = !isInstructor;
 			if (isStudent && !await CanStudentViewGroupsStatistics(UserId, groupsIds))

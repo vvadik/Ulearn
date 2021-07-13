@@ -30,8 +30,7 @@ namespace Ulearn.Web.Api.Utils
 		{
 			var result = new T { CourseId = courseId };
 			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourse(userId, courseId, CourseRoleType.Instructor);
-
-			groupsIds ??= new List<string>();
+			
 			/* if groupsIds contains "all" (it should be exclusive), get all users. Available only for course admins */
 			if (groupsIds.Contains("all") && isCourseAdmin)
 				return result;
