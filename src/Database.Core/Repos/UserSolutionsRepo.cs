@@ -23,17 +23,17 @@ namespace Database.Repos
 		private readonly UlearnDb db;
 		private readonly ITextsRepo textsRepo;
 		private readonly IWorkQueueRepo workQueueRepo;
-		private readonly IWebCourseManager courseManager;
+		private readonly ICourseStorage courseStorage;
 		private const int queueId = 1;
 
 		public UserSolutionsRepo(UlearnDb db,
 			ITextsRepo textsRepo, IWorkQueueRepo workQueueRepo,
-			IWebCourseManager courseManager)
+			ICourseStorage courseStorage)
 		{
 			this.db = db;
 			this.textsRepo = textsRepo;
 			this.workQueueRepo = workQueueRepo;
-			this.courseManager = courseManager;
+			this.courseStorage = courseStorage;
 		}
 
 		public async Task<int> AddUserExerciseSubmission(
@@ -392,7 +392,7 @@ namespace Database.Repos
 			var isWebRunner = checking.CourseId == "web" && checking.SlideId == Guid.Empty;
 			var exerciseSlide = isWebRunner
 				? null
-				: (ExerciseSlide)(await courseManager.GetCourseAsync(checking.CourseId))
+				: (ExerciseSlide)(await courseStorage.GetCourseAsync(checking.CourseId))
 				.GetSlideByIdNotSafe(checking.SlideId);
 
 			var withFullDescription = (exerciseSlide?.Exercise as PolygonExerciseBlock)?.ShowTestDescription ?? false;

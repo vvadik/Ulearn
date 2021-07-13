@@ -14,7 +14,7 @@ using Ulearn.Core.Courses;
 
 namespace Database
 {
-	public class WebCourseManager : CourseManager, IWebCourseManager
+	public class WebCourseManager : CourseManager, IWebCourseManager, ICourseStorage
 	{
 		private static ILog log => LogProvider.Get().ForContext(typeof(WebCourseManager));
 

@@ -32,16 +32,16 @@ namespace Ulearn.Web.Api.Controllers
 	public class BaseController : Controller
 	{
 		private static ILog log => LogProvider.Get().ForContext(typeof(BaseController));
-		protected readonly IWebCourseManager courseManager;
+		protected readonly ICourseStorage courseStorage;
 		protected readonly UlearnDb db;
 		protected readonly IUsersRepo usersRepo;
 
 		protected string UserId => User.GetUserId();
 		protected bool IsAuthenticated => User.Identity.IsAuthenticated;
 
-		public BaseController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo)
+		public BaseController(ICourseStorage courseStorage, UlearnDb db, IUsersRepo usersRepo)
 		{
-			this.courseManager = courseManager;
+			this.courseStorage = courseStorage;
 			this.db = db;
 			this.usersRepo = usersRepo;
 		}

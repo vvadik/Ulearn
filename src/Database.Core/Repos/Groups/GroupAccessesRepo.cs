@@ -21,14 +21,14 @@ namespace Database.Repos.Groups
 		private readonly IGroupMembersRepo groupMembersRepo;
 		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IUsersRepo usersRepo;
-		private readonly IWebCourseManager courseManager;
+		private readonly ICourseStorage courseStorage;
 
 		public GroupAccessesRepo(
 			UlearnDb db,
 			IGroupsRepo groupsRepo, ISystemAccessesRepo systemAccessesRepo, ICoursesRepo coursesRepo, IGroupMembersRepo groupMembersRepo,
 			IUsersRepo usersRepo,
 			ICourseRolesRepo courseRolesRepo,
-			IWebCourseManager courseManager
+			ICourseStorage courseStorage
 		)
 		{
 			this.db = db;
@@ -38,7 +38,7 @@ namespace Database.Repos.Groups
 			this.groupMembersRepo = groupMembersRepo;
 			this.courseRolesRepo = courseRolesRepo;
 			this.usersRepo = usersRepo;
-			this.courseManager = courseManager;
+			this.courseStorage = courseStorage;
 		}
 
 		public async Task<GroupAccess> GrantAccessAsync(int groupId, string userId, GroupAccessType accessType, string grantedById)
@@ -203,7 +203,7 @@ namespace Database.Repos.Groups
 			if (await courseRolesRepo.HasUserAccessTo_Any_Course(instructorId, CourseRoleType.CourseAdmin).ConfigureAwait(false))
 				return true;
 
-			var coursesIds = (await courseManager.GetCoursesAsync()).Select(c => c.Id).ToList();
+			var coursesIds = (await courseStorage.GetCoursesAsync()).Select(c => c.Id).ToList();
 			var groups = await GetAvailableForUserGroupsAsync(coursesIds, instructorId, false, actual: true, archived: false).ConfigureAwait(false);
 			var members = await groupMembersRepo.GetGroupsMembersAsync(groups.Select(g => g.Id).ToList()).ConfigureAwait(false);
 			return members.Select(m => m.UserId).Contains(studentId);

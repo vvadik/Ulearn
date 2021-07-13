@@ -30,13 +30,13 @@ namespace Ulearn.Web.Api.Controllers.Websockets
 		private readonly IHubContext<WebsocketsHub> hubContext;
 		private readonly IServiceScopeFactory serviceScopeFactory;
 
-		public WebsocketsEventSender(IHubContext<WebsocketsHub> hubContext, IWebCourseManager webCourseManager,
+		public WebsocketsEventSender(IHubContext<WebsocketsHub> hubContext, ICourseStorage courseStorage,
 			IServiceScopeFactory serviceScopeFactory)
 		{
 			this.hubContext = hubContext;
 			this.serviceScopeFactory = serviceScopeFactory;
 
-			webCourseManager.CourseChangedEvent += async courseId => await SendCourseChangedEvent(courseId);
+			courseStorage.CourseChangedEvent += async courseId => await SendCourseChangedEvent(courseId);
 		}
 
 		private async Task SendCourseChangedEvent(string courseId)

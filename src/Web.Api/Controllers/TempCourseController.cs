@@ -27,14 +27,16 @@ namespace Ulearn.Web.Api.Controllers
 	{
 		private readonly ITempCoursesRepo tempCoursesRepo;
 		private readonly ICourseRolesRepo courseRolesRepo;
+		private readonly IWebCourseManager courseManager;
 		public bool DontCheckBaseCourseExistsOnCreate = false; // Для тестрирования
 		private static ILog log => LogProvider.Get().ForContext(typeof(TempCourseController));
 
-		public TempCourseController(IWebCourseManager courseManager, UlearnDb db, [CanBeNull] IUsersRepo usersRepo, ITempCoursesRepo tempCoursesRepo, ICourseRolesRepo courseRolesRepo)
-			: base(courseManager, db, usersRepo)
+		public TempCourseController(ICourseStorage courseStorage, IWebCourseManager courseManager, UlearnDb db, [CanBeNull] IUsersRepo usersRepo, ITempCoursesRepo tempCoursesRepo, ICourseRolesRepo courseRolesRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 			this.tempCoursesRepo = tempCoursesRepo;
 			this.courseRolesRepo = courseRolesRepo;
+			this.courseManager = courseManager;
 		}
 
 		/// <summary>
@@ -46,7 +48,7 @@ namespace Ulearn.Web.Api.Controllers
 		{
 			var tmpCourseId = GetTmpCourseId(courseId, UserId);
 
-			if (!DontCheckBaseCourseExistsOnCreate && !await courseManager.HasCourseAsync(courseId))
+			if (!DontCheckBaseCourseExistsOnCreate && !await courseStorage.HasCourseAsync(courseId))
 			{
 				return new TempCourseUpdateResponse
 				{

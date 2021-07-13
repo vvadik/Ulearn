@@ -21,10 +21,10 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo;
 		private readonly IUnitsRepo unitsRepo;
 
-		public FlashcardUserStatisticsController(IWebCourseManager courseManager, UlearnDb db,
+		public FlashcardUserStatisticsController(ICourseStorage courseStorage, UlearnDb db,
 			IUsersRepo usersRepo, IGroupAccessesRepo groupAccessesRepo, IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo,
 			IUnitsRepo unitsRepo)
-			: base(courseManager, db, usersRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 			this.groupAccessesRepo = groupAccessesRepo;
 			this.usersFlashcardsVisitsRepo = usersFlashcardsVisitsRepo;
@@ -34,7 +34,7 @@ namespace Ulearn.Web.Api.Controllers
 		[HttpGet]
 		public async Task<ActionResult<UserFlashcardStatisticResponse>> UserFlashcardStatistics([FromQuery][BindRequired] string courseId)
 		{
-			var course = await courseManager.FindCourseAsync(courseId);
+			var course = await courseStorage.FindCourseAsync(courseId);
 			if (course == null)
 				return NotFound();
 			var groups = await groupAccessesRepo.GetAvailableForUserGroupsAsync(course.Id, UserId, true, actual: true, archived: false);

@@ -17,10 +17,10 @@ namespace Ulearn.Web.Api.Controllers.Comments
 	{
 		private readonly ICommentPoliciesRepo commentPoliciesRepo;
 
-		public CommentPoliciesController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
+		public CommentPoliciesController(ICourseStorage courseStorage, UlearnDb db, IUsersRepo usersRepo,
 			ICommentsRepo commentsRepo, ICommentLikesRepo commentLikesRepo, ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo, INotificationsRepo notificationsRepo,
 			ICommentPoliciesRepo commentPoliciesRepo, IGroupMembersRepo groupMembersRepo, IGroupAccessesRepo groupAccessesRepo, IVisitsRepo visitsRepo, IUnitsRepo unitsRepo)
-			: base(courseManager, db, usersRepo, commentsRepo, commentLikesRepo, coursesRepo, courseRolesRepo, notificationsRepo, groupMembersRepo, groupAccessesRepo, visitsRepo, unitsRepo)
+			: base(courseStorage, db, usersRepo, commentsRepo, commentLikesRepo, coursesRepo, courseRolesRepo, notificationsRepo, groupMembersRepo, groupAccessesRepo, visitsRepo, unitsRepo)
 		{
 			this.commentPoliciesRepo = commentPoliciesRepo;
 		}
@@ -31,7 +31,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		[HttpGet]
 		public async Task<ActionResult<CommentPolicyResponse>> Policy([FromQuery] string courseId)
 		{
-			if (courseId == null || !await courseManager.HasCourseAsync(courseId))
+			if (courseId == null || !await courseStorage.HasCourseAsync(courseId))
 				return NotFound(new ErrorResponse($"Course '{courseId}' not found"));
 
 			var policy = await commentPoliciesRepo.GetCommentsPolicyAsync(courseId).ConfigureAwait(false);
@@ -50,7 +50,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		[Authorize(Policy = "CourseAdmins")]
 		public async Task<IActionResult> UpdatePolicy([FromQuery]string courseId, [FromBody] UpdatePolicyParameters parameters)
 		{
-			if (courseId == null || !await courseManager.HasCourseAsync(courseId))
+			if (courseId == null || !await courseStorage.HasCourseAsync(courseId))
 				return NotFound(new ErrorResponse($"Course '{courseId}' not found"));
 
 			var policy = await commentPoliciesRepo.GetCommentsPolicyAsync(courseId).ConfigureAwait(false);

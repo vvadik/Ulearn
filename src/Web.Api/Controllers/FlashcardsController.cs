@@ -32,11 +32,11 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly string baseUrlWeb;
 
 
-		public FlashcardsController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
+		public FlashcardsController(ICourseStorage courseStorage, UlearnDb db, IUsersRepo usersRepo,
 			IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo,
 			IUserFlashcardsUnlockingRepo userFlashcardsUnlockingRepo,
 			IUnitsRepo unitsRepo, IOptions<WebApiConfiguration> configuration)
-			: base(courseManager, db, usersRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 			this.usersFlashcardsVisitsRepo = usersFlashcardsVisitsRepo;
 			this.userFlashcardsUnlockingRepo = userFlashcardsUnlockingRepo;

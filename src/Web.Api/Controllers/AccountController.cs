@@ -37,11 +37,11 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly WebApiConfiguration configuration;
 		private readonly IUnitsRepo unitsRepo;
 
-		public AccountController(IOptions<WebApiConfiguration> options, IWebCourseManager courseManager, UlearnDb db,
+		public AccountController(IOptions<WebApiConfiguration> options, ICourseStorage courseStorage, UlearnDb db,
 			UlearnUserManager userManager, SignInManager<ApplicationUser> signInManager,
 			ICourseRolesRepo courseRolesRepo, ICoursesRepo coursesRepo, IUsersRepo usersRepo, ISystemAccessesRepo systemAccessesRepo, IGroupMembersRepo groupMembersRepo,
 			IUnitsRepo unitsRepo)
-			: base(courseManager, db, usersRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 			this.userManager = userManager;
 			this.signInManager = signInManager;

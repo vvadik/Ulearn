@@ -28,10 +28,10 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		private readonly IGroupMembersRepo groupMembersRepo;
 		private readonly INotificationsRepo notificationsRepo;
 
-		public GroupsController(IWebCourseManager courseManager, UlearnDb db,
+		public GroupsController(ICourseStorage courseStorage, UlearnDb db,
 			IUsersRepo usersRepo,
 			IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo, INotificationsRepo notificationsRepo)
-			: base(courseManager, db, usersRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 			this.groupsRepo = groupsRepo;
 			this.groupAccessesRepo = groupAccessesRepo;

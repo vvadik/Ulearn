@@ -14,19 +14,19 @@ namespace Database.Repos.Groups
 		private readonly IVisitsRepo visitsRepo;
 		private readonly IUserQuizzesRepo userQuizzesRepo;
 		private readonly IUnitsRepo unitsRepo;
-		private readonly IWebCourseManager courseManager;
+		private readonly ICourseStorage courseStorage;
 		private static ILog log => LogProvider.Get().ForContext(typeof(ManualCheckingsForOldSolutionsAdder));
 
 		public ManualCheckingsForOldSolutionsAdder(
 			IUserSolutionsRepo userSolutionsRepo, ISlideCheckingsRepo slideCheckingsRepo, IVisitsRepo visitsRepo, IUserQuizzesRepo userQuizzesRepo,
-			IUnitsRepo unitsRepo, IWebCourseManager courseManager)
+			IUnitsRepo unitsRepo, ICourseStorage courseStorage)
 		{
 			this.userSolutionsRepo = userSolutionsRepo;
 			this.slideCheckingsRepo = slideCheckingsRepo;
 			this.visitsRepo = visitsRepo;
 			this.userQuizzesRepo = userQuizzesRepo;
 			this.unitsRepo = unitsRepo;
-			this.courseManager = courseManager;
+			this.courseStorage = courseStorage;
 		}
 
 		public async Task AddManualCheckingsForOldSolutionsAsync(string courseId, IEnumerable<string> usersIds)
@@ -39,7 +39,7 @@ namespace Database.Repos.Groups
 		{
 			log.Info($"Создаю ручные проверки для всех решения пользователя {userId} в курсе {courseId}");
 
-			var course = await courseManager.GetCourseAsync(courseId);
+			var course = await courseStorage.GetCourseAsync(courseId);
 			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIds(course, userId);
 
 			/* For exercises */

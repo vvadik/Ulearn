@@ -11,13 +11,13 @@ namespace Database.Repos
 	public class UnitsRepo : IUnitsRepo
 	{
 		private readonly UlearnDb db;
-		private readonly IWebCourseManager courseManager;
+		private readonly ICourseStorage courseStorage;
 		private readonly ICourseRolesRepo courseRolesRepo;
 
-		public UnitsRepo(UlearnDb db, IWebCourseManager courseManager, ICourseRolesRepo courseRolesRepo)
+		public UnitsRepo(UlearnDb db, ICourseStorage courseStorage, ICourseRolesRepo courseRolesRepo)
 		{
 			this.db = db;
-			this.courseManager = courseManager;
+			this.courseStorage = courseStorage;
 			this.courseRolesRepo = courseRolesRepo;
 		}
 
@@ -58,10 +58,10 @@ namespace Database.Repos
 				.Select(u => new { u.CourseId, u.UnitId })
 				.ToListAsync())
 				.GroupBy(p => p.CourseId)
-				.Where(g => courseManager.FindCourse(g.Key) != null)
+				.Where(g => courseStorage.FindCourse(g.Key) != null)
 				.Where(g =>
 				{
-					var units = courseManager.GetCourse(g.Key).GetUnitsNotSafe().Select(u => u.Id).ToHashSet();
+					var units = courseStorage.GetCourse(g.Key).GetUnitsNotSafe().Select(u => u.Id).ToHashSet();
 					units.IntersectWith(g.Select(p => p.UnitId));
 					return units.Any();
 				})
@@ -71,14 +71,14 @@ namespace Database.Repos
 
 		public async Task<bool> IsCourseVisibleForStudents(string courseId)
 		{
-			if (await courseManager.FindCourseAsync(courseId) == null)
+			if (await courseStorage.FindCourseAsync(courseId) == null)
 				return false;
 			var visibleUnitsIds = await db.UnitAppearances
 				.Where(u => u.CourseId == courseId)
 				.Where(u => u.PublishTime <= DateTime.Now)
 				.Select(u => u.UnitId)
 				.ToListAsync();
-			var units = (await courseManager.GetCourseAsync(courseId)).GetUnitsNotSafe().Select(u => u.Id).ToHashSet();
+			var units = (await courseStorage.GetCourseAsync(courseId)).GetUnitsNotSafe().Select(u => u.Id).ToHashSet();
 			units.IntersectWith(visibleUnitsIds);
 			return units.Any();
 		}

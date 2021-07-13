@@ -11,8 +11,8 @@ namespace Ulearn.Web.Api.Controllers.Groups
 {
 	public abstract class BaseGroupController : BaseController
 	{
-		protected BaseGroupController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo)
-			: base(courseManager, db, usersRepo)
+		protected BaseGroupController(ICourseStorage courseStorage, UlearnDb db, IUsersRepo usersRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 		}
 

@@ -28,13 +28,13 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 		private static int? commentsFeedNotificationTransportId;
 		private static ILog log => LogProvider.Get().ForContext(typeof(NotificationsController));
 
-		public NotificationsController(IWebCourseManager courseManager, UlearnDb db,
+		public NotificationsController(ICourseStorage courseStorage, UlearnDb db,
 			IUsersRepo usersRepo,
 			IFeedRepo feedRepo,
 			IServiceProvider serviceProvider,
 			INotificationDataPreloader notificationDataPreloader,
 			IOptions<WebApiConfiguration> options)
-			: base(courseManager, db, usersRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 			this.feedRepo = feedRepo;
 			this.serviceProvider = serviceProvider;

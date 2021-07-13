@@ -22,9 +22,9 @@ namespace Ulearn.Web.Api.Controllers.Review
 		private readonly IUnitsRepo unitsRepo;
 		private readonly INotificationsRepo notificationsRepo;
 
-		public ReviewCommentsController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
+		public ReviewCommentsController(ICourseStorage courseStorage, UlearnDb db, IUsersRepo usersRepo,
 			ISlideCheckingsRepo slideCheckingsRepo, ICourseRolesRepo courseRolesRepo, IUnitsRepo unitsRepo, INotificationsRepo notificationsRepo)
-			: base(courseManager, db, usersRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 			this.slideCheckingsRepo = slideCheckingsRepo;
 			this.courseRolesRepo = courseRolesRepo;
@@ -59,7 +59,7 @@ namespace Ulearn.Web.Api.Controllers.Review
 
 			if (review.ExerciseCheckingId.HasValue && review.ExerciseChecking.IsChecked)
 			{
-				var course = await courseManager.FindCourseAsync(submissionCourseId);
+				var course = await courseStorage.FindCourseAsync(submissionCourseId);
 				var slideId = review.ExerciseChecking.SlideId;
 				var unit = course?.FindUnitBySlideIdNotSafe(slideId, isInstructor);
 				if (unit != null && await unitsRepo.IsUnitVisibleForStudents(course, unit.Id))

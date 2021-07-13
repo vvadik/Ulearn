@@ -30,10 +30,10 @@ namespace Ulearn.Web.Api.Controllers.Comments
 	[Route("/comments/{commentId:int:min(0)}")]
 	public class CommentController : BaseCommentController
 	{
-		public CommentController(IWebCourseManager courseManager, UlearnDb db,
+		public CommentController(ICourseStorage courseStorage, UlearnDb db,
 			IUsersRepo usersRepo, ICommentsRepo commentsRepo, ICommentLikesRepo commentLikesRepo, ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo,
 			INotificationsRepo notificationsRepo, IGroupMembersRepo groupMembersRepo, IGroupAccessesRepo groupAccessesRepo, IVisitsRepo visitsRepo, IUnitsRepo unitsRepo)
-			: base(courseManager, db, usersRepo, commentsRepo, commentLikesRepo, coursesRepo, courseRolesRepo, notificationsRepo, groupMembersRepo, groupAccessesRepo, visitsRepo, unitsRepo)
+			: base(courseStorage, db, usersRepo, commentsRepo, commentLikesRepo, coursesRepo, courseRolesRepo, notificationsRepo, groupMembersRepo, groupAccessesRepo, visitsRepo, unitsRepo)
 		{
 		}
 
@@ -86,7 +86,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 				return NotFound(new ErrorResponse($"Comment {commentId} not found"));
 			var canUserSeeNotApprovedComments = await CanUserSeeNotApprovedCommentsAsync(UserId, comment.CourseId).ConfigureAwait(false);
 
-			var course = await courseManager.FindCourseAsync(comment.CourseId);
+			var course = await courseStorage.FindCourseAsync(comment.CourseId);
 			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIds(course, UserId);
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(User.GetUserId(), comment.CourseId, CourseRoleType.Instructor).ConfigureAwait(false);
 			var slide = course.FindSlideById(comment.SlideId, isInstructor, visibleUnitsIds);

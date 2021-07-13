@@ -31,12 +31,12 @@ namespace Ulearn.Web.Api.Controllers.Runner
 		private readonly List<IResultObserver> resultObservers;
 		private static ILog log => LogProvider.Get().ForContext(typeof(RunnerSetResultController));
 
-		public RunnerSetResultController(IWebCourseManager courseManager, UlearnDb db, IOptions<WebApiConfiguration> options,
+		public RunnerSetResultController(ICourseStorage courseStorage, UlearnDb db, IOptions<WebApiConfiguration> options,
 			IUsersRepo usersRepo, IUserSolutionsRepo userSolutionsRepo, ISlideCheckingsRepo slideCheckingsRepo,
 			IGroupsRepo groupsRepo, IVisitsRepo visitsRepo, MetricSender metricSender,
 			XQueueResultObserver xQueueResultObserver, SandboxErrorsResultObserver sandboxErrorsResultObserver,
 			AntiPlagiarismResultObserver antiPlagiarismResultObserver, StyleErrorsResultObserver styleErrorsResultObserver, LtiResultObserver ltiResultObserver)
-			: base(courseManager, db, usersRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 			configuration = options.Value;
 			resultObservers = new List<IResultObserver>
@@ -74,7 +74,7 @@ namespace Ulearn.Web.Api.Controllers.Runner
 
 			foreach (var result in results)
 				await FuncUtils.TrySeveralTimesAsync(() => userSolutionsRepo.SaveResult(result,
-					submission => SendToReviewAndUpdateScore(submission, courseManager, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender)
+					submission => SendToReviewAndUpdateScore(submission, courseStorage, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender)
 				), 3).ConfigureAwait(false);
 
 			var submissionsByIds = (await userSolutionsRepo
@@ -96,11 +96,11 @@ namespace Ulearn.Web.Api.Controllers.Runner
 		}
 
 		public static async Task<bool> SendToReviewAndUpdateScore(UserExerciseSubmission submissionNoTracking,
-			IWebCourseManager courseManager, ISlideCheckingsRepo slideCheckingsRepo, IGroupsRepo groupsRepo, IVisitsRepo visitsRepo, MetricSender metricSender)
+			ICourseStorage courseStorage, ISlideCheckingsRepo slideCheckingsRepo, IGroupsRepo groupsRepo, IVisitsRepo visitsRepo, MetricSender metricSender)
 		{
 			var userId = submissionNoTracking.UserId;
 			var courseId = submissionNoTracking.CourseId;
-			var course = await courseManager.GetCourseAsync(courseId);
+			var course = await courseStorage.GetCourseAsync(courseId);
 			var exerciseSlide = course.FindSlideByIdNotSafe(submissionNoTracking.SlideId) as ExerciseSlide; // SlideId проверен в вызывающем методе 
 			if (exerciseSlide == null)
 				return false;

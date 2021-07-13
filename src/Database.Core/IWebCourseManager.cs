@@ -9,18 +9,22 @@ namespace Database
 {
 	public delegate void CourseChangedEventHandler(string courseId);
 
-	public interface IWebCourseManager
+	public interface ICourseStorage
 	{
-		event CourseChangedEventHandler CourseChangedEvent;
 		Task<Course> GetCourseAsync(string courseId);
-		Task<IEnumerable<Course>> GetCoursesAsync();
-		void UpdateCourseVersion(string courseId, Guid versionId);
-		IEnumerable<Course> GetCourses();
 		Course GetCourse(string courseId);
+		Task<IEnumerable<Course>> GetCoursesAsync();
+		IEnumerable<Course> GetCourses();
 		Task<Course> FindCourseAsync(string courseId);
 		Course FindCourse(string courseId);
 		bool HasCourse(string courseId);
 		Task<bool> HasCourseAsync(string courseId);
+		event CourseChangedEventHandler CourseChangedEvent;
+	}
+
+	public interface IWebCourseManager
+	{
+		void UpdateCourseVersion(string courseId, Guid versionId);
 		Course GetVersion(Guid versionId);
 		FileInfo GetStagingCourseFile(string courseId);
 		FileInfo GetStagingTempCourseFile(string courseId);

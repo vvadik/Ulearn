@@ -19,8 +19,8 @@ namespace Ulearn.Web.Api.Controllers
 		private ICourseRolesRepo courseRolesRepo;
 		private IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo;
 
-		public FlashcardStatisticsController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo)
-			: base(courseManager, db, usersRepo)
+		public FlashcardStatisticsController(ICourseStorage courseStorage, UlearnDb db, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 			this.courseRolesRepo = courseRolesRepo;
 			this.usersFlashcardsVisitsRepo = usersFlashcardsVisitsRepo;
@@ -33,7 +33,7 @@ namespace Ulearn.Web.Api.Controllers
 		[HttpGet]
 		public async Task<ActionResult<FlashcardsStatistics>> FlashcardsStatistics([FromQuery][BindRequired] string courseId)
 		{
-			var course = await courseManager.FindCourseAsync(courseId);
+			var course = await courseStorage.FindCourseAsync(courseId);
 			if (course == null)
 				return NotFound();
 			var hasUserAccessToCourse = await courseRolesRepo.HasUserAccessToCourse(UserId, course.Id, CourseRoleType.Instructor);

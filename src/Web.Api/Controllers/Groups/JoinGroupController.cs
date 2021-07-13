@@ -23,11 +23,11 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		private readonly IGroupMembersRepo groupMembersRepo;
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
 
-		public JoinGroupController(IWebCourseManager courseManager, UlearnDb db,
+		public JoinGroupController(ICourseStorage courseStorage, UlearnDb db,
 			IUsersRepo usersRepo,
 			IGroupsRepo groupsRepo, IGroupMembersRepo groupMembersRepo,
 			ISlideCheckingsRepo slideCheckingsRepo)
-			: base(courseManager, db, usersRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 			this.groupsRepo = groupsRepo;
 			this.groupMembersRepo = groupMembersRepo;

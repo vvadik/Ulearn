@@ -22,15 +22,15 @@ namespace Notifications
 
 		private readonly IEmailSender emailSender;
 		private readonly ITelegramSender telegramSender;
-		private readonly IWebCourseManager courseManager;
+		private readonly ICourseStorage courseStorage;
 		private readonly string baseUrl;
 		private readonly string secretForHashes;
 
-		public NotificationSender(IWebCourseManager courseManager, IEmailSender emailSender, ITelegramSender telegramSender, MetricSender metricSender, IOptions<NotificationsConfiguration> options)
+		public NotificationSender(ICourseStorage courseStorage, IEmailSender emailSender, ITelegramSender telegramSender, MetricSender metricSender, IOptions<NotificationsConfiguration> options)
 		{
 			this.emailSender = emailSender;
 			this.telegramSender = telegramSender;
-			this.courseManager = courseManager;
+			this.courseStorage = courseStorage;
 			this.metricSender = metricSender;
 
 			baseUrl = options.Value.BaseUrl ?? "";
@@ -60,7 +60,7 @@ namespace Notifications
 
 			/*
 				var courseId = delivery.Notification.CourseId;
-				var courseTitle = courseManager.GetCourse(courseId).Title;
+				var courseTitle = courseStorage.GetCourse(courseId).Title;
 				return GetEmailHtmlSignature(delivery.NotificationTransportId, delivery.Notification.GetNotificationType(), courseId, courseTitle);
 			*/
 		}
@@ -71,7 +71,7 @@ namespace Notifications
 				return;
 
 			var notification = notificationDelivery.Notification;
-			var course = await courseManager.GetCourseAsync(notification.CourseId);
+			var course = await courseStorage.GetCourseAsync(notification.CourseId);
 
 			var notificationButton = notification.GetNotificationButton(transport, notificationDelivery, course, baseUrl);
 			var htmlMessage = notification.GetHtmlMessageForDelivery(transport, notificationDelivery, course, baseUrl);
@@ -103,7 +103,7 @@ namespace Notifications
 			foreach (var delivery in notificationDeliveries)
 			{
 				var notification = delivery.Notification;
-				var course = await courseManager.GetCourseAsync(notification.CourseId);
+				var course = await courseStorage.GetCourseAsync(notification.CourseId);
 
 				var htmlMessage = notification.GetHtmlMessageForDelivery(transport, delivery, course, baseUrl);
 				var textMessage = notification.GetTextMessageForDelivery(transport, delivery, course, baseUrl);
@@ -134,7 +134,7 @@ namespace Notifications
 				return;
 
 			var notification = notificationDelivery.Notification;
-			var course = await courseManager.GetCourseAsync(notification.CourseId);
+			var course = await courseStorage.GetCourseAsync(notification.CourseId);
 
 			var notificationButton = notification.GetNotificationButton(transport, notificationDelivery, course, baseUrl);
 
@@ -159,7 +159,7 @@ namespace Notifications
 			foreach (var delivery in notificationDeliveries)
 			{
 				var notification = delivery.Notification;
-				var course = await courseManager.GetCourseAsync(notification.CourseId);
+				var course = await courseStorage.GetCourseAsync(notification.CourseId);
 
 				var htmlMessage = notification.GetHtmlMessageForDelivery(transport, delivery, course, baseUrl);
 				var button = notification.GetNotificationButton(transport, delivery, course, baseUrl);

@@ -20,9 +20,9 @@ namespace Ulearn.Web.Api.Controllers.Users
 		private readonly IUserSearcher userSearcher;
 		private readonly ICourseRolesRepo courseRolesRepo;
 
-		public UsersController(IWebCourseManager courseManager, UlearnDb db,
+		public UsersController(ICourseStorage courseStorage, UlearnDb db,
 			IUsersRepo usersRepo, IUserSearcher userSearcher, ICourseRolesRepo courseRolesRepo)
-			: base(courseManager, db, usersRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 			this.userSearcher = userSearcher;
 			this.courseRolesRepo = courseRolesRepo;
