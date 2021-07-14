@@ -1,18 +1,10 @@
 ﻿using System;
 using System.Threading;
-using System.Threading.Tasks;
 using Vostok.Applications.Scheduled;
 using Vostok.Hosting.Abstractions;
 
-namespace Ulearn.Core.Courses
+namespace Ulearn.Core.Courses.Manager
 {
-	public interface ICourseUpdater
-	{
-		// Эти же методы загружают курсы в начале работы
-		Task UpdateCourses();
-		Task UpdateTempCourses();
-	}
-
 	public class UpdateCoursesWorker : VostokScheduledApplication
 	{
 		private readonly ICourseUpdater courseUpdater;
@@ -31,11 +23,17 @@ namespace Ulearn.Core.Courses
 
 		private void RunUpdateCoursesWorker(IScheduledActionsBuilder builder)
 		{
-			builder.Schedule("UpdateCoursesWorker", Scheduler.Periodical(coursesUpdatePeriod), courseUpdater.UpdateCourses);
-			builder.Schedule("UpdateCoursesWorker", Scheduler.Periodical(tempCoursesUpdatePeriod), courseUpdater.UpdateTempCourses);
+			var updateCoursesScheduler = Scheduler.Multi(Scheduler.Periodical(coursesUpdatePeriod), Scheduler.OnDemand(out var updateCourses));
+			builder.Schedule("UpdateCoursesWorker", updateCoursesScheduler, courseUpdater.UpdateCourses);
+
+			var updateTempCoursesScheduler = Scheduler.Multi(Scheduler.Periodical(tempCoursesUpdatePeriod), Scheduler.OnDemand(out var updateTempCourses));
+			builder.Schedule("UpdateTempCoursesWorker", updateTempCoursesScheduler, courseUpdater.UpdateTempCourses);
+
+			updateCourses();
+			updateTempCourses();
 		}
 
-		private void RunUpdateCoursesWorker()
+		public void RunCoursesUpdateInThreads()
 		{
 			var coursesThread = new Thread(UpdateCoursesLoop);
 			coursesThread.Start();
@@ -50,6 +48,7 @@ namespace Ulearn.Core.Courses
 				courseUpdater.UpdateCourses().Wait();
 				Thread.Sleep(coursesUpdatePeriod);
 			}
+			// ReSharper disable once FunctionNeverReturns
 		}
 
 		private void UpdateTempCoursesLoop()
@@ -59,6 +58,7 @@ namespace Ulearn.Core.Courses
 				courseUpdater.UpdateTempCourses().Wait();
 				Thread.Sleep(tempCoursesUpdatePeriod);
 			}
+			// ReSharper disable once FunctionNeverReturns
 		}
 	}
 }

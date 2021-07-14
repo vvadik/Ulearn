@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Ulearn.Core.Courses.Manager
 {
@@ -10,6 +11,12 @@ namespace Ulearn.Core.Courses.Manager
 		IEnumerable<Course> GetCourses();
 		Course FindCourse(string courseId);
 		bool HasCourse(string courseId);
-		event CourseChangedEventHandler CourseChangedEvent;
+		event CourseChangedEventHandler CourseChangedEvent; // Вызывается при загрузке версии курса, но не при его удалении.
+	}
+
+	public interface IUpdateCourseStorage
+	{
+		void AddOrUpdateCourse(Course course, Guid version);
+		void TryRemoveCourse(string courseId);
 	}
 }

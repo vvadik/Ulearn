@@ -17,7 +17,7 @@ namespace Ulearn.Core.Courses
 		}
 
 		public string Id { get; set; }
-		public Guid CourseVersion { get; set; }
+		public Guid CourseVersion { get; set; } // TODO устанавливать в конструкторе
 		public string Title => Settings.Title;
 		[NotNull]
 		public CourseSettings Settings { get; private set; }

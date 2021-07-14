@@ -12,6 +12,7 @@ using Database;
 using Database.Di;
 using Database.Models;
 using Database.Repos;
+using Database.Repos.Users;
 using Ionic.Zip;
 using ManualUtils.AntiPlagiarism;
 using Microsoft.AspNetCore.Identity;
@@ -20,7 +21,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
-using Ulearn.Core;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Exercises;
@@ -71,35 +71,35 @@ namespace ManualUtils
 
 		private static async Task Run(AntiPlagiarismDb adb, UlearnDb db, IServiceProvider serviceProvider)
 		{
-			//await new UsersRepo(db, serviceProvider.GetService<UlearnUserManager>()).CreateUlearnBotUserIfNotExistsAsync();
-			//FillLanguageToAntiplagiarism.FillLanguage(adb);
-			//GenerateUpdateSequences();
-			//CompareColumns();
-			//await ResendLti(db);
-			//await FindExternalSolutionsPlagiarism.UploadSolutions();
-			//await FindExternalSolutionsPlagiarism.GetRawResults();
-			//await FindExternalSolutionsPlagiarism.PrepareResults();
-			//await UpdateExerciseVisits(db, "fpIntroduction");
-
-			//Users.PrintCourseAdmins(db);
-			//await ScoresUpdater.UpdateTests(db, "java-rtf");
-			//GetMostSimilarSubmission(adb);
-			//ParsePairWeightsFromLogs();
-			//GetBlackAndWhiteLabels(db, adb);
-			//ParseTaskWeightsFromLogs();
-			//CampusRegistration();
-			//GetIps(db);
-			//FillAntiplagFields.FillClientSubmissionId(adb);
-			//await XQueueRunAutomaticChecking(db);
-			//TextBlobsWithZeroByte(db);
-			//UpdateCertificateArchives(db);
-			//GetVKByEmail(serviceProvider);
-			//TestStagingZipsEncodings();
-			//ConvertZipsToCourseXmlInRoot();
-			//await UploadStagingToDb(serviceProvider);
-			//await UploadStagingFromDbAndExtractToCourses(serviceProvider);
-			//await SetCourseIdAndSlideIdInLikesAndPromotes(db);
-			await SetNewFieldsInReview(db, serviceProvider);
+			// await serviceProvider.GetService<IUsersRepo>().CreateUlearnBotUserIfNotExists();
+			// FillLanguageToAntiplagiarism.FillLanguage(adb);
+			// GenerateUpdateSequences();
+			// CompareColumns();
+			// await ResendLti(serviceProvider);
+			// await FindExternalSolutionsPlagiarism.UploadSolutions();
+			// await FindExternalSolutionsPlagiarism.GetRawResults();
+			// await FindExternalSolutionsPlagiarism.PrepareResults();
+			// await UpdateExerciseVisits(serviceProvider, "fpIntroduction");
+			//
+			// Users.PrintCourseAdmins(db);
+			// await ScoresUpdater.UpdateTests(serviceProvider, "java-rtf");
+			// GetMostSimilarSubmission(adb);
+			// ParsePairWeightsFromLogs();
+			// GetBlackAndWhiteLabels(db, adb);
+			// ParseTaskWeightsFromLogs(serviceProvider);
+			// CampusRegistration(db);
+			// GetIps(db);
+			// FillAntiplagFields.FillClientSubmissionId(adb);
+			// await XQueueRunAutomaticChecking(db);
+			// TextBlobsWithZeroByte(db);
+			// UpdateCertificateArchives(db);
+			// GetVKByEmail(serviceProvider);
+			// TestStagingZipsEncodings();
+			// ConvertZipsToCourseXmlInRoot();
+			// await UploadStagingToDb(serviceProvider);
+			// await UploadStagingFromDbAndExtractToCourses(serviceProvider);
+			// await SetCourseIdAndSlideIdInLikesAndPromotes(db);
+			// await SetNewFieldsInReview(db, serviceProvider);
 		}
 
 		private static void GenerateUpdateSequences()
@@ -130,14 +130,15 @@ namespace ManualUtils
 			File.WriteAllLines(@"C:\git\Ulearn-postgres\tools\pgloader\files\update_sequences.sql", strings);
 		}
 
-		private static async Task ResendLti(UlearnDb db)
+		private static async Task ResendLti(IServiceProvider serviceProvider)
 		{
-			var ltiConsumersRepo = new LtiConsumersRepo(db);
-			var slideCheckingsRepo = new SlideCheckingsRepo(db, null);
-			var visitsRepo = new VisitsRepo(db, slideCheckingsRepo);
+			var ltiConsumersRepo = serviceProvider.GetService<ILtiConsumersRepo>();
+			var visitsRepo = serviceProvider.GetService<VisitsRepo>();
+			var courseStorage = serviceProvider.GetService<ICourseStorage>();
+			var db = serviceProvider.GetService<UlearnDb>();
+
 			// current 288064
 			var ltiRequests = await db.LtiRequests.Where(r => r.RequestId > 285417).OrderByDescending(r => r.RequestId).ToListAsync();
-			var courseManager = new CourseManager(CourseManager.GetCoursesDirectory());
 
 			var i = 0;
 			foreach (var ltiRequest in ltiRequests)
@@ -146,7 +147,7 @@ namespace ManualUtils
 				Console.WriteLine($"{i} requestId {ltiRequest.RequestId}");
 				try
 				{
-					var course = courseManager.GetCourse(ltiRequest.CourseId);
+					var course = courseStorage.GetCourse(ltiRequest.CourseId);
 					var slide = course.GetSlideByIdNotSafe(ltiRequest.SlideId);
 					var score = await visitsRepo.GetScore(ltiRequest.CourseId, ltiRequest.SlideId, ltiRequest.UserId);
 					await LtiUtils.SubmitScore(slide, ltiRequest.UserId, score, ltiRequest.Request, ltiConsumersRepo);
@@ -159,12 +160,12 @@ namespace ManualUtils
 			}
 		}
 
-		private static async Task UpdateExerciseVisits(UlearnDb db, string courseId)
+		private static async Task UpdateExerciseVisits(IServiceProvider serviceProvider, string courseId)
 		{
-			var courseManager = new CourseManager(CourseManager.GetCoursesDirectory());
-			var course = courseManager.GetCourse(courseId);
-			var slideCheckingsRepo = new SlideCheckingsRepo(db, null);
-			var visitsRepo = new VisitsRepo(db, slideCheckingsRepo);
+			var courseStorage = serviceProvider.GetService<ICourseStorage>();
+			var course = courseStorage.GetCourse(courseId);
+			var visitsRepo = serviceProvider.GetService<IVisitsRepo>();
+			var db = serviceProvider.GetService<UlearnDb>();
 			var slides = course.GetSlidesNotSafe().OfType<ExerciseSlide>().ToList();
 			foreach (var slide in slides)
 			{
@@ -250,10 +251,10 @@ namespace ManualUtils
 			File.WriteAllLines("result.txt", jsons);
 		}
 
-		private static void ParseTaskWeightsFromLogs(UlearnDb db)
+		private static void ParseTaskWeightsFromLogs(IServiceProvider serviceProvider)
 		{
 			var lines = File.ReadLines("weights.txt");
-			var jsons = AntiplagiarismLogsParser.GetWeightsForStatistics(db, lines);
+			var jsons = AntiplagiarismLogsParser.GetWeightsForStatistics(serviceProvider, lines);
 			File.WriteAllLines("result.txt", jsons);
 		}
 

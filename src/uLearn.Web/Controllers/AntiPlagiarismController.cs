@@ -54,7 +54,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		public AntiPlagiarismController()
-			: this(new ULearnDb(), WebCourseManager.CourseStorageInstance)
+			: this(new ULearnDb(), CourseManager.CourseStorageInstance)
 		{
 		}
 

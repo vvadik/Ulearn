@@ -6,7 +6,7 @@ using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using Database;
 using Newtonsoft.Json;
-using Ulearn.Core;
+using Microsoft.Extensions.DependencyInjection;
 using Ulearn.Core.Courses.Manager;
 
 namespace ManualUtils.AntiPlagiarism
@@ -16,10 +16,13 @@ namespace ManualUtils.AntiPlagiarism
 	{
 		[DataMember(Name = "taskId")]
 		public string TaskId;
+
 		[DataMember(Name = "name")]
 		public string Name;
+
 		[DataMember(Name = "courseId")]
 		public string CourseId;
+
 		[DataMember(Name = "weights")]
 		public double[] Weights;
 	}
@@ -29,8 +32,10 @@ namespace ManualUtils.AntiPlagiarism
 	{
 		[DataMember(Name = "s")]
 		public int Submission;
+
 		[DataMember(Name = "o")]
 		public int Other;
+
 		[DataMember(Name = "w")]
 		public double Weight;
 	}
@@ -60,11 +65,14 @@ namespace ManualUtils.AntiPlagiarism
 					}
 				}
 			}
+
 			return submission2WithMaxWeight.Select(kvp => new BestPairWeight { Submission = kvp.Key, Other = kvp.Value.Item1, Weight = kvp.Value.Item2 });
 		}
 
-		public static IEnumerable<string> GetWeightsForStatistics(UlearnDb db, IEnumerable<string> lines)
+		public static IEnumerable<string> GetWeightsForStatistics(IServiceProvider serviceProvider, IEnumerable<string> lines)
 		{
+			var db = serviceProvider.GetService<UlearnDb>();
+			var courseStorage = serviceProvider.GetService<ICourseStorage>();
 			var weights = ParseWeights(lines)
 				.GroupBy(w => w.TaskId)
 				.Select(g => g.Last())
@@ -77,11 +85,15 @@ namespace ManualUtils.AntiPlagiarism
 				.ToDictionary(p => p.SlideId.ToString(), p => p.CourseId);
 			weights = weights
 				.Where(w => slideId2CourseId.ContainsKey(w.TaskId))
-				.Select(w => { w.CourseId = slideId2CourseId[w.TaskId]; return w; })
+				.Select(w =>
+				{
+					w.CourseId = slideId2CourseId[w.TaskId];
+					return w;
+				})
 				.ToList();
 			var courseManager = new CourseManager(CourseManager.GetCoursesDirectory());
-			var bp = courseManager.GetCourse("basicprogramming");
-			var bp2 = courseManager.GetCourse("basicprogramming2");
+			var bp = courseStorage.GetCourse("basicprogramming");
+			var bp2 = courseStorage.GetCourse("basicprogramming2");
 			weights = weights.Select(w =>
 			{
 				var slide = bp.FindSlideByIdNotSafe(new Guid(w.TaskId)) ?? bp2.FindSlideByIdNotSafe(new Guid(w.TaskId));
@@ -90,6 +102,7 @@ namespace ManualUtils.AntiPlagiarism
 			}).ToList();
 			return weights.Select(JsonConvert.SerializeObject);
 		}
+
 		private static IEnumerable<TaskWeights> ParseWeights(IEnumerable<string> lines)
 		{
 			var taskIdRegex = new Regex(@"Новые статистические параметры задачи \(TaskStatisticsParameters\) по задаче ([^:]+):", RegexOptions.Compiled);
@@ -103,6 +116,7 @@ namespace ManualUtils.AntiPlagiarism
 					currentWeights = JsonConvert.DeserializeObject<double[]>(weightsMatch.Groups[1].Value);
 					continue;
 				}
+
 				var taskIdMatch = taskIdRegex.Match(line);
 				if (taskIdMatch.Success)
 				{

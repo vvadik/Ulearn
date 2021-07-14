@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Database.DataContexts;
 using Database.Models;
 using Vostok.Logging.Abstractions;
@@ -10,12 +11,13 @@ using Ulearn.Core.Courses.Manager;
 
 namespace Database
 {
-	public class WebCourseManager : CourseManager, ICourseStorage, IWebCourseManager
+	public class WebCourseManager : CourseManager, IWebCourseManager, ICourseUpdater
 	{
 		private static ILog log => LogProvider.Get().ForContext(typeof(WebCourseManager));
+
 		private static readonly WebCourseManager courseManagerInstance = new WebCourseManager();
-		public static ICourseStorage CourseStorageInstance => courseManagerInstance;
 		public static IWebCourseManager CourseManagerInstance => courseManagerInstance;
+		public static ICourseUpdater CourseUpdaterInstance => courseManagerInstance;
 
 		private readonly Dictionary<string, Guid> loadedCourseVersions = new Dictionary<string, Guid>();
 
@@ -26,7 +28,7 @@ namespace Database
 
 		private readonly object @lock = new object();
 
-		public void UpdateCourses()
+		public async Task UpdateCourses()
 		{
 			LoadCoursesIfNotYet();
 			var coursesRepo = new CoursesRepo();
@@ -47,7 +49,7 @@ namespace Database
 			}
 		}
 
-		public void UpdateTempCourses()
+		public async Task UpdateTempCourses()
 		{
 			TryCheckTempCoursesAndReloadIfNecessary();
 		}
@@ -113,7 +115,7 @@ namespace Database
 					Course course = null;
 					try
 					{
-						course = base.GetCourse(courseId); // Не используется FindCourse, иначе бесконечная рекурсия
+						course = CourseStorageInstance.GetCourse(courseId);
 					}
 					catch (Exception ex)
 					{
@@ -131,7 +133,5 @@ namespace Database
 				log.Error(ex);
 			}
 		}
-
-		public event CourseChangedEventHandler CourseChangedEvent;
 	}
 }

@@ -248,6 +248,7 @@ namespace Ulearn.Web.Api
 		{
 			builder.AddHostedServiceFromApplication<ArchiveGroupsWorker>();
 			builder.AddHostedServiceFromApplication<RefreshMaterializedViewsWorker>();
+			builder.AddHostedServiceFromApplication<UpdateCoursesWorker>();
 		}
 
 		public void ConfigureAuthServices(IServiceCollection services, WebApiConfiguration configuration)

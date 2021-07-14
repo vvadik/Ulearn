@@ -16,9 +16,10 @@ namespace Database.Di
 	{
 		public static IServiceCollection AddDatabaseServices(this IServiceCollection services)
 		{
-			services.AddSingleton<WebCourseManager, WebCourseManager>();
+			services.AddSingleton(CourseManager.CourseStorageInstance);
+			services.AddSingleton<WebCourseManager>();
 			services.AddSingleton<IWebCourseManager>(x => x.GetRequiredService<WebCourseManager>());
-			services.AddSingleton<ICourseStorage>(x => x.GetRequiredService<WebCourseManager>());
+			services.AddSingleton<ICourseUpdater>(x => x.GetRequiredService<WebCourseManager>());
 
 			services.AddScoped<UlearnUserManager>();
 			services.AddScoped<InitialDataCreator>();

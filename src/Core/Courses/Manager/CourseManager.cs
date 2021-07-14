@@ -9,7 +9,6 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Ionic.Zip;
-using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 using Telegram.Bot.Types.Enums;
 using Ulearn.Common;
@@ -29,12 +28,13 @@ namespace Ulearn.Core.Courses.Manager
 
 		private static ILog log => LogProvider.Get().ForContext(typeof(CourseManager));
 
+		private static readonly CourseStorage courseStorage = new CourseStorage();
+		public static ICourseStorage CourseStorageInstance => courseStorage;
+
 		private readonly DirectoryInfo stagedDirectory;
 		private readonly DirectoryInfo coursesDirectory;
 		private readonly DirectoryInfo tempCourseStaging;
 		private readonly DirectoryInfo coursesVersionsDirectory;
-
-		private readonly ConcurrentDictionary<string, Course> courses = new ConcurrentDictionary<string, Course>(StringComparer.InvariantCultureIgnoreCase);
 
 		/* LRU-cache for course versions. 50 is a capactiy of the cache. */
 		private readonly LruCache<Guid, Course> versionsCache = new LruCache<Guid, Course>(50);
@@ -68,42 +68,7 @@ namespace Ulearn.Core.Courses.Manager
 			this.coursesVersionsDirectory = coursesVersionsDirectory;
 			coursesVersionsDirectory.EnsureExists();
 		}
-
-		public virtual IEnumerable<Course> GetCourses()
-		{
-			return courses.Values.OrderBy(c => c.Title, StringComparer.OrdinalIgnoreCase);
-		}
-
-		///
-		/// <exception cref="KeyNotFoundException"></exception>
-		/// <exception cref="CourseNotFoundException"></exception>
-		///
-		[NotNull]
-		public virtual Course GetCourse(string courseId)
-		{
-			if (courses.TryGetValue(courseId, out var course))
-				return course;
-			throw new CourseNotFoundException($"Course {courseId} not found");
-		}
-
-		[CanBeNull]
-		public Course FindCourse(string courseId)
-		{
-			try
-			{
-				return GetCourse(courseId);
-			}
-			catch (CourseNotFoundException e)
-			{
-				return null;
-			}
-		}
-
-		public bool HasCourse(string courseId)
-		{
-			return FindCourse(courseId) != null;
-		}
-
+		
 		protected bool CourseIsBroken(string courseId)
 		{
 			return courseIdToIsBroken.TryGetValue(courseId, out var val) ? val : false;
@@ -173,7 +138,7 @@ namespace Ulearn.Core.Courses.Manager
 		{
 			lock (reloadLock)
 			{
-				if (courses.Count != 0)
+				if (courseStorage.GetCourses().Count() != 0)
 					return;
 				var courseZips = stagedDirectory.GetFiles("*.zip");
 				var courseIdsWithZips = courseZips.Select(z => GetCourseId(z.FullName));
@@ -236,7 +201,8 @@ namespace Ulearn.Core.Courses.Manager
 		private Course ReloadCourseFromZip(FileInfo zipFile)
 		{
 			var course = LoadCourseFromZip(zipFile);
-			courses[course.Id] = course;
+			var versionId = Guid.Empty;
+			courseStorage.AddOrUpdateCourse(course, versionId); // TODO хранить версии
 			log.Info($"Курс {course.Id} загружен из {zipFile.FullName} и сохранён в памяти");
 			exerciseStudentZipsCache.DeleteCourseZips(course.Id);
 			ExerciseCheckerZipsCache.DeleteCourseZips(course.Id);
@@ -246,7 +212,8 @@ namespace Ulearn.Core.Courses.Manager
 		private Course ReloadCourseFromDirectory(DirectoryInfo directory)
 		{
 			var course = LoadCourseFromDirectory(directory);
-			courses[course.Id] = course;
+			var versionId = Guid.Empty;
+			courseStorage.AddOrUpdateCourse(course, versionId); // TODO хранить версии
 			log.Info($"Курс {course.Id} загружен из {directory.FullName} и сохранён в памяти");
 			exerciseStudentZipsCache.DeleteCourseZips(course.Id);
 			ExerciseCheckerZipsCache.DeleteCourseZips(course.Id);
@@ -469,13 +436,14 @@ namespace Ulearn.Core.Courses.Manager
 
 		private void UpdateCourse(Course course)
 		{
-			if (!courses.ContainsKey(course.Id))
+			if (!courseStorage.HasCourse(course.Id))
 				return;
 
 			exerciseStudentZipsCache.DeleteCourseZips(course.Id);
 			ExerciseCheckerZipsCache.DeleteCourseZips(course.Id);
 
-			courses[course.Id] = course;
+			var versionId = Guid.Empty;
+			courseStorage.AddOrUpdateCourse(course, versionId); // TODO хранить версии
 		}
 
 		private readonly TimeSpan waitBetweenLockTries = TimeSpan.FromSeconds(0.1);

@@ -26,7 +26,6 @@ namespace Database
 		void ReloadCourseNotSafe(string courseId, bool notifyAboutErrors = true);
 		void ExtractTempCourseChanges(string tempCourseId);
 		bool TryCreateTempCourse(string courseId, string courseTitle, Guid firstVersionId);
-		void NotifyCourseChanged(string courseId);
 		FileInfo GenerateOrFindStudentZip(string courseId, Slide slide);
 	}
 }

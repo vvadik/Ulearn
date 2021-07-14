@@ -7,18 +7,16 @@ using Database.Models;
 using Database.Repos;
 using Microsoft.Extensions.DependencyInjection;
 using Vostok.Logging.Abstractions;
-using Ulearn.Core;
 using Ulearn.Core.Courses.Manager;
 
 namespace Database
 {
-	public class WebCourseManager : CourseManager, IWebCourseManager, ICourseStorage
+	public class WebCourseManager : CourseManager, IWebCourseManager, ICourseUpdater
 	{
 		private static ILog log => LogProvider.Get().ForContext(typeof(WebCourseManager));
 
 		private readonly Dictionary<string, Guid> loadedCourseVersions = new Dictionary<string, Guid>();
 		private readonly IServiceScopeFactory serviceScopeFactory;
-		public event CourseChangedEventHandler CourseChangedEvent;
 
 		public WebCourseManager(IServiceScopeFactory serviceScopeFactory)
 			: base(GetCoursesDirectory())
@@ -66,7 +64,7 @@ namespace Database
 		{
 			var tempCourses = await tempCoursesRepo.GetTempCoursesAsync();
 			tempCourses
-				.Where(tempCourse => !HasCourse(tempCourse.CourseId))
+				.Where(tempCourse => !CourseStorageInstance.HasCourse(tempCourse.CourseId))
 				.ToList()
 				.ForEach(course => TryReloadCourse(course.CourseId));
 		}
@@ -79,11 +77,6 @@ namespace Database
 			}
 		}
 
-		public void NotifyCourseChanged(string courseId)
-		{
-			CourseChangedEvent?.Invoke(courseId);
-		}
-
 		private void ReloadCourseIfLoadedAndPublishedVersionsAreDifferent(string courseId, CourseVersion publishedVersion)
 		{
 			lock (@lock)
@@ -93,8 +86,7 @@ namespace Database
 				{
 					var actual = isCourseLoaded ? loadedVersionId.ToString() : "<none>";
 					log.Info($"Загруженная версия курса {courseId} отличается от актуальной ({actual} != {publishedVersion.Id}). Обновляю курс.");
-					if (TryReloadCourse(courseId))
-						NotifyCourseChanged(courseId);
+					TryReloadCourse(courseId);
 				}
 
 				loadedCourseVersions[courseId.ToLower()] = publishedVersion.Id;
