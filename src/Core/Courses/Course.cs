@@ -17,6 +17,7 @@ namespace Ulearn.Core.Courses
 		}
 
 		public string Id { get; set; }
+		public Guid CourseVersion { get; set; }
 		public string Title => Settings.Title;
 		[NotNull]
 		public CourseSettings Settings { get; private set; }

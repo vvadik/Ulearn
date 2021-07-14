@@ -10,11 +10,11 @@ namespace Ulearn.Core.Courses
 		Course FindCourse(string courseId);
 		bool HasCourse(string courseId);
 
-		void AddOrUpdateCourse(Course course);
+		void AddOrUpdateCourse(Course course, Guid version);
 		void TryRemoveCourse(string courseId);
 	}
 
-	public class CoursesStorage
+	public class CoursesStorage : ICoursesStorage
 	{
 		private readonly ConcurrentDictionary<string, Course> courses = new ConcurrentDictionary<string, Course>(StringComparer.InvariantCultureIgnoreCase);
 
@@ -38,8 +38,9 @@ namespace Ulearn.Core.Courses
 			return FindCourse(courseId) != null;
 		}
 
-		public void AddOrUpdateCourse(Course course)
+		public void AddOrUpdateCourse(Course course, Guid version)
 		{
+			course.CourseVersion = version;
 			courses.AddOrUpdate(course.Id, _ => course, (_, _) => course);
 		}
 
