@@ -51,9 +51,18 @@ namespace Ulearn.Web.Api.Controllers.Groups
 
 		private async Task<GroupsListResponse> GetGroupsListResponseAsync(GroupsListParameters parameters)
 		{
-			var showArchieve = parameters.Archived ?? true;
-			var showActual = parameters.Archived == null ? true : !(parameters.Archived.Value);
-			var groups = await groupAccessesRepo.GetAvailableForUserGroupsAsync(parameters.CourseId, UserId, false, showActual, showArchieve).ConfigureAwait(false);
+			var groups = await groupAccessesRepo.GetAvailableForUserGroupsAsync(parameters.CourseId, UserId, false, true, parameters.Archived).ConfigureAwait(false);
+
+			if (parameters.UserId != null)
+			{
+				var userGroups = await groupAccessesRepo.GetAvailableForUserGroupsAsync(parameters.CourseId, parameters.UserId, false, true, parameters.Archived).ConfigureAwait(false);
+				var userGroupsIds = userGroups
+					.Select(g => g.Id)
+					.ToImmutableHashSet();
+
+				groups = groups.Where(g => userGroupsIds.Contains(g.Id)).ToList();
+			}
+			
 			/* Order groups by (name, createTime) and get one page of data (offset...offset+count) */
 			var groupIds = groups
 				.OrderBy(g => g.Name, StringComparer.InvariantCultureIgnoreCase)
@@ -62,8 +71,9 @@ namespace Ulearn.Web.Api.Controllers.Groups
 				.Take(parameters.Count)
 				.Select(g => g.Id)
 				.ToImmutableHashSet();
+
 			var filteredGroups = groups
-				.Where(g => groupIds.Contains(g.Id) && (parameters.UserId == null || g.Members.Any(m => m.UserId == parameters.UserId)))
+				.Where(g => groupIds.Contains(g.Id))
 				.ToList();
 
 			var groupMembers = await groupMembersRepo.GetGroupsMembersAsync(groupIds).ConfigureAwait(false);

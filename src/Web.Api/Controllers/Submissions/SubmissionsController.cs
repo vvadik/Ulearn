@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Database;
 using Database.Models;
@@ -15,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using Ulearn.Common.Api.Models.Responses;
-using Ulearn.Web.Api.Models.Responses.Exercise;
+using Ulearn.Web.Api.Models.Responses.Submissions;
 
 namespace Ulearn.Web.Api.Controllers.Submissions
 {
@@ -44,10 +41,10 @@ namespace Ulearn.Web.Api.Controllers.Submissions
 		[SwaggerResponse((int)HttpStatusCode.Forbidden, "You don't have access to view submissions")]
 		public async Task<ActionResult<SubmissionsResponse>> GetSubmissions([FromQuery] [CanBeNull] string userId, [FromQuery] string courseId, [FromQuery] Guid slideId)
 		{
-			if (userId != null)
+			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.CourseAdmin);
+			if (userId != null && !isCourseAdmin)
 			{
 				var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.Instructor);
-
 				if (!isInstructor)
 					return StatusCode((int)HttpStatusCode.Forbidden, new ErrorResponse("You don't have access to view submissions"));
 			}
@@ -58,26 +55,12 @@ namespace Ulearn.Web.Api.Controllers.Submissions
 				.GetAllSubmissionsByUser(courseId, slideId, userId)
 				.ToListAsync();
 			var submissionsScores = await slideCheckingsRepo.GetCheckedPercentsBySubmissions(courseId, slideId, userId, null);
-			return SubmissionsResponse.Build(submissions,submissionsScores);
-		}
-	}
-
-	[DataContract]
-	public class SubmissionsResponse
-	{
-		[DataMember]
-		public List<SubmissionInfo> Submissions { get; set; }
-		
-		[DataMember]
-		public Dictionary<int,int?> SubmissionsScores { get; set; }
-
-		public static SubmissionsResponse Build(IEnumerable<UserExerciseSubmission> submissions,Dictionary<int,int?> checkPercentBuSubmissions)
-		{
-			return new SubmissionsResponse
-			{
-				Submissions = submissions.Select(s => SubmissionInfo.Build(s, null, false)).ToList(),
-				SubmissionsScores = checkPercentBuSubmissions,
-			};
+			var codeReviewComments = await slideCheckingsRepo.GetExerciseCodeReviewComments(courseId, slideId, userId);
+			var reviewId2Comments = codeReviewComments
+				?.GroupBy(c => c.ReviewId)
+				.ToDictionary(g => g.Key, g => g.AsEnumerable());
+			
+			return SubmissionsResponse.Build(submissions, submissionsScores, reviewId2Comments, isCourseAdmin);
 		}
 	}
 }

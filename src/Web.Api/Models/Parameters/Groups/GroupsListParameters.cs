@@ -14,7 +14,7 @@ namespace Ulearn.Web.Api.Models.Parameters.Groups
 		public string CourseId { get; set; }
 
 		[FromQuery(Name = "archived")]
-		public bool? Archived { get; set; } = false;
+		public bool Archived { get; set; } = false;
 		
 		[FromQuery(Name = "userId")]
 		[CanBeNull]

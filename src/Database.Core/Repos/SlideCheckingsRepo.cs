@@ -137,6 +137,7 @@ namespace Database.Repos
 				if (!isRightAnswer)
 					return (0, null);
 			}
+
 			var checkedScoresAndPercents = await GetCheckedScoresAndPercents(courseId, slide, userId, null);
 			var automaticScore = slide.Scoring.PassedTestsScore;
 			if (checkedScoresAndPercents.Count == 0)
@@ -197,17 +198,17 @@ namespace Database.Repos
 				.ToList();
 			return checkedScoresAndPercents;
 		}
-		
-		public async Task<Dictionary<int,int?>> GetCheckedPercentsBySubmissions(string courseId, Guid slideId, string userId, DateTime? submissionBefore)
+
+		public async Task<Dictionary<int, int?>> GetCheckedPercentsBySubmissions(string courseId, Guid slideId, string userId, DateTime? submissionBefore)
 		{
 			var query = GetSlideCheckingsByUser<ManualExerciseChecking>(courseId, slideId, userId)
 				.Where(c => c.IsChecked);
 			if (submissionBefore != null)
 				query = query.Where(c => c.Submission.Timestamp < submissionBefore);
 			var checkedScoresAndPercents = (await query
-					.Select(c => new { c.Percent, c.SubmissionId})
+					.Select(c => new { c.Percent, c.SubmissionId })
 					.ToListAsync())
-				.ToDictionary(k=>k.SubmissionId,v=>v.Percent);
+				.ToDictionary(k => k.SubmissionId, v => v.Percent);
 			return checkedScoresAndPercents;
 		}
 
