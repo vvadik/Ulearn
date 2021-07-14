@@ -1,11 +1,16 @@
 import React from "react";
 
 import { FLAT_THEME, Select, Tabs, ThemeContext, Toggle } from "ui";
-import { Controlled, } from "react-codemirror2";
+import { UnControlled, } from "react-codemirror2";
 
 import { Review } from "../Blocks/Exercise/Review/Review";
 import { BlocksWrapper, } from "../Blocks";
 import ScoreControls from "./ScoreControls/ScoreControls";
+import CourseLoader from "../../CourseLoader";
+import AddCommentForm from "./AddCommentForm/AddCommentForm";
+import AntiplagiarismHeader from "./AntiplagiarismHeader/AntiplagiarismHeader";
+import StickyWrapper from "./AntiplagiarismHeader/StickyWrapper";
+
 import 'codemirror/addon/selection/mark-selection.js';
 
 import {
@@ -16,27 +21,20 @@ import {
 	getSelectedReviewIdByCursor,
 	loadLanguageStyles,
 	buildRange,
-	PreviousManualCheckingInfo, TextMarkersByReviewId,
 } from "../Blocks/Exercise/ExerciseUtils";
+import { clone } from "src/utils/jsonExtensions";
+import { DiffInfo, getDataFromReviewToCompareChanges, getDiffInfo, getReviewAnchorTop } from "./utils";
 
 import { InstructorReviewTabs } from "./InstructorReviewTabs";
 import { Language } from "src/consts/languages";
 import { ReviewInfo, SubmissionInfo } from "src/models/exercise";
 import CodeMirror, { Editor, EditorConfiguration, MarkerRange, TextMarker, } from "codemirror";
-import { clone } from "src/utils/jsonExtensions";
-import { DiffInfo, getDataFromReviewToCompareChanges, getDiffInfo, getReviewAnchorTop } from "./utils";
-import { InstructorReviewInfo, InstructorReviewInfoWithAnchor, Props, State } from "./InstructorReview.types";
-
-import AddCommentForm from "./AddCommentForm/AddCommentForm";
-import AntiplagiarismHeader from "./AntiplagiarismHeader/AntiplagiarismHeader";
-import StickyWrapper from "./AntiplagiarismHeader/StickyWrapper";
 import {
 	AntiplagiarismStatusResponse,
 } from "src/models/instructor";
-import CourseLoader from "../../CourseLoader";
 
+import { InstructorReviewInfo, InstructorReviewInfoWithAnchor, Props, State } from "./InstructorReview.types";
 import texts from "./InstructorReview.texts";
-
 import styles from './InstructorReview.less';
 
 
@@ -395,15 +393,8 @@ class InstructorReview extends React.Component<Props, State> {
 				{ this.renderTopControls() }
 				<StickyWrapper
 					stickerClass={ styles.wrapperStickerStopper }
-					sticker={ (fixed) =>
-						<AntiplagiarismHeader
-							fixed={ fixed }
-							shouldCheck={ true }
-							getAntiplagiarismStatus={ this.getAntiplagiarismStatus }
-							onZeroScoreButtonPressed={ this.onZeroScoreButtonPressed }
-						/>
-					}
-					content={ this.renderEditor() }
+					renderSticker={ this.renderHeader }
+					renderContent={ this.renderEditor }
 				/>
 				<ScoreControls
 					curReviewScore={ currentScore ?? currentScore }
@@ -421,7 +412,11 @@ class InstructorReview extends React.Component<Props, State> {
 		const { currentSubmission, } = this.state;
 		const { getAntiplagiarismStatus, } = this.props;
 
-		return getAntiplagiarismStatus(currentSubmission!.id);
+		if(currentSubmission) {
+			return getAntiplagiarismStatus(currentSubmission.id);
+		}
+
+		return Promise.resolve('no submission');
 	};
 
 	onZeroScoreButtonPressed = (): void => {
@@ -464,6 +459,14 @@ class InstructorReview extends React.Component<Props, State> {
 		);
 	}
 
+	renderHeader = (fixed: boolean,): React.ReactElement =>
+		<AntiplagiarismHeader
+			fixed={ fixed }
+			shouldCheck={ true }
+			getAntiplagiarismStatus={ this.getAntiplagiarismStatus }
+			onZeroScoreButtonPressed={ this.onZeroScoreButtonPressed }
+		/>;
+
 	renderEditor = (): React.ReactNode => {
 		const {
 			user,
@@ -487,9 +490,7 @@ class InstructorReview extends React.Component<Props, State> {
 		return (
 			<div className={ styles.positionWrapper }>
 				<div className={ styles.wrapper }>
-					<Controlled
-						//controlled component refreshes more wisely, but it need onChange function, so we mocking it
-						onBeforeChange={ this.mock }
+					<UnControlled
 						onSelection={ this.onSelectionChange }
 						editorDidMount={ this.onEditorMount }
 						className={ styles.editor }
@@ -562,10 +563,6 @@ class InstructorReview extends React.Component<Props, State> {
 		}
 
 		return allReviews;
-	};
-
-	mock = (): void => {
-		return;
 	};
 
 	onToggleReviewFavouriteByReviewId = (reviewId: number): void => {
@@ -745,7 +742,6 @@ class InstructorReview extends React.Component<Props, State> {
 			markers,
 		}, () => selectedReviewId > -1 && this.highlightReview(selectedReviewId, editor,));
 	};
-
 
 	formatLine = (lineNumber: number): string => {
 		const { diffInfo, showDiff, } = this.state;
@@ -968,7 +964,7 @@ class InstructorReview extends React.Component<Props, State> {
 	};
 
 	onCursorActivity = (): void => {
-		const { reviews, editor, selectedReviewId, } = this.state;
+		const { reviews, outdatedReviews, editor, selectedReviewId, } = this.state;
 
 		if(!editor) {
 			return;
@@ -985,7 +981,7 @@ class InstructorReview extends React.Component<Props, State> {
 			return;
 		}
 
-		this.highlightReview(getSelectedReviewIdByCursor(reviews, doc, cursor), editor);
+		this.highlightReview(getSelectedReviewIdByCursor(reviews.concat(outdatedReviews), doc, cursor), editor);
 	};
 
 	selectComment = (e: React.MouseEvent<Element, MouseEvent> | React.FocusEvent, id: number,): void => {

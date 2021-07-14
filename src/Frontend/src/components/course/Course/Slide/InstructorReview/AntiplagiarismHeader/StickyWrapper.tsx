@@ -4,23 +4,23 @@ import { Sticky } from "ui";
 interface StickyWrapper {
 	stickerClass: string;
 
-	sticker: (fixed: boolean) => React.ReactElement<StickerProps>;
-	content: React.ReactNode;
+	renderSticker: (fixed: boolean) => React.ReactElement<StickerProps>;
+	renderContent: () => React.ReactNode;
 }
 
 export interface StickerProps {
 	fixed: boolean;
 }
 
-export default function StickyWrapper({ sticker, stickerClass, content, }: StickyWrapper): React.ReactElement {
+export default function StickyWrapper({ renderSticker, stickerClass, renderContent, }: StickyWrapper): React.ReactElement {
 	const ref = React.useRef<HTMLDivElement>(null);
 
 	return (
 		<>
 			<Sticky getStop={ getStopper } side={ "top" }>
-				{ fixed => sticker(fixed) }
+				{ fixed => renderSticker(fixed) }
 			</Sticky>
-			{ content }
+			{ renderContent() }
 			<div ref={ ref } className={ stickerClass }/>
 		</>
 	);
