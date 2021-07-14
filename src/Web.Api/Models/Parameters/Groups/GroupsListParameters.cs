@@ -18,7 +18,7 @@ namespace Ulearn.Web.Api.Models.Parameters.Groups
 		
 		[FromQuery(Name = "userId")]
 		[CanBeNull]
-		public string UserId { get; set; }
+		public string UserId { get; set; } // Для получения групп, где есть этот студент
 
 		[FromQuery(Name = "offset")]
 		[MinValue(0, ErrorMessage = "Offset should be non-negative")]

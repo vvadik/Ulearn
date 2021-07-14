@@ -46,23 +46,19 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		[Authorize(Policy = "Instructors")]
 		public async Task<ActionResult<GroupsListResponse>> GroupsList([FromQuery] GroupsListParameters parameters)
 		{
-			return await GetGroupsListResponseAsync(parameters).ConfigureAwait(false);
+			return await GetGroupsListResponseAsync(parameters);
 		}
 
 		private async Task<GroupsListResponse> GetGroupsListResponseAsync(GroupsListParameters parameters)
 		{
-			var groups = await groupAccessesRepo.GetAvailableForUserGroupsAsync(parameters.CourseId, UserId, false, true, parameters.Archived).ConfigureAwait(false);
+			var groups = await groupAccessesRepo.GetAvailableForUserGroupsAsync(parameters.CourseId, UserId, false, true, parameters.Archived);
 
 			if (parameters.UserId != null)
 			{
-				var userGroups = await groupAccessesRepo.GetAvailableForUserGroupsAsync(parameters.CourseId, parameters.UserId, false, true, parameters.Archived).ConfigureAwait(false);
-				var userGroupsIds = userGroups
-					.Select(g => g.Id)
-					.ToImmutableHashSet();
-
-				groups = groups.Where(g => userGroupsIds.Contains(g.Id)).ToList();
+				var groupsWithUserAsMemberIds = (await groupMembersRepo.GetUserGroupsIdsAsync(parameters.CourseId, parameters.UserId, parameters.Archived)).ToHashSet();
+				groups = groups.Where(g => groupsWithUserAsMemberIds.Contains(g.Id)).ToList();
 			}
-			
+
 			/* Order groups by (name, createTime) and get one page of data (offset...offset+count) */
 			var groupIds = groups
 				.OrderBy(g => g.Name, StringComparer.InvariantCultureIgnoreCase)
@@ -76,10 +72,10 @@ namespace Ulearn.Web.Api.Controllers.Groups
 				.Where(g => groupIds.Contains(g.Id))
 				.ToList();
 
-			var groupMembers = await groupMembersRepo.GetGroupsMembersAsync(groupIds).ConfigureAwait(false);
+			var groupMembers = await groupMembersRepo.GetGroupsMembersAsync(groupIds);
 			var membersCountByGroup = groupMembers.GroupBy(m => m.GroupId).ToDictionary(g => g.Key, g => g.Count()).ToDefaultDictionary();
 
-			var groupAccessesByGroup = await groupAccessesRepo.GetGroupAccessesAsync(groupIds).ConfigureAwait(false);
+			var groupAccessesByGroup = await groupAccessesRepo.GetGroupAccessesAsync(groupIds);
 
 			var groupInfos = filteredGroups.Select(g => BuildGroupInfo(
 				g,
@@ -110,13 +106,13 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		public async Task<ActionResult<CreateGroupResponse>> CreateGroup([FromQuery] CourseAuthorizationParameters courseAuthorizationParameters, CreateGroupParameters parameters)
 		{
 			var ownerId = User.GetUserId();
-			var group = await groupsRepo.CreateGroupAsync(courseAuthorizationParameters.CourseId, parameters.Name, ownerId).ConfigureAwait(false);
+			var group = await groupsRepo.CreateGroupAsync(courseAuthorizationParameters.CourseId, parameters.Name, ownerId);
 
 			await notificationsRepo.AddNotification(
 				group.CourseId,
 				new CreatedGroupNotification(group.Id),
 				UserId
-			).ConfigureAwait(false);
+			);
 
 			var url = Url.Action(new UrlActionContext { Action = nameof(GroupController.Group), Controller = "Group", Values = new { groupId = group.Id } });
 			return Created(url, new CreateGroupResponse
