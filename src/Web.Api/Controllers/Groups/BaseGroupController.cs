@@ -5,6 +5,7 @@ using Database;
 using Database.Models;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Web.Api.Models.Responses.Groups;
 
 namespace Ulearn.Web.Api.Controllers.Groups

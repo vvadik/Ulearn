@@ -8,6 +8,7 @@ using Database.Repos.Users;
 using Database.Repos.Users.Search;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Ulearn.Core.Courses.Manager;
 
 namespace Database.Di
 {

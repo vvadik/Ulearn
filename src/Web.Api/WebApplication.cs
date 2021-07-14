@@ -32,6 +32,7 @@ using Ulearn.Common.Api.Swagger;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Helpers;
 using Ulearn.Core.Metrics;
 using Ulearn.Core.RunCheckerJobApi;

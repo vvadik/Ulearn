@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Swashbuckle.AspNetCore.Annotations;
 using Ulearn.Common.Api.Models.Responses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Web.Api.Models.Responses.Groups;
 
 namespace Ulearn.Web.Api.Controllers.Groups

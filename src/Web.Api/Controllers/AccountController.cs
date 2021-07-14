@@ -18,6 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Web.Api.Authorization;
 using Ulearn.Web.Api.Models.Parameters;
 using Ulearn.Web.Api.Models.Responses.Account;

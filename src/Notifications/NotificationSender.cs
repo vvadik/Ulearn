@@ -6,6 +6,7 @@ using Database.Models;
 using Database.Repos;
 using Microsoft.Extensions.Options;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Metrics;
 
 namespace Notifications

@@ -19,6 +19,7 @@ using Ulearn.Common;
 using Ulearn.Common.Api;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Web.Api.Models.Parameters.Comments;
 using Ulearn.Web.Api.Models.Responses.Comments;

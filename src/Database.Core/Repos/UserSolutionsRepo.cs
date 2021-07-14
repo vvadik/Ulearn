@@ -11,6 +11,7 @@ using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.RunCheckerJobApi;

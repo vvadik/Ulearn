@@ -21,6 +21,7 @@ using Ulearn.Common.Api;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;

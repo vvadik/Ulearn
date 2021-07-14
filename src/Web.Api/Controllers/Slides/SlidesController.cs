@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Web.Api.Models.Common;
 using Web.Api.Configuration;
 

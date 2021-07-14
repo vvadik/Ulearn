@@ -13,6 +13,7 @@ using Microsoft.AspNet.Identity;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
 using Ulearn.Core;
+using Ulearn.Core.Courses.Manager;
 
 namespace uLearn.Web.Controllers
 {

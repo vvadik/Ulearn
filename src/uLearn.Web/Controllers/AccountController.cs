@@ -18,6 +18,7 @@ using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 using Vostok.Logging.Abstractions;
 using Web.Api.Configuration;
 

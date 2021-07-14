@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Repos;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.RunCheckerJobApi;
 using Ulearn.Web.Api.Utils.LTI;

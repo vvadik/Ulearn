@@ -16,6 +16,7 @@ using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Models.Responses.TempCourses;
 using Ionic.Zip;
 using Ulearn.Common;
+using Ulearn.Core.Courses.Manager;
 using Vostok.Logging.Abstractions;
 
 

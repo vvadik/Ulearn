@@ -3,6 +3,7 @@ using System.Web.Mvc;
 using Database;
 using Database.DataContexts;
 using Database.Models;
+using Ulearn.Core.Courses.Manager;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 using Ulearn.Core.Courses.Slides.Exercises;

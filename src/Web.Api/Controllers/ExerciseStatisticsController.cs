@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Web.Api.Controllers.Slides;
 using Ulearn.Web.Api.Models.Responses.ExerciseStatistics;

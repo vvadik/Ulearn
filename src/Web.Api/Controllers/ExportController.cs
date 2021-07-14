@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
 using Ulearn.Core.Extensions;

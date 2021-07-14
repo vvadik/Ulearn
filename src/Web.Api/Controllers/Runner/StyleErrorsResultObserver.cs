@@ -4,6 +4,7 @@ using Database;
 using Database.Models;
 using Database.Repos;
 using Database.Repos.Users;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Metrics;
 using Ulearn.Core.RunCheckerJobApi;

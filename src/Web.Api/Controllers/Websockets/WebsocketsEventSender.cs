@@ -8,6 +8,7 @@ using Database.Repos.Users;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Web.Api.Models.Responses.Websockets;
 
 namespace Ulearn.Web.Api.Controllers.Websockets

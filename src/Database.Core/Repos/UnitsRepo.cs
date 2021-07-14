@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Database.Models;
 using Microsoft.EntityFrameworkCore;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 
 namespace Database.Repos
 {

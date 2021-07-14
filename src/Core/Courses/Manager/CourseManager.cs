@@ -11,18 +11,17 @@ using System.Xml.XPath;
 using Ionic.Zip;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
-using Vostok.Logging.Abstractions;
 using Telegram.Bot.Types.Enums;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
-using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Units;
 using Ulearn.Core.Helpers;
 using Ulearn.Core.Telegram;
+using Vostok.Logging.Abstractions;
 
-namespace Ulearn.Core
+namespace Ulearn.Core.Courses.Manager
 {
 	public class CourseManager
 	{
@@ -72,7 +71,6 @@ namespace Ulearn.Core
 
 		public virtual IEnumerable<Course> GetCourses()
 		{
-			LoadCoursesIfNotYet();
 			return courses.Values.OrderBy(c => c.Title, StringComparer.OrdinalIgnoreCase);
 		}
 
@@ -83,8 +81,9 @@ namespace Ulearn.Core
 		[NotNull]
 		public virtual Course GetCourse(string courseId)
 		{
-			LoadCoursesIfNotYet();
-			return courses.Get(courseId);
+			if (courses.TryGetValue(courseId, out var course))
+				return course;
+			throw new CourseNotFoundException($"Course {courseId} not found");
 		}
 
 		[CanBeNull]
@@ -94,16 +93,9 @@ namespace Ulearn.Core
 			{
 				return GetCourse(courseId);
 			}
-			catch (Exception e) when (e is KeyNotFoundException || e is CourseNotFoundException || e is CourseLoadingException)
+			catch (CourseNotFoundException e)
 			{
 				return null;
-			}
-			catch (AggregateException e)
-			{
-				var ie = e.InnerException;
-				if (ie is KeyNotFoundException || ie is CourseNotFoundException || ie is CourseLoadingException)
-					return null;
-				throw;
 			}
 		}
 

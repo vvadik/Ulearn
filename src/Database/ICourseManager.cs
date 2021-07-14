@@ -1,23 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
 using Ulearn.Core.Courses;
-using Ulearn.Core.Courses.Slides;
 
 namespace Database
 {
-	public delegate void CourseChangedEventHandler(string courseId);
-
-	public interface ICourseStorage
-	{
-		Course GetCourse(string courseId);
-		IEnumerable<Course> GetCourses();
-		Course FindCourse(string courseId);
-		bool HasCourse(string courseId);
-		event CourseChangedEventHandler CourseChangedEvent;
-	}
-
 	public interface IWebCourseManager
 	{
 		void UpdateCourseVersion(string courseId, Guid versionId);
@@ -37,9 +23,5 @@ namespace Database
 		void MoveCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory);
 		bool TryReloadCourse(string courseId);
 		void ReloadCourseNotSafe(string courseId, bool notifyAboutErrors = true);
-		void ExtractTempCourseChanges(string tempCourseId);
-		bool TryCreateTempCourse(string courseId, string courseTitle, Guid firstVersionId);
-		void NotifyCourseChanged(string courseId);
-		FileInfo GenerateOrFindStudentZip(string courseId, Slide slide);
 	}
 }

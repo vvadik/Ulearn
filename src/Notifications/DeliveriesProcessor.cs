@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Repos;
+using Ulearn.Core.Courses.Manager;
 using Vostok.Logging.Abstractions;
 
 namespace Notifications

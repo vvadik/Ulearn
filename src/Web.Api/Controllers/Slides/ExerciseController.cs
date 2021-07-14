@@ -16,6 +16,7 @@ using Ulearn.Common;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;

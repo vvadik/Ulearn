@@ -12,6 +12,7 @@ using Microsoft.AspNet.Identity;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Extensions;

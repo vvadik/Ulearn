@@ -9,6 +9,7 @@ using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using Microsoft.AspNet.Identity;
+using Ulearn.Core.Courses.Manager;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 using Ulearn.Core.Courses.Slides;

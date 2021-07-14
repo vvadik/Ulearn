@@ -4,6 +4,7 @@ using Database;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 
 namespace Ulearn.Web.Api.Models.Binders
 {

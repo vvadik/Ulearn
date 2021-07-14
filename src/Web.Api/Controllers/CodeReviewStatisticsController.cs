@@ -9,6 +9,7 @@ using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Web.Api.Authorization;
 using Ulearn.Web.Api.Models.Responses.CodeReviewStatistics;

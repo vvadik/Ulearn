@@ -6,6 +6,7 @@ using Database;
 using Database.Models.Quizzes;
 using Database.Repos;
 using Ulearn.Core;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
 

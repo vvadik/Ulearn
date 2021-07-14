@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
 using Vostok.Logging.Abstractions;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Web.Api.Models.Parameters.Notifications;
 using Ulearn.Web.Api.Models.Responses.Notifications;
 using Web.Api.Configuration;

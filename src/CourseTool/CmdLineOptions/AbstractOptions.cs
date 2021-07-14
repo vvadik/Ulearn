@@ -4,6 +4,7 @@ using System.IO;
 using CommandLine;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
+using Ulearn.Core.Courses.Manager;
 
 namespace uLearn.CourseTool.CmdLineOptions
 {

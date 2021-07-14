@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using Ulearn.Common.Api.Models.Responses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Web.Api.Models.Parameters.Exercise;
 using Ulearn.Web.Api.Models.Responses.AcceptedSolutions;

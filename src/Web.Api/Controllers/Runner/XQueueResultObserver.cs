@@ -4,6 +4,7 @@ using Database;
 using Database.Models;
 using Database.Repos;
 using Ulearn.Common;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.RunCheckerJobApi;
 using Vostok.Logging.Abstractions;

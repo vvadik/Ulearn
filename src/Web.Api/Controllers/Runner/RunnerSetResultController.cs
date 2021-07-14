@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Ulearn.Common;
 using Ulearn.Common.Api.Models.Responses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Metrics;
 using Ulearn.Core.RunCheckerJobApi;

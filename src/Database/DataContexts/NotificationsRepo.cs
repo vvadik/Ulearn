@@ -14,6 +14,7 @@ using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 
 namespace Database.DataContexts
 {

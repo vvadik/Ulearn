@@ -15,6 +15,7 @@ using Vostok.Logging.Abstractions;
 using Swashbuckle.AspNetCore.Annotations;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Units;
 using Ulearn.Web.Api.Models.Parameters.Groups;
 using Ulearn.Web.Api.Models.Responses.Groups;

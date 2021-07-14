@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using Database;
 using Newtonsoft.Json;
 using Ulearn.Core;
+using Ulearn.Core.Courses.Manager;
 
 namespace ManualUtils.AntiPlagiarism
 {
