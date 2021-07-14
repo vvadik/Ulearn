@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
+using Ulearn.Web.Api.Utils.LTI;
 
 namespace Ulearn.Web.Api.Utils
 {
-	public class ExcelWorksheetBuilder
+	public class ExcelWorksheetBuilder : ISheetBuilder
 	{
 		private readonly ExcelWorksheet worksheet;
 		private int currentRow;
@@ -23,7 +24,28 @@ namespace Ulearn.Web.Api.Utils
 			ColumnsCount = 1;
 		}
 
-		public void AddCell(object value, int colspan = 1)
+		public void AddCell(string value, int colspan = 1)
+		{
+			if (colspan < 1)
+				return;
+
+			var cell = worksheet.Cells[currentRow, currentColumn];
+			cell.Value = value;
+
+			var range = worksheet.Cells[currentRow, currentColumn, currentRow, currentColumn + colspan - 1];
+			if (colspan > 1)
+				range.Merge = true;
+
+			foreach (var styleRule in styleRules)
+				styleRule(range.Style);
+			if (isLastStyleRuleForOneCellOnly)
+				PopStyleRule();
+
+			currentColumn += colspan;
+			ColumnsCount = Math.Max(ColumnsCount, currentColumn);
+		}
+		
+		public void AddCell(int value, int colspan = 1)
 		{
 			if (colspan < 1)
 				return;

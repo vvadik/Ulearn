@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Http;
@@ -15,7 +16,7 @@ namespace Ulearn.Core.GoogleSheet
 		private readonly SheetsService service;
 		private readonly bool writeTokenToConsole;
 		private readonly string accessToken;
-		
+
 		public GoogleApiClient(bool writeTokenToConsole, string accessToken, string credentialsJson)
 		{
 			this.writeTokenToConsole = writeTokenToConsole;
@@ -46,25 +47,58 @@ namespace Ulearn.Core.GoogleSheet
 
 		public void FillSpreadSheet(string spreadsheetId, GoogleSheet googleSheet)
 		{
-			ClearSheet(spreadsheetId, googleSheet.ListId);
+			WhiteWashSheet(spreadsheetId, googleSheet.ListId, googleSheet.Width);
 			var requests = RequestCreator.GetRequests(googleSheet);
 			service.Spreadsheets.BatchUpdate(new BatchUpdateSpreadsheetRequest { Requests = requests },
 				spreadsheetId).Execute();
 			//TODO: проверить асинхронные методы
 		}
 
-		private void ClearSheet(string spreadsheetId, int listId)
+		private void WhiteWashSheet(string spreadsheetId, int listId, int length)
 		{
 			var spreadsheet = service.Spreadsheets.Get(spreadsheetId).Execute();
-			var range = "";
+			// var range = "";
 			foreach (var sheet in spreadsheet.Sheets)
 			{
 				if (sheet.Properties.SheetId == listId)
-					range = sheet.Properties.Title;
+					continue;
+				// range = sheet.Properties.Title;
 			}
-			var request = service.Spreadsheets.Values.Clear(new ClearValuesRequest(),
-				spreadsheetId, range);
-			request.Execute();
+
+			// var request = service.Spreadsheets.Values.Clear(new ClearValuesRequest(),
+			// 	spreadsheetId, range);
+			// request.Execute();
+			var requests = new List<Request>
+			{
+				new()
+				{
+					DeleteDimension = new DeleteDimensionRequest
+					{
+						Range = new DimensionRange
+						{
+							Dimension = "COLUMNS",
+							StartIndex = 0,
+							EndIndex = spreadsheet.Sheets.FirstOrDefault(e => e.Properties.SheetId == listId)?.Properties.GridProperties.ColumnCount - 1,
+							SheetId = listId
+						}
+					}
+				},
+				new()
+				{
+					InsertDimension = new InsertDimensionRequest
+					{
+						Range = new DimensionRange
+						{
+							Dimension = "COLUMNS",
+							StartIndex = 0,
+							EndIndex = length,
+							SheetId = listId
+						}
+					}
+				}
+			};
+			service.Spreadsheets.BatchUpdate(new BatchUpdateSpreadsheetRequest { Requests = requests },
+				spreadsheetId).Execute();
 		}
 	}
 }
