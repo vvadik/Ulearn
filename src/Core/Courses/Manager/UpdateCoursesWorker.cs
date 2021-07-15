@@ -10,6 +10,8 @@ namespace Ulearn.Core.Courses.Manager
 		private readonly ICourseUpdater courseUpdater;
 		private readonly TimeSpan coursesUpdatePeriod = TimeSpan.FromMilliseconds(1000);
 		private readonly TimeSpan tempCoursesUpdatePeriod = TimeSpan.FromMilliseconds(500);
+		public static readonly string UpdateCoursesJobName = "UpdateCoursesJob";
+		public static readonly string UpdateTempCoursesJobName = "UpdateTempCoursesJob";
 
 		public UpdateCoursesWorker(ICourseUpdater courseUpdater)
 		{
@@ -24,10 +26,10 @@ namespace Ulearn.Core.Courses.Manager
 		private void RunUpdateCoursesWorker(IScheduledActionsBuilder builder)
 		{
 			var updateCoursesScheduler = Scheduler.Multi(Scheduler.Periodical(coursesUpdatePeriod), Scheduler.OnDemand(out var updateCourses));
-			builder.Schedule("UpdateCoursesWorker", updateCoursesScheduler, courseUpdater.UpdateCourses);
+			builder.Schedule(UpdateCoursesJobName, updateCoursesScheduler, courseUpdater.UpdateCourses);
 
 			var updateTempCoursesScheduler = Scheduler.Multi(Scheduler.Periodical(tempCoursesUpdatePeriod), Scheduler.OnDemand(out var updateTempCourses));
-			builder.Schedule("UpdateTempCoursesWorker", updateTempCoursesScheduler, courseUpdater.UpdateTempCourses);
+			builder.Schedule(UpdateTempCoursesJobName, updateTempCoursesScheduler, courseUpdater.UpdateTempCourses);
 
 			updateCourses();
 			updateTempCourses();
