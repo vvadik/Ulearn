@@ -51,6 +51,12 @@ namespace uLearn.Web.Models
 
 		public DefaultDictionary<string, List<int>> VisitedUsersGroups { get; set; }
 
+		public string JsonExportUrl { get; set; }
+		
+		public string XmlExportUrl { get; set; }
+		
+		public string XlsxExportUrl { get; set; }
+
 		public SortedDictionary<string, ScoringGroup> GetUsingUnitScoringGroups(Unit unit, SortedDictionary<string, ScoringGroup> courseScoringGroups)
 		{
 			return unit.Scoring.Groups

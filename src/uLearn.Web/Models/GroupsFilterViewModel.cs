@@ -14,6 +14,8 @@ namespace uLearn.Web.Models
 
 		public List<Group> Groups { get; set; }
 
+		public string InputControlName { get; set; } = "group";
+
 		[CanBeNull] // Если это студент
 		public Dictionary<int, List<string>> UsersIdsWithGroupsAccess { get; set; }
 	}

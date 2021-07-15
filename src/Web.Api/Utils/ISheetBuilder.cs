@@ -1,7 +1,7 @@
 ﻿using System;
 using OfficeOpenXml.Style;
 
-namespace Ulearn.Web.Api.Utils.LTI
+namespace Ulearn.Web.Api.Utils
 {
 	public interface ISheetBuilder
 	{

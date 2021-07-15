@@ -24,7 +24,7 @@ using OfficeOpenXml.Style;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.GoogleSheet;
 using Ulearn.Web.Api.Models.Responses.Analytics;
-using Ulearn.Web.Api.Utils.LTI;
+using Web.Api.Configuration;
 
 namespace Ulearn.Web.Api.Controllers
 {
@@ -45,7 +45,7 @@ namespace Ulearn.Web.Api.Controllers
 			IGroupMembersRepo groupMembersRepo, IUnitsRepo unitsRepo,
 			IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo,
 			ControllerUtils controllerUtils, IVisitsRepo visitsRepo, IAdditionalScoresRepo additionalScoresRepo,
-			IOptions<UlearnConfiguration> options)
+			IOptions<WebApiConfiguration> options)
 			: base(courseManager, db, usersRepo)
 		{
 			this.courseRolesRepo = courseRolesRepo;
@@ -60,7 +60,7 @@ namespace Ulearn.Web.Api.Controllers
 		}
 		
 		[HttpGet("course-score-sheet/export/{fileNameWithNoExtension}.json")]
-		[Authorize(Policy = "Instructors")]
+		[Authorize(Policy = "Instructors", AuthenticationSchemes = "Bearer,Identity.Application")]
 		public async Task<ActionResult> ExportCourseStatisticsAsJson([FromQuery] CourseStatisticsParams param)
 		{
 			if (param.CourseId == null)
@@ -73,7 +73,7 @@ namespace Ulearn.Web.Api.Controllers
 		}
 		
 		[HttpGet("course-score-sheet/export/{fileNameWithNoExtension}.xml")]
-		[Authorize(Policy = "Instructors")]
+		[Authorize(Policy = "Instructors", AuthenticationSchemes = "Bearer,Identity.Application")]
 		public async Task<ActionResult> ExportCourseStatisticsAsXml([FromQuery] CourseStatisticsParams param)
 		{
 			if (param.CourseId == null)
@@ -84,7 +84,7 @@ namespace Ulearn.Web.Api.Controllers
 		}
 
 		[HttpGet("course-score-sheet/export/{fileNameWithNoExtension}.xlsx")]
-		[Authorize(Policy = "Instructors")]
+		[Authorize(Policy = "Instructors", AuthenticationSchemes = "Bearer,Identity.Application")]
 		public async Task<ActionResult> ExportCourseStatisticsAsXlsx([FromQuery] CourseStatisticsParams param)
 		{
 			if (param.CourseId == null)
@@ -109,6 +109,7 @@ namespace Ulearn.Web.Api.Controllers
 				await package.SaveAsAsync(stream);
 				bytes = stream.ToArray();
 			}
+			
 			return File(bytes, "application/vnd.ms-excel", $"{param.FileNameWithNoExtension}.xlsx");
 		}
 
@@ -123,11 +124,9 @@ namespace Ulearn.Web.Api.Controllers
 			var builder = new GoogleSheetBuilder(sheet);
 			FillCourseStatisticsWithBuilder(builder, model);
 			
-			var spreadsheetId = "1dlMITgyLknv-cRd0SleTTGetiNsSfdXAprjKGHU-FNI"; // перенести в params
-			var accessToken = configuration.GoogleAccessToken;
-			// string accessToken = null;
+			var spreadsheetId = "1dlMITgyLknv-cRd0SleTTGetiNsSfdXAprjKGHU-FNI"; //TODO: перенести в params
 			var credentialsJson = configuration.GoogleAccessCredentials;
-			var client = new GoogleApiClient(false, accessToken, credentialsJson);
+			var client = new GoogleApiClient(credentialsJson);
 			client.FillSpreadSheet(spreadsheetId, sheet);
 			return Ok();
 		}
@@ -432,125 +431,5 @@ namespace Ulearn.Web.Api.Controllers
 				.GroupBy(e => e.GroupId)
 				.ToDictionary(g => g.Key, g => g.Select(e => e.ScoringGroupId).ToList());
 		}
-		
-		// private void FillCourseStatisticsExcelWorksheet(ExcelWorksheet worksheet, CourseStatisticPageModel model, bool onlyFullScores = false)
-		// {
-		// 	var builder = new ExcelWorksheetBuilder(worksheet);
-		//
-		// 	builder.AddStyleRule(s => s.Font.Bold = true);
-		//
-		// 	builder.AddCell("", 3);
-		// 	builder.AddCell("За весь курс", model.ScoringGroups.Count);
-		// 	builder.AddStyleRule(s => s.Border.Left.Style = ExcelBorderStyle.Thin);
-		// 	foreach (var unit in model.Units)
-		// 	{
-		// 		var colspan = 0;
-		// 		foreach (var scoringGroup in model.GetUsingUnitScoringGroups(unit, model.ScoringGroups).Values)
-		// 		{
-		// 			var shouldBeSolvedSlides = model.ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, scoringGroup.Id)];
-		// 			colspan += shouldBeSolvedSlides.Count + 1;
-		// 			if (shouldBeSolvedSlides.Count > 0 && scoringGroup.CanBeSetByInstructor)
-		// 				colspan++;
-		// 		}
-		//
-		// 		builder.AddCell(unit.Title, colspan);
-		// 	}
-		//
-		// 	builder.PopStyleRule(); // Border.Left
-		// 	builder.GoToNewLine();
-		//
-		// 	builder.AddCell("Фамилия Имя");
-		// 	builder.AddCell("Эл. почта");
-		// 	builder.AddCell("Группа");
-		// 	foreach (var scoringGroup in model.ScoringGroups.Values)
-		// 		builder.AddCell(scoringGroup.Abbreviation);
-		// 	foreach (var unit in model.Units)
-		// 	{
-		// 		builder.AddStyleRuleForOneCell(s => s.Border.Left.Style = ExcelBorderStyle.Thin);
-		// 		foreach (var scoringGroup in model.GetUsingUnitScoringGroups(unit, model.ScoringGroups).Values)
-		// 		{
-		// 			var shouldBeSolvedSlides = model.ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, scoringGroup.Id)];
-		// 			builder.AddCell(scoringGroup.Abbreviation);
-		//
-		// 			builder.AddStyleRule(s => s.TextRotation = 90);
-		// 			builder.AddStyleRule(s => s.Font.Bold = false);
-		// 			foreach (var slide in shouldBeSolvedSlides)
-		// 				builder.AddCell($"{scoringGroup.Abbreviation}: {slide.Title}");
-		// 			if (shouldBeSolvedSlides.Count > 0 && scoringGroup.CanBeSetByInstructor)
-		// 				builder.AddCell("Доп");
-		// 			builder.PopStyleRule();
-		// 			builder.PopStyleRule();
-		// 		}
-		// 	}
-		//
-		// 	builder.GoToNewLine();
-		//
-		// 	builder.AddStyleRule(s => s.Border.Bottom.Style = ExcelBorderStyle.Thin);
-		// 	builder.AddStyleRuleForOneCell(s =>
-		// 	{
-		// 		s.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-		// 		s.Font.Size = 10;
-		// 	});
-		// 	builder.AddCell("Максимум:", 3);
-		// 	foreach (var scoringGroup in model.ScoringGroups.Values)
-		// 		builder.AddCell(model.Units.Sum(unit => model.GetMaxScoreForUnitByScoringGroup(unit, scoringGroup)));
-		// 	foreach (var unit in model.Units)
-		// 	{
-		// 		builder.AddStyleRuleForOneCell(s => s.Border.Left.Style = ExcelBorderStyle.Thin);
-		// 		foreach (var scoringGroup in model.GetUsingUnitScoringGroups(unit, model.ScoringGroups).Values)
-		// 		{
-		// 			var shouldBeSolvedSlides = model.ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, scoringGroup.Id)];
-		// 			builder.AddCell(model.GetMaxScoreForUnitByScoringGroup(unit, scoringGroup));
-		// 			foreach (var slide in shouldBeSolvedSlides)
-		// 				builder.AddCell(slide.MaxScore);
-		// 			if (shouldBeSolvedSlides.Count > 0 && scoringGroup.CanBeSetByInstructor)
-		// 				builder.AddCell(scoringGroup.MaxAdditionalScore);
-		// 		}
-		// 	}
-		//
-		// 	builder.PopStyleRule(); // Bottom.Border
-		// 	builder.GoToNewLine();
-		//
-		// 	builder.AddStyleRule(s => s.Font.Bold = false);
-		//
-		// 	foreach (var user in model.VisitedUsers)
-		// 	{
-		// 		builder.AddCell(user.UserVisibleName);
-		// 		builder.AddCell(user.UserEmail);
-		// 		var userGroups = model.Groups.Where(g => model.VisitedUsersGroups[user.UserId].Contains(g.Id)).Select(g => g.Name).ToList();
-		// 		builder.AddCell(string.Join(", ", userGroups));
-		// 		foreach (var scoringGroup in model.ScoringGroups.Values)
-		// 		{
-		// 			var scoringGroupScore = model.Units.Sum(unit => model.GetTotalScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup));
-		// 			var scoringGroupOnlyFullScore = model.Units.Sum(unit => model.GetTotalOnlyFullScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup));
-		// 			builder.AddCell(onlyFullScores ? scoringGroupOnlyFullScore : scoringGroupScore);
-		// 		}
-		//
-		// 		foreach (var unit in model.Units)
-		// 		{
-		// 			builder.AddStyleRuleForOneCell(s => s.Border.Left.Style = ExcelBorderStyle.Thin);
-		// 			foreach (var scoringGroup in model.GetUsingUnitScoringGroups(unit, model.ScoringGroups).Values)
-		// 			{
-		// 				var shouldBeSolvedSlides = model.ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, scoringGroup.Id)];
-		// 				var scoringGroupScore = model.GetTotalScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup);
-		// 				var scoringGroupOnlyFullScore = model.GetTotalOnlyFullScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup);
-		// 				builder.AddCell(onlyFullScores ? scoringGroupOnlyFullScore : scoringGroupScore);
-		// 				foreach (var slide in shouldBeSolvedSlides)
-		// 				{
-		// 					var slideScore = model.ScoreByUserAndSlide[Tuple.Create(user.UserId, slide.Id)];
-		// 					builder.AddCell(onlyFullScores ? model.GetOnlyFullScore(slideScore, slide) : slideScore);
-		// 				}
-		//
-		// 				if (shouldBeSolvedSlides.Count > 0 && scoringGroup.CanBeSetByInstructor)
-		// 					builder.AddCell(model.AdditionalScores[Tuple.Create(user.UserId, unit.Id, scoringGroup.Id)]);
-		// 			}
-		// 		}
-		//
-		// 		builder.GoToNewLine();
-		// 	}
-		//
-		// 	for (var column = 1; column <= builder.ColumnsCount; column++)
-		// 		worksheet.Column(column).AutoFit(0.1);
-		// }
 	}
 }

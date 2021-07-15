@@ -139,8 +139,6 @@ namespace Ulearn.Core.Configuration
 		
 		public bool DisableKonturServices { get; set; }
 
-		public string GoogleAccessToken { get; set; }
-		
 		public string GoogleAccessCredentials { get; set; }
 	}
 
