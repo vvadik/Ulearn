@@ -22,7 +22,7 @@ using Vostok.Logging.Abstractions;
 
 namespace Ulearn.Core.Courses.Manager
 {
-	public class CourseManager
+	public abstract class CourseManager
 	{
 		private const string examplePackageName = "Help";
 
@@ -556,17 +556,6 @@ namespace Ulearn.Core.Courses.Manager
 		public FileInfo GenerateOrFindStudentZip(string courseId, Slide slide)
 		{
 			return exerciseStudentZipsCache.GenerateOrFindZip(courseId, slide, GetExtractedCourseDirectory(courseId).FullName);
-		}
-
-		public static DirectoryInfo GetCourseXmlDirectory(DirectoryInfo directory)
-		{
-			if (!directory.GetFile("course.xml").Exists)
-			{
-				var courseXmlDirectory = directory.GetFiles("course.xml", SearchOption.AllDirectories).FirstOrDefault()?.Directory;
-				if (courseXmlDirectory != null)
-					directory = courseXmlDirectory;
-			}
-			return directory;
 		}
 	}
 }

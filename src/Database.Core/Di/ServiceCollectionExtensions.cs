@@ -16,7 +16,7 @@ namespace Database.Di
 	{
 		public static IServiceCollection AddDatabaseServices(this IServiceCollection services)
 		{
-			services.AddSingleton(CourseManager.CourseStorageInstance);
+			services.AddSingleton(WebCourseManager.CourseStorageInstance);
 			services.AddSingleton<WebCourseManager>();
 			services.AddSingleton<IWebCourseManager>(x => x.GetRequiredService<WebCourseManager>());
 			services.AddSingleton<ICourseUpdater>(x => x.GetRequiredService<WebCourseManager>());

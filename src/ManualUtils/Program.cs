@@ -393,7 +393,7 @@ namespace ManualUtils
 
 		private static void ConvertZipsToCourseXmlInRoot()
 		{
-			var mainDirectory = CourseManager.GetCoursesDirectory();
+			var mainDirectory = WebCourseManager.GetCoursesDirectory();
 			var stagingDirectory = mainDirectory.GetSubdirectory("Courses.Staging");
 			var versionsDirectory = mainDirectory.GetSubdirectory("Courses.Versions");
 
@@ -439,7 +439,7 @@ namespace ManualUtils
 
 		private static async Task UploadStagingToDb(IServiceProvider serviceProvider)
 		{
-			var mainDirectory = CourseManager.GetCoursesDirectory();
+			var mainDirectory = WebCourseManager.GetCoursesDirectory();
 			var stagingDirectory = mainDirectory.GetSubdirectory("Courses.Staging");
 
 			var db = serviceProvider.GetService<UlearnDb>();
@@ -468,8 +468,8 @@ namespace ManualUtils
 
 		private static async Task UploadStagingFromDbAndExtractToCourses(IServiceProvider serviceProvider)
 		{
-			var courseManager = new CourseManager(CourseManager.GetCoursesDirectory());
 			var db = serviceProvider.GetService<UlearnDb>();
+			var courseManager = serviceProvider.GetService<IWebCourseManager>();
 
 			foreach (var courseFile in db.CourseFiles.AsNoTracking())
 			{

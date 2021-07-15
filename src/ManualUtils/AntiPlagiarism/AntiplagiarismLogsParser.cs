@@ -91,7 +91,6 @@ namespace ManualUtils.AntiPlagiarism
 					return w;
 				})
 				.ToList();
-			var courseManager = new CourseManager(CourseManager.GetCoursesDirectory());
 			var bp = courseStorage.GetCourse("basicprogramming");
 			var bp2 = courseStorage.GetCourse("basicprogramming2");
 			weights = weights.Select(w =>

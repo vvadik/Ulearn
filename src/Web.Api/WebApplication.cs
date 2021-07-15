@@ -33,7 +33,6 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Manager;
-using Ulearn.Core.Helpers;
 using Ulearn.Core.Metrics;
 using Ulearn.Core.RunCheckerJobApi;
 using Ulearn.Core.Telegram;
@@ -125,7 +124,7 @@ namespace Ulearn.Web.Api
 		protected override IApplicationBuilder UseStaticFiles(IApplicationBuilder app)
 		{
 			var contentTypeProvider = new FileExtensionContentTypeProvider(CourseStaticFilesHelper.AllowedExtensions);
-			var coursesDirectory = Path.Combine(CourseManager.GetCoursesDirectory().FullName, "Courses");
+			var coursesDirectory = Path.Combine(WebCourseManager.GetCoursesDirectory().FullName, "Courses");
 
 			var options = new RewriteOptions()
 				.AddRewrite(@"^courses/([^/]+)/files/(.+)", "courses/$1/$2", skipRemainingRules: true);
