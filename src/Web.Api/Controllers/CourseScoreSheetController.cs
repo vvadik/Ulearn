@@ -22,6 +22,7 @@ using Microsoft.Extensions.Options;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using Ulearn.Core.Configuration;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.GoogleSheet;
 using Ulearn.Web.Api.Models.Responses.Analytics;
 using Web.Api.Configuration;
@@ -41,12 +42,12 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly UlearnConfiguration configuration;
 		
 
-		public CourseScoreSheetController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo,
+		public CourseScoreSheetController(ICourseStorage courseStorage, UlearnDb db, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo,
 			IGroupMembersRepo groupMembersRepo, IUnitsRepo unitsRepo,
 			IGroupsRepo groupsRepo, IGroupAccessesRepo groupAccessesRepo,
 			ControllerUtils controllerUtils, IVisitsRepo visitsRepo, IAdditionalScoresRepo additionalScoresRepo,
 			IOptions<WebApiConfiguration> options)
-			: base(courseManager, db, usersRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 			this.courseRolesRepo = courseRolesRepo;
 			this.groupMembersRepo = groupMembersRepo;
@@ -258,7 +259,7 @@ namespace Ulearn.Web.Api.Controllers
 
 			var realPeriodFinish = periodFinish.Add(TimeSpan.FromDays(1));
 
-			var course = await courseManager.GetCourseAsync(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIds(course, UserId);
 			var visibleUnits = course.GetUnits(visibleUnitsIds);
 
