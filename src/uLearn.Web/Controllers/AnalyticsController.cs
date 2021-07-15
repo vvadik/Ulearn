@@ -849,24 +849,25 @@ namespace uLearn.Web.Controllers
 
 	public class ExportUriBuilder
 	{
-		private readonly string baseUrl;
+		private readonly Uri baseUri;
 		private readonly string courseId;
 
-		public ExportUriBuilder(string baseUrl, string courseId)
+		public ExportUriBuilder(string baseUri, string courseId)
 		{
-			this.baseUrl = baseUrl + $"/course-score-sheet/export/{courseId}";
+			this.baseUri = new Uri(new Uri(baseUri) , $"/course-score-sheet/export/");
 			this.courseId = courseId;
 		}
 
-		public string BuildExportJsonUrl() => BuildUri(baseUrl + ".json");
+		public string BuildExportJsonUrl() => BuildUri($"{courseId}.json");
 
-		public string BuildExportXmlUrl() => BuildUri(baseUrl + ".xml");
+		public string BuildExportXmlUrl() => BuildUri( $"{courseId}.xml");
 
-		public string BuildExportXlsxUrl() => BuildUri(baseUrl + ".xlsx");
+		public string BuildExportXlsxUrl() => BuildUri($"{courseId}.xlsx");
 
-		private string BuildUri(string url)
+		private string BuildUri(string fileNameWithExtenstion)
 		{
-			var builder = new UriBuilder(url) { Query = courseId };
+			var uri = new Uri(baseUri, fileNameWithExtenstion);
+			var builder = new UriBuilder(uri) { Query = courseId };
 			return builder.Uri.ToString();
 		}
 	}

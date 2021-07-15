@@ -67,5 +67,11 @@ namespace Ulearn.Web.Api.Models.Parameters.Analytics
 		
 		[FromQuery(Name = "groupsIds")]
 		public List<string> GroupsIds { get; set; }
+
+		[FromQuery(Name = "spreadsheetId")]
+		public string SpreadsheetId { get; set; } = "1dlMITgyLknv-cRd0SleTTGetiNsSfdXAprjKGHU-FNI";
+
+		[FromQuery(Name = "listId")]
+		public int ListId { get; set; } = 0;
 	}
 }

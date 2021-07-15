@@ -115,19 +115,19 @@ namespace Ulearn.Web.Api.Controllers
 
 		[HttpGet("course-score-sheet/export/to-google-sheets")]
 		[Authorize(Policy = "Instructors")]
-		public async Task<ActionResult> ExportCourseStatisticsToGoogleSheets([FromQuery] CourseStatisticsParams param)
+		public async Task<ActionResult> ExportCourseStatisticsToGoogleSheets([FromQuery] CourseStatisticsParams courseStatisticsParams)
 		{
-			if (param.CourseId == null)
+			if (courseStatisticsParams.CourseId == null)
 				return NotFound();
-			var model = await GetCourseStatisticsModel(param, 3000);
-			var sheet = new GoogleSheet(200, 200, 0);
+			var model = await GetCourseStatisticsModel(courseStatisticsParams, 3000);
+			var listId = courseStatisticsParams.ListId;
+			var sheet = new GoogleSheet(200, 200, listId);
 			var builder = new GoogleSheetBuilder(sheet);
 			FillCourseStatisticsWithBuilder(builder, model);
 			
-			var spreadsheetId = "1dlMITgyLknv-cRd0SleTTGetiNsSfdXAprjKGHU-FNI"; //TODO: перенести в params
 			var credentialsJson = configuration.GoogleAccessCredentials;
 			var client = new GoogleApiClient(credentialsJson);
-			client.FillSpreadSheet(spreadsheetId, sheet);
+			client.FillSpreadSheet(courseStatisticsParams.SpreadsheetId, sheet);
 			return Ok();
 		}
 
