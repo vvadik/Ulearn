@@ -27,7 +27,6 @@ namespace Ulearn.Core.GoogleSheet
 			var requests = RequestCreator.GetRequests(googleSheet);
 			service.Spreadsheets.BatchUpdate(new BatchUpdateSpreadsheetRequest { Requests = requests },
 				spreadsheetId).Execute();
-			//TODO: проверить асинхронные методы
 		}
 
 		private void WhiteWashSheet(string spreadsheetId, int listId, int length)
