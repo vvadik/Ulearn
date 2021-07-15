@@ -34,7 +34,9 @@ namespace Database
 
 		public void MigrateToLatestVersion()
 		{
+			Database.SetCommandTimeout(TimeSpan.FromMinutes(5));
 			Database.Migrate();
+			Database.SetCommandTimeout(TimeSpan.FromSeconds(30));
 		}
 
 		public Task CreateInitialDataAsync(InitialDataCreator creator)
@@ -269,6 +271,7 @@ namespace Database
 			AddIndex<EnabledAdditionalScoringGroup>(modelBuilder, c => c.GroupId);
 
 			AddIndex<ExerciseCodeReview>(modelBuilder, c => c.ExerciseCheckingId);
+			AddIndex<ExerciseCodeReview>(modelBuilder, c => new { c.CourseId, c.SlideId, c.SubmissionAuthorId });
 
 			AddIndex<FeedViewTimestamp>(modelBuilder, c => c.UserId);
 			AddIndex<FeedViewTimestamp>(modelBuilder, c => c.Timestamp);

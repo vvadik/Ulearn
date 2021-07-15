@@ -50,10 +50,10 @@ namespace Ulearn.Web.Api.Controllers.Runner
 
 			var exerciseMetricId = RunnerSetResultController.GetExerciseMetricId(submission.CourseId, exerciseSlide);
 
-			await CreateStyleErrorsReviewsForSubmission(submission.Id, result.StyleErrors, exerciseMetricId);
+			await CreateStyleErrorsReviewsForSubmission(submission, result.StyleErrors, exerciseMetricId);
 		}
 
-		public async Task<List<ExerciseCodeReview>> CreateStyleErrorsReviewsForSubmission(int? submissionId, List<StyleError> styleErrors, string exerciseMetricId)
+		public async Task<List<ExerciseCodeReview>> CreateStyleErrorsReviewsForSubmission(UserExerciseSubmission submission, List<StyleError> styleErrors, string exerciseMetricId)
 		{
 			if (ulearnBotUserId == null)
 				ulearnBotUserId = await usersRepo.GetUlearnBotUserId();
@@ -64,7 +64,7 @@ namespace Ulearn.Web.Api.Controllers.Runner
 			foreach (var error in styleErrors)
 			{
 				var review = await slideCheckingsRepo.AddExerciseCodeReview(
-					submissionId,
+					submission,
 					ulearnBotUserId,
 					error.Span.StartLinePosition.Line,
 					error.Span.StartLinePosition.Character,

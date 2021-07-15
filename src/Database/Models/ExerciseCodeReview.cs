@@ -56,6 +56,20 @@ namespace Database.Models
 
 		public virtual IList<ExerciseCodeReviewComment> Comments { get; set; }
 
+		[Required]
+		[StringLength(100)]
+		[Index("IDX_ExerciseCodeReview_Course_Slide_SubmissionAuthor", 1)]
+		public string CourseId { get; set; }
+
+		[Required]
+		[Index("IDX_ExerciseCodeReview_Course_Slide_SubmissionAuthor", 2)]
+		public Guid SlideId { get; set; }
+
+		//[Required]
+		[StringLength(64)]
+		[Index("IDX_ExerciseCodeReview_Course_Slide_SubmissionAuthor", 3)]
+		public string SubmissionAuthorId { get; set; }
+
 		[NotMapped]
 		public List<ExerciseCodeReviewComment> NotDeletedComments => Comments.Where(r => !r.IsDeleted).OrderBy(r => r.AddingTime).ToList();
 	}

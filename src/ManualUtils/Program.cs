@@ -97,7 +97,8 @@ namespace ManualUtils
 			//ConvertZipsToCourseXmlInRoot();
 			//await UploadStagingToDb(serviceProvider);
 			//await UploadStagingFromDbAndExtractToCourses(serviceProvider);
-			await SetCourseIdAndSlideIdInLikesAndPromotes(db);
+			//await SetCourseIdAndSlideIdInLikesAndPromotes(db);
+			await SetNewFieldsInReview(db, serviceProvider);
 		}
 
 		private static void GenerateUpdateSequences()
@@ -506,6 +507,36 @@ namespace ManualUtils
 				promote.SlideId = promote.Submission.SlideId;
 			}
 			db.SaveChanges();
+		}
+
+		private static async Task SetNewFieldsInReview(UlearnDb db, IServiceProvider serviceProvider)
+		{
+			var reviewsIds = await db.ExerciseCodeReviews.Where(r=> r.CourseId == "").Select(r => r.Id).ToListAsync();
+			Console.WriteLine("Count " + reviewsIds.Count);
+			var i = 0;
+			foreach (var group in reviewsIds.GroupBy(r => r / 2000))
+			{
+				using (var scope = serviceProvider.CreateScope())
+				{
+					var scopedDb = (UlearnDb)scope.ServiceProvider.GetService(typeof(UlearnDb));
+					var ids = group.ToList();
+					i += ids.Count;
+					var reviews = await scopedDb.ExerciseCodeReviews
+						.Include(s => s.ExerciseChecking)
+						.Include(s => s.Submission)
+						.Where(s => ids.Contains(s.Id))
+						.ToListAsync();
+					foreach (var review in reviews)
+					{
+						review.CourseId = review.Submission?.CourseId ?? review.ExerciseChecking?.CourseId ?? "";
+						review.SlideId = (review.Submission?.SlideId ?? review.ExerciseChecking?.SlideId) ?? default;
+						review.SubmissionAuthorId = review.Submission?.UserId ?? review.ExerciseChecking?.UserId;
+					}
+
+					scopedDb.SaveChanges();
+				}
+				Console.WriteLine($"{i} / {reviewsIds.Count}");
+			}
 		}
 	}
 }

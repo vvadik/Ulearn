@@ -1,7 +1,7 @@
 uLearn
 =======
 
-[![Build status](https://tc.skbkontur.ru/app/rest/builds/buildType:\(id:Ulearn_BuildSolution\)/statusIcon)](https://tc.skbkontur.ru/app/rest/builds/buildType:\(id:Ulearn_BuildSolution\)/statusIcon)
+[![Build status](https://tc.skbkontur.ru/app/rest/builds/buildType:\(id:Ulearn_Net5\)/statusIcon)](https://tc.skbkontur.ru/app/rest/builds/buildType:\(id:Ulearn_Net5\)/statusIcon)
 
 
 E-learning platform and courses

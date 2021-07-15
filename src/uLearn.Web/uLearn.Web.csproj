@@ -37,6 +37,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Use64BitIISExpress />
     <LangVersion>default</LangVersion>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
   <PropertyGroup>
     <GeneratedMSBuildEditorConfigFile>$(IntermediateOutputPath)$(MSBuildProjectName).GeneratedMSBuildEditorConfig.editorconfig</GeneratedMSBuildEditorConfigFile>
@@ -1229,7 +1230,6 @@
     <Error Condition="!Exists('..\packages\EmptyFiles.2.6.0\build\EmptyFiles.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EmptyFiles.2.6.0\build\EmptyFiles.targets'))" />
     <Error Condition="!Exists('..\packages\NUnit.3.10.0\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit.3.10.0\build\NUnit.props'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Net.Compilers.3.9.0\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Net.Compilers.3.9.0\build\Microsoft.Net.Compilers.props'))" />
-    <Error Condition="!Exists('..\packages\Kontur.IDevOps.Tools.GitCommit2AssemblyTitle.2.0.25\build\netstandard2.0\Kontur.IDevOps.Tools.GitCommit2AssemblyTitle.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Kontur.IDevOps.Tools.GitCommit2AssemblyTitle.2.0.25\build\netstandard2.0\Kontur.IDevOps.Tools.GitCommit2AssemblyTitle.targets'))" />
   </Target>
   <Import Project="..\packages\Microsoft.Web.WebJobs.Publish.1.0.13\tools\webjobs.targets" Condition="Exists('..\packages\Microsoft.Web.WebJobs.Publish.1.0.13\tools\webjobs.targets')" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
@@ -1240,7 +1240,6 @@
   <Import Project="..\packages\OctoPack.3.6.5\build\OctoPack.targets" Condition="Exists('..\packages\OctoPack.3.6.5\build\OctoPack.targets')" />
   <Import Project="..\packages\ApprovalTests.5.4.5\build\ApprovalTests.targets" Condition="Exists('..\packages\ApprovalTests.5.4.5\build\ApprovalTests.targets')" />
   <Import Project="..\packages\EmptyFiles.2.6.0\build\EmptyFiles.targets" Condition="Exists('..\packages\EmptyFiles.2.6.0\build\EmptyFiles.targets')" />
-  <Import Project="..\packages\Kontur.IDevOps.Tools.GitCommit2AssemblyTitle.2.0.25\build\netstandard2.0\Kontur.IDevOps.Tools.GitCommit2AssemblyTitle.targets" Condition="Exists('..\packages\Kontur.IDevOps.Tools.GitCommit2AssemblyTitle.2.0.25\build\netstandard2.0\Kontur.IDevOps.Tools.GitCommit2AssemblyTitle.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

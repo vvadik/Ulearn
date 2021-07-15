@@ -32,6 +32,7 @@ namespace Database.Models
 		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlideAndTime", 3)]
 		public DateTime Timestamp { get; set; }
 
+		// Пользователь, чья работа проверяется. А кто проверил, написано в LockedById
 		[Required]
 		[StringLength(64)]
 		[Index("IDX_AbstractSlideChecking_AbstractSlideCheckingBySlideAndUser", 3)]

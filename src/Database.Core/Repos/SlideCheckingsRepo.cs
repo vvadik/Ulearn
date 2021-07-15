@@ -137,6 +137,7 @@ namespace Database.Repos
 				if (!isRightAnswer)
 					return (0, null);
 			}
+
 			var checkedScoresAndPercents = await GetCheckedScoresAndPercents(courseId, slide, userId, null);
 			var automaticScore = slide.Scoring.PassedTestsScore;
 			if (checkedScoresAndPercents.Count == 0)
@@ -414,14 +415,17 @@ namespace Database.Repos
 			await db.SaveChangesAsync();
 		}
 
-		private async Task<ExerciseCodeReview> AddExerciseCodeReview(int? submissionId, [CanBeNull] ManualExerciseChecking checking, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime)
+		private async Task<ExerciseCodeReview> AddExerciseCodeReview([CanBeNull] UserExerciseSubmission submission, [CanBeNull] ManualExerciseChecking checking, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime)
 		{
 			var review = db.ExerciseCodeReviews.Add(new ExerciseCodeReview
 			{
+				CourseId = submission?.CourseId ?? checking?.CourseId,
+				SlideId = (submission?.SlideId ?? checking?.SlideId)!.Value,
+				SubmissionAuthorId = submission?.UserId ?? checking?.UserId,
 				AuthorId = userId,
 				Comment = comment,
 				ExerciseCheckingId = checking?.Id,
-				SubmissionId = submissionId,
+				SubmissionId = submission?.Id,
 				StartLine = startLine,
 				StartPosition = startPosition,
 				FinishLine = finishLine,
@@ -439,9 +443,9 @@ namespace Database.Repos
 			return AddExerciseCodeReview(null, checking, userId, startLine, startPosition, finishLine, finishPosition, comment, setAddingTime);
 		}
 
-		public Task<ExerciseCodeReview> AddExerciseCodeReview(int? submissionId, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime = false)
+		public Task<ExerciseCodeReview> AddExerciseCodeReview([CanBeNull] UserExerciseSubmission submission, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime = false)
 		{
-			return AddExerciseCodeReview(submissionId, null, userId, startLine, startPosition, finishLine, finishPosition, comment, setAddingTime);
+			return AddExerciseCodeReview(submission, null, userId, startLine, startPosition, finishLine, finishPosition, comment, setAddingTime);
 		}
 
 		public async Task<ExerciseCodeReview> FindExerciseCodeReviewById(int reviewId)
@@ -472,19 +476,15 @@ namespace Database.Repos
 
 		public async Task<List<string>> GetTopUserReviewComments(string courseId, Guid slideId, string userId, int count)
 		{
-			var result = await db.ExerciseCodeReviews.Include(r => r.ExerciseChecking)
-				.Where(r => r.ExerciseChecking.CourseId == courseId &&
-							r.ExerciseChecking.SlideId == slideId &&
-							r.AuthorId == userId &&
-							!r.HiddenFromTopComments &&
-							!r.IsDeleted)
-				.Select(r => new { r.Comment, r.ExerciseChecking.Timestamp })
+			var result = await db.ExerciseCodeReviews
+				.Where(r => r.CourseId == courseId && r.SlideId == slideId && r.AuthorId == userId && !r.HiddenFromTopComments && !r.IsDeleted)
+				.Select(r => new { r.Comment, r.AddingTime })
 				.GroupBy(r => r.Comment)
 				.Select(g => new
 				{
 					g.Key,
 					Count = g.Count(),
-					Timestamp = g.Max(r => r.Timestamp)
+					Timestamp = g.Max(r => r.AddingTime)
 				})
 				.OrderByDescending(g => g.Count)
 				.ThenByDescending(g => g.Timestamp)
@@ -497,12 +497,8 @@ namespace Database.Repos
 		public async Task<List<string>> GetTopOtherUsersReviewComments(string courseId, Guid slideId, string userId, int count, List<string> excludeComments)
 		{
 			var excludeCommentsSet = excludeComments.ToHashSet();
-			var result = (await db.ExerciseCodeReviews.Include(r => r.ExerciseChecking)
-					.Where(r => r.ExerciseChecking.CourseId == courseId &&
-								r.ExerciseChecking.SlideId == slideId &&
-								r.AuthorId != userId &&
-								!r.HiddenFromTopComments &&
-								!r.IsDeleted)
+			var result = (await db.ExerciseCodeReviews
+					.Where(r => r.CourseId == courseId && r.SlideId == slideId && r.AuthorId != userId && !r.HiddenFromTopComments && !r.IsDeleted)
 					.GroupBy(r => r.Comment)
 					.Select(g => new { g.Key, Count = g.Count() })
 					.OrderByDescending(g => g.Count)
@@ -539,14 +535,9 @@ namespace Database.Repos
 
 		public async Task HideFromTopCodeReviewComments(string courseId, Guid slideId, string userId, string comment)
 		{
-			var reviews = await db.ExerciseCodeReviews.Include(r => r.ExerciseChecking)
-				.Where(r => r.ExerciseChecking.CourseId == courseId
-							&& r.ExerciseChecking.SlideId == slideId
-							&& r.AuthorId == userId
-							&& r.Comment == comment
-							&& !r.IsDeleted)
+			var reviews = await db.ExerciseCodeReviews
+				.Where(r => r.CourseId == courseId && r.SlideId == slideId && r.AuthorId == userId && r.Comment == comment && !r.IsDeleted)
 				.ToListAsync();
-
 			foreach (var review in reviews)
 				review.HiddenFromTopComments = true;
 			await db.SaveChangesAsync();
@@ -555,12 +546,9 @@ namespace Database.Repos
 		public async Task<List<ExerciseCodeReview>> GetLastYearReviewComments(string courseId, Guid slideId)
 		{
 			var lastYear = DateTime.Today.AddYears(-1);
-			var result = await db.ExerciseCodeReviews.Where(
-				r => r.ExerciseChecking.CourseId == courseId &&
-					r.ExerciseChecking.SlideId == slideId &&
-					!r.IsDeleted &&
-					r.ExerciseChecking.Timestamp > lastYear
-			).ToListAsync();
+			var result = await db.ExerciseCodeReviews
+				.Where(r => r.CourseId == courseId && r.SlideId == slideId && !r.IsDeleted && r.AddingTime > lastYear)
+				.ToListAsync();
 			return result;
 		}
 
@@ -591,17 +579,11 @@ namespace Database.Repos
 			return await db.ExerciseCodeReviewComments
 				.Include(c => c.Author)
 				.Where(c =>
-					(
-						c.Review.ExerciseChecking.CourseId == courseId
-						&& c.Review.ExerciseChecking.SlideId == slideId
-						&& c.Review.ExerciseChecking.UserId == userId
-						&& !c.Review.IsDeleted
-						||
-						c.Review.Submission.CourseId == courseId
-						&& c.Review.Submission.SlideId == slideId
-						&& c.Review.Submission.UserId == userId
-					) && !c.IsDeleted
-				)
+					c.Review.CourseId == courseId
+					&& c.Review.SlideId == slideId
+					&& c.Review.SubmissionAuthorId == userId
+					&& !c.Review.IsDeleted
+					&& !c.IsDeleted)
 				.ToListAsync();
 		}
 
@@ -638,8 +620,10 @@ namespace Database.Repos
 
 		public async Task RefreshExerciseStatisticsMaterializedViews()
 		{
+			db.Database.SetCommandTimeout(TimeSpan.FromMinutes(2));
 			await db.RefreshMaterializedView(ExerciseAttemptedUsersCount.ViewName);
 			await db.RefreshMaterializedView(ExerciseUsersWithRightAnswerCount.ViewName);
+			db.Database.SetCommandTimeout(TimeSpan.FromSeconds(30));
 		}
 	}
 }
