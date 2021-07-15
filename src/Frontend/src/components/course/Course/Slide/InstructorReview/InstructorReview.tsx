@@ -3,7 +3,7 @@ import React from "react";
 import { FLAT_THEME, Select, Tabs, ThemeContext, Toggle } from "ui";
 import { UnControlled, } from "react-codemirror2";
 
-import { Review } from "../Blocks/Exercise/Review/Review";
+import Review from "../Blocks/Exercise/Review";
 import { BlocksWrapper, } from "../Blocks";
 import ScoreControls from "./ScoreControls/ScoreControls";
 import CourseLoader from "../../CourseLoader";
@@ -126,7 +126,6 @@ class InstructorReview extends React.Component<Props, State> {
 	componentDidUpdate = (prevProps: Readonly<Props>, prevState: Readonly<State>): void => {
 		const { studentSubmissions, } = this.props;
 		const { currentSubmission, reviews, diffInfo, showDiff, } = this.state;
-
 		if(!currentSubmission && studentSubmissions && studentSubmissions.length > 0) {
 			this.loadSubmission(studentSubmissions, 0);
 			return;
@@ -154,16 +153,12 @@ class InstructorReview extends React.Component<Props, State> {
 					diffInfo,
 					showDiff,
 				);
-				const reviewsCompare = reviews.map(
-					r => getDataFromReviewToCompareChanges(r));
-				const newReviewsCompare = newReviews.reviews.map(
-					r => getDataFromReviewToCompareChanges(r));
-
+				const reviewsCompare = reviews.map(getDataFromReviewToCompareChanges);
+				const newReviewsCompare = newReviews.reviews.map(getDataFromReviewToCompareChanges);
 				// outdated should not be changed
 				//	const newOutdatedReviewsCompare = newReviews.outdatedReviews.map(r => getDataFromReviewToCompareChanges(r));
 				//  const outdatedReviewsCompare = outdatedReviews.map(r => getDataFromReviewToCompareChanges(r));
 				//  if(JSON.stringify(outdatedReviewsCompare) !== JSON.stringify(newOutdatedReviewsCompare)) {}
-
 				if(JSON.stringify(newReviewsCompare) !== JSON.stringify(reviewsCompare)) {
 					this.setState({
 						currentSubmission: submission,
@@ -561,7 +556,6 @@ class InstructorReview extends React.Component<Props, State> {
 				anchor: getReviewAnchorTop(r, editor,),
 			})));
 		}
-
 		return allReviews;
 	};
 
@@ -740,7 +734,7 @@ class InstructorReview extends React.Component<Props, State> {
 
 		this.setState({
 			markers,
-		}, () => selectedReviewId > -1 && this.highlightReview(selectedReviewId, editor,));
+		}, () => selectedReviewId > -1 && this.highlightReview(selectedReviewId));
 	};
 
 	formatLine = (lineNumber: number): string => {
@@ -774,7 +768,7 @@ class InstructorReview extends React.Component<Props, State> {
 
 		for (const selection of selections) {
 			const range = selection;
-			const selectedText = doc.getSelection();//ЕСЛИ УБРАТЬ ВЫБОР ТЕКСТА, НЕ ДОБАВИТЬ КОММЕНТ!
+			const selectedText = doc.getSelection();
 
 			if(selectedText.length > 0) {
 				const [startRange, endRange,] = this.getStartAndEndFromRange(range);
@@ -842,7 +836,7 @@ class InstructorReview extends React.Component<Props, State> {
 				startRange.ch,
 				actualEndLine,
 				endRange.ch,
-			).then(r => this.highlightReview(r.id, editor,));
+			).then(r => this.highlightReview(r.id));
 		} else {
 			addReview(currentSubmission.id,
 				comment,
@@ -850,7 +844,7 @@ class InstructorReview extends React.Component<Props, State> {
 				startRange.ch,
 				endRange.line,
 				endRange.ch
-			).then(r => this.highlightReview(r.id, editor,));
+			).then(r => this.highlightReview(r.id));
 		}
 		onAddReview(comment);
 
@@ -964,24 +958,28 @@ class InstructorReview extends React.Component<Props, State> {
 	};
 
 	onCursorActivity = (): void => {
-		const { reviews, outdatedReviews, editor, selectedReviewId, } = this.state;
+		const { reviews, outdatedReviews, editor, selectedReviewId, showDiff, } = this.state;
 
 		if(!editor) {
 			return;
 		}
 		const doc = editor.getDoc();
 		const cursor = doc.getCursor();
-
 		document.addEventListener('mouseup', this.onMouseUp);
+
+		if(cursor.sticky === undefined) {
+			return;
+		}
 
 		if(doc.getSelection().length > 0) {
 			if(selectedReviewId > -1) {
-				this.highlightReview(-1, editor);
+				this.highlightReview(-1);
 			}
 			return;
 		}
 
-		this.highlightReview(getSelectedReviewIdByCursor(reviews.concat(outdatedReviews), doc, cursor), editor);
+		const id = getSelectedReviewIdByCursor(reviews.concat(showDiff ? outdatedReviews : []), doc, cursor);
+		this.highlightReview(id);
 	};
 
 	selectComment = (e: React.MouseEvent<Element, MouseEvent> | React.FocusEvent, id: number,): void => {
@@ -989,15 +987,17 @@ class InstructorReview extends React.Component<Props, State> {
 		e.stopPropagation();
 
 		if(selectedReviewId !== id && editor) {
-			this.highlightReview(id, editor);
+			this.highlightReview(id);
 		}
 	};
 
-	highlightReview = (id: number, editor: Editor): void => {
-		const {
-			markers,
-			selectedReviewId,
-		} = this.state;
+	highlightReview = (id: number): void => {
+		const { markers, selectedReviewId, editor, } = this.state;
+
+		if(!editor) {
+			return;
+		}
+
 		const doc = editor.getDoc();
 		const newMarkers = { ...markers };
 
@@ -1012,6 +1012,10 @@ class InstructorReview extends React.Component<Props, State> {
 				return pv;
 			}, [] as TextMarker[]);
 
+		if(!newMarkers[id] && id > -1) {
+			return;
+		}
+
 		if(newMarkers[selectedReviewId]) {
 			newMarkers[selectedReviewId] = resetMarkers(newMarkers[selectedReviewId], styles.defaultMarker,);
 		}
@@ -1019,6 +1023,7 @@ class InstructorReview extends React.Component<Props, State> {
 		if(newMarkers[id]) {
 			newMarkers[id] = resetMarkers(newMarkers[id], styles.selectedMarker,);
 		}
+
 		this.setState({
 			selectedReviewId: id,
 			markers: newMarkers,

@@ -2,6 +2,7 @@ import React from "react";
 import { CourseAccessType, CourseRoleType, SystemAccessType } from "../consts/accessType";
 import { UserInfo } from "../utils/courseRoles";
 import { getMockedUser } from "../components/comments/storiesData";
+import { clone } from "../utils/jsonExtensions";
 
 export const mock = (): unknown => ({});
 
@@ -47,24 +48,35 @@ export class StoryUpdater<T> extends React.Component<Props<T>, State<T>> {
 				if(enableLogger) {
 					console.log(`UPDATER: binding ${ key }`);
 				}
-
 				const base = args[key];
 
 				// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 				// @ts-ignore
-				args[key] = ((...funcArgs: unknown[]) => {
+				args[key] = (...funcArgs: unknown[]) => {
 					// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 					// @ts-ignore
-					const res = base.bind(args)(...funcArgs);
-					this.version++;
+					let res = base.bind(args)(...funcArgs);
 					if(enableLogger) {
 						console.log(`UPDATER: get new version ${ this.version }`);
 					}
-					this.setState({
-						version: this.version,
-					});
-					return res;
-				});
+					if(res) {
+						if(res.then) {
+							res = res.finally(() => {
+								this.version++;
+								this.setState({
+									version: this.version,
+								});
+							});
+						} else {
+							this.version++;
+							this.setState({
+								version: this.version,
+							});
+						}
+
+						return res;
+					}
+				};
 			}
 		}
 
@@ -78,7 +90,7 @@ export class StoryUpdater<T> extends React.Component<Props<T>, State<T>> {
 		const { childrenBuilder, } = this.props;
 		const { args, } = this.state;
 
-		return childrenBuilder(args);
+		return childrenBuilder({ ...args, } as unknown as T);
 	}
 }
 

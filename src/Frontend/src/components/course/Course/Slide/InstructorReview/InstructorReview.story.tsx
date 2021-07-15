@@ -410,18 +410,35 @@ const args: Props = {
 		if(!this.favouriteReviews) {
 			return Promise.resolve(comment);
 		}
-		this.favouriteReviews = [...this.favouriteReviews, comment];
-		return returnPromiseAfterDelay(loadingTimes.toggleReviewFavourite, comment);
+
+		return returnPromiseAfterDelay(loadingTimes.toggleReviewFavourite, comment).then(r => {
+				if(this.favouriteReviews) {
+					this.favouriteReviews = [...this.favouriteReviews, comment];
+				}
+				return r;
+			}
+		);
 	},
 	onToggleReviewFavourite(favouriteCommentId: number) {
-		if(this.favouriteReviews) {
-			const commentIndex = this.favouriteReviews.findIndex(c => c.id === favouriteCommentId);
-			if(commentIndex > -1) {
-				this.favouriteReviews = clone(this.favouriteReviews);
-				const comment = this.favouriteReviews[commentIndex];
-				this.favouriteReviews[commentIndex] = { ...comment, isFavourite: !comment.isFavourite };
-			}
+		if(!this.favouriteReviews) {
+			return Promise.resolve({} as FavouriteReview);
 		}
+
+		const commentIndex = this.favouriteReviews.findIndex(c => c.id === favouriteCommentId);
+		const comment = {
+			...this.favouriteReviews[commentIndex],
+			isFavourite: !this.favouriteReviews[commentIndex].isFavourite
+		};
+
+		return returnPromiseAfterDelay(loadingTimes.toggleReviewFavourite, comment).then(r => {
+				if(this.favouriteReviews) {
+					if(commentIndex > -1) {
+						this.favouriteReviews[commentIndex] = comment;
+					}
+				}
+				return r;
+			}
+		);
 	},
 	onProhibitFurtherReviewToggleChange(value: boolean) {
 		this.prohibitFurtherManualChecking = value;
@@ -436,15 +453,12 @@ const args: Props = {
 				const review = submission.manualCheckingReviews.find(c => c.id === id);
 				if(review) {
 					review.comments = review.comments.filter(c => c.id !== reviewId);
-					submission.manualCheckingReviews = [
-						...submission.manualCheckingReviews.slice(0, submission.manualCheckingReviews.length - 2),
-						{ ...review }
-					];
-					return;
 				}
+			} else {
+				submission.manualCheckingReviews = submission.manualCheckingReviews.filter(c => c.id !== id);
 			}
-			submission.manualCheckingReviews = submission.manualCheckingReviews.filter(c => c.id !== id);
 		}
+		return returnPromiseAfterDelay(loadingTimes.addReview, { status: 200 });
 	},
 	addReview(
 		submissionId: number,
@@ -481,29 +495,41 @@ const args: Props = {
 		if(review) {
 			if(reviewId) {
 				const comment = review.comments.find(c => c.id === id);
-				if(comment) {
-					comment.text = text;
-					comment.renderedText = renderMd(text);
-				}
+				return returnPromiseAfterDelay(loadingTimes.addReview, comment).then((r) => {
+					if(comment) {
+						comment.text = text;
+						comment.renderedText = renderMd(text);
+					}
+					return r;
+				});
 			} else {
-				review.comment = text;
-				review.renderedComment = renderMd(text);
+				return returnPromiseAfterDelay(loadingTimes.addReview, review).then((r) => {
+					review.comment = text;
+					review.renderedComment = renderMd(text);
+					return r;
+				});
 			}
 		}
+		return returnPromiseAfterDelay(loadingTimes.addReview, {} as ReviewCommentResponse);
 	},
 	addReviewComment(submissionId: number, reviewId: number, commentText: string) {
 		const submission = this.studentSubmissions?.find(s => s.id === submissionId);
 		const review = submission?.manualCheckingReviews.find(r => r.id === reviewId);
-		if(review && this.user) {
-			const comment: ReviewCommentResponse = {
-				id: extra.reviewId++,
-				text: commentText,
-				renderedText: renderMd(commentText),
-				publishTime: new Date().toDateString(),
-				author: this.user,
-			};
-			review.comments.push(comment);
-		}
+		const comment: ReviewCommentResponse = {
+			id: extra.reviewId++,
+			text: commentText,
+			renderedText: renderMd(commentText),
+			publishTime: new Date().toDateString(),
+			author: this.user || getMockedUser({}),
+		};
+
+		return returnPromiseAfterDelay(loadingTimes.addReview, comment).then((r) => {
+			if(review && this.user) {
+				review.comments = [...review.comments, comment];
+			}
+
+			return r;
+		});
 	},
 	getAntiplagiarismStatus(submissionId: number): Promise<AntiplagiarismStatusResponse | string> {
 		const rnd = Math.random();

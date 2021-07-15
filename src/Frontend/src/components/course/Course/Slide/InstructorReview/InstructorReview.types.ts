@@ -1,5 +1,5 @@
 import { UserInfo } from "src/utils/courseRoles";
-import { ShortGroupInfo } from "src/models/comments";
+import { Response, ShortGroupInfo } from "src/models/comments";
 import {
 	AntiplagiarismInfo,
 	AntiplagiarismStatusResponse,
@@ -7,7 +7,7 @@ import {
 	FavouriteReviewResponse
 } from "src/models/instructor";
 import { ShortUserInfo } from "src/models/users";
-import { ReviewInfo, SubmissionInfo } from "src/models/exercise";
+import { ReviewCommentResponse, ReviewInfo, SubmissionInfo } from "src/models/exercise";
 import { GroupsInfoResponse } from "src/models/groups";
 import React from "react";
 import { SlideContext } from "../Slide";
@@ -43,7 +43,7 @@ export interface ApiFromRedux {
 	onProhibitFurtherReviewToggleChange: (value: boolean) => void;
 	onAddReview: (comment: string) => Promise<FavouriteReview>;
 	onAddReviewToFavourite: (comment: string) => Promise<FavouriteReview>;
-	onToggleReviewFavourite: (commentId: number) => void;
+	onToggleReviewFavourite: (commentId: number) => Promise<FavouriteReview>;
 
 	addReview: (
 		submissionId: number,
@@ -53,9 +53,9 @@ export interface ApiFromRedux {
 		finishLine: number,
 		finishPosition: number,
 	) => Promise<ReviewInfo>;
-	addReviewComment: (submissionId: number, reviewId: number, comment: string) => void;
-	deleteReviewOrComment: (submissionId: number, reviewId: number, commentId?: number) => void;
-	editReviewOrComment: (text: string, submissionId: number, reviewId: number, commentId?: number) => void;
+	addReviewComment: (submissionId: number, reviewId: number, comment: string) => Promise<ReviewCommentResponse>;
+	deleteReviewOrComment: (submissionId: number, reviewId: number, commentId?: number) => Promise<Response>;
+	editReviewOrComment: (text: string, submissionId: number, reviewId: number, commentId?: number) => Promise<ReviewInfo | ReviewCommentResponse>;
 }
 
 export interface Props extends PropsFromRedux, ApiFromRedux {
