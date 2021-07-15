@@ -125,6 +125,7 @@ namespace Ulearn.Web.Api
 		{
 			var contentTypeProvider = new FileExtensionContentTypeProvider(CourseStaticFilesHelper.AllowedExtensions);
 			var coursesDirectory = Path.Combine(WebCourseManager.GetCoursesDirectory().FullName, "Courses");
+			new DirectoryInfo(coursesDirectory).EnsureExists();
 
 			var options = new RewriteOptions()
 				.AddRewrite(@"^courses/([^/]+)/files/(.+)", "courses/$1/$2", skipRemainingRules: true);
