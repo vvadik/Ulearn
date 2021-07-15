@@ -19,9 +19,9 @@ using Newtonsoft.Json.Converters;
 using uLearn.Web.FilterAttributes;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
-using Ulearn.Core;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 
@@ -32,7 +32,7 @@ namespace uLearn.Web.Controllers
 	{
 		private readonly UserSolutionsRepo userSolutionsRepo;
 		private readonly GroupsRepo groupsRepo;
-		private readonly CourseManager courseManager;
+		private readonly ICourseStorage courseStorage;
 		private static readonly IAntiPlagiarismClient antiPlagiarismClient;
 
 		static AntiPlagiarismController()
@@ -47,14 +47,14 @@ namespace uLearn.Web.Controllers
 			this.groupsRepo = groupsRepo;
 		}
 
-		public AntiPlagiarismController(ULearnDb db, WebCourseManager courseManager)
-			: this(new UserSolutionsRepo(db), new GroupsRepo(db, courseManager))
+		public AntiPlagiarismController(ULearnDb db, ICourseStorage courseStorage)
+			: this(new UserSolutionsRepo(db), new GroupsRepo(db, courseStorage))
 		{
-			this.courseManager = courseManager;
+			this.courseStorage = courseStorage;
 		}
 
 		public AntiPlagiarismController()
-			: this(new ULearnDb(), WebCourseManager.Instance)
+			: this(new ULearnDb(), WebCourseManager.CourseStorageInstance)
 		{
 		}
 
@@ -64,7 +64,7 @@ namespace uLearn.Web.Controllers
 			if (!string.Equals(submission.CourseId, courseId, StringComparison.InvariantCultureIgnoreCase))
 				return HttpNotFound();
 
-			var slide = courseManager.FindCourse(courseId)?.FindSlideByIdNotSafe(submission.SlideId) as ExerciseSlide;
+			var slide = courseStorage.FindCourse(courseId)?.FindSlideByIdNotSafe(submission.SlideId) as ExerciseSlide;
 			if (slide == null)
 				return HttpNotFound();
 
@@ -137,7 +137,7 @@ namespace uLearn.Web.Controllers
 			var usersArchivedGroups = groupsRepo.GetUsersGroupsNamesAsStrings(courseId, userIds, new MockUserCanSeeAllGroups(), actual: false, archived: true).ToDefaultDictionary();
 			var isCourseOrSysAdmin = User.HasAccessFor(courseId, CourseRole.CourseAdmin);
 
-			var course = courseManager.FindCourse(courseId);
+			var course = courseStorage.FindCourse(courseId);
 			var slide = course?.FindSlideByIdNotSafe(submission.SlideId);
 			var details = new AntiPlagiarismDetailsModel
 			{
@@ -166,7 +166,7 @@ namespace uLearn.Web.Controllers
 			var courseId = submission.CourseId;
 			var slideId = submission.SlideId;
 			var userId = submission.UserId;
-			var slide = courseManager.FindCourse(courseId)?.FindSlideByIdNotSafe(slideId);
+			var slide = courseStorage.FindCourse(courseId)?.FindSlideByIdNotSafe(slideId);
 			if (slide == null)
 				return HttpNotFound();
 			var submissions = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).ToList();

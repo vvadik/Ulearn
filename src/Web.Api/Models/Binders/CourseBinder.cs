@@ -4,6 +4,7 @@ using Database;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 
 namespace Ulearn.Web.Api.Models.Binders
 {
@@ -17,11 +18,11 @@ namespace Ulearn.Web.Api.Models.Binders
 	 */
 	public class CourseBinder : IModelBinder
 	{
-		private readonly IWebCourseManager courseManager;
+		private readonly ICourseStorage courseStorage;
 
-		public CourseBinder(IWebCourseManager courseManager)
+		public CourseBinder(ICourseStorage courseStorage)
 		{
-			this.courseManager = courseManager;
+			this.courseStorage = courseStorage;
 		}
 
 		public async Task BindModelAsync(ModelBindingContext bindingContext)
@@ -47,7 +48,7 @@ namespace Ulearn.Web.Api.Models.Binders
 			if (string.IsNullOrEmpty(value))
 				return;
 
-			var model = await courseManager.FindCourseAsync(value);
+			var model = courseStorage.FindCourse(value);
 			if (model == null)
 				bindingContext.ModelState.TryAddModelError(modelName, $"Course {value} not found");
 			bindingContext.Result = model == null ? ModelBindingResult.Failed() : ModelBindingResult.Success(model);

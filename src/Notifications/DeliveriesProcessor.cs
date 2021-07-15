@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Repos;
+using Ulearn.Core.Courses.Manager;
 using Vostok.Logging.Abstractions;
 
 namespace Notifications
@@ -13,15 +14,16 @@ namespace Notifications
 	{
 		private readonly INotificationsRepo notificationsRepo;
 		private readonly INotificationSender notificationSender;
-		private readonly IWebCourseManager courseManager;
+		private readonly ICourseStorage courseStorage;
 
 		private ILog log => LogProvider.Get().ForContext(typeof(NotificationsApplication));
 
-		public DeliveriesProcessor(INotificationsRepo notificationsRepo, INotificationSender notificationSender, IWebCourseManager courseManager)
+		public DeliveriesProcessor(INotificationsRepo notificationsRepo, INotificationSender notificationSender,
+			ICourseStorage courseStorage)
 		{
 			this.notificationsRepo = notificationsRepo;
 			this.notificationSender = notificationSender;
-			this.courseManager = courseManager;
+			this.courseStorage = courseStorage;
 		}
 
 		public async Task CreateDeliveries()
@@ -52,7 +54,7 @@ namespace Notifications
 			if (deliveries.Count == 1)
 			{
 				var delivery = deliveries[0];
-				var course = await courseManager.FindCourseAsync(delivery.Notification.CourseId);
+				var course = courseStorage.FindCourse(delivery.Notification.CourseId);
 				if (course == null)
 				{
 					log.Warn($"Can't find course {delivery.Notification.CourseId}");

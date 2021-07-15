@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Vostok.Logging.Abstractions;
 using Ulearn.Common.Api.Models.Responses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.RunCheckerJobApi;
@@ -58,8 +59,9 @@ namespace Ulearn.Web.Api.Controllers.Runner
 						else
 							return new List<RunnerSubmission>();
 
-						var courseManager = (IWebCourseManager)scope.ServiceProvider.GetService(typeof(IWebCourseManager));
-						var builtSubmissions = new List<RunnerSubmission> { await ToRunnerSubmission(submission, courseManager) };
+						var courseStorage = scope.ServiceProvider.GetService<ICourseStorage>();
+						var courseManager = scope.ServiceProvider.GetService<IWebCourseManager>();
+						var builtSubmissions = new List<RunnerSubmission> { await ToRunnerSubmission(submission, courseStorage, courseManager) };
 						log.Info($"Собрал решения: [{submission.Id}], отдаю их агенту {agent}");
 						return builtSubmissions;
 					}
@@ -70,10 +72,11 @@ namespace Ulearn.Web.Api.Controllers.Runner
 			}
 		}
 
-		private async Task<RunnerSubmission> ToRunnerSubmission(UserExerciseSubmission submission, IWebCourseManager courseManager)
+		private async Task<RunnerSubmission> ToRunnerSubmission(UserExerciseSubmission submission,
+			ICourseStorage courseStorage, IWebCourseManager courseManager)
 		{
 			log.Info($"Собираю для отправки в RunCsJob решение {submission.Id}");
-			var slide = (await courseManager.FindCourseAsync(submission.CourseId))?.FindSlideByIdNotSafe(submission.SlideId);
+			var slide = courseStorage.FindCourse(submission.CourseId)?.FindSlideByIdNotSafe(submission.SlideId);
 
 			if (slide is ExerciseSlide exerciseSlide)
 			{

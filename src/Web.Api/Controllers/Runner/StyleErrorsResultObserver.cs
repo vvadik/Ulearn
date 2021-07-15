@@ -4,6 +4,7 @@ using Database;
 using Database.Models;
 using Database.Repos;
 using Database.Repos.Users;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Metrics;
 using Ulearn.Core.RunCheckerJobApi;
@@ -14,15 +15,15 @@ namespace Ulearn.Web.Api.Controllers.Runner
 	{
 		private static string ulearnBotUserId;
 
-		private readonly IWebCourseManager courseManager;
+		private readonly ICourseStorage courseStorage;
 		private readonly MetricSender metricSender;
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
 		private readonly IUsersRepo usersRepo;
 
-		public StyleErrorsResultObserver(IWebCourseManager courseManager, MetricSender metricSender,
+		public StyleErrorsResultObserver(ICourseStorage courseStorage, MetricSender metricSender,
 			IUsersRepo usersRepo, ISlideCheckingsRepo slideCheckingsRepo)
 		{
-			this.courseManager = courseManager;
+			this.courseStorage = courseStorage;
 			this.metricSender = metricSender;
 			this.slideCheckingsRepo = slideCheckingsRepo;
 			this.usersRepo = usersRepo;
@@ -40,7 +41,7 @@ namespace Ulearn.Web.Api.Controllers.Runner
 			if (!checking.IsRightAnswer)
 				return;
 
-			var exerciseSlide = (await courseManager.FindCourseAsync(submission.CourseId))
+			var exerciseSlide = courseStorage.FindCourse(submission.CourseId)
 				?.FindSlideByIdNotSafe(submission.SlideId) as ExerciseSlide;
 			if (exerciseSlide == null)
 				return;

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -11,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using Ulearn.Common.Api.Models.Responses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Web.Api.Models.Parameters.Exercise;
 using Ulearn.Web.Api.Models.Responses.AcceptedSolutions;
@@ -26,9 +26,9 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		private readonly IVisitsRepo visitsRepo;
 		private readonly IUserSolutionsRepo userSolutionsRepo;
 
-		public AcceptedSolutionsController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
+		public AcceptedSolutionsController(ICourseStorage courseStorage, UlearnDb db, IUsersRepo usersRepo,
 			IAcceptedSolutionsRepo acceptedSolutionsRepo, ICourseRolesRepo courseRolesRepo, IUnitsRepo unitsRepo, IVisitsRepo visitsRepo, IUserSolutionsRepo userSolutionsRepo)
-			: base(courseManager, db, usersRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 			this.acceptedSolutionsRepo = acceptedSolutionsRepo;
 			this.courseRolesRepo = courseRolesRepo;
@@ -46,7 +46,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		[SwaggerResponse((int)HttpStatusCode.NotFound, "Course or slide are not found")]
 		public async Task<ActionResult<AcceptedSolutionsResponse>> GetAcceptedSolutions(string courseId, Guid slideId)
 		{
-			var course = await courseManager.FindCourseAsync(courseId);
+			var course = courseStorage.FindCourse(courseId);
 			if (course == null)
 				return NotFound(new { status = "error", message = "Course not found" });
 

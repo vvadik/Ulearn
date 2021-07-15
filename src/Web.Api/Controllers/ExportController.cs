@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
 using Ulearn.Core.Extensions;
@@ -32,10 +33,10 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly IUserQuizzesRepo userQuizzesRepo;
 		private readonly IUnitsRepo unitsRepo;
 
-		public ExportController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
+		public ExportController(ICourseStorage courseStorage, UlearnDb db, IUsersRepo usersRepo,
 			IGroupMembersRepo groupMembersRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo, IUserQuizzesRepo userQuizzesRepo,
 			ICourseRolesRepo courseRolesRepo, IUnitsRepo unitsRepo)
-			: base(courseManager, db, usersRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 			this.groupMembersRepo = groupMembersRepo;
 			this.visitsRepo = visitsRepo;
@@ -63,7 +64,7 @@ namespace Ulearn.Web.Api.Controllers
 
 			List<string> questions = null;
 			var courseId = group.CourseId;
-			var course = await courseManager.GetCourseAsync(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var visibleUnits = await unitsRepo.GetPublishedUnitIds(course);
 			if (quizSlideId != null)
 			{

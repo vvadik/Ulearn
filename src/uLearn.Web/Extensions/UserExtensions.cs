@@ -13,8 +13,8 @@ namespace uLearn.Web.Extensions
 		{
 			if (!principal.IsSystemAdministrator())
 				return principal.GetCoursesIdFor(CourseRole.Instructor);
-			var courseManager = WebCourseManager.Instance;
-			return courseManager.GetCourses().Select(course => course.Id);
+			var courseStorage = WebCourseManager.CourseStorageInstance;
+			return courseStorage.GetCourses().Select(course => course.Id);
 		}
 	}
 }

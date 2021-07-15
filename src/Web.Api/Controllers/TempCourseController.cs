@@ -16,6 +16,7 @@ using Ulearn.Common.Extensions;
 using Ulearn.Web.Api.Models.Responses.TempCourses;
 using Ionic.Zip;
 using Ulearn.Common;
+using Ulearn.Core.Courses.Manager;
 using Vostok.Logging.Abstractions;
 
 
@@ -27,14 +28,16 @@ namespace Ulearn.Web.Api.Controllers
 	{
 		private readonly ITempCoursesRepo tempCoursesRepo;
 		private readonly ICourseRolesRepo courseRolesRepo;
+		private readonly IWebCourseManager courseManager;
 		public bool DontCheckBaseCourseExistsOnCreate = false; // Для тестрирования
 		private static ILog log => LogProvider.Get().ForContext(typeof(TempCourseController));
 
-		public TempCourseController(IWebCourseManager courseManager, UlearnDb db, [CanBeNull] IUsersRepo usersRepo, ITempCoursesRepo tempCoursesRepo, ICourseRolesRepo courseRolesRepo)
-			: base(courseManager, db, usersRepo)
+		public TempCourseController(ICourseStorage courseStorage, IWebCourseManager courseManager, UlearnDb db, [CanBeNull] IUsersRepo usersRepo, ITempCoursesRepo tempCoursesRepo, ICourseRolesRepo courseRolesRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 			this.tempCoursesRepo = tempCoursesRepo;
 			this.courseRolesRepo = courseRolesRepo;
+			this.courseManager = courseManager;
 		}
 
 		/// <summary>
@@ -46,7 +49,7 @@ namespace Ulearn.Web.Api.Controllers
 		{
 			var tmpCourseId = GetTmpCourseId(courseId, UserId);
 
-			if (!DontCheckBaseCourseExistsOnCreate && !await courseManager.HasCourseAsync(courseId))
+			if (!DontCheckBaseCourseExistsOnCreate && !courseStorage.HasCourse(courseId))
 			{
 				return new TempCourseUpdateResponse
 				{
@@ -218,7 +221,6 @@ namespace Ulearn.Web.Api.Controllers
 			{
 				courseManager.ReloadCourseNotSafe(courseId, notifyAboutErrors: false);
 				courseManager.UpdateCourseVersion(courseId, Guid.Empty);
-				courseManager.NotifyCourseChanged(courseId);
 				await UpdateStagingZipFromExtracted(courseId);
 			}
 			catch (Exception error)

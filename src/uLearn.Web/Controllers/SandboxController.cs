@@ -3,6 +3,7 @@ using System.Web.Mvc;
 using Database;
 using Database.DataContexts;
 using Database.Models;
+using Ulearn.Core.Courses.Manager;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
 using Ulearn.Core.Courses.Slides.Exercises;
@@ -13,7 +14,7 @@ namespace uLearn.Web.Controllers
 	public class SandboxController : Controller
 	{
 		private readonly UserSolutionsRepo solutionsRepo;
-		private readonly WebCourseManager courseManager = WebCourseManager.Instance;
+		private readonly ICourseStorage courseStorage = WebCourseManager.CourseStorageInstance;
 
 		public SandboxController()
 		{
@@ -36,7 +37,7 @@ namespace uLearn.Web.Controllers
 			if (submission == null)
 				return HttpNotFound();
 
-			submission.SolutionCode.Text = ((ExerciseSlide)courseManager
+			submission.SolutionCode.Text = ((ExerciseSlide)courseStorage
 					.GetCourse(submission.CourseId)
 					.GetSlideByIdNotSafe(submission.SlideId))
 				.Exercise

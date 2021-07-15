@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Web.Api.Models.Common;
 using Web.Api.Configuration;
 
@@ -27,10 +28,10 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		protected readonly SlideRenderer slideRenderer;
 		protected readonly WebApiConfiguration configuration;
 
-		public SlidesController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo,
+		public SlidesController(ICourseStorage courseStorage, UlearnDb db, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo,
 			IUserSolutionsRepo solutionsRepo, IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo,
 			SlideRenderer slideRenderer, ICoursesRepo coursesRepo, IUnitsRepo unitsRepo, IOptions<WebApiConfiguration> configuration)
-			: base(courseManager, db, usersRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 			this.coursesRepo = coursesRepo;
 			this.courseRolesRepo = courseRolesRepo;

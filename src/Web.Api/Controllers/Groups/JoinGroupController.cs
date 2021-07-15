@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Swashbuckle.AspNetCore.Annotations;
 using Ulearn.Common.Api.Models.Responses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Web.Api.Models.Responses.Groups;
 
 namespace Ulearn.Web.Api.Controllers.Groups
@@ -23,11 +24,11 @@ namespace Ulearn.Web.Api.Controllers.Groups
 		private readonly IGroupMembersRepo groupMembersRepo;
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
 
-		public JoinGroupController(IWebCourseManager courseManager, UlearnDb db,
+		public JoinGroupController(ICourseStorage courseStorage, UlearnDb db,
 			IUsersRepo usersRepo,
 			IGroupsRepo groupsRepo, IGroupMembersRepo groupMembersRepo,
 			ISlideCheckingsRepo slideCheckingsRepo)
-			: base(courseManager, db, usersRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 			this.groupsRepo = groupsRepo;
 			this.groupMembersRepo = groupMembersRepo;

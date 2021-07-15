@@ -9,6 +9,7 @@ using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Web.Api.Models.Parameters.Users;
 using Ulearn.Web.Api.Models.Responses.Users;
 
@@ -20,9 +21,9 @@ namespace Ulearn.Web.Api.Controllers.Users
 		private readonly IUserSearcher userSearcher;
 		private readonly ICourseRolesRepo courseRolesRepo;
 
-		public UsersController(IWebCourseManager courseManager, UlearnDb db,
+		public UsersController(ICourseStorage courseStorage, UlearnDb db,
 			IUsersRepo usersRepo, IUserSearcher userSearcher, ICourseRolesRepo courseRolesRepo)
-			: base(courseManager, db, usersRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 			this.userSearcher = userSearcher;
 			this.courseRolesRepo = courseRolesRepo;

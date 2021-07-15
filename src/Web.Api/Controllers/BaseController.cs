@@ -16,6 +16,7 @@ using Vostok.Logging.Abstractions;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Quizzes;
@@ -32,16 +33,16 @@ namespace Ulearn.Web.Api.Controllers
 	public class BaseController : Controller
 	{
 		private static ILog log => LogProvider.Get().ForContext(typeof(BaseController));
-		protected readonly IWebCourseManager courseManager;
+		protected readonly ICourseStorage courseStorage;
 		protected readonly UlearnDb db;
 		protected readonly IUsersRepo usersRepo;
 
 		protected string UserId => User.GetUserId();
 		protected bool IsAuthenticated => User.Identity.IsAuthenticated;
 
-		public BaseController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo)
+		public BaseController(ICourseStorage courseStorage, UlearnDb db, IUsersRepo usersRepo)
 		{
-			this.courseManager = courseManager;
+			this.courseStorage = courseStorage;
 			this.db = db;
 			this.usersRepo = usersRepo;
 		}

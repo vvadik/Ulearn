@@ -4,6 +4,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using Vostok.Logging.Abstractions;
 using Ulearn.Core.Configuration;
+using Ulearn.Core.Courses.Manager;
 using Vostok.Logging.Abstractions.Values;
 using Vostok.Logging.Console;
 using Vostok.Logging.File;
@@ -36,6 +37,14 @@ namespace Ulearn.Core.Logging
 				telegramLog = new TelegramLog { OutputTemplate = OutputTemplate }
 					.WithMinimumLevel(LogLevel.Error);
 
+			var minimumLevelString = hostLog.MinimumLevel ?? "debug";
+			var dbMinimumLevelString = hostLog.DbMinimumLevel ?? "";
+			if (!TryParseLogLevel(minimumLevelString, out var minimumLevel))
+				minimumLevel = LogLevel.Debug;
+			if (!TryParseLogLevel(dbMinimumLevelString, out var dbMinimumLevel))
+				dbMinimumLevel = minimumLevel;
+			var min = dbMinimumLevel > minimumLevel ? minimumLevel : dbMinimumLevel;
+
 			var pathFormat = hostLog.PathFormat;
 			ILog fileLog = null;
 			if (!string.IsNullOrEmpty(pathFormat))
@@ -47,13 +56,6 @@ namespace Ulearn.Core.Logging
 					var fileName = Path.GetFileName(pathFormat);
 					pathFormat = Path.Combine(directory, subdirectory, fileName);
 				}
-
-				var minimumLevelString = hostLog.MinimumLevel ?? "debug";
-				var dbMinimumLevelString = hostLog.DbMinimumLevel ?? "";
-				if (!TryParseLogLevel(minimumLevelString, out var minimumLevel))
-					minimumLevel = LogLevel.Debug;
-				if (!TryParseLogLevel(dbMinimumLevelString, out var dbMinimumLevel))
-					dbMinimumLevel = minimumLevel;
 
 				var fileLogSettings = new FileLogSettings
 				{
@@ -67,15 +69,24 @@ namespace Ulearn.Core.Logging
 					},
 					OutputTemplate = OutputTemplate
 				};
-				var min = dbMinimumLevel > minimumLevel ? minimumLevel : dbMinimumLevel;
-				fileLog = new FileLog(fileLogSettings)
-					.WithMinimumLevelForSourceContext("ULearnDb", dbMinimumLevel) // Database
-					.WithMinimumLevel(min);
+				fileLog = new FileLog(fileLogSettings);
 			}
 
 			var log = new CompositeLog(new[] { fileLog, consoleLog, telegramLog }.Where(l => l != null).ToArray())
 				.WithProperty("threadId", () => Environment.CurrentManagedThreadId)
-				.WithMinimumLevel(LogLevel.Debug);
+				.WithMinimumLevelForSourceContext("ULearnDb", dbMinimumLevel) // Database
+				.DropEvents(p =>
+				{
+					if (minimumLevel < LogLevel.Info || p.Properties == null || p.Level > LogLevel.Info)
+						return false;
+					var isScheduler = p.Properties.TryGetValue("sourceContext", out var sourceContextValue) && ((SourceContextValue)sourceContextValue).Contains("Scheduler");
+					var isUpdateCoursesJob = p.Properties.TryGetValue("operationContext", out var operationContextValue)
+											&& ((OperationContextValue)operationContextValue).Contains(UpdateCoursesWorker.UpdateCoursesJobName);
+					var isUpdateTempCoursesJob = p.Properties.TryGetValue("operationContext", out var operationContextValue2)
+												&& ((OperationContextValue)operationContextValue2).Contains(UpdateCoursesWorker.UpdateTempCoursesJobName);
+					return isScheduler && (isUpdateCoursesJob || isUpdateTempCoursesJob); // Отключает избыточное логирование для частой задачи
+				})
+				.WithMinimumLevel(min);
 
 			if (addInLogProvider)
 				LogProvider.Configure(log);

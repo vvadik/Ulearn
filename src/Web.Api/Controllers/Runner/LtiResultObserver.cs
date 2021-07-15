@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Repos;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.RunCheckerJobApi;
 using Ulearn.Web.Api.Utils.LTI;
@@ -12,16 +13,16 @@ namespace Ulearn.Web.Api.Controllers.Runner
 {
 	public class LtiResultObserver : IResultObserver
 	{
-		private readonly IWebCourseManager courseManager;
+		private readonly ICourseStorage courseStorage;
 		private readonly ILtiConsumersRepo ltiConsumersRepo;
 		private readonly ILtiRequestsRepo ltiRequestsRepo;
 		private readonly IVisitsRepo visitsRepo;
 		private static ILog log => LogProvider.Get().ForContext(typeof(LtiResultObserver));
 
-		public LtiResultObserver(IWebCourseManager courseManager, ILtiConsumersRepo ltiConsumersRepo,
+		public LtiResultObserver(ICourseStorage courseStorage, ILtiConsumersRepo ltiConsumersRepo,
 			ILtiRequestsRepo ltiRequestsRepo, IVisitsRepo visitsRepo)
 		{
-			this.courseManager = courseManager;
+			this.courseStorage = courseStorage;
 			this.ltiConsumersRepo = ltiConsumersRepo;
 			this.ltiRequestsRepo = ltiRequestsRepo;
 			this.visitsRepo = visitsRepo;
@@ -34,7 +35,7 @@ namespace Ulearn.Web.Api.Controllers.Runner
 			{
 				try
 				{
-					var exerciseSlide = (await courseManager.FindCourseAsync(submission.CourseId)).FindSlideByIdNotSafe(submission.SlideId) as ExerciseSlide;
+					var exerciseSlide = courseStorage.FindCourse(submission.CourseId).FindSlideByIdNotSafe(submission.SlideId) as ExerciseSlide;
 					var score = await visitsRepo.GetScore(submission.CourseId, submission.SlideId, submission.UserId);
 					await LtiUtils.SubmitScore(exerciseSlide, submission.UserId, score, ltiRequestJson, ltiConsumersRepo);
 				}

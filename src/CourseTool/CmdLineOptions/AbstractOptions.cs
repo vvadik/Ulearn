@@ -1,9 +1,11 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using CommandLine;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
+using Ulearn.Core.Courses.Manager;
 
 namespace uLearn.CourseTool.CmdLineOptions
 {
@@ -36,7 +38,18 @@ namespace uLearn.CourseTool.CmdLineOptions
 		public Config Config => config.Value;
 		private readonly Lazy<Config> config;
 
-		public DirectoryInfo CourseDirectory => CourseManager.GetCourseXmlDirectory(new DirectoryInfo(Path.Combine(WorkingDirectory, Config.ULearnCoursePackageRoot)));
+		public DirectoryInfo CourseDirectory => GetCourseXmlDirectory(new DirectoryInfo(Path.Combine(WorkingDirectory, Config.ULearnCoursePackageRoot)));
+
+		private static DirectoryInfo GetCourseXmlDirectory(DirectoryInfo directory)
+		{
+			if (!directory.GetFile("course.xml").Exists)
+			{
+				var courseXmlDirectory = directory.GetFiles("course.xml", SearchOption.AllDirectories).FirstOrDefault()?.Directory;
+				if (courseXmlDirectory != null)
+					directory = courseXmlDirectory;
+			}
+			return directory;
+		}
 
 		public void InitializeDirectoryIfNotYet()
 		{

@@ -12,6 +12,7 @@ using Microsoft.AspNet.Identity;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Extensions;
@@ -30,12 +31,12 @@ namespace Database.DataContexts
 		private readonly UserRolesRepo userRolesRepo;
 		private readonly UnitsRepo unitsRepo;
 
-		private readonly WebCourseManager courseManager;
+		private readonly ICourseStorage courseStorage;
 
-		public GroupsRepo(ULearnDb db, WebCourseManager courseManager)
+		public GroupsRepo(ULearnDb db, ICourseStorage courseStorage)
 		{
 			this.db = db;
-			this.courseManager = courseManager;
+			this.courseStorage = courseStorage;
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
 			userSolutionsRepo = new UserSolutionsRepo(db);
 			userQuizzesRepo = new UserQuizzesRepo(db);
@@ -244,7 +245,7 @@ namespace Database.DataContexts
 		{
 			log.Info($"Создаю ручные проверки для всех решения пользователя {userId} в курсе {courseId}");
 
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var visibleUnitsIds = unitsRepo.GetVisibleUnitIds(course);
 
 			/* For exercises */
@@ -438,7 +439,7 @@ namespace Database.DataContexts
 			if (instructor.HasAccess(CourseRole.CourseAdmin))
 				return true;
 
-			var coursesIds = courseManager.GetCourses().Select(c => c.Id).ToList();
+			var coursesIds = courseStorage.GetCourses().Select(c => c.Id).ToList();
 			var groups = GetAvailableForUserGroups(coursesIds, instructor);
 			var members = GetGroupsMembers(groups.Select(g => g.Id).ToList());
 			return members.Select(m => m.UserId).Contains(studentId);
