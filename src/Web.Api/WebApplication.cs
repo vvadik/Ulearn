@@ -46,6 +46,7 @@ using Ulearn.Web.Api.Models;
 using Ulearn.Web.Api.Models.Binders;
 using Ulearn.Web.Api.Models.Responses.SlideBlocks;
 using Ulearn.Web.Api.Swagger;
+using Ulearn.Web.Api.Utils;
 using Ulearn.Web.Api.Workers;
 using Vostok.Applications.AspNetCore.Builders;
 using Vostok.Hosting.Abstractions;
@@ -240,6 +241,7 @@ namespace Ulearn.Web.Api
 			services.AddScoped<AntiPlagiarismResultObserver>();
 			services.AddScoped<StyleErrorsResultObserver>();
 			services.AddScoped<LtiResultObserver>();
+			services.AddScoped<ControllerUtils>();
 
 			services.AddDatabaseServices();
 		}

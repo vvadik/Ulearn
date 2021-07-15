@@ -18,6 +18,7 @@ namespace Database.Repos.Groups
 		Task<Dictionary<string, List<int>>> GetUsersGroupsIdsAsync(string courseId, List<string> usersIds, bool includeArchived = false);
 		Task<List<int>> GetUserGroupsIdsAsync(string courseId, string userId, bool includeArchived = false);
 		Task<List<Group>> GetUserGroupsAsync(string courseId, string userId, bool includeArchived = false);
+		Task<List<(int GroupId, string UserId)>> GetGroupsMembersAsGroupsIdsAndUserIds(ICollection<int> groupIds);
 		Task<bool> IsUserMemberOfGroup(int groupId, string userId);
 		Task<Dictionary<string, List<Group>>> GetUsersGroupsAsync(string courseId, List<string> usersIds, bool includeArchived = false);
 		Task<List<Group>> GetUserGroupsAsync(string userId);
