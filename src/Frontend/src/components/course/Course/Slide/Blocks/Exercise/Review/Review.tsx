@@ -2,10 +2,10 @@ import React from "react";
 import cn from "classnames";
 
 import Avatar from "src/components/common/Avatar/Avatar";
-import { DropdownMenu, MenuItem, MenuSeparator, Textarea, ThemeContext, Button, Gapped, } from "ui";
+import { DropdownMenu, MenuItem, MenuSeparator, Textarea, ThemeContext, Button, Gapped, Hint, } from "ui";
 import { Send3, MenuKebab, } from "icons";
 import { getDataFromReviewToCompareChanges } from "../../../InstructorReview/utils";
-import { InstructorReviewInfo, } from "../../../InstructorReview/InstructorReview.types";
+import { InstructorReviewInfo, ReviewCompare, } from "../../../InstructorReview/InstructorReview.types";
 
 import { textareaHidden } from "src/uiTheme";
 
@@ -68,15 +68,24 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 		const oldReviews = this.getCommentsOrderByStart(clone(prevProps.reviews));
 		const newReviewsChanges = newReviews.map(getDataFromReviewToCompareChanges);
 		const oldReviewsChanges = oldReviews.map(getDataFromReviewToCompareChanges);
-		const sameReviews = JSON.stringify(newReviewsChanges) === JSON.stringify(oldReviewsChanges);
+		const sameReviews = this.areReviewsSame(newReviewsChanges, oldReviewsChanges);
 
-		if(!sameReviews) {
+		if(sameReviews === 'containsChangedReviews') {
+			this.setState({
+				renderedReviews: renderedReviews
+					.map((r, index) => ({
+						...r,
+						review: newReviews[index],
+					})),
+				replies: this.buildCommentsReplies(newReviews, replies),
+			});
+		} else if(sameReviews === 'containsNewReviews') {
 			this.setState({
 				renderedReviews: newReviews
-					.map(r => ({
-						margin: 0,
-						review: r,
+					.map((r, index) => ({
 						ref: React.createRef<HTMLLIElement>(),
+						margin: 0,
+						review: newReviews[index],
 					})),
 				replies: this.buildCommentsReplies(newReviews, replies),
 			});
@@ -87,6 +96,38 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 			});
 		}
 	}
+
+	areReviewsSame = (newReviews: ReviewCompare[],
+		oldReviews: ReviewCompare[]
+	): 'containsNewReviews' | 'containsChangedReviews' | true => {
+		if(newReviews.length !== oldReviews.length) {
+			return 'containsNewReviews';
+		}
+
+		for (let i = 0; i < newReviews.length; i++) {
+			const review = newReviews[i];
+			const compareReview = oldReviews[i];
+
+			if(review.comments.length > compareReview.comments.length) {
+				return 'containsNewReviews';
+			}
+
+			if(review.startLine !== compareReview.startLine
+				|| review.comment !== compareReview.comment
+				|| review.anchor !== compareReview.anchor
+				|| review.instructor?.outdated !== compareReview.instructor?.outdated
+				|| review.instructor?.isFavourite !== compareReview.instructor?.isFavourite) {
+				return 'containsChangedReviews';
+			}
+
+			if(JSON.stringify(review.comments) !== JSON.stringify(compareReview.comments)) {
+				return 'containsChangedReviews';
+			}
+		}
+
+
+		return true;
+	};
 
 	addMarginsToReviews = (renderedReviews: RenderedReview[], selectedReviewId: number,): RenderedReview[] => {
 		if(renderedReviews.length === 0) {
@@ -131,10 +172,10 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 					const height = comment.ref.current?.offsetHeight || 0;
 
 					const availableSpace = distanceToSelectedReviewFromTop - (curPosition + spaceWhichReviewsWillConsume);
-					if(curPosition + availableSpace >= anchorTop) {
-						comment.margin = anchorTop - curPosition;
+					if(curPosition <= anchorTop && curPosition + availableSpace >= anchorTop) {
+						comment.margin = Math.max(5, anchorTop - curPosition);
 					} else {
-						comment.margin = availableSpace;
+						comment.margin = Math.max(5, availableSpace);
 					}
 					curPosition += (height + comment.margin);
 					spaceWhichReviewsWillConsume -= (height + this.minDistanceBetweenReviews);
@@ -185,7 +226,7 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 
 	renderTopLevelComment = ({ review, margin, ref, prevMargin, }: RenderedReview, i: number,): React.ReactNode => {
 		const { id, comments, instructor, } = review;
-		const { selectedReviewId, } = this.props;
+		const { selectedReviewId, user, assignBotComment, } = this.props;
 		const { replies, editingReviewId, } = this.state;
 
 		const outdated = instructor?.outdated;
@@ -226,6 +267,25 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 				&& !outdated
 				&& (authorToRender.id !== this.botUser.id || comments.length > 0)
 				&& this.renderAddReviewComment(replies[id], id) }
+				{
+					authorToRender.id === this.botUser.id
+					&& user
+					&& !outdated
+					&& selectedReviewId === id
+					&& assignBotComment
+					&& isInstructor(user)
+					&& <Gapped gap={ 8 }>
+						<Hint pos={ 'bottom center' }
+							  text={ texts.botReview.hintText }>
+							<Button use={ 'primary' } onClick={ this.assignBotComment }>
+								{ texts.botReview.assign }
+							</Button>
+						</Hint>
+						<Button onClick={ this.deleteBotReview }>
+							{ texts.botReview.delete }
+						</Button>
+					</Gapped>
+				}
 			</li>
 		);
 	};
@@ -410,6 +470,18 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 		toggleReviewFavourite(id);
 		event.preventDefault();
 		event.stopPropagation();
+	};
+
+	assignBotComment = (): void => {
+		const { selectedReviewId, assignBotComment, } = this.props;
+
+		assignBotComment?.(selectedReviewId);
+	};
+
+	deleteBotReview = (): void => {
+		const { selectedReviewId, deleteReviewOrComment, } = this.props;
+
+		deleteReviewOrComment(selectedReviewId);
 	};
 
 	deleteReviewOrComment = (event: React.MouseEvent | React.SyntheticEvent): void => {

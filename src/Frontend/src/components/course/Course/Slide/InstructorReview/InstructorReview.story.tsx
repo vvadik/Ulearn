@@ -10,7 +10,7 @@ import {
 import { ShortUserInfo } from "src/models/users";
 import { returnPromiseAfterDelay } from "src/utils/storyMock";
 import { getMockedUser } from "../../../../comments/storiesData";
-import { renderMd, StoryUpdater } from "src/storiesUtils";
+import { instructor, renderMd, StoryUpdater } from "src/storiesUtils";
 import {
 	AntiplagiarismInfo,
 	AntiplagiarismStatusResponse,
@@ -21,10 +21,11 @@ import { GroupInfo, GroupsInfoResponse } from "src/models/groups";
 import { UserInfo } from "src/utils/courseRoles";
 import { BlocksWrapper, StaticCode } from "../Blocks";
 import { Props } from "./InstructorReview.types";
-import { clone } from "../../../../../utils/jsonExtensions";
+import { clone } from "src/utils/jsonExtensions";
 
 
 const user: UserInfo = getMockedUser({
+	...instructor,
 	visibleName: 'Пользователь ДлиннаяФамилияКоторояМожетСломатьВерстку',
 	lastName: 'ДлиннаяФамилияКоторояМожетСломатьВерстку',
 	firstName: 'Пользователь',
@@ -446,19 +447,30 @@ const args: Props = {
 	onScoreSubmit(score: number) {
 		return;
 	},
-	deleteReviewOrComment(submissionId: number, id: number, reviewId?: number,) {
+	deleteReviewOrComment(submissionId: number, reviewId: number, parentReviewId?: number,) {
 		const submission = this.studentSubmissions?.find(s => s.id === submissionId);
-		if(submission) {
-			if(reviewId !== undefined) {
-				const review = submission.manualCheckingReviews.find(c => c.id === id);
-				if(review) {
-					review.comments = review.comments.filter(c => c.id !== reviewId);
+
+		return returnPromiseAfterDelay(loadingTimes.addReview, { status: 200 }, () => {
+			if(submission) {
+				if(parentReviewId !== undefined) {
+					const review = submission.manualCheckingReviews.find(c => c.id === reviewId);
+					if(review) {
+						review.comments = review.comments.filter(c => c.id !== parentReviewId);
+					} else if(submission.automaticChecking && submission.automaticChecking.reviews) {
+						const review = submission.automaticChecking.reviews.find(c => c.id === reviewId);
+						if(review) {
+							review.comments = review.comments.filter(c => c.id !== parentReviewId);
+						}
+					}
+				} else {
+					submission.manualCheckingReviews = submission.manualCheckingReviews.filter(c => c.id !== reviewId);
+					if(submission.automaticChecking && submission.automaticChecking.reviews) {
+						submission.automaticChecking.reviews = submission.automaticChecking.reviews.filter(
+							c => c.id !== reviewId);
+					}
 				}
-			} else {
-				submission.manualCheckingReviews = submission.manualCheckingReviews.filter(c => c.id !== id);
 			}
-		}
-		return returnPromiseAfterDelay(loadingTimes.addReview, { status: 200 });
+		});
 	},
 	addReview(
 		submissionId: number,

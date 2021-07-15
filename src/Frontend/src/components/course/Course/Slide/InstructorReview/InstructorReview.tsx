@@ -36,6 +36,7 @@ import {
 import { InstructorReviewInfo, InstructorReviewInfoWithAnchor, Props, State } from "./InstructorReview.types";
 import texts from "./InstructorReview.texts";
 import styles from './InstructorReview.less';
+import { submissions } from "../../../../../consts/routes";
 
 
 class InstructorReview extends React.Component<Props, State> {
@@ -500,6 +501,7 @@ class InstructorReview extends React.Component<Props, State> {
 						backgroundColor={ 'gray' }
 						user={ user }
 						addReviewComment={ this.onAddReviewComment }
+						assignBotComment={ this.assignBotComment }
 						toggleReviewFavourite={ this.onToggleReviewFavouriteByReviewId }
 						deleteReviewOrComment={ this.onDeleteReviewOrComment }
 						editReviewOrComment={ this.editReviewOrComment }
@@ -798,6 +800,35 @@ class InstructorReview extends React.Component<Props, State> {
 
 		if(currentSubmission) {
 			addReviewComment(currentSubmission.id, reviewId, this.removeWhiteSpaces(comment));
+		}
+	};
+
+	assignBotComment = (reviewId: number): void => {
+		const {
+			addReview,
+			deleteReviewOrComment,
+		} = this.props;
+		const {
+			currentSubmission,
+			reviews,
+		} = this.state;
+
+		if(!currentSubmission) {
+			return;
+		}
+
+		const review = reviews.find(r => r.id === reviewId);
+
+		if(review) {
+			deleteReviewOrComment(currentSubmission.id, reviewId);
+
+			addReview(
+				currentSubmission.id,
+				review.comment,
+				review.startLine,
+				review.startPosition,
+				review.finishLine,
+				review.finishPosition).then(r => this.highlightReview(r.id));
 		}
 	};
 

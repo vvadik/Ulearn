@@ -16,6 +16,12 @@ export default {
 		cancel: 'Отменить',
 	},
 
+	botReview: {
+		hintText: 'Опубликовать от своего имени',
+		assign: 'Присвоить',
+		delete: 'Удалить',
+	},
+
 	getLineCapture: (startLine: number, finishLine: number): string => {
 		return startLine === finishLine ? `строка ${ startLine + 1 }` : `строки ${ startLine + 1 }-${ finishLine + 1 }`;
 	},

@@ -32,6 +32,7 @@ export interface ReviewProps {
 	addReviewComment: (reviewId: number, comment: string) => void;
 	deleteReviewOrComment: (id: number, reviewId?: number) => void;
 	editReviewOrComment: (text: string, id: number, reviewId?: number) => void;
+	assignBotComment?: (reviewId: number,) => void;
 
 	backgroundColor?: 'orange' | 'gray';
 
