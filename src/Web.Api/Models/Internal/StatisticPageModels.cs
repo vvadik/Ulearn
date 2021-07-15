@@ -8,8 +8,9 @@ using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Units;
+using Ulearn.Web.Api.Models.Common;
 
-namespace uLearn.Web.Models
+namespace Ulearn.Web.Api.Models.Internal
 {
 	public class StatisticPageModel
 	{
@@ -51,12 +52,6 @@ namespace uLearn.Web.Models
 
 		public DefaultDictionary<string, List<int>> VisitedUsersGroups { get; set; }
 
-		public string JsonExportUrl { get; set; }
-		
-		public string XmlExportUrl { get; set; }
-		
-		public string XlsxExportUrl { get; set; }
-
 		public SortedDictionary<string, ScoringGroup> GetUsingUnitScoringGroups(Unit unit, SortedDictionary<string, ScoringGroup> courseScoringGroups)
 		{
 			return unit.Scoring.Groups
@@ -94,8 +89,8 @@ namespace uLearn.Web.Models
 		}
 
 		/* Option "only full scores" acts only on exercise slides.
-		   If user scores 4 out of 5 points for quiz, it's okay to be scored in course statistics with enabled "only full scores" option.
-		   Potentially bug: if user is not a member of group with enabled code-review, his slide's max score may vary from slide.MaxScore */
+			If user scores 4 out of 5 points for quiz, it's okay to be scored in course statistics with enabled "only full scores" option.
+			Potentially bug: if user is not a member of group with enabled code-review, his slide's max score may vary from slide.MaxScore */
 		public int GetOnlyFullScore(int score, Slide slide)
 		{
 			var isExercise = slide is ExerciseSlide;
@@ -104,30 +99,7 @@ namespace uLearn.Web.Models
 			return score == slide.MaxScore ? score : 0;
 		}
 	}
-
-	public class UnitSheetPageModel : StatisticPageModel
-	{
-		public Unit Unit { get; set; }
-		public List<Slide> Slides { get; set; }
-		public Dictionary<Guid, List<Visit>> SlidesVisits { get; set; }
-
-		public Dictionary<string, int> VisitedSlidesCountByUser { get; set; }
-		public Dictionary<string, int> VisitedSlidesCountByUserAllTime { get; set; }
-
-		/* Dictionary<(userId, scoringGroupId), additionalScore> */
-		public Dictionary<Tuple<string, string>, int> AdditionalScores { get; set; }
-
-		public bool ShowStatisticsLink { get; set; }
-	}
-
-	public class UnitStatModel : UnitSheetPageModel
-	{
-		public int UsersVisitedAllSlidesInPeriodCount { get; set; }
-		public Dictionary<Guid, int> QuizzesAverageScore { get; set; }
-		public Dictionary<Guid, int> ExercisesSolutionsCount { get; set; }
-		public Dictionary<Guid, int> ExercisesAcceptedSolutionsCount { get; set; }
-	}
-
+	
 	public class UnitStatisticUserInfo
 	{
 		public UnitStatisticUserInfo(string userId, string userName, string email, string firstName, string lastName)
@@ -146,21 +118,5 @@ namespace uLearn.Web.Models
 		public string UserFirstName { get; private set; }
 		public string UserLastName { get; private set; }
 		public string UserEmail { get; private set; }
-	}
-
-	public class UserInfo
-	{
-		public string UserId { get; set; }
-		public string UserName { get; set; }
-		public UserSlideInfo[] SlidesSlideInfo { get; set; }
-	}
-
-	public class UserSlideInfo
-	{
-		public bool IsVisited { get; set; }
-		public bool IsExerciseSolved { get; set; }
-		public int AttemptsCount { get; set; }
-		public bool IsQuizPassed { get; set; }
-		public double QuizPercentage { get; set; }
 	}
 }
