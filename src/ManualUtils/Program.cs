@@ -12,7 +12,6 @@ using Database;
 using Database.Di;
 using Database.Models;
 using Database.Repos;
-using Database.Repos.Users;
 using Ionic.Zip;
 using ManualUtils.AntiPlagiarism;
 using Microsoft.AspNetCore.Identity;
@@ -100,6 +99,8 @@ namespace ManualUtils
 			// await UploadStagingFromDbAndExtractToCourses(serviceProvider);
 			// await SetCourseIdAndSlideIdInLikesAndPromotes(db);
 			// await SetNewFieldsInReview(db, serviceProvider);
+			// await UploadCourseVersions(serviceProvider); // TODO выполнить
+			await PrintPublishedVersionsWithoutFile(serviceProvider);
 		}
 
 		private static void GenerateUpdateSequences()
@@ -538,6 +539,65 @@ namespace ManualUtils
 					scopedDb.SaveChanges();
 				}
 				Console.WriteLine($"{i} / {reviewsIds.Count}");
+			}
+		}
+
+		private static async Task UploadCourseVersions(IServiceProvider serviceProvider)
+		{
+			using (var scope = serviceProvider.CreateScope())
+			{
+				var db = scope.ServiceProvider.GetService<UlearnDb>();
+				var versions = await db.CourseVersions.Select(v => v).OrderBy(c => c.Id).ToListAsync();
+				var versionsWithFiles = (await db.CourseVersionFiles.Select(v => v.CourseVersionId).ToListAsync()).ToHashSet();
+				versions = versions.Where(v => !versionsWithFiles.Contains(v.Id)).ToList();
+				Console.WriteLine("Versions without file " + versions.Count);
+
+				var courseManager = scope.ServiceProvider.GetService<IWebCourseManager>();
+				var i = 0;
+				foreach (var version in versions)
+				{
+					var file = courseManager.GetCourseVersionFile(version.Id);
+					if (!file.Exists)
+					{
+						Console.WriteLine($"{version.Id} {version.CourseId} file not found");
+						continue;
+					}
+					db.CourseVersionFiles.Add(new CourseVersionFile
+					{
+						CourseVersionId = version.Id,
+						CourseId = version.CourseId,
+						File = await ReadAllContentAsync(file)
+					});
+					db.SaveChanges();
+					i++;
+				}
+				Console.WriteLine($"Uploaded {i}");
+			}
+		}
+
+		private static async Task<byte[]> ReadAllContentAsync(FileInfo file)
+		{
+			byte[] result;
+			using (var stream = File.Open(file.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
+			{
+				result = new byte[stream.Length];
+				await stream.ReadAsync(result, 0, (int)stream.Length);
+			}
+			return result;
+		}
+
+		private static async Task PrintPublishedVersionsWithoutFile(IServiceProvider serviceProvider)
+		{
+			using (var scope = serviceProvider.CreateScope())
+			{
+				var db = scope.ServiceProvider.GetService<UlearnDb>();
+				var versionsWithFiles = (await db.CourseVersionFiles.Select(v => v.CourseVersionId).ToListAsync()).ToHashSet();
+				var versionsWithoutFiles = (await db.CourseVersions.Where(v => !versionsWithFiles.Contains(v.Id))
+					.Select(v => v.Id).ToListAsync()).ToHashSet();
+				var coursesRepo = scope.ServiceProvider.GetService<ICoursesRepo>();
+				var publishedCourseVersionsWithoutFiles = (await coursesRepo.GetPublishedCourseVersions())
+					.Where(p => versionsWithoutFiles.Contains(p.Id));
+				Console.WriteLine(string.Join("\n", publishedCourseVersionsWithoutFiles));
 			}
 		}
 	}
