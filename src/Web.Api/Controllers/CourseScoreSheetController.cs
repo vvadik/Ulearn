@@ -19,6 +19,7 @@ using Ulearn.Web.Api.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using Ulearn.Core.Configuration;
@@ -67,7 +68,7 @@ namespace Ulearn.Web.Api.Controllers
 				return NotFound();
 
 			var model = await GetCourseStatisticsModel(param, 3000);
-			var serializedModel = new CourseStatisticsModel(model).JsonSerialize();
+			var serializedModel = new CourseStatisticsModel(model).JsonSerialize(Formatting.Indented);
 
 			return File(Encoding.UTF8.GetBytes(serializedModel), "application/json", $"{param.FileNameWithNoExtension}.json");
 		}
@@ -96,12 +97,14 @@ namespace Ulearn.Web.Api.Controllers
 			var builder = new ExcelWorksheetBuilder(package.Workbook.Worksheets.Add(model.CourseTitle));
 			FillCourseStatisticsWithBuilder(
 				builder,
-				model
+				model,
+				exportEmails: true
 			);
 			builder = new ExcelWorksheetBuilder(package.Workbook.Worksheets.Add("Только полные баллы"));
 			FillCourseStatisticsWithBuilder(
 				builder,
 				model,
+				exportEmails: true,
 				onlyFullScores: true
 			);
 			byte[] bytes;
@@ -131,7 +134,7 @@ namespace Ulearn.Web.Api.Controllers
 			return Ok();
 		}
 
-		private void FillCourseStatisticsWithBuilder(ISheetBuilder builder, CourseStatisticPageModel model, bool onlyFullScores = false)
+		private void FillCourseStatisticsWithBuilder(ISheetBuilder builder, CourseStatisticPageModel model, bool exportEmails = false, bool onlyFullScores = false)
 		{
 			builder.AddStyleRule(s => s.Font.Bold = true);
 
@@ -156,7 +159,7 @@ namespace Ulearn.Web.Api.Controllers
 			builder.GoToNewLine();
 
 			builder.AddCell("Фамилия Имя");
-			builder.AddCell("Эл. почта");
+			if (exportEmails) builder.AddCell("Эл. почта");
 			builder.AddCell("Группа");
 			foreach (var scoringGroup in model.ScoringGroups.Values)
 				builder.AddCell(scoringGroup.Abbreviation);
@@ -208,11 +211,11 @@ namespace Ulearn.Web.Api.Controllers
 			builder.GoToNewLine();
 
 			builder.AddStyleRule(s => s.Font.Bold = false);
-
+			
 			foreach (var user in model.VisitedUsers)
 			{
 				builder.AddCell(user.UserVisibleName);
-				builder.AddCell(user.UserEmail);
+				if (exportEmails) builder.AddCell(user.UserEmail);
 				var userGroups = model.Groups.Where(g => model.VisitedUsersGroups[user.UserId].Contains(g.Id)).Select(g => g.Name).ToList();
 				builder.AddCell(string.Join(", ", userGroups));
 				foreach (var scoringGroup in model.ScoringGroups.Values)
@@ -319,7 +322,7 @@ namespace Ulearn.Web.Api.Controllers
 			Dictionary<int, List<GroupAccess>> groupsAccesses = null;
 			if (isInstructor)
 			{
-				groups = await groupAccessesRepo.GetAvailableForUserGroupsAsync(courseId, UserId, true, true, false); // а нужная ли перегрузка?
+				groups = await groupAccessesRepo.GetAvailableForUserGroupsAsync(courseId, UserId, true, true, false);
 				groupsAccesses = await groupAccessesRepo.GetGroupAccessesAsync(groups.Select(g => g.Id));
 			}
 			else
