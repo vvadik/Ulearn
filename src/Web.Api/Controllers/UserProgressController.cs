@@ -12,6 +12,7 @@ using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ulearn.Common.Api.Models.Responses;
+using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Web.Api.Models.Parameters;
@@ -189,10 +190,13 @@ namespace Ulearn.Web.Api.Controllers
 			return await UserProgress(course.Id, new UserProgressParameters());
 		}
 
-		[HttpPatch("/{courseId}/{slideId}/prohibit-further-manual-checking")]
+		[HttpPut("/{courseId}/{slideId}/prohibit-further-manual-checking")]
 		[Authorize(Policy = "Instructors")]
 		public async Task<ActionResult<UsersProgressResponse>> ProhibitFurtherManualChecking([FromRoute] string courseId, [FromRoute] Guid slideId, [FromQuery] string userId, [FromBody] bool prohibit)
 		{
+			if (!await groupAccessesRepo.CanInstructorViewStudentAsync(User.GetUserId(), userId))
+				return StatusCode((int)HttpStatusCode.Forbidden, "This student should be member of one of accessible for you groups");
+			
 			if (prohibit)
 				await slideCheckingsRepo.DisableProhibitFurtherManualCheckings(courseId, userId, slideId);
 			else
