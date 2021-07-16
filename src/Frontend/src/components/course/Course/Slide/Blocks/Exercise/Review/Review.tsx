@@ -288,7 +288,7 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 				}
 			</li>
 		);
-	};
+	}
 
 	renderComment(review: InstructorReviewInfo): React.ReactNode;
 	renderComment(reviewComment: ReviewCommentResponse, reviewId: number, reviewOutdated?: boolean): React.ReactNode;
@@ -335,7 +335,7 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 						}
 					</div>
 				</div>
-				{ editingReviewId !== id && editingParentReviewId !== reviewId
+				{ editingReviewId !== id
 					? <p
 						className={ styles.commentText }
 						dangerouslySetInnerHTML={ { __html: renderedText ?? renderedComment } }
