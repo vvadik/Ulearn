@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -142,7 +143,7 @@ namespace Ulearn.Core.Courses.Manager
 					return;
 				var courseZips = stagedDirectory.GetFiles("*.zip");
 				var courseIdsWithZips = courseZips.Select(z => GetCourseId(z.FullName));
-				LoadCourseZipsToDiskFromExternalStorage(courseIdsWithZips);
+				LoadCourseZipsToDiskFromExternalStorage(courseIdsWithZips).Wait();
 
 				log.Info($"Загружаю курсы из {stagedDirectory.FullName}");
 				courseZips = stagedDirectory.GetFiles("*.zip");
@@ -155,9 +156,9 @@ namespace Ulearn.Core.Courses.Manager
 			}
 		}
 
-		protected virtual void LoadCourseZipsToDiskFromExternalStorage(IEnumerable<string> existingOnDiskCourseIds)
+		protected virtual Task LoadCourseZipsToDiskFromExternalStorage(IEnumerable<string> existingOnDiskCourseIds)
 		{
-			// NONE
+			return Task.CompletedTask;
 		}
 
 		public bool TryReloadCourse(string courseId)
