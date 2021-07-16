@@ -201,8 +201,7 @@ namespace Ulearn.Core.Courses.Manager
 		private Course ReloadCourseFromZip(FileInfo zipFile)
 		{
 			var course = LoadCourseFromZip(zipFile);
-			var versionId = Guid.Empty;
-			courseStorage.AddOrUpdateCourse(course, versionId); // TODO хранить версии
+			courseStorage.AddOrUpdateCourse(course);
 			log.Info($"Курс {course.Id} загружен из {zipFile.FullName} и сохранён в памяти");
 			exerciseStudentZipsCache.DeleteCourseZips(course.Id);
 			ExerciseCheckerZipsCache.DeleteCourseZips(course.Id);
@@ -212,8 +211,7 @@ namespace Ulearn.Core.Courses.Manager
 		private Course ReloadCourseFromDirectory(DirectoryInfo directory)
 		{
 			var course = LoadCourseFromDirectory(directory);
-			var versionId = Guid.Empty;
-			courseStorage.AddOrUpdateCourse(course, versionId); // TODO хранить версии
+			courseStorage.AddOrUpdateCourse(course);
 			log.Info($"Курс {course.Id} загружен из {directory.FullName} и сохранён в памяти");
 			exerciseStudentZipsCache.DeleteCourseZips(course.Id);
 			ExerciseCheckerZipsCache.DeleteCourseZips(course.Id);
@@ -443,7 +441,7 @@ namespace Ulearn.Core.Courses.Manager
 			ExerciseCheckerZipsCache.DeleteCourseZips(course.Id);
 
 			var versionId = Guid.Empty;
-			courseStorage.AddOrUpdateCourse(course, versionId); // TODO хранить версии
+			courseStorage.AddOrUpdateCourse(course);
 		}
 
 		private readonly TimeSpan waitBetweenLockTries = TimeSpan.FromSeconds(0.1);

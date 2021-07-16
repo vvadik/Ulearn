@@ -16,7 +16,7 @@ namespace Ulearn.Core.Courses.Manager
 
 	public interface IUpdateCourseStorage
 	{
-		void AddOrUpdateCourse(Course course, Guid version);
+		void AddOrUpdateCourse(Course course);
 		void TryRemoveCourse(string courseId);
 	}
 }

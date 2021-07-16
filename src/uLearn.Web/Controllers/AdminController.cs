@@ -154,8 +154,9 @@ namespace uLearn.Web.Controllers
 			else
 			{
 				var path = courseManager.GetExtractedCourseDirectory(courseId);
-				stream = ZipUtils.CreateZipFromDirectory(new List<string> { path.FullName }, null, null);
+				stream = ZipUtils.CreateZipFromDirectory(new List<string> { path.FullName }, new List<string> { ".meta" }, null);
 			}
+
 			return File(stream, "application/zip", packageName);
 		}
 
@@ -259,7 +260,8 @@ namespace uLearn.Web.Controllers
 
 			Guid versionId;
 			Exception error;
-			using(var inputStream = ZipUtils.GetZipWithFileWithNameInRoot(tmpFileName, "course.xml")) {
+			using (var inputStream = ZipUtils.GetZipWithFileWithNameInRoot(tmpFileName, "course.xml"))
+			{
 				(versionId, error) = await UploadCourse(courseId, inputStream, User.Identity.GetUserId()).ConfigureAwait(false);
 			}
 
@@ -297,7 +299,8 @@ namespace uLearn.Web.Controllers
 			try
 			{
 				using (IGitRepo git = new GitRepo(repoUrl, reposDirectory, publicKey, privateKey, new DirectoryInfo(Path.GetTempPath())))
-				{ // В GitRepo используется Monitor. Он должен быть освобожден в том же потоке, что и взят.
+				{
+					// В GitRepo используется Monitor. Он должен быть освобожден в том же потоке, что и взят.
 					git.Checkout(branch);
 					var commitInfo = git.GetCurrentCommitInfo();
 					foreach (var courseRepo in courses)
@@ -363,7 +366,7 @@ namespace uLearn.Web.Controllers
 				{
 					git.Checkout(courseRepo.Branch);
 					commitInfo = git.GetCurrentCommitInfo();
-					(zip, pathToCourseXml) = git.GetCurrentStateAsZip(pathToCourseXml); 
+					(zip, pathToCourseXml) = git.GetCurrentStateAsZip(pathToCourseXml);
 				}
 			}
 			catch (GitException ex)
@@ -448,7 +451,7 @@ namespace uLearn.Web.Controllers
 			var versionId = Guid.NewGuid();
 
 			if (!courseManager.TryCreateCourse(courseId, courseTitle, versionId))
-				return RedirectToAction("Courses", "Course",  new { courseId = courseId, courseTitle = courseTitle });
+				return RedirectToAction("Courses", "Course", new { courseId = courseId, courseTitle = courseTitle });
 
 			var userId = User.Identity.GetUserId();
 			await coursesRepo.AddCourseVersion(courseId, versionId, userId, null, null, null, null).ConfigureAwait(false);
@@ -554,7 +557,7 @@ namespace uLearn.Web.Controllers
 
 			return result;
 		}
-		
+
 		private HashSet<Guid> GetMergedCheckingQueueSlideIds(ManualCheckingQueueFilterOptions filterOptions)
 		{
 			var result = slideCheckingsRepo.GetManualCheckingQueueSlideIds<ManualExerciseChecking>(filterOptions);
@@ -658,7 +661,7 @@ namespace uLearn.Web.Controllers
 			/* Remove divider iff it is first or last item */
 			if (allCheckingsSlides.First().Key == Guid.Empty || allCheckingsSlides.Last().Key == Guid.Empty)
 				allCheckingsSlides.RemoveAll(kvp => kvp.Key == Guid.Empty);
-			
+
 			return allCheckingsSlides;
 		}
 
@@ -732,6 +735,7 @@ namespace uLearn.Web.Controllers
 				itemToCheckId = itemToCheck.Id;
 				transaction.Commit();
 			}
+
 			return await InternalManualChecking<T>(courseId, itemToCheckId, ignoreLock: true, groupsIds: groupsIds).ConfigureAwait(false);
 		}
 
@@ -758,7 +762,7 @@ namespace uLearn.Web.Controllers
 			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
 			return CheckNextManualCheckingForSlide<ManualExerciseChecking>(courseId, slideId, groupsIds, previous);
 		}
-		
+
 		public async Task<ActionResult> GetNextManualCheckingExerciseForSlide(string courseId, Guid slideId, int previous)
 		{
 			var action = await CheckNextExerciseForSlide(courseId, slideId, previous).ConfigureAwait(false);
@@ -767,7 +771,7 @@ namespace uLearn.Web.Controllers
 			var url = Url.RouteUrl(redirect.RouteName, redirect.RouteValues);
 			return Json(new { url });
 		}
-		
+
 		public async Task<ActionResult> GetNextManualCheckingQuizForSlide(string courseId, Guid slideId, int previous)
 		{
 			var action = await CheckNextQuizForSlide(courseId, slideId, previous).ConfigureAwait(false);
@@ -934,7 +938,7 @@ namespace uLearn.Web.Controllers
 			var authorId = tempCoursesRepo.Find(courseId).AuthorId;
 			var baseCourseId = courseId.Replace($"_{authorId}", ""); // todo добавить поле baseCourseId в сущность tempCourse
 			var baseCourseVersion = coursesRepo.GetPublishedCourseVersion(baseCourseId).Id;
-			return RedirectToAction("Diagnostics", new {courseId, versionId = baseCourseVersion});
+			return RedirectToAction("Diagnostics", new { courseId, versionId = baseCourseVersion });
 		}
 
 		public static void CopyFilesRecursively(DirectoryInfo source, DirectoryInfo target)
@@ -1032,6 +1036,7 @@ namespace uLearn.Web.Controllers
 					isPublishedCourseVersionFound |= publishedCourseVersion.Id == version.Id;
 					continue;
 				}
+
 				versionsAfterPublishedCount++;
 				if (version.CommitHash == null && (version.LoadingTime > timeLimit || (version.PublishTime.HasValue && version.PublishTime.Value > timeLimit)))
 					continue;
@@ -1603,6 +1608,7 @@ namespace uLearn.Web.Controllers
 				result = d;
 				return true;
 			}
+
 			return false;
 		}
 	}
