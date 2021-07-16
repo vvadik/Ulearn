@@ -617,7 +617,7 @@ namespace Database.Models
 
 		public override List<string> GetRecipientsIds(ULearnDb db, Course course)
 		{
-			return new GroupsRepo(db, WebCourseManager.Instance).GetInstructorsOfAllGroupsWhereUserIsMember(CourseId, Comment.Author).ToList();
+			return new GroupsRepo(db, WebCourseManager.CourseStorageInstance).GetInstructorsOfAllGroupsWhereUserIsMember(CourseId, Comment.Author).ToList();
 		}
 
 		public override bool IsNotificationForEveryone => true;
@@ -1252,7 +1252,7 @@ namespace Database.Models
 
 		public override List<string> GetRecipientsIds(ULearnDb db, Course course)
 		{
-			var groupsRepo = new GroupsRepo(db, WebCourseManager.Instance);
+			var groupsRepo = new GroupsRepo(db, WebCourseManager.CourseStorageInstance);
 			var accesses = groupsRepo.GetGroupAccesses(GroupId);
 			return accesses.Select(a => a.UserId).Concat(new[] { Group.OwnerId }).ToList();
 		}
@@ -1375,7 +1375,7 @@ namespace Database.Models
 
 		public override List<string> GetRecipientsIds(ULearnDb db, Course course)
 		{
-			var groupsRepo = new GroupsRepo(db, WebCourseManager.Instance);
+			var groupsRepo = new GroupsRepo(db, WebCourseManager.CourseStorageInstance);
 			var accesses = groupsRepo.GetGroupAccesses(GroupId);
 			return accesses.Select(a => a.UserId).Concat(new[] { Group.OwnerId }).ToList();
 		}

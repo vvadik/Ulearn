@@ -14,6 +14,7 @@ using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 
 namespace Database.DataContexts
 {
@@ -28,7 +29,7 @@ namespace Database.DataContexts
 		private readonly UnitsRepo unitsRepo;
 		private readonly UserRolesRepo userRolesRepo;
 		private readonly UsersRepo usersRepo;
-		private readonly WebCourseManager courseManager;
+		private readonly ICourseStorage courseStorage;
 
 		public NotificationsRepo()
 			: this(new ULearnDb())
@@ -41,7 +42,7 @@ namespace Database.DataContexts
 			unitsRepo = new UnitsRepo(db);
 			userRolesRepo = new UserRolesRepo(db);
 			usersRepo = new UsersRepo(db);
-			courseManager = WebCourseManager.Instance;
+			courseStorage = WebCourseManager.CourseStorageInstance;
 		}
 
 		private static DateTime CalculateNextTryTime(DateTime createTime, int failsCount)
@@ -292,7 +293,7 @@ namespace Database.DataContexts
 			Course course = null;
 			if (!string.IsNullOrWhiteSpace(notification.CourseId))
 			{
-				course = courseManager.FindCourse(notification.CourseId);
+				course = courseStorage.FindCourse(notification.CourseId);
 				if (course == null)
 					return;
 			}
@@ -425,7 +426,7 @@ namespace Database.DataContexts
 		{
 			if (notification.CourseId != "")
 			{
-				var course = courseManager.FindCourse(notification.CourseId);
+				var course = courseStorage.FindCourse(notification.CourseId);
 				if (course != null)
 				{
 					var visibleUnits = unitsRepo.GetVisibleUnitIds(course);

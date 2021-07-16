@@ -4,6 +4,8 @@ using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using Database;
+using Ulearn.Core.Courses.Manager;
 using uLearn.Web.SameSite;
 using Vostok.Logging.File;
 
@@ -18,6 +20,7 @@ namespace uLearn.Web
 			UlearnLogger.ConfigureLogging();
 			FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
 			RouteConfig.RegisterRoutes(RouteTable.Routes);
+			new UpdateCoursesWorker(WebCourseManager.CourseUpdaterInstance).RunCoursesUpdateInThreads();
 
 			/* Disable identity checks for CSRF tokens.
 			 * See http://stackoverflow.com/questions/14970102/anti-forgery-token-is-meant-for-user-but-the-current-user-is-username for details

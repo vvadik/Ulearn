@@ -18,6 +18,7 @@ using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 using Vostok.Logging.Abstractions;
 using Web.Api.Configuration;
 
@@ -26,7 +27,7 @@ namespace uLearn.Web.Controllers
 	[ULearnAuthorize]
 	public class AccountController : BaseUserController
 	{
-		private readonly WebCourseManager courseManager = WebCourseManager.Instance;
+		private readonly ICourseStorage courseStorage = WebCourseManager.CourseStorageInstance;
 
 		private readonly UserRolesRepo userRolesRepo;
 		private readonly GroupsRepo groupsRepo;
@@ -53,7 +54,7 @@ namespace uLearn.Web.Controllers
 		public AccountController()
 		{
 			userRolesRepo = new UserRolesRepo(db);
-			groupsRepo = new GroupsRepo(db, courseManager);
+			groupsRepo = new GroupsRepo(db, courseStorage);
 			certificatesRepo = new CertificatesRepo(db);
 			visitsRepo = new VisitsRepo(db);
 			notificationsRepo = new NotificationsRepo(db);
@@ -143,7 +144,7 @@ namespace uLearn.Web.Controllers
 						{
 							Role = role,
 							CourseId = s,
-							CourseTitle = courseManager.GetCourse(s).Title,
+							CourseTitle = courseStorage.GetCourse(s).Title,
 							HasAccess = coursesForUser.ContainsKey(role) && coursesForUser[role].Contains(s.ToLower()),
 							ToggleUrl = Url.Content($"~/Account/{nameof(ToggleRole)}?courseId={s}&userId={user.UserId}&role={role}"),
 							UserName = user.UserVisibleName,
@@ -285,7 +286,7 @@ namespace uLearn.Web.Controllers
 			if (user == null)
 				return RedirectToAction("List");
 
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 
 			return View(new UserCourseModel(course, user, db));
 		}
@@ -297,7 +298,7 @@ namespace uLearn.Web.Controllers
 			if (user == null)
 				return RedirectToAction("List");
 
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var model = new UserCourseToggleHistoryModel(user, course,
 				ToSingleCourseRolesHistoryModel(userRolesRepo.GetUserRolesHistoryByCourseId(userId, courseId)),
 				ToSingleCourseAccessHistoryModel(coursesRepo.GetUserAccessHistoryByCourseId(userId, courseId)));
@@ -316,7 +317,7 @@ namespace uLearn.Web.Controllers
 			var logins = await userManager.GetLoginsAsync(userId);
 
 			var userCoursesIds = visitsRepo.GetUserCourses(user.Id).Select(s => s.ToLower());
-			var courses = courseManager.GetCourses().ToList();
+			var courses = courseStorage.GetCourses().ToList();
 			var userCourses = courses.Where(c => userCoursesIds.Contains(c.Id.ToLower())).OrderBy(c => c.Title).ToList();
 
 			var allCourses = courses.ToDictionary(c => c.Id, c => c, StringComparer.InvariantCultureIgnoreCase);

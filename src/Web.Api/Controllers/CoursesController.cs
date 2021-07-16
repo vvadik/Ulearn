@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Flashcards;
 using Ulearn.Core.Courses.Units;
@@ -37,11 +38,11 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly SlideRenderer slideRenderer;
 		private readonly ITempCoursesRepo tempCoursesRepo;
 
-		public CoursesController(IWebCourseManager courseManager, UlearnDb db, ICoursesRepo coursesRepo,
+		public CoursesController(ICourseStorage courseStorage, UlearnDb db, ICoursesRepo coursesRepo,
 			IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, IUnitsRepo unitsRepo, IUserSolutionsRepo solutionsRepo,
 			IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo, IGroupMembersRepo groupMembersRepo,
 			IGroupAccessesRepo groupAccessesRepo, SlideRenderer slideRenderer, ITempCoursesRepo tempCoursesRepo)
-			: base(courseManager, db, usersRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 			this.coursesRepo = coursesRepo;
 			this.courseRolesRepo = courseRolesRepo;
@@ -69,7 +70,7 @@ namespace Ulearn.Web.Api.Controllers
 			if (role == CourseRoleType.Student)
 				return NotFound(new ErrorResponse("Role can not be student. Specify tester, instructor or courseAdmin"));
 
-			var courses = await courseManager.GetCoursesAsync().ConfigureAwait(false);
+			var courses = courseStorage.GetCourses();
 
 			var isSystemAdministrator = await IsSystemAdministratorAsync().ConfigureAwait(false);
 
@@ -125,10 +126,10 @@ namespace Ulearn.Web.Api.Controllers
 		[HttpGet("{courseId}")]
 		public async Task<ActionResult<CourseInfo>> CourseInfo([FromRoute]string courseId, [FromQuery][CanBeNull]int? groupId = null)
 		{
-			if (!await courseManager.HasCourseAsync(courseId))
+			if (!courseStorage.HasCourse(courseId))
 				return NotFound(new ErrorResponse("Course not found"));
 
-			var course = await courseManager.FindCourseAsync(courseId);
+			var course = courseStorage.FindCourse(courseId);
 			List<UnitInfo> units;
 			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIds(course, UserId);
 			var visibleUnits = course.GetUnits(visibleUnitsIds);

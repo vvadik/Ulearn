@@ -15,7 +15,7 @@ namespace uLearn.Web
 		[Test]
 		public static void CreateList()
 		{
-			var solutions = WebCourseManager.Instance
+			var solutions = WebCourseManager.CourseStorageInstance
 				.GetCourses()
 				.SelectMany(course => course.GetSlidesNotSafe().OfType<ExerciseSlide>())
 				.Where(slide => slide.Exercise is SingleFileExerciseBlock)

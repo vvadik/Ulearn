@@ -1,34 +1,25 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
+using System.Threading.Tasks;
 using Database.DataContexts;
 using Database.Models;
-using JetBrains.Annotations;
 using Vostok.Logging.Abstractions;
-using Ulearn.Core;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 
 namespace Database
 {
-	public class WebCourseManager : CourseManager
+	public class WebCourseManager : CourseManager, IWebCourseManager, ICourseUpdater
 	{
 		private static ILog log => LogProvider.Get().ForContext(typeof(WebCourseManager));
-		public static readonly WebCourseManager Instance = new WebCourseManager();
+
+		private static readonly WebCourseManager courseManagerInstance = new WebCourseManager();
+		public static IWebCourseManager CourseManagerInstance => courseManagerInstance;
+		public static ICourseUpdater CourseUpdaterInstance => courseManagerInstance;
 
 		private readonly Dictionary<string, Guid> loadedCourseVersions = new Dictionary<string, Guid>();
-		private readonly ConcurrentDictionary<string, DateTime> courseVersionFetchTime = new ConcurrentDictionary<string, DateTime>();
-		private readonly TimeSpan fetchCourseVersionEvery = TimeSpan.FromMinutes(1);
-		private readonly ConcurrentDictionary<string, DateTime> tempCourseUpdateTime = new ConcurrentDictionary<string, DateTime>();
-		private readonly TimeSpan tempCourseUpdateEvery = TimeSpan.FromSeconds(1);
-		private long allTempCoursesUpdateTime;
-		private readonly TimeSpan allTempCoursesUpdateEvery = TimeSpan.FromMinutes(1);
-
-		private List<TempCourse> tempCoursesCache;
-		private readonly TimeSpan tempCoursesCacheUpdateEvery = TimeSpan.FromSeconds(0.5);
-		private long tempCoursesCacheUpdateTime;
 
 		private WebCourseManager()
 			: base(GetCoursesDirectory())
@@ -37,59 +28,45 @@ namespace Database
 
 		private readonly object @lock = new object();
 
-		public override Course GetCourse(string courseId)
+		public async Task UpdateCourses()
 		{
-			Course course;
-			try
-			{
-				LoadCoursesIfNotYet();
-				TryReloadTempCourseIfNecessary(courseId);
-				course = base.GetCourse(courseId);
-			}
-			catch (Exception e) when (e is KeyNotFoundException || e is CourseNotFoundException || e is CourseLoadingException)
-			{
-				course = null;
-			}
-			catch (AggregateException e)
-			{
-				var ie = e.InnerException;
-				if (ie is KeyNotFoundException || ie is CourseNotFoundException || ie is CourseLoadingException)
-					course = null;
-				else
-					throw;
-			}
-
-			if (IsCourseVersionWasUpdatedRecent(courseId) || CourseIsBroken(courseId) || IsTempCourse(courseId))
-				return course ?? throw new KeyNotFoundException($"Key {courseId} not found");
-
-			courseVersionFetchTime[courseId] = DateTime.Now;
+			LoadCoursesIfNotYet();
 			var coursesRepo = new CoursesRepo();
-			var publishedVersion = coursesRepo.GetPublishedCourseVersion(courseId);
-
-			if (publishedVersion == null)
-				return course ?? throw new KeyNotFoundException($"Key {courseId} not found");
-
-			lock (@lock)
+			var publishedCourseVersions = coursesRepo.GetPublishedCourseVersions();
+			foreach (var courseVersion in publishedCourseVersions)
 			{
-				if (loadedCourseVersions.TryGetValue(courseId.ToLower(), out var loadedVersionId)
-					&& loadedVersionId != publishedVersion.Id)
+				if (CourseIsBroken(courseVersion.CourseId))
+					continue;
+				try
 				{
-					log.Info($"Загруженная версия курса {courseId} отличается от актуальной ({loadedVersionId.ToString()} != {publishedVersion.Id}). Обновляю курс.");
-					if (TryReloadCourse(courseId))
-						course = base.GetCourse(courseId);
+					ReloadCourseIfLoadedAndPublishedVersionsAreDifferent(courseVersion.CourseId, courseVersion);
 				}
-
-				loadedCourseVersions[courseId.ToLower()] = publishedVersion.Id;
+				catch (FileNotFoundException)
+				{
+					/* Sometimes zip-archive with course has been deleted already. It's strange but ok */
+					log.Warn("Это странно, что я не смог загрузить с диска курс, который, если верить базе данных, был опубликован. Но ничего, просто проигнорирую");
+				}
 			}
-
-			return course ?? throw new KeyNotFoundException($"Key {courseId} not found");
 		}
 
-		private bool IsCourseVersionWasUpdatedRecent(string courseId)
+		public async Task UpdateTempCourses()
 		{
-			if (courseVersionFetchTime.TryGetValue(courseId, out var lastFetchTime))
-				return lastFetchTime > DateTime.Now.Subtract(fetchCourseVersionEvery);
-			return false;
+			TryCheckTempCoursesAndReloadIfNecessary();
+		}
+
+		private void ReloadCourseIfLoadedAndPublishedVersionsAreDifferent(string courseId, CourseVersion publishedVersion)
+		{
+			lock (@lock)
+			{
+				var isCourseLoaded = loadedCourseVersions.TryGetValue(courseId.ToLower(), out var loadedVersionId);
+				if ((isCourseLoaded && loadedVersionId != publishedVersion.Id) || !isCourseLoaded)
+				{
+					var actual = isCourseLoaded ? loadedVersionId.ToString() : "<none>";
+					log.Info($"Загруженная версия курса {courseId} отличается от актуальной ({actual} != {publishedVersion.Id}). Обновляю курс.");
+					TryReloadCourse(courseId);
+				}
+				loadedCourseVersions[courseId.ToLower()] = publishedVersion.Id;
+			}
 		}
 
 		public void UpdateCourseVersion(string courseId, Guid versionId)
@@ -124,72 +101,12 @@ namespace Database
 			}
 		}
 
-		public override IEnumerable<Course> GetCourses()
-		{
-			try
-			{
-				LoadCoursesIfNotYet();
-				TryCheckTempCoursesAndReloadIfNecessary();
-			}
-			catch (Exception e)
-			{
-				log.Error(e, "GetCourses exception");
-			}
-			return base.GetCourses();
-		}
-
-		private void TryReloadTempCourseIfNecessary([NotNull]string courseId)
-		{
-			try
-			{
-				if (IsTempCourseUpdatedRecent(courseId))
-					return;
-
-				var tempCourses = GetTempCoursesWithCache();
-				var tempCourse = tempCourses.FirstOrDefault(tc => string.Equals(tc.CourseId, courseId, StringComparison.OrdinalIgnoreCase));
-				if (tempCourse == null)
-					return;
-				Course course = null;
-				try
-				{
-					course = base.GetCourse(courseId); // Не используется FindCourse, иначе бесконечная рекурсия
-				}
-				catch (Exception ex)
-				{
-					log.Error(ex);
-				}
-
-				if (tempCourse.LastUpdateTime < tempCourse.LoadingTime)
-					RemoveCourseFromBroken(courseId);
-				if (CourseIsBroken(courseId))
-				{
-					tempCourseUpdateTime[courseId] = DateTime.Now;
-					return;
-				}
-				if (course == null || tempCourse.LastUpdateTime < tempCourse.LoadingTime)
-				{
-					TryReloadCourse(courseId);
-					var tempCoursesRepo = new TempCoursesRepo();
-					tempCoursesRepo.UpdateTempCourseLastUpdateTime(courseId);
-					tempCourseUpdateTime[courseId] = DateTime.Now;
-				} else if (tempCourse.LastUpdateTime > tempCourse.LoadingTime)
-					tempCourseUpdateTime[courseId] = DateTime.Now;
-			}
-			catch (Exception ex)
-			{
-				log.Error(ex);
-			}
-		}
-		
 		private void TryCheckTempCoursesAndReloadIfNecessary()
 		{
 			try
 			{
-				if (new DateTime(allTempCoursesUpdateTime) > DateTime.Now.Subtract(allTempCoursesUpdateEvery))
-					return;
-				Interlocked.Exchange(ref allTempCoursesUpdateTime, DateTime.Now.Ticks);
-
-				var tempCourses = GetTempCoursesWithCache();
+				var tempCoursesRepo = new TempCoursesRepo();
+				var tempCourses = tempCoursesRepo.GetTempCoursesNoTracking();
 				foreach (var tempCourse in tempCourses)
 				{
 					var courseId = tempCourse.CourseId;
@@ -198,7 +115,7 @@ namespace Database
 					Course course = null;
 					try
 					{
-						course = base.GetCourse(courseId); // Не используется FindCourse, иначе бесконечная рекурсия
+						course = CourseStorageInstance.GetCourse(courseId);
 					}
 					catch (Exception ex)
 					{
@@ -207,40 +124,14 @@ namespace Database
 					if (course == null || course.GetSlidesNotSafe().Count == 0)
 					{
 						TryReloadCourse(courseId);
-						var tempCoursesRepo = new TempCoursesRepo();
 						tempCoursesRepo.UpdateTempCourseLastUpdateTime(courseId);
-						tempCourseUpdateTime[courseId] = DateTime.Now;
-					} else if (tempCourse.LastUpdateTime > tempCourse.LoadingTime)
-						tempCourseUpdateTime[courseId] = DateTime.Now;
+					}
 				}
 			}
 			catch (Exception ex)
 			{
 				log.Error(ex);
 			}
-		}
-
-		private List<TempCourse> GetTempCoursesWithCache()
-		{
-			if (tempCoursesCache != null && new DateTime(tempCoursesCacheUpdateTime) > DateTime.Now.Subtract(tempCoursesCacheUpdateEvery))
-				return tempCoursesCache;
-			Interlocked.Exchange(ref tempCoursesCacheUpdateTime, DateTime.Now.Ticks);
-
-			var tempCoursesRepo = new TempCoursesRepo();
-			tempCoursesCache = tempCoursesRepo.GetTempCoursesNoTracking();
-			return tempCoursesCache;
-		}
-
-		private bool IsTempCourseUpdatedRecent(string courseId)
-		{
-			if (tempCourseUpdateTime.TryGetValue(courseId, out var lastFetchTime))
-				return lastFetchTime > DateTime.Now.Subtract(tempCourseUpdateEvery);
-			return false;
-		}
-
-		public bool IsTempCourse(string courseId)
-		{
-			return GetTempCoursesWithCache().Any(c => string.Equals(c.CourseId, courseId, StringComparison.OrdinalIgnoreCase));
 		}
 	}
 }

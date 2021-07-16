@@ -4,6 +4,7 @@ using Database;
 using Database.Models;
 using Database.Repos;
 using Ulearn.Common;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.RunCheckerJobApi;
 using Vostok.Logging.Abstractions;
@@ -14,13 +15,13 @@ namespace Ulearn.Web.Api.Controllers.Runner
 {
 	public class XQueueResultObserver : IResultObserver
 	{
-		private readonly IWebCourseManager courseManager;
+		private readonly ICourseStorage courseStorage;
 		private readonly IXQueueRepo xQueueRepo;
 		private static ILog log => LogProvider.Get().ForContext(typeof(XQueueResultObserver));
 
-		public XQueueResultObserver(IWebCourseManager courseManager, IXQueueRepo xQueueRepo)
+		public XQueueResultObserver(ICourseStorage courseStorage, IXQueueRepo xQueueRepo)
 		{
-			this.courseManager = courseManager;
+			this.courseStorage = courseStorage;
 			this.xQueueRepo = xQueueRepo;
 		}
 
@@ -49,7 +50,7 @@ namespace Ulearn.Web.Api.Controllers.Runner
 		{
 			var checking = submission.Submission.AutomaticChecking;
 
-			var slide = (await courseManager.FindCourseAsync(checking.CourseId))?.FindSlideByIdNotSafe(checking.SlideId) as ExerciseSlide;
+			var slide = courseStorage.FindCourse(checking.CourseId)?.FindSlideByIdNotSafe(checking.SlideId) as ExerciseSlide;
 			if (slide == null)
 			{
 				log.Warn($"Can't find exercise slide {checking.SlideId} in course {checking.CourseId}. Exit");

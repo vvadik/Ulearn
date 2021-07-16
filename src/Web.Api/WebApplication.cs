@@ -32,6 +32,7 @@ using Ulearn.Common.Api.Swagger;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Metrics;
 using Ulearn.Core.RunCheckerJobApi;
 using Ulearn.Core.Telegram;
@@ -124,7 +125,7 @@ namespace Ulearn.Web.Api
 		protected override IApplicationBuilder UseStaticFiles(IApplicationBuilder app)
 		{
 			var contentTypeProvider = new FileExtensionContentTypeProvider(CourseStaticFilesHelper.AllowedExtensions);
-			var coursesDirectory = Path.Combine(CourseManager.GetCoursesDirectory().FullName, "Courses");
+			var coursesDirectory = Path.Combine(WebCourseManager.GetCoursesDirectory().FullName, "Courses");
 			new DirectoryInfo(coursesDirectory).EnsureExists();
 
 			var options = new RewriteOptions()
@@ -249,6 +250,7 @@ namespace Ulearn.Web.Api
 		{
 			builder.AddHostedServiceFromApplication<ArchiveGroupsWorker>();
 			builder.AddHostedServiceFromApplication<RefreshMaterializedViewsWorker>();
+			builder.AddHostedServiceFromApplication<UpdateCoursesWorker>();
 		}
 
 		public void ConfigureAuthServices(IServiceCollection services, WebApiConfiguration configuration)

@@ -21,6 +21,7 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
@@ -35,7 +36,7 @@ namespace uLearn.Web.Controllers
 		private static ILog log => LogProvider.Get().ForContext(typeof(CourseController));
 
 		private readonly ULearnDb db = new ULearnDb();
-		private readonly WebCourseManager courseManager = WebCourseManager.Instance;
+		private readonly ICourseStorage courseStorage = WebCourseManager.CourseStorageInstance;
 
 		private readonly string baseUrlApi;
 		private readonly string baseUrlWeb;
@@ -62,7 +63,7 @@ namespace uLearn.Web.Controllers
 			unitsRepo = new UnitsRepo(db);
 			solutionsRepo = new UserSolutionsRepo(db);
 			ltiRequestsRepo = new LtiRequestsRepo(db);
-			groupsRepo = new GroupsRepo(db, courseManager);
+			groupsRepo = new GroupsRepo(db, courseStorage);
 			userQuizzesRepo = new UserQuizzesRepo(db);
 			coursesRepo = new CoursesRepo(db);
 			tempCoursesRepo = new TempCoursesRepo(db);
@@ -86,7 +87,7 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("Index", "Home");
 			}
 
-			var course = courseManager.FindCourse(courseId);
+			var course = courseStorage.FindCourse(courseId);
 			if (course == null)
 				return HttpNotFound();
 
@@ -145,7 +146,7 @@ namespace uLearn.Web.Controllers
 		[AllowAnonymous]
 		public async Task<ActionResult> Slide(string courseId)
 		{
-			var course = courseManager.FindCourse(courseId);
+			var course = courseStorage.FindCourse(courseId);
 			if (course == null)
 				return HttpNotFound();
 			var visibleUnitIds = unitsRepo.GetVisibleUnitIds(course, User);
@@ -163,7 +164,7 @@ namespace uLearn.Web.Controllers
 			if (string.IsNullOrWhiteSpace(courseId))
 				return RedirectToAction("Index", "Home");
 
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var visibleUnitIds = unitsRepo.GetVisibleUnitIds(course);
 			var slide = course.GetSlideById(slideId, false, visibleUnitIds);
 
@@ -383,7 +384,7 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult InstructorNote(string courseId, Guid unitId)
 		{
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var slide = course.GetUnitByIdNotSafe(unitId).InstructorNote;
 			if (slide == null)
 				return HttpNotFound("No instructor note for this unit");
@@ -394,7 +395,7 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Tester)]
 		public async Task<ActionResult> ForgetAll(string courseId, Guid slideId)
 		{
-			var slide = courseManager.GetCourse(courseId).GetSlideByIdNotSafe(slideId);
+			var slide = courseStorage.GetCourse(courseId).GetSlideByIdNotSafe(slideId);
 			var userId = User.Identity.GetUserId();
 			db.SolutionLikes.RemoveRange(db.SolutionLikes.Where(q => q.UserId == userId && q.Submission.SlideId == slideId));
 
@@ -415,7 +416,7 @@ namespace uLearn.Web.Controllers
 		{
 			var isSystemAdministrator = User.IsSystemAdministrator();
 			var userId = User.Identity.GetUserId();
-			var courses = courseManager.GetCourses();
+			var courses = courseStorage.GetCourses();
 
 			// Неопубликованные курсы не покажем тем, кто не имеет роли в них.
 			if (!isSystemAdministrator)
@@ -430,7 +431,7 @@ namespace uLearn.Web.Controllers
 					|| coursesWhereIAmStudent.Contains(c.Id, StringComparer.OrdinalIgnoreCase));
 			}
 
-			var incorrectChars = new string(CourseManager.GetInvalidCharacters().OrderBy(c => c).Where(c => 32 <= c).ToArray());
+			var incorrectChars = new string(WebCourseManager.GetInvalidCharacters().OrderBy(c => c).Where(c => 32 <= c).ToArray());
 			if (isSystemAdministrator)
 				courses = courses.OrderBy(course => course.Id, StringComparer.InvariantCultureIgnoreCase);
 			else
@@ -444,7 +445,6 @@ namespace uLearn.Web.Controllers
 					{
 						Id = course.Id,
 						Title = course.Title,
-						LastWriteTime = courseManager.GetLastWriteTime(course.Id),
 						IsTemp = tempCourses.Contains(course.Id)
 					})
 					.ToList(),

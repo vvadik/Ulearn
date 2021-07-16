@@ -16,6 +16,7 @@ using uLearn.Web.FilterAttributes;
 using Ulearn.Core;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 
 namespace uLearn.Web.Controllers
 {
@@ -27,7 +28,7 @@ namespace uLearn.Web.Controllers
 		private readonly StepikRepo stepikRepo;
 		private readonly NotificationsRepo notificationsRepo;
 		private readonly UsersRepo usersRepo;
-		private readonly CourseManager courseManager;
+		private readonly ICourseStorage courseStorage;
 
 		private readonly string stepikClientId;
 		private readonly string stepikClientSecret;
@@ -37,21 +38,21 @@ namespace uLearn.Web.Controllers
 		private readonly string ulearnApiBaseUrl;
 
 		public StepikController()
-			: this(new ULearnDb(), WebCourseManager.Instance)
+			: this(new ULearnDb(), WebCourseManager.CourseStorageInstance)
 		{
 		}
 
-		public StepikController(ULearnDb db, CourseManager courseManager)
-			: this(courseManager, new StepikRepo(db), new NotificationsRepo(db), new UsersRepo(db))
+		public StepikController(ULearnDb db, ICourseStorage courseStorage)
+			: this(courseStorage, new StepikRepo(db), new NotificationsRepo(db), new UsersRepo(db))
 		{
 		}
 
-		public StepikController(CourseManager courseManager, StepikRepo stepikRepo, NotificationsRepo notificationsRepo, UsersRepo usersRepo)
+		public StepikController(ICourseStorage courseStorage, StepikRepo stepikRepo, NotificationsRepo notificationsRepo, UsersRepo usersRepo)
 		{
 			this.stepikRepo = stepikRepo;
 			this.notificationsRepo = notificationsRepo;
 			this.usersRepo = usersRepo;
-			this.courseManager = courseManager;
+			this.courseStorage = courseStorage;
 			stepikClientId = WebConfigurationManager.AppSettings["stepik.clientId"];
 			stepikClientSecret = WebConfigurationManager.AppSettings["stepik.clientSecret"];
 			defaultXQueueName = WebConfigurationManager.AppSettings["stepik.defaultXQueueName"];
@@ -67,7 +68,7 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult InitialExportOptions(string courseId, int stepikCourseId)
 		{
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 
 			return View(new InitialExportOptionsModel
 			{
@@ -87,7 +88,7 @@ namespace uLearn.Web.Controllers
 				return Redirect(oauthAuthorizationUrl);
 
 			var exporter = new CourseExporter(stepikClientId, stepikClientSecret, ulearnApiBaseUrl, ulearnWebBaseUrl, client.AccessToken);
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 
 			var exportOptions = new CourseInitialExportOptions(stepikCourseId, xQueueName, ConvertStringToGuidList(newLessonsSlidesIds).ToList())
 			{
@@ -101,7 +102,7 @@ namespace uLearn.Web.Controllers
 
 		public async Task<ActionResult> UpdateOptions(string courseId, int stepikCourseId)
 		{
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var slides = course.GetSlidesNotSafe();
 			var slidesXmls = slides.ToDictionary(s => s.Id, s => stepikRepo.GetSlideXmlIndicatedChanges(s));
 
@@ -155,7 +156,7 @@ namespace uLearn.Web.Controllers
 				return Redirect(oauthAuthorizationUrl);
 
 			var exporter = new CourseExporter(stepikClientId, stepikClientSecret, ulearnApiBaseUrl, ulearnWebBaseUrl, client.AccessToken);
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 
 			var updateSlidesGuids = ConvertStringToGuidList(updateSlidesIds).ToList();
 			var slidesUpdateOptions = new List<SlideUpdateOptions>();
@@ -191,7 +192,7 @@ namespace uLearn.Web.Controllers
 			if (client == null)
 				return Redirect(oauthAuthorizationUrl);
 
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var myCourses = await client.GetMyCourses();
 			return View("SelectTarget", new SelectTargetModel
 			{
@@ -326,7 +327,7 @@ namespace uLearn.Web.Controllers
 			if (process.OwnerId != userId && !User.IsSystemAdministrator())
 				return HttpNotFound();
 
-			var course = courseManager.GetCourse(process.UlearnCourseId);
+			var course = courseStorage.GetCourse(process.UlearnCourseId);
 
 			return View(new ProcessModel
 			{

@@ -672,6 +672,10 @@
     <Reference Include="UnidecodeSharpCore, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\UnidecodeSharpCore.2.0.1\lib\net45\UnidecodeSharpCore.dll</HintPath>
     </Reference>
+    <Reference Include="Vostok.Applications.Scheduled, Version=0.2.7.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Applications.Scheduled.0.2.7\lib\netstandard2.0\Vostok.Applications.Scheduled.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Vostok.ClusterClient.Context, Version=0.1.4.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\packages\Vostok.ClusterClient.Context.0.1.4\lib\netstandard2.0\Vostok.ClusterClient.Context.dll</HintPath>
       <Private>True</Private>
@@ -744,8 +748,16 @@
       <HintPath>..\packages\Vostok.Hercules.Client.Abstractions.0.1.7\lib\netstandard2.0\Vostok.Hercules.Client.Abstractions.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Vostok.Hosting.Abstractions, Version=0.3.5.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Hosting.Abstractions.0.3.5\lib\netstandard2.0\Vostok.Hosting.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Vostok.Logging.Abstractions, Version=1.0.20.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\packages\Vostok.Logging.Abstractions.1.0.20\lib\netstandard2.0\Vostok.Logging.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.Logging.Context, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Logging.Context.1.0.1\lib\netstandard2.0\Vostok.Logging.Context.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Vostok.Logging.File, Version=1.0.12.0, Culture=neutral, PublicKeyToken=null">
@@ -774,6 +786,10 @@
     </Reference>
     <Reference Include="Vostok.Metrics.Hercules, Version=0.1.2.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\packages\Vostok.Metrics.Hercules.0.1.2\lib\netstandard2.0\Vostok.Metrics.Hercules.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.ServiceDiscovery.Abstractions, Version=0.1.4.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.ServiceDiscovery.Abstractions.0.1.4\lib\netstandard2.0\Vostok.ServiceDiscovery.Abstractions.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Vostok.Telemetry.Kontur, Version=1.0.52.0, Culture=neutral, PublicKeyToken=null">

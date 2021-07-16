@@ -9,6 +9,7 @@ using Database.Models;
 using JetBrains.Annotations;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Extensions;
 
 namespace Database.DataContexts
 {
@@ -29,6 +30,15 @@ namespace Database.DataContexts
 		public CourseVersion GetPublishedCourseVersion(string courseId)
 		{
 			return db.CourseVersions.Where(v => v.CourseId == courseId && v.PublishTime != null).OrderByDescending(v => v.PublishTime).FirstOrDefault();
+		}
+
+		public List<CourseVersion> GetPublishedCourseVersions()
+		{
+			var courseVersions = db.CourseVersions.ToList();
+			return courseVersions
+				.GroupBy(v => v.CourseId.ToLower())
+				.Select(g => g.MaxBy(v => v.PublishTime))
+				.ToList();
 		}
 
 		public IEnumerable<CourseVersion> GetCourseVersions(string courseId)

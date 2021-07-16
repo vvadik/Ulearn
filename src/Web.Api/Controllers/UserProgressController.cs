@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Web.Api.Models.Parameters;
@@ -35,11 +36,11 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly ILtiConsumersRepo ltiConsumersRepo;
 		private readonly IUnitsRepo unitsRepo;
 
-		public UserProgressController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo,
+		public UserProgressController(ICourseStorage courseStorage, UlearnDb db, IUsersRepo usersRepo,
 			IVisitsRepo visitsRepo, IUserQuizzesRepo userQuizzesRepo, IAdditionalScoresRepo additionalScoresRepo,
 			ICourseRolesRepo courseRolesRepo, IGroupAccessesRepo groupAccessesRepo, IGroupMembersRepo groupMembersRepo,
 			ISlideCheckingsRepo slideCheckingsRepo, ILtiRequestsRepo ltiRequestsRepo, ILtiConsumersRepo ltiConsumersRepo, IUnitsRepo unitsRepo)
-			: base(courseManager, db, usersRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 			this.visitsRepo = visitsRepo;
 			this.userQuizzesRepo = userQuizzesRepo;
@@ -60,9 +61,9 @@ namespace Ulearn.Web.Api.Controllers
 		[Authorize]
 		public async Task<ActionResult<UsersProgressResponse>> UserProgress([FromRoute]string courseId, [FromBody]UserProgressParameters parameters)
 		{
-			if (!await courseManager.HasCourseAsync(courseId))
+			if (!courseStorage.HasCourse(courseId))
 				return NotFound(new ErrorResponse($"Course {courseId} not found"));
-			var course = await courseManager.FindCourseAsync(courseId);
+			var course = courseStorage.FindCourse(courseId);
 			var userIds = parameters.UserIds;
 			if (userIds == null || userIds.Count == 0)
 				userIds = new List<string> { UserId };
