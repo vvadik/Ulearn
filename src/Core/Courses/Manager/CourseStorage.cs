@@ -29,9 +29,8 @@ namespace Ulearn.Core.Courses.Manager
 			return FindCourse(courseId) != null;
 		}
 
-		public void AddOrUpdateCourse(Course course, Guid version)
+		public void AddOrUpdateCourse(Course course)
 		{
-			course.CourseVersion = version;
 			courses.AddOrUpdate(course.Id, _ => course, (_, _) => course);
 			CourseChangedEvent?.Invoke(course.Id);
 		}

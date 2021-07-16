@@ -447,6 +447,8 @@ namespace Database
 
 		public DbSet<CourseVersion> CourseVersions { get; set; }
 		public DbSet<CourseFile> CourseFiles { get; set; }
+		public DbSet<CourseVersionFile> CourseVersionFiles { get; set; }
+
 		public DbSet<CourseGit> CourseGitRepos { get; set; }
 
 		public DbSet<ManualExerciseChecking> ManualExerciseCheckings { get; set; }

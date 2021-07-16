@@ -92,5 +92,32 @@ namespace Database
 				loadedCourseVersions[courseId.ToLower()] = publishedVersion.Id;
 			}
 		}
+
+		protected override async Task LoadCourseZipsToDiskFromExternalStorage(IEnumerable<string> existingOnDiskCourseIds)
+		{
+			log.Info("Загружаю курсы из БД");
+			using (var scope = serviceScopeFactory.CreateScope())
+			{
+				var coursesRepo = (CoursesRepo)scope.ServiceProvider.GetService(typeof(ICoursesRepo));
+				var coursesWithCourseFiles = (await coursesRepo!.GetCourseIdsFromCourseFiles()).Where(c => !existingOnDiskCourseIds.Contains(c));
+				foreach (var courseId in coursesWithCourseFiles)
+				{
+					var fileInDb = await coursesRepo.GetCourseFile(courseId);
+					try
+					{
+						var stagingCourseFile = GetStagingCourseFile(fileInDb.CourseId);
+						File.WriteAllBytes(stagingCourseFile.FullName, fileInDb.File);
+						var versionCourseFile = GetCourseVersionFile(fileInDb.CourseVersionId);
+						if (!versionCourseFile.Exists)
+							File.WriteAllBytes(versionCourseFile.FullName, fileInDb.File);
+						UnzipFile(stagingCourseFile, GetExtractedCourseDirectory(fileInDb.CourseId));
+					}
+					catch (Exception ex)
+					{
+						log.Error(ex, $"Не смог загрузить {fileInDb.CourseId} из базы данных");
+					}
+				}
+			}
+		}
 	}
 }

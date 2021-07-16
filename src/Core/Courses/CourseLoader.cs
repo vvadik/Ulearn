@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
+using Newtonsoft.Json;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Flashcards;
@@ -70,6 +72,8 @@ namespace Ulearn.Core.Courses
 				settings.Description = "";
 			}
 
+			var courseMeta = LoadMeta(courseDirectory);
+
 			var context = new CourseLoadingContext(courseId, settings, courseDirectory);
 
 			var units = LoadUnits(context).ToList();
@@ -84,7 +88,7 @@ namespace Ulearn.Core.Courses
 			AddDefaultScoringGroupIfNeeded(units, slides, settings);
 			CalculateScoringGroupScores(units, settings);
 
-			return new Course(courseId, units, settings);
+			return new Course(courseId, units, settings, courseMeta);
 		}
 
 		private static string GetValidationLog(List<Unit> units)
@@ -126,6 +130,23 @@ namespace Ulearn.Core.Courses
 				/* Add default scoring group to each unit */
 				foreach (var unit in units)
 					unit.Scoring.Groups.Add(defaultScoringGroup.Id, defaultScoringGroup);
+			}
+		}
+
+		// Meta присутствует в курсах, для которых уже создана версия в базе
+		[CanBeNull]
+		public static CourseMeta LoadMeta(DirectoryInfo courseDirectory)
+		{
+			var metaFile = courseDirectory.GetFile(".meta");
+			if (!metaFile.Exists)
+				return null;
+			try
+			{
+				return JsonConvert.DeserializeObject<CourseMeta>(metaFile.ContentAsUtf8());
+			}
+			catch (Exception ex)
+			{
+				return null;
 			}
 		}
 

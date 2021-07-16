@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Database.DataContexts;
 using Database.Models;
@@ -74,30 +73,6 @@ namespace Database
 			lock (@lock)
 			{
 				loadedCourseVersions[courseId.ToLower()] = versionId;
-			}
-		}
-
-		protected override void LoadCourseZipsToDiskFromExternalStorage(IEnumerable<string> existingOnDiskCourseIds)
-		{
-			log.Info("Загружаю курсы из БД");
-			var coursesRepo = new CoursesRepo();
-			var coursesWithCourseFiles = coursesRepo.GetCourseIdsFromCourseFiles().Where(c => !existingOnDiskCourseIds.Contains(c));
-			foreach (var courseId in coursesWithCourseFiles)
-			{
-				var fileInDb = coursesRepo.GetCourseFile(courseId);
-				try
-				{
-					var stagingCourseFile = GetStagingCourseFile(fileInDb.CourseId);
-					File.WriteAllBytes(stagingCourseFile.FullName, fileInDb.File);
-					var versionCourseFile = GetCourseVersionFile(fileInDb.CourseVersionId);
-					if (!versionCourseFile.Exists)
-						File.WriteAllBytes(versionCourseFile.FullName, fileInDb.File);
-					UnzipFile(stagingCourseFile, GetExtractedCourseDirectory(fileInDb.CourseId));
-				}
-				catch (Exception ex)
-				{
-					log.Error(ex, $"Не смог загрузить {fileInDb.CourseId} из базы данных");
-				}
 			}
 		}
 
