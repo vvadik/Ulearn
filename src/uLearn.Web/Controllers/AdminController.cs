@@ -425,7 +425,7 @@ namespace uLearn.Web.Controllers
 			log.Info($"Successfully update course files '{courseId}'");
 
 			await coursesRepo.AddCourseVersion(courseId, versionId, userId,
-				pathToCourseXmlInRepo, uploadedFromRepoUrl, commitInfo?.Hash, commitInfo?.Message);
+				pathToCourseXmlInRepo, uploadedFromRepoUrl, commitInfo?.Hash, commitInfo?.Message, await destinationFile.ReadAllContentAsync());
 			await NotifyAboutCourseVersion(courseId, versionId, userId);
 			try
 			{
@@ -454,10 +454,11 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("Courses", "Course", new { courseId = courseId, courseTitle = courseTitle });
 
 			var userId = User.Identity.GetUserId();
-			await coursesRepo.AddCourseVersion(courseId, versionId, userId, null, null, null, null).ConfigureAwait(false);
-			await coursesRepo.MarkCourseVersionAsPublished(versionId).ConfigureAwait(false);
 			var courseFile = courseManager.GetStagingCourseFile(courseId);
-			await coursesRepo.AddCourseFile(courseId, versionId, courseFile.ReadAllContent()).ConfigureAwait(false);
+			var courseContent = await courseFile.ReadAllContentAsync();
+			await coursesRepo.AddCourseVersion(courseId, versionId, userId, null, null, null, null, courseContent).ConfigureAwait(false);
+			await coursesRepo.MarkCourseVersionAsPublished(versionId).ConfigureAwait(false);
+			await coursesRepo.AddCourseFile(courseId, versionId, courseContent).ConfigureAwait(false);
 			await NotifyAboutPublishedCourseVersion(courseId, versionId, userId).ConfigureAwait(false);
 
 			return RedirectToAction("Packages", new { courseId, onlyPrivileged = true });

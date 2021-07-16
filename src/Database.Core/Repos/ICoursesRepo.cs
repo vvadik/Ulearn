@@ -15,7 +15,7 @@ namespace Database.Repos
 		Task<List<CourseVersion>> GetCourseVersions(string courseId);
 
 		Task<CourseVersion> AddCourseVersion(string courseId, Guid versionId, string authorId,
-			string pathToCourseXml, string repoUrl, string commitHash, string description);
+			string pathToCourseXml, string repoUrl, string commitHash, string description, byte[] courseContent);
 
 		Task MarkCourseVersionAsPublished(Guid versionId);
 		Task DeleteCourseVersion(string courseId, Guid versionId);

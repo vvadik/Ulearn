@@ -44,7 +44,7 @@ namespace Database.Repos
 		}
 
 		public async Task<CourseVersion> AddCourseVersion(string courseId, Guid versionId, string authorId,
-			string pathToCourseXml, string repoUrl, string commitHash, string description)
+			string pathToCourseXml, string repoUrl, string commitHash, string description, byte[] courseContent)
 		{
 			var courseVersion = new CourseVersion
 			{
@@ -59,7 +59,15 @@ namespace Database.Repos
 				RepoUrl = repoUrl
 			};
 			db.CourseVersions.Add(courseVersion);
-			await db.SaveChangesAsync();
+			var courseVersionFile = new CourseVersionFile
+			{
+				CourseVersionId = versionId,
+				CourseVersion = courseVersion,
+				CourseId = courseId,
+				File = courseContent
+			};
+			db.CourseVersionFiles.Add(courseVersionFile);
+			await db.SaveChangesAsync(); // автоматически выполнит обе операции в транзации
 
 			return courseVersion;
 		}

@@ -1,12 +1,14 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Database.Models
 {
 	public class CourseVersionFile
 	{
 		[Key]
-		[Required]
+		[Column("CourseVersionId")]
+		[ForeignKey("CourseVersion")]
 		public Guid CourseVersionId { get; set; }
 
 		public virtual CourseVersion CourseVersion { get; set; }
