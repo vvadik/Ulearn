@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace Ulearn.Web.Api.Models.Responses.Submissions
+namespace Ulearn.Web.Api.Models.Responses.Review
 {
 	[DataContract]
 	public class FavouriteReviewsResponse

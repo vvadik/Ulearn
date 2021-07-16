@@ -4,18 +4,13 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Database;
-using Database.Models;
-using Database.Repos;
 using Database.Repos.Users;
-using JetBrains.Annotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
-using Ulearn.Common.Api.Models.Responses;
-using Ulearn.Web.Api.Models.Responses.Submissions;
+using Ulearn.Web.Api.Models.Responses.Review;
 
-namespace Ulearn.Web.Api.Controllers.Submissions
+namespace Ulearn.Web.Api.Controllers.Review
 {
 	[Route("/favourite-reviews")]
 	public class FavouriteReviewsController : BaseController
