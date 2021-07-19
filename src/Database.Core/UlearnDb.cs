@@ -153,6 +153,12 @@ namespace Database
 				.HasForeignKey(d => d.NotificationId)
 				.OnDelete(DeleteBehavior.Cascade);
 
+			modelBuilder.Entity<ExerciseCodeReview>()
+				.HasOne(s => s.ExerciseChecking)
+				.WithMany(c => c.Reviews)
+				.HasForeignKey(p => p.ExerciseCheckingId)
+				.OnDelete(DeleteBehavior.Cascade);
+
 			modelBuilder.Entity<UserQuizSubmission>()
 				.HasOne(s => s.AutomaticChecking)
 				.WithOne(c => c.Submission)

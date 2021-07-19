@@ -23,6 +23,7 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Exercises;
+using Ulearn.Core.Extensions;
 using Ulearn.Core.Logging;
 using Ulearn.Web.Api.Utils.LTI;
 using Vostok.Logging.Abstractions;
@@ -99,8 +100,9 @@ namespace ManualUtils
 			// await UploadStagingFromDbAndExtractToCourses(serviceProvider);
 			// await SetCourseIdAndSlideIdInLikesAndPromotes(db);
 			// await SetNewFieldsInReview(db, serviceProvider);
-			//await UploadCourseVersions(serviceProvider);
-			await RemoveVersionsWithoutFile(serviceProvider);
+			// await UploadCourseVersions(serviceProvider);
+			// await RemoveVersionsWithoutFile(serviceProvider);
+			await RemoveDuplicateExerciseManualCheckings(serviceProvider);
 		}
 
 		private static void GenerateUpdateSequences()
@@ -601,6 +603,36 @@ namespace ManualUtils
 					db.CourseVersions.Remove(cv);
 				}
 				await db.SaveChangesAsync();
+			}
+		}
+
+		private static async Task RemoveDuplicateExerciseManualCheckings(IServiceProvider serviceProvider)
+		{
+			using (var scope = serviceProvider.CreateScope())
+			{
+				var db = scope.ServiceProvider.GetService<UlearnDb>();
+				var doubles = await db!.ManualExerciseCheckings
+					.GroupBy(c => c.SubmissionId)
+					.Select(g => new { SubmissionId = g.Key, Count = g.Count() })
+					.Where(p => p.Count > 1)
+					.ToListAsync();
+				Console.WriteLine($"Doubles count {doubles.Count}");
+				var i = 0;
+				foreach (var d in doubles)
+				{
+					var submissionId = d.SubmissionId;
+					var checkings = await db.ManualExerciseCheckings
+						.Where(c => c.SubmissionId == submissionId)
+						.ToListAsync();
+					var bestChecking = checkings.Any(c => c.IsChecked)
+						? checkings.Where(c => c.IsChecked).MaxBy(c => c.Timestamp)
+						: checkings.MaxBy(c => c.Timestamp);
+					var notBestCheckings = checkings.Where(c => c.Id != bestChecking.Id).ToList();
+					db.ManualExerciseCheckings.RemoveRange(notBestCheckings);
+					db.SaveChanges();
+					i++;
+					Console.WriteLine($"{i}/{doubles.Count}");
+				}
 			}
 		}
 	}
