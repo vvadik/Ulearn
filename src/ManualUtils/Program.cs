@@ -99,8 +99,8 @@ namespace ManualUtils
 			// await UploadStagingFromDbAndExtractToCourses(serviceProvider);
 			// await SetCourseIdAndSlideIdInLikesAndPromotes(db);
 			// await SetNewFieldsInReview(db, serviceProvider);
-			// await UploadCourseVersions(serviceProvider); // TODO выполнить
-			await PrintPublishedVersionsWithoutFile(serviceProvider);
+			//await UploadCourseVersions(serviceProvider);
+			await RemoveVersionsWithoutFile(serviceProvider);
 		}
 
 		private static void GenerateUpdateSequences()
@@ -586,7 +586,7 @@ namespace ManualUtils
 			return result;
 		}
 
-		private static async Task PrintPublishedVersionsWithoutFile(IServiceProvider serviceProvider)
+		private static async Task RemoveVersionsWithoutFile(IServiceProvider serviceProvider)
 		{
 			using (var scope = serviceProvider.CreateScope())
 			{
@@ -594,10 +594,13 @@ namespace ManualUtils
 				var versionsWithFiles = (await db.CourseVersionFiles.Select(v => v.CourseVersionId).ToListAsync()).ToHashSet();
 				var versionsWithoutFiles = (await db.CourseVersions.Where(v => !versionsWithFiles.Contains(v.Id))
 					.Select(v => v.Id).ToListAsync()).ToHashSet();
-				var coursesRepo = scope.ServiceProvider.GetService<ICoursesRepo>();
-				var publishedCourseVersionsWithoutFiles = (await coursesRepo.GetPublishedCourseVersions())
-					.Where(p => versionsWithoutFiles.Contains(p.Id));
-				Console.WriteLine(string.Join("\n", publishedCourseVersionsWithoutFiles));
+				Console.WriteLine(string.Join("\n", versionsWithoutFiles));
+				foreach (var wf in versionsWithoutFiles)
+				{
+					var cv = await db.CourseVersions.FindAsync(wf);
+					db.CourseVersions.Remove(cv);
+				}
+				await db.SaveChangesAsync();
 			}
 		}
 	}

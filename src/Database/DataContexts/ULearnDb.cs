@@ -92,31 +92,6 @@ namespace Database.DataContexts
 
 			CancelCascaseDeleting<GraderClient, ApplicationUser, string>(modelBuilder, c => c.User, c => c.UserId);
 
-			CancelCascaseDeleting<Notification, ApplicationUser, string>(modelBuilder, c => c.InitiatedBy, c => c.InitiatedById);
-			CancelCascaseDeleting<AddedInstructorNotification, ApplicationUser, string>(modelBuilder, c => c.AddedUser, c => c.AddedUserId);
-			CancelCascaseDeleting<LikedYourCommentNotification, ApplicationUser, string>(modelBuilder, c => c.LikedUser, c => c.LikedUserId);
-			CancelCascaseDeleting<JoinedToYourGroupNotification, ApplicationUser, string>(modelBuilder, c => c.JoinedUser, c => c.JoinedUserId);
-			CancelCascaseDeleting<JoinedToYourGroupNotification, Group, int>(modelBuilder, c => c.Group, c => c.GroupId);
-			CancelCascaseDeleting<GrantedAccessToGroupNotification, GroupAccess, int>(modelBuilder, c => c.Access, c => c.AccessId);
-			CancelCascaseDeleting<RevokedAccessToGroupNotification, GroupAccess, int>(modelBuilder, c => c.Access, c => c.AccessId);
-			CancelCascaseDeleting<GroupMembersHaveBeenRemovedNotification, Group, int>(modelBuilder, c => c.Group, c => c.GroupId);
-			CancelCascaseDeleting<GroupMembersHaveBeenAddedNotification, Group, int>(modelBuilder, c => c.Group, c => c.GroupId);
-			CancelCascaseDeleting<CreatedGroupNotification, Group, int>(modelBuilder, c => c.Group, c => c.GroupId);
-			CancelCascaseDeleting<PassedManualExerciseCheckingNotification, ManualExerciseChecking, int>(modelBuilder, c => c.Checking, c => c.CheckingId);
-			CancelCascaseDeleting<PassedManualQuizCheckingNotification, ManualQuizChecking, int>(modelBuilder, c => c.Checking, c => c.CheckingId);
-
-			CancelCascaseDeleting<NewCommentNotification, Comment, int>(modelBuilder, c => c.Comment, c => c.CommentId);
-			CancelCascaseDeleting<NewCommentFromYourGroupStudentNotification, Comment, int>(modelBuilder, c => c.Comment, c => c.CommentId);
-			CancelCascaseDeleting<LikedYourCommentNotification, Comment, int>(modelBuilder, c => c.Comment, c => c.CommentId);
-			CancelCascaseDeleting<RepliedToYourCommentNotification, Comment, int>(modelBuilder, c => c.Comment, c => c.CommentId);
-			CancelCascaseDeleting<RepliedToYourCommentNotification, Comment, int>(modelBuilder, c => c.ParentComment, c => c.ParentCommentId);
-			CancelCascaseDeleting<NewCommentForInstructorsOnlyNotification, Comment, int>(modelBuilder, c => c.Comment, c => c.CommentId);
-
-			CancelCascaseDeleting<UploadedPackageNotification, CourseVersion, Guid>(modelBuilder, c => c.CourseVersion, c => c.CourseVersionId);
-			CancelCascaseDeleting<PublishedPackageNotification, CourseVersion, Guid>(modelBuilder, c => c.CourseVersion, c => c.CourseVersionId);
-
-			CancelCascaseDeleting<CourseExportedToStepikNotification, StepikExportProcess, int>(modelBuilder, c => c.Process, c => c.ProcessId);
-
 			CancelCascaseDeleting<XQueueWatcher, ApplicationUser, string>(modelBuilder, c => c.User, c => c.UserId);
 
 			CancelCascaseDeleting<StepikExportProcess, ApplicationUser, string>(modelBuilder, c => c.Owner, c => c.OwnerId);

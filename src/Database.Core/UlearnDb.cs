@@ -180,28 +180,7 @@ namespace Database
 
 			SetDeleteBehavior<GraderClient, ApplicationUser>(modelBuilder, c => c.User, c => c.UserId);
 
-			SetDeleteBehavior<Notification, ApplicationUser>(modelBuilder, c => c.InitiatedBy, c => c.InitiatedById);
-			SetDeleteBehavior<AddedInstructorNotification, ApplicationUser>(modelBuilder, c => c.AddedUser, c => c.AddedUserId);
-			SetDeleteBehavior<LikedYourCommentNotification, ApplicationUser>(modelBuilder, c => c.LikedUser, c => c.LikedUserId);
-			SetDeleteBehavior<JoinedToYourGroupNotification, ApplicationUser>(modelBuilder, c => c.JoinedUser, c => c.JoinedUserId);
-			SetDeleteBehavior<JoinedToYourGroupNotification, Group>(modelBuilder, c => c.Group, c => c.GroupId);
-			SetDeleteBehavior<GrantedAccessToGroupNotification, GroupAccess>(modelBuilder, c => c.Access, c => c.AccessId);
-			SetDeleteBehavior<RevokedAccessToGroupNotification, GroupAccess>(modelBuilder, c => c.Access, c => c.AccessId);
-			SetDeleteBehavior<CreatedGroupNotification, Group>(modelBuilder, c => c.Group, c => c.GroupId);
-			SetDeleteBehavior<PassedManualExerciseCheckingNotification, ManualExerciseChecking>(modelBuilder, c => c.Checking, c => c.CheckingId);
-			SetDeleteBehavior<PassedManualQuizCheckingNotification, ManualQuizChecking>(modelBuilder, c => c.Checking, c => c.CheckingId);
 			SetDeleteBehavior<ReceivedAdditionalScoreNotification, AdditionalScore>(modelBuilder, c => c.Score, c => c.ScoreId, DeleteBehavior.Cascade);
-
-			SetDeleteBehavior<NewCommentNotification, Comment>(modelBuilder, c => c.Comment, c => c.CommentId);
-			SetDeleteBehavior<NewCommentFromYourGroupStudentNotification, Comment>(modelBuilder, c => c.Comment, c => c.CommentId);
-			SetDeleteBehavior<LikedYourCommentNotification, Comment>(modelBuilder, c => c.Comment, c => c.CommentId);
-			SetDeleteBehavior<RepliedToYourCommentNotification, Comment>(modelBuilder, c => c.Comment, c => c.CommentId);
-			SetDeleteBehavior<RepliedToYourCommentNotification, Comment>(modelBuilder, c => c.ParentComment, c => c.ParentCommentId);
-
-			SetDeleteBehavior<UploadedPackageNotification, CourseVersion>(modelBuilder, c => c.CourseVersion, c => c.CourseVersionId);
-			SetDeleteBehavior<PublishedPackageNotification, CourseVersion>(modelBuilder, c => c.CourseVersion, c => c.CourseVersionId);
-
-			SetDeleteBehavior<CourseExportedToStepikNotification, StepikExportProcess>(modelBuilder, c => c.Process, c => c.ProcessId);
 
 			SetDeleteBehavior<XQueueWatcher, ApplicationUser>(modelBuilder, c => c.User, c => c.UserId);
 
