@@ -255,5 +255,9 @@ namespace Database.DataContexts
 		public DbSet<WorkQueueItem> WorkQueueItems { get; set; }
 
 		public DbSet<AcceptedSolutionsPromote> AcceptedSolutionsPromotes { get; set; }
+
+		public DbSet<GoogleSheetTask> GoogleSheetTasks { get; set; }
+
+		public DbSet<GoogleSheetTaskGroup> GoogleSheetTaskGroups { get; set; }
 	}
 }

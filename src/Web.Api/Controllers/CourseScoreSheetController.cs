@@ -63,7 +63,7 @@ namespace Ulearn.Web.Api.Controllers
 		
 		[HttpGet("course-score-sheet/export/{fileNameWithNoExtension}.json")]
 		[Authorize(Policy = "Instructors", AuthenticationSchemes = "Bearer,Identity.Application")]
-		public async Task<ActionResult> ExportCourseStatisticsAsJson([FromQuery] CourseStatisticsParams param)
+		public async Task<ActionResult> ExportCourseStatisticsAsJson([FromQuery] CourseStatisticsParams param, [FromRoute] string fileNameWithNoExtension)
 		{
 			if (param.CourseId == null)
 				return NotFound();
@@ -71,23 +71,23 @@ namespace Ulearn.Web.Api.Controllers
 			var model = await GetCourseStatisticsModel(param, 3000);
 			var serializedModel = new CourseStatisticsModel(model).JsonSerialize(Formatting.Indented);
 
-			return File(Encoding.UTF8.GetBytes(serializedModel), "application/json", $"{param.FileNameWithNoExtension}.json");
+			return File(Encoding.UTF8.GetBytes(serializedModel), "application/json", $"{fileNameWithNoExtension}.json");
 		}
 		
 		[HttpGet("course-score-sheet/export/{fileNameWithNoExtension}.xml")]
 		[Authorize(Policy = "Instructors", AuthenticationSchemes = "Bearer,Identity.Application")]
-		public async Task<ActionResult> ExportCourseStatisticsAsXml([FromQuery] CourseStatisticsParams param)
+		public async Task<ActionResult> ExportCourseStatisticsAsXml([FromQuery] CourseStatisticsParams param, [FromRoute] string fileNameWithNoExtension)
 		{
 			if (param.CourseId == null)
 				return NotFound();
 			var model = await GetCourseStatisticsModel(param, 3000); 
 			var serializedModel = new CourseStatisticsModel(model).XmlSerialize();
-			return File(Encoding.UTF8.GetBytes(serializedModel), "text/xml", $"{param.FileNameWithNoExtension}.xml");
+			return File(Encoding.UTF8.GetBytes(serializedModel), "text/xml", $"{fileNameWithNoExtension}.xml");
 		}
 
 		[HttpGet("course-score-sheet/export/{fileNameWithNoExtension}.xlsx")]
 		[Authorize(Policy = "Instructors", AuthenticationSchemes = "Bearer,Identity.Application")]
-		public async Task<ActionResult> ExportCourseStatisticsAsXlsx([FromQuery] CourseStatisticsParams param)
+		public async Task<ActionResult> ExportCourseStatisticsAsXlsx([FromQuery] CourseStatisticsParams param, [FromRoute] string fileNameWithNoExtension)
 		{
 			if (param.CourseId == null)
 				return NotFound();
@@ -114,7 +114,7 @@ namespace Ulearn.Web.Api.Controllers
 				bytes = stream.ToArray();
 			}
 			
-			return File(bytes, "application/vnd.ms-excel", $"{param.FileNameWithNoExtension}.xlsx");
+			return File(bytes, "application/vnd.ms-excel", $"{fileNameWithNoExtension}.xlsx");
 		}
 
 		[HttpGet("course-score-sheet/export/to-google-sheets")]

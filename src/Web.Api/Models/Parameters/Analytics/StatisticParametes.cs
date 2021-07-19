@@ -61,10 +61,7 @@ namespace Ulearn.Web.Api.Models.Parameters.Analytics
 		
 		[BindNever]
 		public new DateTime PeriodFinishDate => DateTime.MaxValue.Subtract(TimeSpan.FromDays(2));
-		
-		[FromRoute(Name = "fileNameWithNoExtension")]
-		public string FileNameWithNoExtension { get; set; }
-		
+
 		[FromQuery(Name = "groupsIds")]
 		public List<string> GroupsIds { get; set; }
 
