@@ -172,6 +172,7 @@ namespace Database
 				.OnDelete(DeleteBehavior.Restrict);
 
 			SetDeleteBehavior<CourseRole, ApplicationUser>(modelBuilder, r => r.User, r => r.UserId, DeleteBehavior.Cascade);
+			SetDeleteBehavior<ReceivedCommentToCodeReviewNotification, ExerciseCodeReviewComment>(modelBuilder, c => c.Comment, c => c.CommentId, DeleteBehavior.Cascade);
 
 			SetDeleteBehavior<ExerciseCodeReview, ApplicationUser>(modelBuilder, c => c.Author, c => c.AuthorId);
 
