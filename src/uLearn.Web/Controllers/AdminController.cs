@@ -596,7 +596,7 @@ namespace uLearn.Web.Controllers
 			if (alreadyChecked)
 			{
 				reviews = slideCheckingsRepo.GetExerciseCodeReviewForCheckings(checkings.Select(c => c.Id));
-				var submissionsIds = checkings.Select(c => (c as ManualExerciseChecking)?.SubmissionId).Where(s => s.HasValue).Select(s => s.Value);
+				var submissionsIds = checkings.Select(c => (c as ManualExerciseChecking)?.Id).Where(s => s.HasValue).Select(s => s.Value);
 				solutions = userSolutionsRepo.GetSolutionsForSubmissions(submissionsIds);
 			}
 
@@ -618,7 +618,7 @@ namespace uLearn.Web.Controllers
 						ContextTimestamp = c.Timestamp,
 						ContextReviews = alreadyChecked ? reviews.GetOrDefault(c.Id, new List<ExerciseCodeReview>()) : new List<ExerciseCodeReview>(),
 						ContextExerciseSolution = alreadyChecked && c is ManualExerciseChecking checking ?
-							solutions.GetOrDefault(checking.SubmissionId, "") :
+							solutions.GetOrDefault(checking.Id, "") :
 							"",
 					};
 				}).ToList(),

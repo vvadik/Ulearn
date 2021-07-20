@@ -104,7 +104,7 @@ namespace Database.Repos
 			var query = db.UserExerciseSubmissions.AsQueryable();
 			if (includeManualAndAutomaticCheckings)
 				query = query
-					.Include(s => s.ManualCheckings)
+					.Include(s => s.ManualChecking)
 					.Include(s => s.AutomaticChecking);
 			return query.Where(x => x.CourseId == courseId);
 		}
@@ -323,7 +323,7 @@ namespace Database.Repos
 				.Include(s => s.AutomaticChecking).ThenInclude(c => c.CompilationError)
 				.Include(s => s.SolutionCode)
 				.Include(s => s.Reviews).ThenInclude(c => c.Author)
-				.Include(s => s.ManualCheckings).ThenInclude(c => c.Reviews).ThenInclude(r => r.Author)
+				.Include(s => s.ManualChecking).ThenInclude(c => c.Reviews).ThenInclude(r => r.Author)
 				.SingleOrDefaultAsync(x => x.Id == id);
 		}
 

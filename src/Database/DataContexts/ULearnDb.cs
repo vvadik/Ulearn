@@ -64,12 +64,23 @@ namespace Database.DataContexts
 				.HasForeignKey(d => d.NotificationId)
 				.WillCascadeOnDelete(true);
 
+			modelBuilder.Entity<ExerciseCodeReview>()
+				.HasRequired(s => s.ExerciseChecking)
+				.WithMany(c => c.Reviews)
+				.HasForeignKey(p => p.ExerciseCheckingId)
+				.WillCascadeOnDelete(true);
+
 			modelBuilder.Entity<UserQuizSubmission>()
 				.HasOptional(s => s.AutomaticChecking)
 				.WithRequired(c => c.Submission)
 				.WillCascadeOnDelete(false);
 
 			modelBuilder.Entity<UserQuizSubmission>()
+				.HasOptional(s => s.ManualChecking)
+				.WithRequired(c => c.Submission)
+				.WillCascadeOnDelete(false);
+
+			modelBuilder.Entity<UserExerciseSubmission>()
 				.HasOptional(s => s.ManualChecking)
 				.WithRequired(c => c.Submission)
 				.WillCascadeOnDelete(false);

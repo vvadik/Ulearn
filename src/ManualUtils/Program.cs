@@ -103,7 +103,7 @@ namespace ManualUtils
 			// await UploadCourseVersions(serviceProvider);
 			// await RemoveVersionsWithoutFile(serviceProvider);
 			// await RemoveDuplicateExerciseManualCheckings(serviceProvider);
-			await UpdateManualCheckingIds(serviceProvider);
+			// await UpdateManualCheckingIds(serviceProvider);
 		}
 
 		private static void GenerateUpdateSequences()
@@ -607,7 +607,7 @@ namespace ManualUtils
 			}
 		}
 
-		private static async Task RemoveDuplicateExerciseManualCheckings(IServiceProvider serviceProvider)
+		/* private static async Task RemoveDuplicateExerciseManualCheckings(IServiceProvider serviceProvider)
 		{
 			using (var scope = serviceProvider.CreateScope())
 			{
@@ -635,9 +635,9 @@ namespace ManualUtils
 					Console.WriteLine($"{i}/{doubles.Count}");
 				}
 			}
-		}
+		}*/
 
-		private static async Task UpdateManualCheckingIds(IServiceProvider serviceProvider)
+		/*private static async Task UpdateManualCheckingIds(IServiceProvider serviceProvider)
 		{
 			using (var scope = serviceProvider.CreateScope())
 			{
@@ -667,6 +667,6 @@ namespace ManualUtils
 				Console.WriteLine("All");
 				db.SaveChanges();
 			}
-		}
+		}*/
 	}
 }

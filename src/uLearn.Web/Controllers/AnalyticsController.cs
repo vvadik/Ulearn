@@ -518,7 +518,7 @@ namespace uLearn.Web.Controllers
 				.ToList();
 			var reviewedSubmissions = userSolutionsRepo
 				.GetAllAcceptedSubmissionsByUser(courseId, exercises.Select(s => s.Id), userId)
-				.Where(s => s.ManualCheckings.Any(c => c.IsChecked))
+				.Where(s => s.ManualChecking != null && s.ManualChecking.IsChecked)
 				.OrderByDescending(s => s.Timestamp)
 				.DistinctBy(u => u.SlideId)
 				.ToList();

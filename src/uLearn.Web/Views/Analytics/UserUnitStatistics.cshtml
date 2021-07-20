@@ -64,7 +64,7 @@
 					<p>
 						Код-ревью
 						@{
-							manualPercent = SlideCheckingsRepo.GetExerciseSubmissionManualCheckingsScoreAndPercent(submission.ManualCheckings, slide).Percent;
+							manualPercent = SlideCheckingsRepo.GetExerciseSubmissionManualCheckingsScoreAndPercent(submission.ManualChecking, slide).Percent;
 							var isChecked = manualPercent != null;
 							if (isChecked)
 							{
@@ -96,16 +96,16 @@
 
 				@{
 					var reviewedSubmission = Model.ReviewedSubmissions.FirstOrDefault(s => s.SlideId == submission.SlideId);
-					var lastManualChecking = reviewedSubmission?.ManualCheckings.OrderBy(c => c.Timestamp).LastOrDefault(c => c.IsChecked);
+					var manualChecking = reviewedSubmission?.ManualChecking;
 				}
-				@if (lastManualChecking != null && lastManualChecking.NotDeletedReviews.Any())
+				@if (manualChecking != null && manualChecking.NotDeletedReviews.Any())
 				{
 					@Html.Partial(
 						"~/Views/Exercise/_ExerciseLastReviewComments.cshtml",
 						new ExerciseLastReviewCommentModel
 						{
 							ReviewedSubmission = reviewedSubmission,
-							NotDeletedReviews = lastManualChecking.NotDeletedReviews
+							NotDeletedReviews = manualChecking.NotDeletedReviews
 						})
 				}
 			</div>

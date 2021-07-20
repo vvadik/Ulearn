@@ -197,8 +197,8 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			}
 
 			var score = await visitsRepo.GetScore(courseId, exerciseSlide.Id, userId);
-			var waitingForManualChecking = submissionNoTracking.ManualCheckings.Any(c => !c.IsChecked) ? true : (bool?)null;
-			var prohibitFurtherManualChecking = submissionNoTracking.ManualCheckings.Any(c => c.ProhibitFurtherManualCheckings);
+			var waitingForManualChecking = !submissionNoTracking.ManualChecking?.IsChecked;
+			var prohibitFurtherManualChecking = submissionNoTracking.ManualChecking?.ProhibitFurtherManualCheckings ?? false;
 			var result = new RunSolutionResponse(SolutionRunStatus.Success)
 			{
 				Score = score,

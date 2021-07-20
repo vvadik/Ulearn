@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Data.Entity;
 using System.Diagnostics;
 using System.Linq;
@@ -59,7 +58,7 @@ namespace Database.DataContexts
 
 		public bool HasManualExerciseChecking(string courseId, Guid slideId, string userId, int submissionId)
 		{
-			return db.ManualExerciseCheckings.Any(c => c.CourseId == courseId && c.UserId == userId && c.SlideId == slideId && c.SubmissionId == submissionId);
+			return db.ManualExerciseCheckings.Any(c => c.CourseId == courseId && c.UserId == userId && c.SlideId == slideId && c.Id == submissionId);
 		}
 
 		public async Task<ManualExerciseChecking> AddManualExerciseChecking(string courseId, Guid slideId, string userId, UserExerciseSubmission submission)
@@ -71,7 +70,6 @@ namespace Database.DataContexts
 				SlideId = slideId,
 				UserId = userId,
 				Timestamp = DateTime.Now,
-				SubmissionId = submission.Id,
 			};
 			db.ManualExerciseCheckings.Add(manualChecking);
 
@@ -145,11 +143,11 @@ namespace Database.DataContexts
 			return GetScoreAndPercentByScoresAndPercents(slide, checkedScoresAndPercents);
 		}
 
-		public static (int Score, int? Percent) GetExerciseSubmissionManualCheckingsScoreAndPercent(IList<ManualExerciseChecking> manualCheckings, ExerciseSlide slide)
+		public static (int Score, int? Percent) GetExerciseSubmissionManualCheckingsScoreAndPercent([CanBeNull] ManualExerciseChecking manualChecking, ExerciseSlide slide)
 		{
-			var checkedScoresAndPercents = manualCheckings
+			var checkedScoresAndPercents = Enumerable.Repeat(manualChecking, 1)
+				.Where(c => c != null)
 				.Where(c => c.IsChecked)
-				.OrderBy(c => c.Timestamp)
 				.Select(c => (c.Score, c.Percent))
 				.ToList();
 			return GetScoreAndPercentByScoresAndPercents(slide, checkedScoresAndPercents);

@@ -62,7 +62,7 @@ namespace Database.Repos
 		public async Task<bool> HasManualExerciseChecking(string courseId, Guid slideId, string userId, int submissionId)
 		{
 			return await db.ManualExerciseCheckings
-				.AnyAsync(c => c.CourseId == courseId && c.UserId == userId && c.SlideId == slideId && c.SubmissionId == submissionId);
+				.AnyAsync(c => c.CourseId == courseId && c.UserId == userId && c.SlideId == slideId && c.Id == submissionId);
 		}
 
 		public async Task<ManualExerciseChecking> AddManualExerciseChecking(string courseId, Guid slideId, string userId, int submissionId)
@@ -74,7 +74,6 @@ namespace Database.Repos
 				SlideId = slideId,
 				UserId = userId,
 				Timestamp = DateTime.Now,
-				SubmissionId = submissionId,
 			};
 			db.ManualExerciseCheckings.Add(manualChecking);
 

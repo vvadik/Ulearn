@@ -171,6 +171,12 @@ namespace Database
 				.HasForeignKey<ManualQuizChecking>(p => p.Id)
 				.OnDelete(DeleteBehavior.Restrict);
 
+			modelBuilder.Entity<UserExerciseSubmission>()
+				.HasOne(s => s.ManualChecking)
+				.WithOne(c => c.Submission)
+				.HasForeignKey<ManualExerciseChecking>(p => p.Id)
+				.OnDelete(DeleteBehavior.Restrict);
+
 			SetDeleteBehavior<CourseRole, ApplicationUser>(modelBuilder, r => r.User, r => r.UserId, DeleteBehavior.Cascade);
 			SetDeleteBehavior<ReceivedCommentToCodeReviewNotification, ExerciseCodeReviewComment>(modelBuilder, c => c.Comment, c => c.CommentId, DeleteBehavior.Cascade);
 
@@ -313,7 +319,6 @@ namespace Database
 			AddIndex<ManualExerciseChecking>(modelBuilder, c => new { c.CourseId, c.SlideId, c.UserId, c.ProhibitFurtherManualCheckings });
 			AddIndex<ManualExerciseChecking>(modelBuilder, c => new { c.CourseId, c.SlideId, c.Timestamp });
 			AddIndex<ManualExerciseChecking>(modelBuilder, c => new { c.CourseId, c.UserId });
-			AddIndex<ManualExerciseChecking>(modelBuilder, c => c.SubmissionId, true);
 			AddIndex<AutomaticExerciseChecking>(modelBuilder, c => new { c.CourseId, c.SlideId });
 			AddIndex<AutomaticExerciseChecking>(modelBuilder, c => new { c.CourseId, c.SlideId, c.UserId });
 			AddIndex<AutomaticExerciseChecking>(modelBuilder, c => new { c.CourseId, c.SlideId, c.Timestamp });
