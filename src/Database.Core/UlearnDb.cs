@@ -391,7 +391,7 @@ namespace Database
 			AddIndex<UserFlashcardsVisit>(modelBuilder, c => new { c.UserId, c.CourseId, c.UnitId, c.FlashcardId }, false);
 			AddIndex<UserFlashcardsUnlocking>(modelBuilder, c => new { c.UserId, c.CourseId, c.UnitId }, false);
 
-			AddIndex<GoogleSheetTask>(modelBuilder, c => new { c.CourseId, c.AuthorId });
+			AddIndex<GoogleSheetExportTask>(modelBuilder, c => new { c.CourseId, c.AuthorId });
 		}
 
 		private void AddIndex<TEntity>(ModelBuilder modelBuilder, Expression<Func<TEntity, object>> indexFunction, bool isUnique = false) where TEntity : class
@@ -518,8 +518,8 @@ namespace Database
 		public DbSet<ExerciseAttemptedUsersCount> ExerciseAttemptedUsersCounts { get; set; }
 		public DbSet<ExerciseUsersWithRightAnswerCount> ExerciseUsersWithRightAnswerCounts { get; set; }
 
-		public DbSet<GoogleSheetTask> GoogleSheetTasks { get; set; }
+		public DbSet<GoogleSheetExportTask> GoogleSheetExportTasks { get; set; }
 
-		public DbSet<GoogleSheetTaskGroup> GoogleSheetTaskGroups { get; set; }
+		public DbSet<GoogleSheetExportTaskGroup> GoogleSheetExportTaskGroups { get; set; }
 	}
 }

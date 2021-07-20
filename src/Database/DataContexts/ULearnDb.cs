@@ -256,8 +256,8 @@ namespace Database.DataContexts
 
 		public DbSet<AcceptedSolutionsPromote> AcceptedSolutionsPromotes { get; set; }
 
-		public DbSet<GoogleSheetTask> GoogleSheetTasks { get; set; }
+		public DbSet<GoogleSheetExportTask> GoogleSheetExportTasks { get; set; }
 
-		public DbSet<GoogleSheetTaskGroup> GoogleSheetTaskGroups { get; set; }
+		public DbSet<GoogleSheetExportTaskGroup> GoogleSheetExportTaskGroups { get; set; }
 	}
 }

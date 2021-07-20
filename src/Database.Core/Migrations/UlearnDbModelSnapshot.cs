@@ -953,7 +953,7 @@ namespace Database.Migrations
                     b.ToTable("FeedViewTimestamps");
                 });
 
-            modelBuilder.Entity("Database.Models.GoogleSheetTask", b =>
+            modelBuilder.Entity("Database.Models.GoogleSheetExportTask", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -995,10 +995,10 @@ namespace Database.Migrations
 
                     b.HasIndex("CourseId", "AuthorId");
 
-                    b.ToTable("GoogleSheetTasks");
+                    b.ToTable("GoogleSheetExportTasks");
                 });
 
-            modelBuilder.Entity("Database.Models.GoogleSheetTaskGroup", b =>
+            modelBuilder.Entity("Database.Models.GoogleSheetExportTaskGroup", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1017,7 +1017,7 @@ namespace Database.Migrations
 
                     b.HasIndex("TaskId");
 
-                    b.ToTable("GoogleSheetTaskGroups");
+                    b.ToTable("GoogleSheetExportTaskGroups");
                 });
 
             modelBuilder.Entity("Database.Models.GraderClient", b =>
@@ -3155,7 +3155,7 @@ namespace Database.Migrations
                     b.Navigation("Transport");
                 });
 
-            modelBuilder.Entity("Database.Models.GoogleSheetTask", b =>
+            modelBuilder.Entity("Database.Models.GoogleSheetExportTask", b =>
                 {
                     b.HasOne("Database.Models.ApplicationUser", "Author")
                         .WithMany()
@@ -3166,7 +3166,7 @@ namespace Database.Migrations
                     b.Navigation("Author");
                 });
 
-            modelBuilder.Entity("Database.Models.GoogleSheetTaskGroup", b =>
+            modelBuilder.Entity("Database.Models.GoogleSheetExportTaskGroup", b =>
                 {
                     b.HasOne("Database.Models.Group", "Group")
                         .WithMany()
@@ -3174,8 +3174,8 @@ namespace Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Database.Models.GoogleSheetTask", "Task")
-                        .WithMany("GoogleSheetTaskGroups")
+                    b.HasOne("Database.Models.GoogleSheetExportTask", "Task")
+                        .WithMany("Groups")
                         .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -3907,9 +3907,9 @@ namespace Database.Migrations
                     b.Navigation("Comments");
                 });
 
-            modelBuilder.Entity("Database.Models.GoogleSheetTask", b =>
+            modelBuilder.Entity("Database.Models.GoogleSheetExportTask", b =>
                 {
-                    b.Navigation("GoogleSheetTaskGroups");
+                    b.Navigation("Groups");
                 });
 
             modelBuilder.Entity("Database.Models.Group", b =>

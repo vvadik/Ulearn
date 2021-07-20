@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Common;
 
 namespace Ulearn.Web.Api.Models.Responses
 {
 	[DataContract]
-	public class GoogleSheetsTaskResponse //TODO спросить Славу про наследование от SuccessResponse
+	public class GoogleSheetsExportTaskResponse : SuccessResponse
 	{
 		[DataMember]
-		public Guid Id { get; set; }
+		public int Id { get; set; }
 
 		[DataMember]
 		public ShortUserInfo AuthorInfo { get; set; }

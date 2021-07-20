@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Database.Models
 {
-	public class GoogleSheetTaskGroup
+	public class GoogleSheetExportTaskGroup
 	{
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -14,7 +14,7 @@ namespace Database.Models
 		public int TaskId { get; set; }
 		
 		[Required]
-		public virtual GoogleSheetTask Task { get; set; }
+		public virtual GoogleSheetExportTask Task { get; set; }
 		
 		[Required]
 		public int GroupId { get; set; }

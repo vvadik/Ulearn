@@ -5,7 +5,7 @@ using Ulearn.Common.Api.Models.Validations;
 
 namespace Ulearn.Web.Api.Models.Parameters
 {
-	public class GoogleSheetsTaskParams
+	public class GoogleSheetsExportTaskParams
 	{
 		[FromQuery(Name = "courseId")]
 		public string CourseId { get; set; }

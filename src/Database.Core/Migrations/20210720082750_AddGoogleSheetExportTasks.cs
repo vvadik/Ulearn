@@ -4,12 +4,12 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Database.Migrations
 {
-    public partial class AddGoogleSheetTasks : Migration
+    public partial class AddGoogleSheetExportTasks : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "GoogleSheetTasks",
+                name: "GoogleSheetExportTasks",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -28,9 +28,9 @@ namespace Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GoogleSheetTasks", x => x.Id);
+                    table.PrimaryKey("PK_GoogleSheetExportTasks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_GoogleSheetTasks_AspNetUsers_AuthorId",
+                        name: "FK_GoogleSheetExportTasks_AspNetUsers_AuthorId",
                         column: x => x.AuthorId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -38,7 +38,7 @@ namespace Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "GoogleSheetTaskGroups",
+                name: "GoogleSheetExportTaskGroups",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -48,15 +48,15 @@ namespace Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GoogleSheetTaskGroups", x => x.Id);
+                    table.PrimaryKey("PK_GoogleSheetExportTaskGroups", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_GoogleSheetTaskGroups_GoogleSheetTasks_TaskId",
+                        name: "FK_GoogleSheetExportTaskGroups_GoogleSheetExportTasks_TaskId",
                         column: x => x.TaskId,
-                        principalTable: "GoogleSheetTasks",
+                        principalTable: "GoogleSheetExportTasks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_GoogleSheetTaskGroups_Groups_GroupId",
+                        name: "FK_GoogleSheetExportTaskGroups_Groups_GroupId",
                         column: x => x.GroupId,
                         principalTable: "Groups",
                         principalColumn: "Id",
@@ -64,33 +64,33 @@ namespace Database.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_GoogleSheetTaskGroups_GroupId",
-                table: "GoogleSheetTaskGroups",
+                name: "IX_GoogleSheetExportTaskGroups_GroupId",
+                table: "GoogleSheetExportTaskGroups",
                 column: "GroupId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_GoogleSheetTaskGroups_TaskId",
-                table: "GoogleSheetTaskGroups",
+                name: "IX_GoogleSheetExportTaskGroups_TaskId",
+                table: "GoogleSheetExportTaskGroups",
                 column: "TaskId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_GoogleSheetTasks_AuthorId",
-                table: "GoogleSheetTasks",
+                name: "IX_GoogleSheetExportTasks_AuthorId",
+                table: "GoogleSheetExportTasks",
                 column: "AuthorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_GoogleSheetTasks_CourseId_AuthorId",
-                table: "GoogleSheetTasks",
+                name: "IX_GoogleSheetExportTasks_CourseId_AuthorId",
+                table: "GoogleSheetExportTasks",
                 columns: new[] { "CourseId", "AuthorId" });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "GoogleSheetTaskGroups");
+                name: "GoogleSheetExportTaskGroups");
 
             migrationBuilder.DropTable(
-                name: "GoogleSheetTasks");
+                name: "GoogleSheetExportTasks");
         }
     }
 }

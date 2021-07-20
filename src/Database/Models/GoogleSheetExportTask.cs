@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Database.Models
 {
-	public class GoogleSheetTask
+	public class GoogleSheetExportTask
 	{
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -13,14 +13,15 @@ namespace Database.Models
 		
 		[Required]
 		[StringLength(100)]
+		[Index("IDX_GoogleSheetExportTask_ByCourseIdAndAuthor", 1)]
 		public string CourseId { get; set; }
 
 		[Required]
-		[StringLength(64)]
-		public virtual IList<GoogleSheetTaskGroup> GoogleSheetTaskGroups { get; set; }
+		public virtual IList<GoogleSheetExportTaskGroup> Groups { get; set; }
 
 		[Required]
 		[StringLength(64)]
+		[Index("IDX_GoogleSheetExportTask_ByCourseIdAndAuthor", 2)]
 		public string AuthorId { get; set; }
 
 		public virtual ApplicationUser Author { get; set; }

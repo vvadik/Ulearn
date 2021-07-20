@@ -8,19 +8,19 @@ namespace Database.Core.Tests.Repos
 {
 	public class GoogleSheetRepoTests : BaseRepoTests
 	{
-		private GoogleSheetTasksRepo GoogleSheetTasksRepo;
+		private GoogleSheetExportTasksRepo googleSheetExportTasksRepo;
 		
 		[SetUp]
 		public override void SetUp()
 		{
 			base.SetUp();
-			GoogleSheetTasksRepo = new GoogleSheetTasksRepo(db);
+			googleSheetExportTasksRepo = new GoogleSheetExportTasksRepo(db);
 		}
 
 		[Test]
 		public async Task GetIds()
 		{
-			var f = await GoogleSheetTasksRepo.GetGroupsIds();
+			// var f = await GoogleSheetTasksRepo.GetGroupsIds();
 		}
 
 	}

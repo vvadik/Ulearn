@@ -4,9 +4,9 @@ using System.Runtime.Serialization;
 namespace Ulearn.Web.Api.Models.Responses
 {
 	[DataContract]
-	public class GoogleSheetsTaskListResponse
+	public class GoogleSheetsExportTaskListResponse
 	{
 		[DataMember]
-		public List<GoogleSheetsTaskResponse> GoogleSheetsTasks { get; set; }
+		public List<GoogleSheetsExportTaskResponse> GoogleSheetsExportTasks { get; set; }
 	}
 }
