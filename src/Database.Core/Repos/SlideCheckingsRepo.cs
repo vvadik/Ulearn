@@ -69,6 +69,7 @@ namespace Database.Repos
 		{
 			var manualChecking = new ManualExerciseChecking
 			{
+				Id = submissionId,
 				CourseId = courseId,
 				SlideId = slideId,
 				UserId = userId,

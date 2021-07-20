@@ -66,6 +66,7 @@ namespace Database.DataContexts
 		{
 			var manualChecking = new ManualExerciseChecking
 			{
+				Id = submission.Id,
 				CourseId = courseId,
 				SlideId = slideId,
 				UserId = userId,
