@@ -145,6 +145,7 @@ namespace Database.Models
 		public override int Id { get; set; }
 
 		[Required]
+		[Index("IX_ManualExerciseChecking_SubmissionId", IsUnique = true)]
 		public int SubmissionId { get; set; }
 
 		public virtual UserExerciseSubmission Submission { get; set; }
