@@ -102,7 +102,8 @@ namespace ManualUtils
 			// await SetNewFieldsInReview(db, serviceProvider);
 			// await UploadCourseVersions(serviceProvider);
 			// await RemoveVersionsWithoutFile(serviceProvider);
-			await RemoveDuplicateExerciseManualCheckings(serviceProvider);
+			// await RemoveDuplicateExerciseManualCheckings(serviceProvider);
+			await UpdateManualCheckingIds(serviceProvider);
 		}
 
 		private static void GenerateUpdateSequences()
@@ -633,6 +634,38 @@ namespace ManualUtils
 					i++;
 					Console.WriteLine($"{i}/{doubles.Count}");
 				}
+			}
+		}
+
+		private static async Task UpdateManualCheckingIds(IServiceProvider serviceProvider)
+		{
+			using (var scope = serviceProvider.CreateScope())
+			{
+				var db = scope.ServiceProvider.GetService<UlearnDb>();
+				var pairs = await db.ManualExerciseCheckings
+					.Where(c => c.Id != c.SubmissionId)
+					.Select(c => new { c.Id, c.SubmissionId })
+					.OrderByDescending(s => s.Id).ToListAsync();
+				Console.WriteLine($"Ids count {pairs.Count}");
+				var i = 0;
+				var rand = new Random();
+				foreach (var pair in pairs)
+				{
+					try
+					{
+						await db.Database.ExecuteSqlRawAsync($@"UPDATE public.""ManualExerciseCheckings"" SET ""Id"" = {pair.SubmissionId} where ""Id"" = {pair.Id};");
+					}
+					catch (Exception ex)
+					{
+						Console.WriteLine($"Error on id {pair.Id} {pair.SubmissionId}");
+						await db.Database.ExecuteSqlRawAsync($@"UPDATE public.""ManualExerciseCheckings"" SET ""Id"" = {10000000 + rand.Next(0, 10000000)} where ""Id"" = {pair.SubmissionId};");
+					}
+					i++;
+					if (i % 1000 == 0)
+						Console.WriteLine($"{i}/{pairs.Count}");
+				}
+				Console.WriteLine("All");
+				db.SaveChanges();
 			}
 		}
 	}
