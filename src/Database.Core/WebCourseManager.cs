@@ -99,10 +99,11 @@ namespace Database
 			using (var scope = serviceScopeFactory.CreateScope())
 			{
 				var coursesRepo = (CoursesRepo)scope.ServiceProvider.GetService(typeof(ICoursesRepo));
-				var coursesWithCourseFiles = (await coursesRepo!.GetCourseIdsFromCourseFiles()).Where(c => !existingOnDiskCourseIds.Contains(c));
-				foreach (var courseId in coursesWithCourseFiles)
+				var publishedCourseVersions = await coursesRepo.GetPublishedCourseVersions();
+				var coursesNotOnDisk = publishedCourseVersions.Where(c => !existingOnDiskCourseIds.Contains(c.CourseId, StringComparer.OrdinalIgnoreCase));
+				foreach (var publishedCourseVersion in coursesNotOnDisk)
 				{
-					var fileInDb = await coursesRepo.GetCourseFile(courseId);
+					var fileInDb = await coursesRepo.GetVersionFile(publishedCourseVersion.Id);
 					try
 					{
 						var stagingCourseFile = GetStagingCourseFile(fileInDb.CourseId);

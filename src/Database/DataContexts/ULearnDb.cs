@@ -185,7 +185,6 @@ namespace Database.DataContexts
 		public DbSet<CommentsPolicy> CommentsPolicies { get; set; }
 
 		public DbSet<CourseVersion> CourseVersions { get; set; }
-		public DbSet<CourseFile> CourseFiles { get; set; }
 		public DbSet<CourseVersionFile> CourseVersionFiles { get; set; }
 		public DbSet<CourseGit> CourseGitRepos { get; set; }
 

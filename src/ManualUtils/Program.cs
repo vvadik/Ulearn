@@ -23,7 +23,6 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Exercises;
-using Ulearn.Core.Extensions;
 using Ulearn.Core.Logging;
 using Ulearn.Web.Api.Utils.LTI;
 using Vostok.Logging.Abstractions;
@@ -449,11 +448,12 @@ namespace ManualUtils
 			var db = serviceProvider.GetService<UlearnDb>();
 			var coursesRepo = serviceProvider.GetService<ICoursesRepo>();
 
-			var courseIdsFromCourseFiles = await coursesRepo.GetCourseIdsFromCourseFiles();
+			var publishedCourseVersions = await coursesRepo.GetPublishedCourseVersions();
 
-			foreach (var courseId in courseIdsFromCourseFiles)
+			foreach (var publishedCourseVersion in publishedCourseVersions)
 			{
-				var fileInDb = await coursesRepo.GetCourseFile(courseId);
+				var versionId = publishedCourseVersion.Id;
+				var fileInDb = await coursesRepo.GetVersionFile(versionId);
 				var zip = stagingDirectory.GetFile($"{fileInDb.CourseId}.zip");
 				if (!zip.Exists)
 				{
@@ -474,15 +474,19 @@ namespace ManualUtils
 		{
 			var db = serviceProvider.GetService<UlearnDb>();
 			var courseManager = serviceProvider.GetService<IWebCourseManager>();
+			var coursesRepo = serviceProvider.GetService<ICoursesRepo>();
 
-			foreach (var courseFile in db.CourseFiles.AsNoTracking())
+			var publishedCourseVersions = await coursesRepo.GetPublishedCourseVersions();
+
+			foreach (var publishedCourseVersion in publishedCourseVersions)
 			{
-				var stagingCourseFile = courseManager.GetStagingCourseFile(courseFile.CourseId);
-				await File.WriteAllBytesAsync(stagingCourseFile.FullName, courseFile.File);
-				var versionCourseFile = courseManager.GetCourseVersionFile(courseFile.CourseVersionId);
+				var fileInDb = await coursesRepo.GetVersionFile(publishedCourseVersion.Id);
+				var stagingCourseFile = courseManager.GetStagingCourseFile(fileInDb.CourseId);
+				await File.WriteAllBytesAsync(stagingCourseFile.FullName, fileInDb.File);
+				var versionCourseFile = courseManager.GetCourseVersionFile(fileInDb.CourseVersionId);
 				if (!versionCourseFile.Exists)
-					await File.WriteAllBytesAsync(versionCourseFile.FullName, courseFile.File);
-				var unpackDirectory = courseManager.GetExtractedCourseDirectory(courseFile.CourseId);
+					await File.WriteAllBytesAsync(versionCourseFile.FullName, fileInDb.File);
+				var unpackDirectory = courseManager.GetExtractedCourseDirectory(fileInDb.CourseId);
 				using (var zip = ZipFile.Read(stagingCourseFile.FullName, new ReadOptions { Encoding = ZipUtils.Cp866 }))
 				{
 					zip.ExtractAll(unpackDirectory.FullName, ExtractExistingFileAction.OverwriteSilently);

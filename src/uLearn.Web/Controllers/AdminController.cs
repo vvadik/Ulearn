@@ -458,7 +458,6 @@ namespace uLearn.Web.Controllers
 			var courseContent = await courseFile.ReadAllContentAsync();
 			await coursesRepo.AddCourseVersion(courseId, versionId, userId, null, null, null, null, courseContent).ConfigureAwait(false);
 			await coursesRepo.MarkCourseVersionAsPublished(versionId).ConfigureAwait(false);
-			await coursesRepo.AddCourseFile(courseId, versionId, courseContent).ConfigureAwait(false);
 			await NotifyAboutPublishedCourseVersion(courseId, versionId, userId).ConfigureAwait(false);
 
 			return RedirectToAction("Packages", new { courseId, onlyPrivileged = true });
@@ -971,9 +970,6 @@ namespace uLearn.Web.Controllers
 			var versionFile = courseManager.GetCourseVersionFile(versionId);
 			var courseFile = courseManager.GetStagingCourseFile(courseId);
 			var oldCourse = courseStorage.GetCourse(courseId);
-
-			log.Info($"загружаю {versionId} курса {courseId} в таблицу {nameof(CourseFile)}");
-			await coursesRepo.AddCourseFile(courseId, versionId, courseFile.ReadAllContent()).ConfigureAwait(false);
 
 			/* First, try to load course from LRU-cache or zip file */
 			log.Info($"Загружаю версию {versionId}");
@@ -1548,24 +1544,6 @@ namespace uLearn.Web.Controllers
 		public async Task<ActionResult> EnableStyleValidation(StyleErrorType errorType, bool isEnabled)
 		{
 			await styleErrorsRepo.EnableStyleErrorAsync(errorType, isEnabled);
-			return Json(new { status = "ok" });
-		}
-
-		[SysAdminsOnly]
-		[HttpPost]
-		public async Task<ActionResult> UploadPublishedCoursesToBd()
-		{
-			var courses = courseStorage.GetCourses();
-			foreach (var course in courses)
-			{
-				var publishedVersion = coursesRepo.GetPublishedCourseVersion(course.Id);
-				if (publishedVersion == null)
-					continue;
-				var fileInfo = courseManager.GetStagingCourseFile(course.Id);
-				var content = await fileInfo.ReadAllContentAsync().ConfigureAwait(false);
-				await coursesRepo.AddCourseFile(course.Id, publishedVersion.Id, content).ConfigureAwait(false);
-			}
-
 			return Json(new { status = "ok" });
 		}
 
