@@ -2,11 +2,12 @@
 using System.IO;
 using System.Threading.Tasks;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides;
 
-namespace Database
+namespace Ulearn.Web.Api.Utils
 {
-	public interface IWebCourseManager
+	public interface IMasterCourseManager : ICourseUpdater
 	{
 		Task<bool> CreateCourseIfNotExists(string courseId, Guid versionId, string courseTitle, string userId);
 		

@@ -27,6 +27,7 @@ using Ulearn.Core.Telegram;
 using Ulearn.Web.Api.Controllers.Runner;
 using Ulearn.Web.Api.Models.Parameters.Exercise;
 using Ulearn.Web.Api.Models.Responses.Exercise;
+using Ulearn.Web.Api.Utils;
 using Vostok.Logging.Abstractions;
 using AutomaticExerciseCheckingStatus = Database.Models.AutomaticExerciseCheckingStatus;
 
@@ -43,12 +44,12 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		private readonly IUnitsRepo unitsRepo;
 		private readonly MetricSender metricSender;
 		private readonly IServiceScopeFactory serviceScopeFactory;
-		private readonly IWebCourseManager courseManager;
+		private readonly IMasterCourseManager courseManager;
 		private readonly StyleErrorsResultObserver styleErrorsResultObserver;
 		private readonly ErrorsBot errorsBot = new ErrorsBot();
 		private static ILog log => LogProvider.Get().ForContext(typeof(ExerciseController));
 
-		public ExerciseController(ICourseStorage courseStorage, IWebCourseManager courseManager, UlearnDb db, MetricSender metricSender,
+		public ExerciseController(ICourseStorage courseStorage, IMasterCourseManager courseManager, UlearnDb db, MetricSender metricSender,
 			IUsersRepo usersRepo, IUserSolutionsRepo userSolutionsRepo, ICourseRolesRepo courseRolesRepo, IVisitsRepo visitsRepo,
 			ISlideCheckingsRepo slideCheckingsRepo, IGroupsRepo groupsRepo, StyleErrorsResultObserver styleErrorsResultObserver,
 			IStyleErrorsRepo styleErrorsRepo, IUnitsRepo unitsRepo, IServiceScopeFactory serviceScopeFactory)

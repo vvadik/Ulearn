@@ -9,7 +9,7 @@ using Ulearn.Core.Courses.Manager;
 
 namespace Database
 {
-	public class WebCourseManager : CourseManager, IWebCourseManager, ICourseUpdater
+	public class WebCourseManager : CourseManager, IWebCourseManager
 	{
 		private static ILog log => LogProvider.Get().ForContext(typeof(WebCourseManager));
 

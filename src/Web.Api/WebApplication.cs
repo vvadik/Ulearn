@@ -125,7 +125,7 @@ namespace Ulearn.Web.Api
 		protected override IApplicationBuilder UseStaticFiles(IApplicationBuilder app)
 		{
 			var contentTypeProvider = new FileExtensionContentTypeProvider(CourseStaticFilesHelper.AllowedExtensions);
-			var coursesDirectory = Path.Combine(WebCourseManager.GetCoursesDirectory().FullName, "Courses");
+			var coursesDirectory = Path.Combine(MasterCourseManager.GetCoursesDirectory().FullName, "Courses");
 			new DirectoryInfo(coursesDirectory).EnsureExists();
 
 			var options = new RewriteOptions()
@@ -224,6 +224,11 @@ namespace Ulearn.Web.Api
 		public override void ConfigureDi(IServiceCollection services)
 		{
 			base.ConfigureDi(services);
+
+			services.AddSingleton(MasterCourseManager.CourseStorageInstance);
+			services.AddSingleton<MasterCourseManager>();
+			services.AddSingleton<IMasterCourseManager>(x => x.GetRequiredService<MasterCourseManager>());
+			services.AddSingleton<ICourseUpdater>(x => x.GetRequiredService<MasterCourseManager>());
 
 			services.AddScoped<IAuthorizationHandler, CourseRoleAuthorizationHandler>();
 			services.AddScoped<IAuthorizationHandler, CourseAccessAuthorizationHandler>();

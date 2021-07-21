@@ -17,6 +17,7 @@ using Ulearn.Web.Api.Models.Responses.TempCourses;
 using Ionic.Zip;
 using Ulearn.Common;
 using Ulearn.Core.Courses.Manager;
+using Ulearn.Web.Api.Utils;
 using Vostok.Logging.Abstractions;
 
 
@@ -28,11 +29,11 @@ namespace Ulearn.Web.Api.Controllers
 	{
 		private readonly ITempCoursesRepo tempCoursesRepo;
 		private readonly ICourseRolesRepo courseRolesRepo;
-		private readonly IWebCourseManager courseManager;
+		private readonly IMasterCourseManager courseManager;
 		public bool DontCheckBaseCourseExistsOnCreate = false; // Для тестрирования
 		private static ILog log => LogProvider.Get().ForContext(typeof(TempCourseController));
 
-		public TempCourseController(ICourseStorage courseStorage, IWebCourseManager courseManager, UlearnDb db, [CanBeNull] IUsersRepo usersRepo, ITempCoursesRepo tempCoursesRepo, ICourseRolesRepo courseRolesRepo)
+		public TempCourseController(ICourseStorage courseStorage, IMasterCourseManager courseManager, UlearnDb db, [CanBeNull] IUsersRepo usersRepo, ITempCoursesRepo tempCoursesRepo, ICourseRolesRepo courseRolesRepo)
 			: base(courseStorage, db, usersRepo)
 		{
 			this.tempCoursesRepo = tempCoursesRepo;

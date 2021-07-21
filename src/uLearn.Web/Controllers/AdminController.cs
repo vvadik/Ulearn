@@ -916,7 +916,7 @@ namespace uLearn.Web.Controllers
 				var schemaPath = Path.Combine(HttpRuntime.BinDirectory, "schema.xsd");
 				var validator = new XmlValidator(schemaPath);
 				var warnings = validator.ValidateSlidesFiles(version.GetSlidesNotSafe()
-					.Select(s => new FileInfo(Path.Combine(courseManager.GetExtractedVersionDirectory(versionId.Value).FullName, s.SlideFilePathRelativeToCourse))).ToList());
+					.Select(s => new FileInfo(Path.Combine(courseDirectory.DirectoryInfo.FullName, s.SlideFilePathRelativeToCourse))).ToList());
 
 				return View(new DiagnosticsModel
 				{

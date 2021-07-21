@@ -16,6 +16,7 @@ using System.Threading;
 using Database;
 using Ionic.Zip;
 using Microsoft.AspNetCore.Http;
+using Ulearn.Web.Api.Utils;
 
 namespace Web.Api.Tests.Controllers.TempCourses
 {
@@ -26,7 +27,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 		private ITempCoursesRepo tempCoursesRepo;
 		private ICourseRolesRepo courseRolesRepo;
 		private DirectoryInfo testCourseDirectory;
-		private IWebCourseManager courseManager;
+		private IMasterCourseManager courseManager;
 		private DirectoryInfo workingCourseDirectory;
 
 		[OneTimeSetUp]
@@ -37,7 +38,7 @@ namespace Web.Api.Tests.Controllers.TempCourses
 			tempCourseController.DontCheckBaseCourseExistsOnCreate = true;
 			tempCoursesRepo = serviceProvider.GetService<ITempCoursesRepo>();
 			courseRolesRepo = serviceProvider.GetService<ICourseRolesRepo>();
-			courseManager = serviceProvider.GetService<IWebCourseManager>();
+			courseManager = serviceProvider.GetService<IMasterCourseManager>();
 			testCourseDirectory = new DirectoryInfo(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestData", "TempCourses", "Help"));
 			workingCourseDirectory = new DirectoryInfo(Path.Combine(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "WorkingCourse")));
 		}

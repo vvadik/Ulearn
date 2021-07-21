@@ -24,6 +24,7 @@ using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Logging;
+using Ulearn.Web.Api.Utils;
 using Ulearn.Web.Api.Utils.LTI;
 using Vostok.Logging.Abstractions;
 using Vostok.Logging.File;
@@ -61,10 +62,18 @@ namespace ManualUtils
 		{
 			var services = new ServiceCollection();
 			services.AddLogging(builder => builder.AddVostok(LogProvider.Get()));
+
 			services.AddSingleton(db);
+			services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<UlearnDb>();
+
+			services.AddSingleton(SlaveCourseManager.CourseStorageInstance);
+			services.AddSingleton<SlaveCourseManager>();
+			services.AddSingleton<ISlaveCourseManager, SlaveCourseManager>();
+			services.AddSingleton<ICourseUpdater>(x => x.GetRequiredService<SlaveCourseManager>());
+
 			services.AddDatabaseServices();
 			services.AddSingleton(adb);
-			services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<UlearnDb>();
+
 			return services.BuildServiceProvider();
 		}
 
@@ -396,7 +405,7 @@ namespace ManualUtils
 
 		private static void ConvertZipsToCourseXmlInRoot()
 		{
-			var mainDirectory = WebCourseManager.GetCoursesDirectory();
+			var mainDirectory = MasterCourseManager.GetCoursesDirectory();
 			var stagingDirectory = mainDirectory.GetSubdirectory("Courses.Staging");
 			var versionsDirectory = mainDirectory.GetSubdirectory("Courses.Versions");
 
@@ -442,7 +451,7 @@ namespace ManualUtils
 
 		private static async Task UploadStagingToDb(IServiceProvider serviceProvider)
 		{
-			var mainDirectory = WebCourseManager.GetCoursesDirectory();
+			var mainDirectory = MasterCourseManager.GetCoursesDirectory();
 			var stagingDirectory = mainDirectory.GetSubdirectory("Courses.Staging");
 
 			var db = serviceProvider.GetService<UlearnDb>();
@@ -473,7 +482,7 @@ namespace ManualUtils
 		private static async Task UploadStagingFromDbAndExtractToCourses(IServiceProvider serviceProvider)
 		{
 			var db = serviceProvider.GetService<UlearnDb>();
-			var courseManager = serviceProvider.GetService<IWebCourseManager>();
+			var courseManager = serviceProvider.GetService<IMasterCourseManager>();
 			var coursesRepo = serviceProvider.GetService<ICoursesRepo>();
 
 			var publishedCourseVersions = await coursesRepo.GetPublishedCourseVersions();
@@ -559,7 +568,7 @@ namespace ManualUtils
 				versions = versions.Where(v => !versionsWithFiles.Contains(v.Id)).ToList();
 				Console.WriteLine("Versions without file " + versions.Count);
 
-				var courseManager = scope.ServiceProvider.GetService<IWebCourseManager>();
+				var courseManager = scope.ServiceProvider.GetService<IMasterCourseManager>();
 				var i = 0;
 				foreach (var version in versions)
 				{
