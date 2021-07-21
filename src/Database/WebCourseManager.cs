@@ -4,6 +4,8 @@ using System.IO;
 using System.Threading.Tasks;
 using Database.DataContexts;
 using Database.Models;
+using Ulearn.Common;
+using Ulearn.Common.Extensions;
 using Vostok.Logging.Abstractions;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Manager;
@@ -106,6 +108,29 @@ namespace Database
 			catch (Exception ex)
 			{
 				log.Error(ex);
+			}
+		}
+
+		public DirectoryInfo ExtractCourseVersionToTemporaryDirectory(string courseId, Guid versionId, byte[] zipContent)
+		{
+			var directoryName = $"{courseId}_{versionId}_{DateTime.Now.ToSortable()}";
+			var directoryPath = Path.Combine(Path.GetTempPath(), directoryName);
+			var courseDirectory = Directory.CreateDirectory(directoryPath);
+			ZipUtils.UnpackZip(zipContent, courseDirectory.FullName);
+			return courseDirectory;
+		}
+
+		public (Course Course, Exception Exception) LoadCourseFromDirectory(string courseId, Guid versionId, DirectoryInfo extractedCourseDirectory)
+		{
+			try
+			{
+				var course = loader.Load(extractedCourseDirectory);
+				return (course, null);
+			}
+			catch (Exception e)
+			{
+				log.Warn(e, $"Upload course exception '{courseId}'");
+				return (null, e);
 			}
 		}
 	}

@@ -244,5 +244,18 @@ namespace Database.DataContexts
 				transaction.Commit();
 			}
 		}
+
+		public const string ExampleCourseId = "Help";
+		public async Task<bool> CreateCourseIfNotExists(string courseId, Guid versionId, string userId)
+		{
+			var hasCourse = GetPublishedCourseVersion(courseId) != null;
+			if (!hasCourse)
+			{
+				var helpVersionFile = GetPublishedVersionFile(ExampleCourseId);
+				await AddCourseVersion(courseId, versionId, userId, null, null, null, null, helpVersionFile.File).ConfigureAwait(false);
+				await MarkCourseVersionAsPublished(versionId).ConfigureAwait(false);
+			}
+			return !hasCourse;
+		}
 	}
 }

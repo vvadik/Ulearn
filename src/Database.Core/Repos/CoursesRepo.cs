@@ -209,5 +209,18 @@ namespace Database.Repos
 			var publishedCourseVersion = await GetPublishedCourseVersion(courseId);
 			return await GetVersionFile(publishedCourseVersion.Id);
 		}
+
+		public const string ExampleCourseId = "Help";
+		public async Task<bool> CreateCourseIfNotExists(string courseId, Guid versionId, string userId)
+		{
+			var hasCourse = await GetPublishedCourseVersion(courseId) != null;
+			if (!hasCourse)
+			{
+				var helpVersionFile = await GetPublishedVersionFile(ExampleCourseId);
+				await AddCourseVersion(courseId, versionId, userId, null, null, null, null, helpVersionFile.File);
+				await MarkCourseVersionAsPublished(versionId);
+			}
+			return !hasCourse;
+		}
 	}
 }

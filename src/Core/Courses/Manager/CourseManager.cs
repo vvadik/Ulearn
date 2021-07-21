@@ -40,7 +40,7 @@ namespace Ulearn.Core.Courses.Manager
 		private readonly ExerciseStudentZipsCache exerciseStudentZipsCache = new ExerciseStudentZipsCache(Options.Create(ApplicationConfiguration.Read<UlearnConfiguration>()));
 
 		/* TODO (andgein): Use DI */
-		private static readonly CourseLoader loader = new CourseLoader(new UnitLoader(new XmlSlideLoader()));
+		public static readonly CourseLoader loader = new CourseLoader(new UnitLoader(new XmlSlideLoader()));
 		private static readonly ErrorsBot errorsBot = new ErrorsBot();
 
 		private static readonly ConcurrentDictionary<string, bool> courseIdToIsBroken = new ConcurrentDictionary<string, bool>(StringComparer.InvariantCultureIgnoreCase);

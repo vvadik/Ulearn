@@ -56,6 +56,10 @@
 		<Content Include="Hunspellx86.dll">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
+		<None Remove="Help.zip" />
+		<Content Include="Help.zip">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
 	<ItemGroup>
 	  <Compile Remove="Configuration\**" />

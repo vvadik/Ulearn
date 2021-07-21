@@ -31,5 +31,6 @@ namespace Database.Repos
 		Task<List<string>> GetCoursesUserHasAccessTo(string userId, CourseAccessType accessType);
 		Task<CourseVersionFile> GetVersionFile(Guid courseVersion);
 		Task<CourseVersionFile> GetPublishedVersionFile(string courseId);
+		Task<bool> CreateCourseIfNotExists(string courseId, Guid versionId, string userId);
 	}
 }
