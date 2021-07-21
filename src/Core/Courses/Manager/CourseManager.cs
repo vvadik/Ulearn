@@ -37,9 +37,6 @@ namespace Ulearn.Core.Courses.Manager
 		private readonly DirectoryInfo tempCourseStaging;
 		private readonly DirectoryInfo coursesVersionsDirectory;
 
-		/* LRU-cache for course versions. 50 is a capactiy of the cache. */
-		private readonly LruCache<Guid, Course> versionsCache = new LruCache<Guid, Course>(50);
-
 		private readonly ExerciseStudentZipsCache exerciseStudentZipsCache = new ExerciseStudentZipsCache(Options.Create(ApplicationConfiguration.Read<UlearnConfiguration>()));
 
 		/* TODO (andgein): Use DI */
@@ -85,14 +82,8 @@ namespace Ulearn.Core.Courses.Manager
 		///
 		public Course GetVersion(Guid versionId)
 		{
-			if (versionsCache.TryGet(versionId, out var version))
-				return version;
-
 			var versionFile = GetCourseVersionFile(versionId);
-			version = LoadCourseFromZip(versionFile);
-
-			/* Add version to cache for fast loading next time */
-			versionsCache.Add(versionId, version);
+			var version = LoadCourseFromZip(versionFile);
 			return version;
 		}
 
