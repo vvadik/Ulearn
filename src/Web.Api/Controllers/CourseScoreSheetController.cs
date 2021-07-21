@@ -117,9 +117,9 @@ namespace Ulearn.Web.Api.Controllers
 			return File(bytes, "application/vnd.ms-excel", $"{fileNameWithNoExtension}.xlsx");
 		}
 
-		[HttpGet("course-score-sheet/export/to-google-sheets")]
+		[HttpPost("course-score-sheet/export/to-google-sheets")]
 		[Authorize(Policy = "Instructors")]
-		public async Task<ActionResult> ExportCourseStatisticsToGoogleSheets([FromQuery] CourseStatisticsParams courseStatisticsParams)
+		public async Task<ActionResult> ExportCourseStatisticsToGoogleSheets([FromBody] CourseStatisticsParams courseStatisticsParams)
 		{
 			if (courseStatisticsParams.CourseId == null)
 				return NotFound();

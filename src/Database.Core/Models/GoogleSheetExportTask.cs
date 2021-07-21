@@ -15,8 +15,7 @@ namespace Database.Models
 		[StringLength(100)]
 		public string CourseId { get; set; }
 
-		[Required]
-		[StringLength(64)]
+		
 		public virtual IList<GoogleSheetExportTaskGroup> Groups { get; set; }
 
 		[Required]

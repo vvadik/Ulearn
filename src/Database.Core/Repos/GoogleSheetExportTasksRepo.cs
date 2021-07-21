@@ -52,7 +52,7 @@ namespace Database.Repos
 		{
 			return await db.GoogleSheetExportTasks
 				.Where(t => t.CourseId == courseId)
-				.Where(t => authorId != null || t.AuthorId == authorId)
+				.Where(t => authorId == null || t.AuthorId == authorId)
 				.ToListAsync();
 		}
 

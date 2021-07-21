@@ -9,6 +9,7 @@ using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses.Manager;
 using Ulearn.Web.Api.Models;
@@ -34,7 +35,11 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly IGoogleSheetExportTasksRepo googleSheetExportTasksRepo;
 		private readonly UlearnConfiguration configuration;
 		
-		public GoogleSheetsStatisticController(ICourseStorage courseStorage, UlearnDb db, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, IGroupMembersRepo groupMembersRepo, IUnitsRepo unitsRepo, IGroupsRepo groupsRepo, ControllerUtils controllerUtils, IVisitsRepo visitsRepo, IAdditionalScoresRepo additionalScoresRepo, IGroupAccessesRepo groupAccessesRepo, UlearnConfiguration configuration, IGoogleSheetExportTasksRepo googleSheetExportTasksRepo)
+		public GoogleSheetsStatisticController(ICourseStorage courseStorage, UlearnDb db,
+			IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, IGroupMembersRepo groupMembersRepo,
+			IUnitsRepo unitsRepo, IGroupsRepo groupsRepo, ControllerUtils controllerUtils, IVisitsRepo visitsRepo,
+			IAdditionalScoresRepo additionalScoresRepo, IGroupAccessesRepo groupAccessesRepo, IOptions<UlearnConfiguration> configuration,
+			IGoogleSheetExportTasksRepo googleSheetExportTasksRepo)
 			: base(courseStorage, db, usersRepo)
 		{
 			this.courseRolesRepo = courseRolesRepo;
@@ -45,21 +50,21 @@ namespace Ulearn.Web.Api.Controllers
 			this.visitsRepo = visitsRepo;
 			this.additionalScoresRepo = additionalScoresRepo;
 			this.groupAccessesRepo = groupAccessesRepo;
-			this.configuration = configuration;
+			this.configuration = configuration.Value;
 			this.googleSheetExportTasksRepo = googleSheetExportTasksRepo;
 		}
 		
-		[HttpGet("/tasks")]
+		[HttpGet("tasks")]
 		[Authorize(Policy = "Instructors")]
-		public async Task<ActionResult<GoogleSheetsExportTaskListResponse>> GetAllCourseTasks([FromQuery] GoogleSheetsExportTaskParams param)
+		public async Task<ActionResult<GoogleSheetsExportTaskListResponse>> GetAllCourseTasks([FromQuery] string courseId)
 		{
-			var exportTasks = await googleSheetExportTasksRepo.GetTasks(param.CourseId);
+			var exportTasks = await googleSheetExportTasksRepo.GetTasks(courseId);
 			var responses = exportTasks
 				.Select(exportTask => new GoogleSheetsExportTaskResponse
 					{
 						Id = exportTask.Id,
 						AuthorInfo = BuildShortUserInfo(exportTask.Author),
-						GroupsIds = exportTask.Groups.Select(e => e.GroupId).ToList(),
+						Groups = exportTask.Groups.Select(e => BuildShortGroupInfo(e.Group)).ToList(),
 						IsVisibleForStudents = exportTask.IsVisibleForStudents,
 						RefreshStartDate = exportTask.RefreshStartDate,
 						RefreshEndDate = exportTask.RefreshEndDate,
@@ -74,14 +79,14 @@ namespace Ulearn.Web.Api.Controllers
 			};
 		}
 		
-		[HttpGet("/tasks/{taskId}")]
+		[HttpGet("tasks/{taskId}")]
 		[Authorize(Policy = "Instructors")]
 		public async Task<ActionResult<GoogleSheetsExportTaskResponse>> GetOneTask([FromQuery] GoogleSheetsExportTaskParams param)
 		{
 			throw new NotImplementedException();
 		}
 		
-		[HttpPost("/tasks")]
+		[HttpPost("tasks")]
 		[Authorize(Policy = "Instructors")]
 		public async Task<ActionResult<GoogleSheetsExportTaskResponse>> AddNewTask([FromQuery] GoogleSheetsExportTaskParams param)
 		{
@@ -93,7 +98,7 @@ namespace Ulearn.Web.Api.Controllers
 			{
 				Id = exportTask.Id,
 				AuthorInfo = BuildShortUserInfo(exportTask.Author),
-				GroupsIds = exportTask.Groups.Select(e => e.GroupId).ToList(),
+				Groups = exportTask.Groups.Select(e => BuildShortGroupInfo(e.Group)).ToList(),
 				IsVisibleForStudents = exportTask.IsVisibleForStudents,
 				RefreshStartDate = exportTask.RefreshStartDate,
 				RefreshEndDate = exportTask.RefreshEndDate,
@@ -104,7 +109,7 @@ namespace Ulearn.Web.Api.Controllers
 			return result;
 		}
 		
-		[HttpPatch("/tasks/{taskId}")]
+		[HttpPatch("tasks/{taskId}")]
 		[Authorize(Policy = "Instructors")]
 		public async Task<ActionResult> UpdateTask([FromQuery] GoogleSheetsExportTaskParams param, [FromRoute] int taskId)
 		{
@@ -112,7 +117,7 @@ namespace Ulearn.Web.Api.Controllers
 			return Ok();
 		}
 		
-		[HttpDelete("/tasks/{taskId}")]
+		[HttpDelete("tasks/{taskId}")]
 		[Authorize(Policy = "Instructors")]
 		public async Task<ActionResult> DeleteTask([FromRoute] int taskId)
 		{

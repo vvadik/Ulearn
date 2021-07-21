@@ -13,13 +13,11 @@ namespace Database.Models
 		[Required]
 		public int TaskId { get; set; }
 		
-		[Required]
 		public virtual GoogleSheetExportTask Task { get; set; }
 		
 		[Required]
 		public int GroupId { get; set; }
-
-		[Required]
+		
 		public virtual Group Group { get; set; }
 	}
 }

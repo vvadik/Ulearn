@@ -16,7 +16,7 @@ namespace Ulearn.Web.Api.Models.Responses
 		public ShortUserInfo AuthorInfo { get; set; }
 
 		[DataMember]
-		public List<int> GroupsIds { get; set; }
+		public List<ShortGroupInfo> Groups { get; set; }
 
 		[DataMember]
 		public bool IsVisibleForStudents { get; set; }
