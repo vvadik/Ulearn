@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.MemoryMappedFiles;
 using System.Threading.Tasks;
 using Database.DataContexts;
 using Database.Models;
@@ -111,27 +112,23 @@ namespace Database
 			}
 		}
 
-		public DirectoryInfo ExtractCourseVersionToTemporaryDirectory(string courseId, Guid versionId, byte[] zipContent)
+		public const string ExampleCourseId = "Help";
+		public async Task<bool> CreateCourseIfNotExists(string courseId, Guid versionId, string courseTitle, string userId)
 		{
-			var directoryName = $"{courseId}_{versionId}_{DateTime.Now.ToSortable()}";
-			var directoryPath = Path.Combine(Path.GetTempPath(), directoryName);
-			var courseDirectory = Directory.CreateDirectory(directoryPath);
-			ZipUtils.UnpackZip(zipContent, courseDirectory.FullName);
-			return courseDirectory;
-		}
-
-		public (Course Course, Exception Exception) LoadCourseFromDirectory(string courseId, Guid versionId, DirectoryInfo extractedCourseDirectory)
-		{
-			try
+			var coursesRepo = new CoursesRepo();
+			var hasCourse = coursesRepo.GetPublishedCourseVersion(courseId) != null;
+			if (!hasCourse)
 			{
-				var course = loader.Load(extractedCourseDirectory);
-				return (course, null);
+				var helpVersionFile = coursesRepo.GetPublishedVersionFile(ExampleCourseId);
+				using (var exampleCourseZip = SaveVersionZipToTemporaryDirectory(courseId, versionId, new MemoryStream(helpVersionFile.File)))
+				{
+					CreateCourseFromExample(courseId, courseTitle, exampleCourseZip.FileInfo);
+					await coursesRepo.AddCourseVersion(courseId, versionId, userId, null, null, null, null, await exampleCourseZip.FileInfo.ReadAllContentAsync()
+						.ConfigureAwait(false)).ConfigureAwait(false);
+				}
+				await coursesRepo.MarkCourseVersionAsPublished(versionId).ConfigureAwait(false);
 			}
-			catch (Exception e)
-			{
-				log.Warn(e, $"Upload course exception '{courseId}'");
-				return (null, e);
-			}
+			return !hasCourse;
 		}
 	}
 }

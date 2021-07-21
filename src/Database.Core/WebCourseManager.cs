@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Database.Models;
 using Database.Repos;
 using Microsoft.Extensions.DependencyInjection;
+using Ulearn.Common.Extensions;
 using Vostok.Logging.Abstractions;
 using Ulearn.Core.Courses.Manager;
 
@@ -98,7 +99,7 @@ namespace Database
 			log.Info("Загружаю курсы из БД");
 			using (var scope = serviceScopeFactory.CreateScope())
 			{
-				var coursesRepo = (CoursesRepo)scope.ServiceProvider.GetService(typeof(ICoursesRepo));
+				var coursesRepo = scope.ServiceProvider.GetService<ICoursesRepo>();
 				var publishedCourseVersions = await coursesRepo.GetPublishedCourseVersions();
 				var coursesNotOnDisk = publishedCourseVersions.Where(c => !existingOnDiskCourseIds.Contains(c.CourseId, StringComparer.OrdinalIgnoreCase));
 				foreach (var publishedCourseVersion in coursesNotOnDisk)
@@ -118,6 +119,27 @@ namespace Database
 						log.Error(ex, $"Не смог загрузить {fileInDb.CourseId} из базы данных");
 					}
 				}
+			}
+		}
+
+		public const string ExampleCourseId = "Help";
+		public async Task<bool> CreateCourseIfNotExists(string courseId, Guid versionId, string courseTitle, string userId)
+		{
+			using (var scope = serviceScopeFactory.CreateScope())
+			{
+				var coursesRepo = scope.ServiceProvider.GetService<ICoursesRepo>();
+				var hasCourse = await coursesRepo.GetPublishedCourseVersion(courseId) != null;
+				if (!hasCourse)
+				{
+					var helpVersionFile = await coursesRepo.GetPublishedVersionFile(ExampleCourseId);
+					using (var exampleCourseZip = SaveVersionZipToTemporaryDirectory(courseId, versionId, new MemoryStream(helpVersionFile.File)))
+					{
+						CreateCourseFromExample(courseId, courseTitle, exampleCourseZip.FileInfo);
+						await coursesRepo.AddCourseVersion(courseId, versionId, userId, null, null, null, null, await exampleCourseZip.FileInfo.ReadAllContentAsync());
+					}
+					await coursesRepo.MarkCourseVersionAsPublished(versionId);
+				}
+				return !hasCourse;
 			}
 		}
 	}

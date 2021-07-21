@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Slides;
 
@@ -7,6 +8,10 @@ namespace Database
 {
 	public interface IWebCourseManager
 	{
+		Task<bool> CreateCourseIfNotExists(string courseId, Guid versionId, string courseTitle, string userId);
+		
+		
+		
 		void UpdateCourseVersion(string courseId, Guid versionId);
 		Course GetVersion(Guid versionId);
 		FileInfo GetStagingCourseFile(string courseId);
@@ -17,9 +22,7 @@ namespace Database
 		string GetStagingCoursePath(string courseId);
 		string GetPackageName(string courseId);
 		string GetPackageName(Guid versionId);
-		bool TryCreateCourse(string courseId, string courseTitle, Guid firstVersionId);
 		void EnsureVersionIsExtracted(Guid versionId);
-		bool HasPackageFor(string courseId);
 		void WaitWhileCourseIsLocked(string courseId);
 		void MoveCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory);
 		bool TryReloadCourse(string courseId);
