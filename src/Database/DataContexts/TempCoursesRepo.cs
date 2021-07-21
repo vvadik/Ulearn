@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Database.Models;
 
 namespace Database.DataContexts
@@ -33,16 +31,6 @@ namespace Database.DataContexts
 		public List<TempCourse> GetTempCoursesNoTracking()
 		{
 			return db.TempCourses.AsNoTracking().ToList();
-		}
-
-		public void UpdateTempCourseLastUpdateTime(string courseId)
-		{
-			var course = db.TempCourses.Find(courseId);
-			if (course == null)
-				return;
-
-			course.LastUpdateTime = DateTime.Now;
-			db.SaveChanges();
 		}
 	}
 }

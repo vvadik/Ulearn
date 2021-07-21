@@ -9,6 +9,7 @@ namespace Ulearn.Core.Courses.Manager
 	public class CourseStorage : ICourseStorage, IUpdateCourseStorage
 	{
 		private readonly ConcurrentDictionary<string, Course> courses = new ConcurrentDictionary<string, Course>(StringComparer.InvariantCultureIgnoreCase);
+
 		public event CourseChangedEventHandler CourseChangedEvent;
 
 		public Course GetCourse(string courseId)

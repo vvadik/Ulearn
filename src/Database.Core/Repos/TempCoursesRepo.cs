@@ -55,17 +55,6 @@ namespace Database.Repos
 			return course.LoadingTime;
 		}
 
-		public async Task<DateTime> UpdateTempCourseLastUpdateTimeAsync(string courseId)
-		{
-			var course = await db.TempCourses.FindAsync(courseId);
-			if (course == null)
-				return default;
-
-			course.LastUpdateTime = DateTime.Now;
-			await db.SaveChangesAsync();
-			return course.LastUpdateTime;
-		}
-
 		public async Task<TempCourseError> UpdateOrAddTempCourseErrorAsync(string courseId, string error)
 		{
 			var course = await db.TempCourses.FindAsync(courseId);

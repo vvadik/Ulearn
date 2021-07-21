@@ -31,6 +31,7 @@ namespace Ulearn.Core.Courses.Manager
 
 		private static readonly CourseStorage courseStorage = new CourseStorage();
 		public static ICourseStorage CourseStorageInstance => courseStorage;
+		public static IUpdateCourseStorage CourseStorageUpdaterInstance => courseStorage;
 
 		private readonly DirectoryInfo stagedDirectory;
 		private readonly DirectoryInfo coursesDirectory;
@@ -66,7 +67,7 @@ namespace Ulearn.Core.Courses.Manager
 			this.coursesVersionsDirectory = coursesVersionsDirectory;
 			coursesVersionsDirectory.EnsureExists();
 		}
-		
+
 		protected bool CourseIsBroken(string courseId)
 		{
 			return courseIdToIsBroken.TryGetValue(courseId, out var val) ? val : false;
@@ -427,7 +428,7 @@ namespace Ulearn.Core.Courses.Manager
 			}
 		}
 
-		private void LockCourse(string courseId)
+		public void LockCourse(string courseId)
 		{
 			var lockFile = GetCourseLockFile(courseId);
 			while (true)
@@ -457,7 +458,7 @@ namespace Ulearn.Core.Courses.Manager
 			}
 		}
 
-		private void ReleaseCourse(string courseId)
+		public void ReleaseCourse(string courseId)
 		{
 			GetCourseLockFile(courseId).Delete();
 		}

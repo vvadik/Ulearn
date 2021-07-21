@@ -12,7 +12,8 @@ namespace Database.Models
 		[Required]
 		public DateTime LoadingTime { get; set; } // Время загрузки новой версии в базу TempCoursesRepo.LoadingTime
 
-		public DateTime LastUpdateTime { get; set; } // Время загрузки курса с диска в web
+		[Obsolete] // TODO удалить после того как будет писаться версия в meta
+		public DateTime LastUpdateTime { get; set; } // Время загрузки курса с диска в web 
 
 		[Required]
 		[StringLength(64)]
