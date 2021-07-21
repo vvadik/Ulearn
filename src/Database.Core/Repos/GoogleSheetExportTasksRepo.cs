@@ -48,6 +48,13 @@ namespace Database.Repos
 			return exportTask;
 		}
 
+		public async Task<GoogleSheetExportTask> GetTaskById(int taskId)
+		{
+			return await db.GoogleSheetExportTasks
+				.Where(t => t.Id == taskId)
+				.FirstOrDefaultAsync();
+		}
+
 		public async Task<List<GoogleSheetExportTask>> GetTasks(string courseId, string authorId = null)
 		{
 			return await db.GoogleSheetExportTasks

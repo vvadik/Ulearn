@@ -81,14 +81,14 @@ namespace Ulearn.Web.Api.Controllers
 		
 		[HttpGet("tasks/{taskId}")]
 		[Authorize(Policy = "Instructors")]
-		public async Task<ActionResult<GoogleSheetsExportTaskResponse>> GetOneTask([FromQuery] GoogleSheetsExportTaskParams param)
+		public async Task<ActionResult<GoogleSheetsExportTaskResponse>> GetOneTask([FromRoute] int taskId)
 		{
 			throw new NotImplementedException();
 		}
 		
 		[HttpPost("tasks")]
 		[Authorize(Policy = "Instructors")]
-		public async Task<ActionResult<GoogleSheetsExportTaskResponse>> AddNewTask([FromQuery] GoogleSheetsExportTaskParams param)
+		public async Task<ActionResult<GoogleSheetsExportTaskResponse>> AddNewTask([FromBody] GoogleSheetsExportTaskParams param)
 		{
 			var exportTask = await googleSheetExportTasksRepo.AddTask(param.CourseId, UserId, param.IsVisibleForStudents,
 				param.RefreshStartDate, param.RefreshEndDate, param.RefreshTimeInMinutes, param.GroupsIds,
@@ -111,9 +111,15 @@ namespace Ulearn.Web.Api.Controllers
 		
 		[HttpPatch("tasks/{taskId}")]
 		[Authorize(Policy = "Instructors")]
-		public async Task<ActionResult> UpdateTask([FromQuery] GoogleSheetsExportTaskParams param, [FromRoute] int taskId)
+		public async Task<ActionResult> UpdateTask([FromBody] GoogleSheetsExportTaskUpdateParams param, [FromRoute] int taskId)
 		{
-			await googleSheetExportTasksRepo.UpdateTask(taskId, param.IsVisibleForStudents, param.RefreshStartDate, param.RefreshEndDate, param.RefreshTimeInMinutes);
+			var task = googleSheetExportTasksRepo.GetTaskById(taskId);
+			if (task == null)
+				return NotFound();
+			// добавить проверки на доступ везде
+			await googleSheetExportTasksRepo.UpdateTask(taskId,
+				param.IsVisibleForStudents, param.RefreshStartDate,
+				param.RefreshEndDate, param.RefreshTimeInMinutes);
 			return Ok();
 		}
 		

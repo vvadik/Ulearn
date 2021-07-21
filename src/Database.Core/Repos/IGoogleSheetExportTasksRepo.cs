@@ -12,6 +12,8 @@ namespace Database.Repos
 			DateTime? refreshEndDate, int? refreshTimeInMinutes,
 			List<int> groupsIds, string spreadsheetId, int listId);
 
+		Task<GoogleSheetExportTask> GetTaskById(int taskId);
+		
 		Task<List<GoogleSheetExportTask>> GetTasks(string courseId, string authorId = null);
 
 		Task UpdateTask(int id, bool isVisibleForStudents, DateTime? refreshStartDate,
