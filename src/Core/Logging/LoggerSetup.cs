@@ -92,17 +92,30 @@ namespace Ulearn.Core.Logging
 		public static ILog FilterLogs(ILog log, LogLevel minimumLevel, LogLevel dbMinimumLevel)
 		{
 			return log.WithMinimumLevelForSourceContext("ULearnDb", dbMinimumLevel) // Database
-				.DropEvents(p =>
-				{
-					if (minimumLevel < LogLevel.Info || p.Properties == null || p.Level > LogLevel.Info)
-						return false;
-					var isScheduler = p.Properties.TryGetValue("sourceContext", out var sourceContextValue) && ((SourceContextValue)sourceContextValue).Contains("Scheduler");
-					var isUpdateCoursesJob = p.Properties.TryGetValue("operationContext", out var operationContextValue)
-											&& ((OperationContextValue)operationContextValue).Contains(UpdateCoursesWorker.UpdateCoursesJobName);
-					var isUpdateTempCoursesJob = p.Properties.TryGetValue("operationContext", out var operationContextValue2)
-												&& ((OperationContextValue)operationContextValue2).Contains(UpdateCoursesWorker.UpdateTempCoursesJobName);
-					return isScheduler && (isUpdateCoursesJob || isUpdateTempCoursesJob); // Отключает избыточное логирование для частой задачи
-				});
+				.DropEvents(e => IsDropDatabaseCoreLogEventForDrop(e, dbMinimumLevel))
+				.DropEvents(e => IsSchedulerLogEventForDrop(e, minimumLevel));
+		}
+
+		private static bool IsDropDatabaseCoreLogEventForDrop(LogEvent e, LogLevel dbMinimumLevel)
+		{
+			if (dbMinimumLevel < LogLevel.Info || e.Level >= dbMinimumLevel || e.Properties == null)
+				return false;
+			var sourceContext = GetSourceContext(e);
+			if (sourceContext == null)
+				return false;
+			return sourceContext.Contains("Microsoft.EntityFrameworkCore.Database.Command")
+					|| sourceContext.Contains("Microsoft.EntityFrameworkCore.Infrastructure");
+		}
+
+		private static bool IsSchedulerLogEventForDrop(LogEvent e, LogLevel minimumLevel)
+		{
+			if (minimumLevel < LogLevel.Info || e.Level > LogLevel.Info || e.Properties == null)
+				return false;
+			var isScheduler = GetSourceContext(e)?.Contains("Scheduler") ?? false;
+			if (!isScheduler)
+				return false;
+			bool IsJobWithName(string jobName) => GetOperationContext(e)?.Contains(jobName) ?? false;
+			return IsJobWithName(UpdateCoursesWorker.UpdateCoursesJobName) || IsJobWithName(UpdateCoursesWorker.UpdateTempCoursesJobName);
 		}
 
 		[CanBeNull]
@@ -111,6 +124,14 @@ namespace Ulearn.Core.Logging
 			if (@event?.Properties == null)
 				return null;
 			return @event.Properties.TryGetValue(WellKnownProperties.SourceContext, out var value) ? value as SourceContextValue : null;
+		}
+
+		[CanBeNull]
+		public static OperationContextValue GetOperationContext([CanBeNull] LogEvent @event)
+		{
+			if (@event?.Properties == null)
+				return null;
+			return @event.Properties.TryGetValue(WellKnownProperties.OperationContext, out var value) ? value as OperationContextValue : null;
 		}
 
 		// Для совместимости с настройками appsettings.json, написанными для серилога
