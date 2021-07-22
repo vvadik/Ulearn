@@ -83,6 +83,7 @@ namespace Notifications
 			services.AddScoped<DeliveriesProcessor>();
 			services.AddScoped(sp => new MetricSender(
 				((IOptions<NotificationsConfiguration>)sp.GetService(typeof(IOptions<NotificationsConfiguration>)))!.Value.GraphiteServiceName));
+			services.AddSingleton<UpdateCoursesWorker>();
 
 			services.AddDatabaseServices();
 		}
