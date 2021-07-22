@@ -16,7 +16,7 @@ namespace Database.Repos
 			this.db = db;
 		}
 
-		public async Task<GoogleSheetExportTask> AddTask(string courseId, string authorId,
+		public async Task<int> AddTask(string courseId, string authorId,
 			bool isVisibleForStudents, DateTime? refreshStartDate,
 			DateTime? refreshEndDate, int? refreshTimeInMinutes,
 			List<int> groupsIds, string spreadsheetId, int listId)
@@ -45,12 +45,14 @@ namespace Database.Repos
 			};
 			db.GoogleSheetExportTasks.Add(exportTask);
 			await db.SaveChangesAsync();
-			return exportTask;
+			return exportTask.Id;
 		}
 
 		public async Task<GoogleSheetExportTask> GetTaskById(int taskId)
 		{
 			return await db.GoogleSheetExportTasks
+				.Include(t => t.Author)
+				.Include(t => t.Groups).ThenInclude(g => g.Group)
 				.Where(t => t.Id == taskId)
 				.FirstOrDefaultAsync();
 		}
@@ -58,19 +60,16 @@ namespace Database.Repos
 		public async Task<List<GoogleSheetExportTask>> GetTasks(string courseId, string authorId = null)
 		{
 			return await db.GoogleSheetExportTasks
+				.Include(t => t.Author)
+				.Include(t => t.Groups).ThenInclude(g => g.Group)
 				.Where(t => t.CourseId == courseId)
 				.Where(t => authorId == null || t.AuthorId == authorId)
 				.ToListAsync();
 		}
 
-		public async Task UpdateTask(int id, bool isVisibleForStudents, DateTime? refreshStartDate,
+		public async Task UpdateTask(GoogleSheetExportTask exportTask, bool isVisibleForStudents, DateTime? refreshStartDate,
 			DateTime? refreshEndDate, int? refreshTimeInMinutes)
 		{
-			var exportTask = await db.GoogleSheetExportTasks.FindAsync(id);
-
-			if (exportTask == null)
-				return;
-
 			exportTask.IsVisibleForStudents = isVisibleForStudents;
 			exportTask.RefreshStartDate = refreshStartDate;
 			exportTask.RefreshEndDate = refreshEndDate;
@@ -78,13 +77,8 @@ namespace Database.Repos
 			await db.SaveChangesAsync();
 		}
 
-		public async Task DeleteTask(int id)
+		public async Task DeleteTask(GoogleSheetExportTask exportTask)
 		{
-			var exportTask = await db.GoogleSheetExportTasks.FindAsync(id);
-			
-			if (exportTask == null)
-				return;
-
 			db.GoogleSheetExportTasks.Remove(exportTask); 
 			await db.SaveChangesAsync();
 		}

@@ -10,7 +10,7 @@ import {
 
 // Groups
 export function getCourseGroups(courseId: string): Promise<{ groups: GroupInfo[] }> {
-	return api.get("groups?courseId=" + courseId);
+		return api.get("groups?courseId=" + courseId);
 }
 
 export function getCourseArchivedGroups(courseId: string): Promise<{ groups: GroupInfo[] }> {
