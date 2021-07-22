@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Database.Repos;
 using Microsoft.Extensions.DependencyInjection;
 using Ulearn.Common.Extensions;
-using Ulearn.Core;
+using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Manager;
 using Vostok.Logging.Abstractions;
 
@@ -13,6 +13,7 @@ namespace Database
 	public class SlaveCourseManager : CourseManager, ISlaveCourseManager
 	{
 		private static ILog log => LogProvider.Get().ForContext(typeof(SlaveCourseManager));
+
 		private readonly IServiceScopeFactory serviceScopeFactory;
 
 		public SlaveCourseManager(IServiceScopeFactory serviceScopeFactory)

@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Database.DataContexts;
 using Ulearn.Common.Extensions;
-using Ulearn.Core;
+using Ulearn.Core.Courses;
 using Vostok.Logging.Abstractions;
 using Ulearn.Core.Courses.Manager;
 

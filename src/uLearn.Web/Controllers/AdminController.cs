@@ -90,10 +90,10 @@ namespace uLearn.Web.Controllers
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
-		public ActionResult SpellingErrors(Guid versionId)
+		public async Task<ActionResult> SpellingErrors(Guid versionId)
 		{
 			var versionFile = coursesRepo.GetVersionFile(versionId);
-			using (var courseDirectory = courseManager.ExtractCourseVersionToTemporaryDirectory(versionFile.CourseId, versionFile.CourseVersionId, versionFile.File))
+			using (var courseDirectory = await courseManager.ExtractCourseVersionToTemporaryDirectory(versionFile.CourseId, versionFile.CourseVersionId, versionFile.File))
 			{
 				var (course, error) = courseManager.LoadCourseFromDirectory(versionFile.CourseId, versionFile.CourseVersionId, courseDirectory.DirectoryInfo);
 				var model = course.SpellCheck(courseDirectory.DirectoryInfo.FullName);
@@ -402,7 +402,7 @@ namespace uLearn.Web.Controllers
 			{
 				try
 				{
-					using (var courseDirectory = courseManager.ExtractCourseVersionToTemporaryDirectory(courseId, versionId, await zipOnDisk.FileInfo.ReadAllContentAsync()))
+					using (var courseDirectory = await courseManager.ExtractCourseVersionToTemporaryDirectory(courseId, versionId, await zipOnDisk.FileInfo.ReadAllContentAsync()))
 					{
 						var (course, exception) = courseManager.LoadCourseFromDirectory(courseId, versionId, courseDirectory.DirectoryInfo);
 						if (exception != null)
@@ -894,7 +894,7 @@ namespace uLearn.Web.Controllers
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
-		public ActionResult Diagnostics(string courseId, Guid? versionId)
+		public async Task<ActionResult> Diagnostics(string courseId, Guid? versionId)
 		{
 			var isTempCourse = tempCoursesRepo.Find(courseId) != null;
 			if (versionId == null)
@@ -908,7 +908,7 @@ namespace uLearn.Web.Controllers
 
 			var course = courseStorage.GetCourse(courseId);
 			var versionFile = coursesRepo.GetVersionFile(versionId.Value);
-			using (var courseDirectory = courseManager.ExtractCourseVersionToTemporaryDirectory(versionFile.CourseId, versionFile.CourseVersionId, versionFile.File))
+			using (var courseDirectory = await courseManager.ExtractCourseVersionToTemporaryDirectory(versionFile.CourseId, versionFile.CourseVersionId, versionFile.File))
 			{
 				var (version, error) = courseManager.LoadCourseFromDirectory(versionFile.CourseId, versionFile.CourseVersionId, courseDirectory.DirectoryInfo);
 
@@ -974,7 +974,7 @@ namespace uLearn.Web.Controllers
 
 			Course version;
 			var versionFile = coursesRepo.GetVersionFile(versionId);
-			using (var courseDirectory = courseManager.ExtractCourseVersionToTemporaryDirectory(versionFile.CourseId, versionFile.CourseVersionId, versionFile.File))
+			using (var courseDirectory = await courseManager.ExtractCourseVersionToTemporaryDirectory(versionFile.CourseId, versionFile.CourseVersionId, versionFile.File))
 			{
 				(version, _) = courseManager.LoadCourseFromDirectory(versionFile.CourseId, versionFile.CourseVersionId, courseDirectory.DirectoryInfo);
 			}

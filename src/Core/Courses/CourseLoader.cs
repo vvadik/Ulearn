@@ -72,7 +72,7 @@ namespace Ulearn.Core.Courses
 				settings.Description = "";
 			}
 
-			var courseMeta = LoadMeta(courseDirectory);
+			var versionToken = CourseVersionToken.Load(courseDirectory);
 
 			var context = new CourseLoadingContext(courseId, settings, courseDirectory);
 
@@ -88,7 +88,7 @@ namespace Ulearn.Core.Courses
 			AddDefaultScoringGroupIfNeeded(units, slides, settings);
 			CalculateScoringGroupScores(units, settings);
 
-			return new Course(courseId, units, settings, courseMeta);
+			return new Course(courseId, units, settings, versionToken);
 		}
 
 		private static string GetValidationLog(List<Unit> units)
@@ -133,22 +133,7 @@ namespace Ulearn.Core.Courses
 			}
 		}
 
-		// Meta присутствует в курсах, для которых уже создана версия в базе
-		[CanBeNull]
-		public static CourseMeta LoadMeta(DirectoryInfo courseDirectory)
-		{
-			var metaFile = courseDirectory.GetFile(".meta");
-			if (!metaFile.Exists)
-				return null;
-			try
-			{
-				return JsonConvert.DeserializeObject<CourseMeta>(metaFile.ContentAsUtf8());
-			}
-			catch (Exception ex)
-			{
-				return null;
-			}
-		}
+
 
 		private IEnumerable<Unit> LoadUnits(CourseLoadingContext context)
 		{

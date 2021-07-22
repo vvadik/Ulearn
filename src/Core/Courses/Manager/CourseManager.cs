@@ -521,10 +521,11 @@ namespace Ulearn.Core.Courses.Manager
 
 #region WorkWithCourseInTemporaryDirectory
 
-		public TempDirectory ExtractCourseVersionToTemporaryDirectory(string courseId, Guid versionId, byte[] zipContent)
+		public async Task<TempDirectory> ExtractCourseVersionToTemporaryDirectory(string courseId, Guid versionId, byte[] zipContent)
 		{
 			var tempDirectory = CreateCourseTempDirectory(courseId, versionId);
 			ZipUtils.UnpackZip(zipContent, tempDirectory.DirectoryInfo.FullName);
+			await new CourseVersionToken(versionId).Save(tempDirectory.DirectoryInfo);
 			return tempDirectory;
 		}
 
@@ -561,7 +562,7 @@ namespace Ulearn.Core.Courses.Manager
 		protected void UpdateCourseOrTempCourseToVersionFromDirectory(string courseId, CourseVersionToken publishedVersionToken)
 		{
 			var courseInMemory = CourseStorageInstance.FindCourse(courseId);
-			if (courseInMemory != null && courseInMemory.CourseMeta.Version == publishedVersionToken)
+			if (courseInMemory != null && courseInMemory.CourseVersionToken == publishedVersionToken)
 				return;
 			try
 			{
@@ -583,16 +584,16 @@ namespace Ulearn.Core.Courses.Manager
 			var courseDirectory = GetExtractedCourseDirectory(courseId);
 			if (!courseDirectory.Exists)
 				return;
-			var meta = CourseLoader.LoadMeta(courseDirectory);
-			if (meta!.Version != publishedVersionToken)
+			var courseVersionToken = CourseVersionToken.Load(courseDirectory);
+			if (courseVersionToken != publishedVersionToken)
 				return;
 			LockCourse(courseId);
 			try
 			{
 				if (!courseDirectory.Exists)
 					return;
-				meta = CourseLoader.LoadMeta(courseDirectory);
-				if (meta!.Version != publishedVersionToken)
+				courseVersionToken = CourseVersionToken.Load(courseDirectory);
+				if (courseVersionToken != publishedVersionToken)
 					return;
 				var course = loader.Load(courseDirectory);
 				CourseStorageUpdaterInstance.AddOrUpdateCourse(course);

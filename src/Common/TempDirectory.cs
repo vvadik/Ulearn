@@ -11,6 +11,7 @@ namespace Ulearn.Common
 		{
 			var path = Path.Combine(Path.GetTempPath(), directoryName);
 			DirectoryInfo = new DirectoryInfo(path);
+			DirectoryInfo.Create();
 		}
 
 		public void Dispose()

@@ -1,20 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.Serialization;
+using System.Text;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 using Ulearn.Common.Extensions;
 
-namespace Ulearn.Core
+namespace Ulearn.Core.Courses
 {
 	// Это данные, которые добавляются на сервере а автору курса никогда не видны
-	[DataContract]
-	public class CourseMeta
-	{
-		[NotNull]
-		[DataMember]
-		public CourseVersionToken Version;
-	}
-
 	[DataContract]
 	public class CourseVersionToken : IEqualityComparer<CourseVersionToken>
 	{
@@ -30,6 +26,25 @@ namespace Ulearn.Core
 		public CourseVersionToken(DateTime tempCourseLoadingTime)
 		{
 			LoadingTime = tempCourseLoadingTime;
+		}
+
+		private const string FileName = ".version";
+		[NotNull]
+		public static CourseVersionToken Load(DirectoryInfo courseDirectory)
+		{
+			var versionFile = courseDirectory.GetFile(FileName);
+			if (!versionFile.Exists)
+				throw new Exception($".version not exists in {courseDirectory.FullName}");
+			return JsonConvert.DeserializeObject<CourseVersionToken>(versionFile.ContentAsUtf8());
+		}
+
+		public async Task Save(DirectoryInfo directory)
+		{
+			var fullName = Path.Combine(directory.FullName, FileName);
+			using var file = File.Open(fullName, FileMode.Create, FileAccess.Write, FileShare.None);
+			var json = JsonConvert.SerializeObject(this, Formatting.Indented);
+			var bytes = Encoding.UTF8.GetBytes(json);
+			await file.WriteAsync(bytes, 0, bytes.Length);
 		}
 
 		[DataMember(EmitDefaultValue = false)]
@@ -89,11 +104,7 @@ namespace Ulearn.Core
 
 		public override string ToString()
 		{
-			if (Version != null)
-				return Version.ToString();
-			if (LoadingTime != null)
-				return LoadingTime.Value.ToSortable();
-			return "";
+			return JsonConvert.SerializeObject(this, Formatting.Indented);
 		}
 	}
 }

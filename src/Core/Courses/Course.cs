@@ -9,17 +9,17 @@ namespace Ulearn.Core.Courses
 {
 	public class Course : ICourse
 	{
-		public Course(string id, List<Unit> units, [NotNull]CourseSettings settings, [CanBeNull]CourseMeta courseMeta)
+		public Course(string id, List<Unit> units, [NotNull]CourseSettings settings, [CanBeNull]CourseVersionToken courseVersionToken)
 		{
 			Id = id;
 			this.units = units;
 			Settings = settings;
-			CourseMeta = courseMeta;
+			CourseVersionToken = courseVersionToken;
 		}
 
 		public string Id { get; set; }
 
-		public CourseMeta CourseMeta { get; set; }
+		public CourseVersionToken CourseVersionToken { get; set; }
 
 		public string Title => Settings.Title;
 		[NotNull]
