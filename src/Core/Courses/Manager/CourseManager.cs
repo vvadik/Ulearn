@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -10,14 +9,12 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Ionic.Zip;
-using Microsoft.Extensions.Options;
 using Telegram.Bot.Types.Enums;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Units;
-using Ulearn.Core.Helpers;
 using Ulearn.Core.Telegram;
 using Vostok.Logging.Abstractions;
 
@@ -40,15 +37,13 @@ namespace Ulearn.Core.Courses.Manager
 		private readonly DirectoryInfo tempCourseStaging;
 		private readonly DirectoryInfo coursesVersionsDirectory;
 
-		private readonly ExerciseStudentZipsCache exerciseStudentZipsCache = new ExerciseStudentZipsCache(Options.Create(ApplicationConfiguration.Read<UlearnConfiguration>()));
-
 		/* TODO (andgein): Use DI */
 		public static readonly CourseLoader loader = new CourseLoader(new UnitLoader(new XmlSlideLoader()));
 		private static readonly ErrorsBot errorsBot = new ErrorsBot();
 
 		private static readonly ConcurrentDictionary<string, bool> courseIdToIsBroken = new ConcurrentDictionary<string, bool>(StringComparer.InvariantCultureIgnoreCase);
 
-		private static readonly ConcurrentDictionary<CourseVersionToken, bool> brokenVersions = new ConcurrentDictionary<CourseVersionToken, bool>();
+		protected static readonly ConcurrentDictionary<CourseVersionToken, bool> brokenVersions = new ConcurrentDictionary<CourseVersionToken, bool>();
 
 		public CourseManager(DirectoryInfo baseDirectory)
 			: this(
@@ -129,34 +124,6 @@ namespace Ulearn.Core.Courses.Manager
 			return GetStagingCourseFile(courseId).FullName;
 		}
 
-		private static readonly object reloadLock = new object();
-
-		public void LoadCoursesIfNotYet()
-		{
-			lock (reloadLock)
-			{
-				if (courseStorage.GetCourses().Count() != 0)
-					return;
-				var courseZips = stagedDirectory.GetFiles("*.zip");
-				var courseIdsWithZips = courseZips.Select(z => GetCourseId(z.FullName));
-				LoadCourseZipsToDiskFromExternalStorage(courseIdsWithZips).Wait();
-
-				log.Info($"Загружаю курсы из {stagedDirectory.FullName}");
-				courseZips = stagedDirectory.GetFiles("*.zip");
-				foreach (var zipFile in courseZips)
-				{
-					log.Info($"Обновляю курс из {zipFile.Name}");
-					var courseId = GetCourseId(zipFile.FullName);
-					TryReloadCourse(courseId);
-				}
-			}
-		}
-
-		protected virtual Task LoadCourseZipsToDiskFromExternalStorage(IEnumerable<string> existingOnDiskCourseIds)
-		{
-			return Task.CompletedTask;
-		}
-
 		public bool TryReloadCourse(string courseId)
 		{
 			if (CourseIsBroken(courseId))
@@ -200,8 +167,7 @@ namespace Ulearn.Core.Courses.Manager
 			var course = LoadCourseFromZip(zipFile);
 			courseStorage.AddOrUpdateCourse(course);
 			log.Info($"Курс {course.Id} загружен из {zipFile.FullName} и сохранён в памяти");
-			exerciseStudentZipsCache.DeleteCourseZips(course.Id);
-			ExerciseCheckerZipsCache.DeleteCourseZips(course.Id);
+			
 			return course;
 		}
 
@@ -210,8 +176,6 @@ namespace Ulearn.Core.Courses.Manager
 			var course = LoadCourseFromDirectory(directory);
 			courseStorage.AddOrUpdateCourse(course);
 			log.Info($"Курс {course.Id} загружен из {directory.FullName} и сохранён в памяти");
-			exerciseStudentZipsCache.DeleteCourseZips(course.Id);
-			ExerciseCheckerZipsCache.DeleteCourseZips(course.Id);
 			return course;
 		}
 
@@ -261,7 +225,6 @@ namespace Ulearn.Core.Courses.Manager
 
 		private Course LoadCourseFromDirectory(DirectoryInfo dir)
 		{
-			WaitWhileCourseIsLocked(GetCourseId(dir.Name));
 			return loader.Load(dir);
 		}
 
@@ -389,7 +352,6 @@ namespace Ulearn.Core.Courses.Manager
 			}
 		}
 
-
 		public static char[] GetInvalidCharacters()
 		{
 			return new[] { '&' }.Concat(Path.GetInvalidFileNameChars()).Concat(Path.GetInvalidPathChars()).Distinct().ToArray();
@@ -400,10 +362,6 @@ namespace Ulearn.Core.Courses.Manager
 			if (!courseStorage.HasCourse(course.Id))
 				return;
 
-			exerciseStudentZipsCache.DeleteCourseZips(course.Id);
-			ExerciseCheckerZipsCache.DeleteCourseZips(course.Id);
-
-			var versionId = Guid.Empty;
 			courseStorage.AddOrUpdateCourse(course);
 		}
 
@@ -475,14 +433,13 @@ namespace Ulearn.Core.Courses.Manager
 			log.Info($"Course lock released {courseId}");
 		}
 
-		public void MoveCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory)
+		protected void MoveCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory)
 		{
-			var tempDirectoryName = coursesDirectory.GetSubdirectory(Path.GetRandomFileName());
+			using var tempDirectory = new TempDirectory(Path.GetRandomFileName());
 			LockCourse(course.Id);
-
 			try
 			{
-				FuncUtils.TrySeveralTimes(() => Directory.Move(destinationDirectory.FullName, tempDirectoryName.FullName), updateCourseEachOperationTriesCount);
+				FuncUtils.TrySeveralTimes(() => Directory.Move(destinationDirectory.FullName, tempDirectory.DirectoryInfo.FullName), updateCourseEachOperationTriesCount);
 
 				try
 				{
@@ -491,18 +448,15 @@ namespace Ulearn.Core.Courses.Manager
 				catch (IOException)
 				{
 					/* In case of any file system's error rollback previous operation */
-					FuncUtils.TrySeveralTimes(() => Directory.Move(tempDirectoryName.FullName, destinationDirectory.FullName), updateCourseEachOperationTriesCount);
+					FuncUtils.TrySeveralTimes(() => Directory.Move(tempDirectory.DirectoryInfo.FullName, destinationDirectory.FullName), updateCourseEachOperationTriesCount);
 					throw;
 				}
-
 				UpdateCourse(course);
 			}
 			finally
 			{
 				ReleaseCourse(course.Id);
 			}
-
-			FuncUtils.TrySeveralTimes(() => tempDirectoryName.ClearDirectory(true), updateCourseEachOperationTriesCount);
 		}
 
 		public static DirectoryInfo GetCoursesDirectory()
@@ -514,12 +468,8 @@ namespace Ulearn.Core.Courses.Manager
 			return new DirectoryInfo(coursesDirectory);
 		}
 
-		public FileInfo GenerateOrFindStudentZip(string courseId, Slide slide)
-		{
-			return exerciseStudentZipsCache.GenerateOrFindZip(courseId, slide, GetExtractedCourseDirectory(courseId).FullName);
-		}
 
-#region WorkWithCourseInTemporaryDirectory
+		#region WorkWithCourseInTemporaryDirectory
 
 		public async Task<TempDirectory> ExtractCourseVersionToTemporaryDirectory(string courseId, Guid versionId, byte[] zipContent)
 		{
@@ -561,6 +511,8 @@ namespace Ulearn.Core.Courses.Manager
 
 		protected void UpdateCourseOrTempCourseToVersionFromDirectory(string courseId, CourseVersionToken publishedVersionToken)
 		{
+			if (brokenVersions.ContainsKey(publishedVersionToken))
+				return;
 			var courseInMemory = CourseStorageInstance.FindCourse(courseId);
 			if (courseInMemory != null && courseInMemory.CourseVersionToken == publishedVersionToken)
 				return;
@@ -584,16 +536,13 @@ namespace Ulearn.Core.Courses.Manager
 			var courseDirectory = GetExtractedCourseDirectory(courseId);
 			if (!courseDirectory.Exists)
 				return;
-			var courseVersionToken = CourseVersionToken.Load(courseDirectory);
-			if (courseVersionToken != publishedVersionToken)
-				return;
 			LockCourse(courseId);
 			try
 			{
-				if (!courseDirectory.Exists)
-					return;
-				courseVersionToken = CourseVersionToken.Load(courseDirectory);
+				var courseVersionToken = CourseVersionToken.Load(courseDirectory);
 				if (courseVersionToken != publishedVersionToken)
+					return;
+				if (!courseDirectory.Exists)
 					return;
 				var course = loader.Load(courseDirectory);
 				CourseStorageUpdaterInstance.AddOrUpdateCourse(course);

@@ -221,7 +221,6 @@ namespace Ulearn.Web.Api.Controllers
 			try
 			{
 				courseManager.ReloadCourseNotSafe(courseId, notifyAboutErrors: false);
-				courseManager.UpdateCourseVersion(courseId, Guid.Empty);
 				await UpdateStagingZipFromExtracted(courseId);
 			}
 			catch (Exception error)

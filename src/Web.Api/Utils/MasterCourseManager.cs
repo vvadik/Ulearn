@@ -1,12 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Database;
 using Database.Models;
 using Database.Repos;
 using Microsoft.Extensions.DependencyInjection;
+using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Slides;
+using Ulearn.Core.Helpers;
 using Vostok.Logging.Abstractions;
 
 namespace Ulearn.Web.Api.Utils
@@ -15,110 +16,82 @@ namespace Ulearn.Web.Api.Utils
 	{
 		private static ILog log => LogProvider.Get().ForContext(typeof(MasterCourseManager));
 
-		private readonly Dictionary<string, Guid> loadedCourseVersions = new Dictionary<string, Guid>();
 		private readonly IServiceScopeFactory serviceScopeFactory;
+		private readonly ExerciseStudentZipsCache exerciseStudentZipsCache;
+		private bool tempCourseLoaded;
 
-		public MasterCourseManager(IServiceScopeFactory serviceScopeFactory)
+		public MasterCourseManager(IServiceScopeFactory serviceScopeFactory, ExerciseStudentZipsCache exerciseStudentZipsCache)
 			: base(serviceScopeFactory)
 		{
 			this.serviceScopeFactory = serviceScopeFactory;
+			this.exerciseStudentZipsCache = exerciseStudentZipsCache;
+
+			CourseStorageInstance.CourseChangedEvent += courseId =>
+			{
+				exerciseStudentZipsCache.DeleteCourseZips(courseId);
+				ExerciseCheckerZipsCache.DeleteCourseZips(courseId);
+			};
 		}
 
-		private readonly object @lock = new object();
-
+		// Невременные курсы не выкладываются на диск сразу, а публикуются в базу и UpdateCourses их обновляет на диске.
 		public override async Task UpdateCourses()
 		{
 			using (var scope = serviceScopeFactory.CreateScope())
 			{
-				LoadCoursesIfNotYet();
 				var coursesRepo = scope.ServiceProvider.GetService<ICoursesRepo>();
 				var publishedCourseVersions = await coursesRepo.GetPublishedCourseVersions();
-
-				foreach (var courseVersion in publishedCourseVersions)
+				foreach (var publishedCourseVersion in publishedCourseVersions)
 				{
-					if (CourseIsBroken(courseVersion.CourseId))
-						continue;
-					try
-					{
-						ReloadCourseIfLoadedAndPublishedVersionsAreDifferent(courseVersion.CourseId, courseVersion);
-					}
-					catch (FileNotFoundException)
-					{
-						/* Sometimes zip-archive with course has been deleted already. It's strange but ok */
-						log.Warn("Это странно, что я не смог загрузить с диска курс, который, если верить базе данных, был опубликован. Но ничего, просто проигнорирую");
-					}
+					await UpdateCourseToVersionInDirectory(publishedCourseVersion, coursesRepo);
 				}
 			}
 		}
 
+		private async Task UpdateCourseToVersionInDirectory(CourseVersion publishedCourseVersions, ICoursesRepo coursesRepo)
+		{
+			var courseId = publishedCourseVersions.CourseId;
+			var publishedVersionToken = new CourseVersionToken(publishedCourseVersions.Id);
+			if (brokenVersions.ContainsKey(publishedVersionToken))
+				return;
+			var courseInMemory = CourseStorageInstance.FindCourse(courseId);
+			if (courseInMemory != null && courseInMemory.CourseVersionToken == publishedVersionToken)
+				return;
+			var courseFile = await coursesRepo.GetVersionFile(publishedCourseVersions.Id);
+			using (var courseDirectory = await ExtractCourseVersionToTemporaryDirectory(courseId, publishedCourseVersions.Id, courseFile.File))
+			{
+				var (course, error) = LoadCourseFromDirectory(courseId, publishedCourseVersions.Id, courseDirectory.DirectoryInfo);
+				if (error != null)
+				{
+					brokenVersions.TryAdd(publishedVersionToken, true);
+					var message = $"Не смог загрузить с диска в память курс {courseId} версии {publishedVersionToken}";
+					log.Error(error, message);
+					return;
+				}
+				try
+				{
+					MoveCourse(course, courseDirectory.DirectoryInfo, GetExtractedCourseDirectory(courseId));
+					CourseStorageUpdaterInstance.AddOrUpdateCourse(course);
+				}
+				catch (Exception ex)
+				{
+					log.Error(ex, $"Не смог переместить курс {courseId} версия {publishedVersionToken} из временной папки в общую");
+				}
+			}
+		}
+
+		// Временные курсы выкладываются на диск сразу контроллером, который их создает, здесь только загружаю курсы с диска при старте
 		public override async Task UpdateTempCourses()
 		{
-			using (var scope = serviceScopeFactory.CreateScope())
+			if (!tempCourseLoaded)
 			{
-				var tempCoursesRepo = scope.ServiceProvider.GetService<TempCoursesRepo>();
-				await LoadTempCoursesIfNotYetAsync(tempCoursesRepo);
+				tempCourseLoaded = true;
+				await base.UpdateTempC ourses(); // TODO: сбрасывать не хэлп не загрузившиеся временные курсы 
 			}
 		}
 
-		private async Task LoadTempCoursesIfNotYetAsync(ITempCoursesRepo tempCoursesRepo)
+		public FileInfo GenerateOrFindStudentZip(string courseId, Slide slide)
 		{
-			var tempCourses = await tempCoursesRepo.GetTempCoursesAsync();
-			tempCourses
-				.Where(tempCourse => !CourseStorageInstance.HasCourse(tempCourse.CourseId))
-				.ToList()
-				.ForEach(course => TryReloadCourse(course.CourseId));
-		}
-
-		public void UpdateCourseVersion(string courseId, Guid versionId)
-		{
-			lock (@lock)
-			{
-				loadedCourseVersions[courseId.ToLower()] = versionId;
-			}
-		}
-
-		private void ReloadCourseIfLoadedAndPublishedVersionsAreDifferent(string courseId, CourseVersion publishedVersion)
-		{
-			lock (@lock)
-			{
-				var isCourseLoaded = loadedCourseVersions.TryGetValue(courseId.ToLower(), out var loadedVersionId);
-				if ((isCourseLoaded && loadedVersionId != publishedVersion.Id) || !isCourseLoaded)
-				{
-					var actual = isCourseLoaded ? loadedVersionId.ToString() : "<none>";
-					log.Info($"Загруженная версия курса {courseId} отличается от актуальной ({actual} != {publishedVersion.Id}). Обновляю курс.");
-					TryReloadCourse(courseId);
-				}
-
-				loadedCourseVersions[courseId.ToLower()] = publishedVersion.Id;
-			}
-		}
-
-		protected override async Task LoadCourseZipsToDiskFromExternalStorage(IEnumerable<string> existingOnDiskCourseIds)
-		{
-			log.Info("Загружаю курсы из БД");
-			using (var scope = serviceScopeFactory.CreateScope())
-			{
-				var coursesRepo = scope.ServiceProvider.GetService<ICoursesRepo>();
-				var publishedCourseVersions = await coursesRepo.GetPublishedCourseVersions();
-				var coursesNotOnDisk = publishedCourseVersions.Where(c => !existingOnDiskCourseIds.Contains(c.CourseId, StringComparer.OrdinalIgnoreCase));
-				foreach (var publishedCourseVersion in coursesNotOnDisk)
-				{
-					var fileInDb = await coursesRepo.GetVersionFile(publishedCourseVersion.Id);
-					try
-					{
-						var stagingCourseFile = GetStagingCourseFile(fileInDb.CourseId);
-						File.WriteAllBytes(stagingCourseFile.FullName, fileInDb.File);
-						var versionCourseFile = GetCourseVersionFile(fileInDb.CourseVersionId);
-						if (!versionCourseFile.Exists)
-							File.WriteAllBytes(versionCourseFile.FullName, fileInDb.File);
-						UnzipFile(stagingCourseFile, GetExtractedCourseDirectory(fileInDb.CourseId));
-					}
-					catch (Exception ex)
-					{
-						log.Error(ex, $"Не смог загрузить {fileInDb.CourseId} из базы данных");
-					}
-				}
-			}
+			return exerciseStudentZipsCache.GenerateOrFindZip(courseId, slide, GetExtractedCourseDirectory(courseId).FullName);
 		}
 	}
 }

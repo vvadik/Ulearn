@@ -33,6 +33,7 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
 using Ulearn.Core.Courses.Manager;
+using Ulearn.Core.Helpers;
 using Ulearn.Core.Metrics;
 using Ulearn.Core.RunCheckerJobApi;
 using Ulearn.Core.Telegram;
@@ -227,6 +228,7 @@ namespace Ulearn.Web.Api
 
 			services.AddSingleton(MasterCourseManager.CourseStorageInstance);
 			services.AddSingleton<MasterCourseManager>();
+			services.AddSingleton<ExerciseStudentZipsCache>();
 			services.AddSingleton<IMasterCourseManager>(x => x.GetRequiredService<MasterCourseManager>());
 			services.AddSingleton<ICourseUpdater>(x => x.GetRequiredService<MasterCourseManager>());
 

@@ -30,6 +30,7 @@ namespace Ulearn.Core.Courses
 
 		private const string FileName = ".version";
 		[NotNull]
+		// Из общей папки читать CourseVersionToken нужно под дисковым локом на курс
 		public static CourseVersionToken Load(DirectoryInfo courseDirectory)
 		{
 			var versionFile = courseDirectory.GetFile(FileName);
@@ -38,6 +39,7 @@ namespace Ulearn.Core.Courses
 			return JsonConvert.DeserializeObject<CourseVersionToken>(versionFile.ContentAsUtf8());
 		}
 
+		// Из общей папки писать CourseVersionToken нужно под дисковым локом на курс
 		public async Task Save(DirectoryInfo directory)
 		{
 			var fullName = Path.Combine(directory.FullName, FileName);
