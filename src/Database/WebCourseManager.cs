@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Database.DataContexts;
 using Ulearn.Common.Extensions;
+using Ulearn.Core;
 using Vostok.Logging.Abstractions;
 using Ulearn.Core.Courses.Manager;
 
@@ -29,7 +30,7 @@ namespace Database
 			{
 				var courseId = publishedVersion.CourseId;
 				var publishedVersionId = publishedVersion.Id;
-				UpdateCourseToVersionFromDirectory(courseId, publishedVersionId);
+				UpdateCourseOrTempCourseToVersionFromDirectory(courseId, new CourseVersionToken(publishedVersionId));
 			}
 		}
 
@@ -41,7 +42,7 @@ namespace Database
 			{
 				var courseId = tempCourse.CourseId;
 				var publishedLoadingTime = tempCourse.LoadingTime;
-				UpdateTempCourseToLoadingTimeFromDirectory(courseId, publishedLoadingTime);
+				UpdateCourseOrTempCourseToVersionFromDirectory(courseId, new CourseVersionToken(publishedLoadingTime));
 			}
 		}
 

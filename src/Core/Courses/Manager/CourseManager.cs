@@ -48,6 +48,8 @@ namespace Ulearn.Core.Courses.Manager
 
 		private static readonly ConcurrentDictionary<string, bool> courseIdToIsBroken = new ConcurrentDictionary<string, bool>(StringComparer.InvariantCultureIgnoreCase);
 
+		private static readonly ConcurrentDictionary<CourseVersionToken, bool> brokenVersions = new ConcurrentDictionary<CourseVersionToken, bool>();
+
 		public CourseManager(DirectoryInfo baseDirectory)
 			: this(
 				baseDirectory.GetSubdirectory("Courses.Staging"),
@@ -556,45 +558,41 @@ namespace Ulearn.Core.Courses.Manager
 
 #region UpdateInMemoryCourseFromCommonDirectory
 
-		protected void UpdateCourseToVersionFromDirectory(string courseId, Guid publishedVersionId)
+		protected void UpdateCourseOrTempCourseToVersionFromDirectory(string courseId, CourseVersionToken publishedVersionToken)
 		{
 			var courseInMemory = CourseStorageInstance.FindCourse(courseId);
-			if (courseInMemory != null && courseInMemory.CourseMeta.Version != publishedVersionId)
+			if (courseInMemory != null && courseInMemory.CourseMeta.Version == publishedVersionToken)
 				return;
 			try
 			{
-				UpdateCourseFromDirectory(courseId, courseDirectory => CourseLoader.LoadMeta(courseDirectory)!.Version == publishedVersionId);
+				UpdateCourseFromDirectory(courseId, publishedVersionToken);
 			}
 			catch (Exception ex)
 			{
-				log.Error(ex, $"Не смог обновить курс {courseId}");
+				brokenVersions.TryAdd(publishedVersionToken, true);
+				var message = $"Не смог загрузить с диска в память курс {courseId} версии {publishedVersionToken}";
+				if (publishedVersionToken.IsTempCourse())
+					log.Warn(ex, message);
+				else
+					log.Error(ex, message);
 			}
 		}
 
-		protected void UpdateTempCourseToLoadingTimeFromDirectory(string courseId, DateTime publishedLoadingTime)
-		{
-			var courseInMemory = CourseStorageInstance.FindCourse(courseId);
-			if (courseInMemory != null && courseInMemory.CourseMeta.LoadingTime != publishedLoadingTime)
-				return;
-			try
-			{
-				UpdateCourseFromDirectory(courseId, courseDirectory => CourseLoader.LoadMeta(courseDirectory)!.LoadingTime == publishedLoadingTime);
-			}
-			catch (Exception ex)
-			{
-				log.Warn(ex, $"Не смог обновить временный курс {courseId}");
-			}
-		}
-
-		private void UpdateCourseFromDirectory(string courseId, Func<DirectoryInfo, bool> isVersionOnDiskEqualPublished)
+		private void UpdateCourseFromDirectory(string courseId, CourseVersionToken publishedVersionToken)
 		{
 			var courseDirectory = GetExtractedCourseDirectory(courseId);
-			if (!courseDirectory.Exists || !isVersionOnDiskEqualPublished(courseDirectory))
+			if (!courseDirectory.Exists)
+				return;
+			var meta = CourseLoader.LoadMeta(courseDirectory);
+			if (meta!.Version != publishedVersionToken)
 				return;
 			LockCourse(courseId);
 			try
 			{
-				if (!courseDirectory.Exists || !isVersionOnDiskEqualPublished(courseDirectory))
+				if (!courseDirectory.Exists)
+					return;
+				meta = CourseLoader.LoadMeta(courseDirectory);
+				if (meta!.Version != publishedVersionToken)
 					return;
 				var course = loader.Load(courseDirectory);
 				CourseStorageUpdaterInstance.AddOrUpdateCourse(course);
