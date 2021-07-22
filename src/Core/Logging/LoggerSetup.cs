@@ -27,54 +27,71 @@ namespace Ulearn.Core.Logging
 
 		public static ILog Setup(HostLogConfiguration hostLog, string subdirectory = null, bool addInLogProvider = true)
 		{
+			var (minimumLevel, dbMinimumLevel) = GetMinimumLevels(hostLog);
+			var min = dbMinimumLevel > minimumLevel ? minimumLevel : dbMinimumLevel;
+
 			ILog consoleLog = null;
 			if (hostLog.Console)
-				consoleLog = new ConsoleLog(new ConsoleLogSettings { OutputTemplate = OutputTemplate })
-					.WithMinimumLevel(LogLevel.Info);
+				consoleLog = new ConsoleLog(new ConsoleLogSettings { OutputTemplate = OutputTemplate });
 
 			ILog telegramLog = null;
 			if (hostLog.ErrorLogsToTelegram)
 				telegramLog = new TelegramLog { OutputTemplate = OutputTemplate }
 					.WithMinimumLevel(LogLevel.Error);
 
+			ILog fileLog = null;
+			if (!string.IsNullOrEmpty(hostLog.PathFormat))
+				fileLog = SetupFileLog(subdirectory, hostLog.PathFormat);
+
+			var log = new CompositeLog(new[] { fileLog, consoleLog, telegramLog }.Where(l => l != null).ToArray())
+				.WithProperty("threadId", () => Environment.CurrentManagedThreadId);
+			log = FilterLogs(log, minimumLevel, dbMinimumLevel)
+				.WithMinimumLevel(min);
+
+			if (addInLogProvider)
+				LogProvider.Configure(log);
+			return log;
+		}
+
+		private static ILog SetupFileLog(string subdirectory, string pathFormat)
+		{
+			pathFormat = pathFormat.Replace("{Date}", "{RollingSuffix}"); // Для совместимости с настройками appsettings.json, написанными для серилога
+			if (Path.IsPathRooted(pathFormat) && subdirectory != null)
+			{
+				var directory = Path.GetDirectoryName(pathFormat);
+				var fileName = Path.GetFileName(pathFormat);
+				pathFormat = Path.Combine(directory, subdirectory, fileName);
+			}
+
+			var fileLogSettings = new FileLogSettings
+			{
+				FilePath = pathFormat,
+				RollingStrategy = new RollingStrategyOptions
+				{
+					MaxFiles = 0,
+					Type = RollingStrategyType.Hybrid,
+					Period = RollingPeriod.Day,
+					MaxSize = 4 * 1073741824L,
+				},
+				OutputTemplate = OutputTemplate
+			};
+			return new FileLog(fileLogSettings);
+		}
+
+		public static (LogLevel MinimumLevel, LogLevel DbMinimumLevel) GetMinimumLevels(HostLogConfiguration hostLog)
+		{
 			var minimumLevelString = hostLog.MinimumLevel ?? "debug";
 			var dbMinimumLevelString = hostLog.DbMinimumLevel ?? "";
 			if (!TryParseLogLevel(minimumLevelString, out var minimumLevel))
 				minimumLevel = LogLevel.Debug;
 			if (!TryParseLogLevel(dbMinimumLevelString, out var dbMinimumLevel))
 				dbMinimumLevel = minimumLevel;
-			var min = dbMinimumLevel > minimumLevel ? minimumLevel : dbMinimumLevel;
+			return (minimumLevel, dbMinimumLevel);
+		}
 
-			var pathFormat = hostLog.PathFormat;
-			ILog fileLog = null;
-			if (!string.IsNullOrEmpty(pathFormat))
-			{
-				pathFormat = pathFormat.Replace("{Date}", "{RollingSuffix}"); // Для совместимости с настройками appsettings.json, написанными для серилога
-				if (Path.IsPathRooted(pathFormat) && subdirectory != null)
-				{
-					var directory = Path.GetDirectoryName(pathFormat);
-					var fileName = Path.GetFileName(pathFormat);
-					pathFormat = Path.Combine(directory, subdirectory, fileName);
-				}
-
-				var fileLogSettings = new FileLogSettings
-				{
-					FilePath = pathFormat,
-					RollingStrategy = new RollingStrategyOptions
-					{
-						MaxFiles = 0,
-						Type = RollingStrategyType.Hybrid,
-						Period = RollingPeriod.Day,
-						MaxSize = 4 * 1073741824L,
-					},
-					OutputTemplate = OutputTemplate
-				};
-				fileLog = new FileLog(fileLogSettings);
-			}
-
-			var log = new CompositeLog(new[] { fileLog, consoleLog, telegramLog }.Where(l => l != null).ToArray())
-				.WithProperty("threadId", () => Environment.CurrentManagedThreadId)
-				.WithMinimumLevelForSourceContext("ULearnDb", dbMinimumLevel) // Database
+		public static ILog FilterLogs(ILog log, LogLevel minimumLevel, LogLevel dbMinimumLevel)
+		{
+			return log.WithMinimumLevelForSourceContext("ULearnDb", dbMinimumLevel) // Database
 				.DropEvents(p =>
 				{
 					if (minimumLevel < LogLevel.Info || p.Properties == null || p.Level > LogLevel.Info)
@@ -85,12 +102,7 @@ namespace Ulearn.Core.Logging
 					var isUpdateTempCoursesJob = p.Properties.TryGetValue("operationContext", out var operationContextValue2)
 												&& ((OperationContextValue)operationContextValue2).Contains(UpdateCoursesWorker.UpdateTempCoursesJobName);
 					return isScheduler && (isUpdateCoursesJob || isUpdateTempCoursesJob); // Отключает избыточное логирование для частой задачи
-				})
-				.WithMinimumLevel(min);
-
-			if (addInLogProvider)
-				LogProvider.Configure(log);
-			return log;
+				});
 		}
 
 		[CanBeNull]
