@@ -14,11 +14,14 @@ using Microsoft.Extensions.Options;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses.Manager;
+using Ulearn.Core.GoogleSheet;
 using Ulearn.Web.Api.Models;
 using Ulearn.Web.Api.Models.Parameters;
+using Ulearn.Web.Api.Models.Parameters.Analytics;
 using Ulearn.Web.Api.Models.Responses;
 using Ulearn.Web.Api.Models.Responses.Courses;
 using Ulearn.Web.Api.Utils;
+using Web.Api.Configuration;
 
 
 namespace Ulearn.Web.Api.Controllers
@@ -35,11 +38,12 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly IAdditionalScoresRepo additionalScoresRepo;
 		private readonly IGroupAccessesRepo groupAccessesRepo;
 		private readonly IGoogleSheetExportTasksRepo googleSheetExportTasksRepo;
+		private readonly UlearnConfiguration configuration;
 
 		public GoogleSheetsStatisticController(ICourseStorage courseStorage, UlearnDb db,
 			IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, IGroupMembersRepo groupMembersRepo,
 			IUnitsRepo unitsRepo, IGroupsRepo groupsRepo, ControllerUtils controllerUtils, IVisitsRepo visitsRepo,
-			IAdditionalScoresRepo additionalScoresRepo, IGroupAccessesRepo groupAccessesRepo, IOptions<UlearnConfiguration> configuration,
+			IAdditionalScoresRepo additionalScoresRepo, IGroupAccessesRepo groupAccessesRepo, IOptions<WebApiConfiguration> options,
 			IGoogleSheetExportTasksRepo googleSheetExportTasksRepo)
 			: base(courseStorage, db, usersRepo)
 		{
@@ -52,6 +56,7 @@ namespace Ulearn.Web.Api.Controllers
 			this.additionalScoresRepo = additionalScoresRepo;
 			this.groupAccessesRepo = groupAccessesRepo;
 			this.googleSheetExportTasksRepo = googleSheetExportTasksRepo;
+			configuration = options.Value;
 		}
 
 		[HttpGet("tasks")]
@@ -63,19 +68,24 @@ namespace Ulearn.Web.Api.Controllers
 			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.CourseAdmin);
 
 			var exportTasks = await googleSheetExportTasksRepo.GetTasks(courseId, isCourseAdmin ? null : UserId);
+			var sortedTasks = exportTasks
+				.OrderBy(t => t.AuthorId == UserId)
+				.ThenByDescending(t => t.RefreshEndDate)
+				.ThenByDescending(t => t.Groups.Count)
+				.ToList();
 			
-			var responses = exportTasks
-				.Select(exportTask => new GoogleSheetsExportTaskResponse
+			var responses = sortedTasks
+				.Select(task => new GoogleSheetsExportTaskResponse
 				{
-					Id = exportTask.Id,
-					AuthorInfo = BuildShortUserInfo(exportTask.Author),
-					Groups = exportTask.Groups.Select(e => BuildShortGroupInfo(e.Group)).ToList(),
-					IsVisibleForStudents = exportTask.IsVisibleForStudents,
-					RefreshStartDate = exportTask.RefreshStartDate,
-					RefreshEndDate = exportTask.RefreshEndDate,
-					RefreshTimeInMinutes = exportTask.RefreshTimeInMinutes,
-					SpreadsheetId = exportTask.SpreadsheetId,
-					ListId = exportTask.ListId
+					Id = task.Id,
+					AuthorInfo = BuildShortUserInfo(task.Author),
+					Groups = task.Groups.Select(e => BuildShortGroupInfo(e.Group)).ToList(),
+					IsVisibleForStudents = task.IsVisibleForStudents,
+					RefreshStartDate = task.RefreshStartDate,
+					RefreshEndDate = task.RefreshEndDate,
+					RefreshTimeInMinutes = task.RefreshTimeInMinutes,
+					SpreadsheetId = task.SpreadsheetId,
+					ListId = task.ListId
 				})
 				.ToList();
 			return new GoogleSheetsExportTaskListResponse
@@ -112,18 +122,35 @@ namespace Ulearn.Web.Api.Controllers
 			return result;
 		}
 
-		// [HttpPost("tasks/{taskId}")]
-		// [Authorize]
-		// public async Task<ActionResult> ExportTaskNow([FromRoute] int taskId, [FromBody] string courseId)
-		// {
-		// 	var task = await googleSheetExportTasksRepo.GetTaskById(taskId);
-		// 	if (task == null)
-		// 		return NotFound();
-		// 	if (!await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.CourseAdmin) && task.AuthorId != UserId)
-		// 		return Forbid();
-		// 	
-		// 	return Ok();
-		// }
+		[HttpPost("tasks/{taskId}")]
+		[Authorize]
+		public async Task<ActionResult> ExportTaskNow([FromRoute] int taskId)
+		{
+			var task = await googleSheetExportTasksRepo.GetTaskById(taskId);
+			if (task == null)
+				return NotFound();
+			if (!await courseRolesRepo.HasUserAccessToCourse(UserId, task.CourseId, CourseRoleType.CourseAdmin) && task.AuthorId != UserId)
+				return Forbid();
+			//TODO: понять, как вызвать рисовалку отсюда
+
+			var courseStatisticsParams = new CourseStatisticsParams
+			{
+				CourseId = task.CourseId,
+				ListId = task.ListId,
+				GroupsIds = task.Groups.Select(g => g.GroupId.ToString()).ToList(),
+			};
+			var model = await StatisticModelUtils.GetCourseStatisticsModel(courseStatisticsParams, 3000, UserId, courseRolesRepo,courseStorage,unitsRepo,
+				groupsRepo, controllerUtils, groupMembersRepo, groupAccessesRepo, visitsRepo, additionalScoresRepo, db);
+			var listId = courseStatisticsParams.ListId;
+			var sheet = new GoogleSheet(200, 200, listId);
+			var builder = new GoogleSheetBuilder(sheet);
+			StatisticModelUtils.FillCourseStatisticsWithBuilder(builder, model);
+			
+			var credentialsJson = configuration.GoogleAccessCredentials;
+			var client = new GoogleApiClient(credentialsJson);
+			client.FillSpreadSheet(courseStatisticsParams.SpreadsheetId, sheet);
+			return Ok();
+		}
 		
 		[HttpPatch("tasks/{taskId}")]
 		[Authorize]
