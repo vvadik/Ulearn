@@ -74,7 +74,7 @@ interface State {
 	courseStatistics: CourseStatistics;
 }
 
-interface Props extends RouteComponentProps {
+interface CourseProps extends RouteComponentProps {
 	courseId: string;
 	slideId?: string;
 
@@ -108,10 +108,10 @@ const defaultMeta: Meta = {
 	imageUrl: '',
 };
 
-class Course extends Component<Props, State> {
+class Course extends Component<CourseProps, State> {
 	private signalRConnection: HubConnection | null = null;
 
-	constructor(props: Props) {
+	constructor(props: CourseProps) {
 		super(props);
 
 		this.state = {
@@ -186,7 +186,7 @@ class Course extends Component<Props, State> {
 		}
 	};
 
-	componentDidUpdate(prevProps: Props, prevState: State): void {
+	componentDidUpdate(prevProps: CourseProps, prevState: State): void {
 		const {
 			loadUserProgress,
 			courseId,
@@ -225,7 +225,7 @@ class Course extends Component<Props, State> {
 		}
 	}
 
-	static getDerivedStateFromProps(props: Props, state: State): State | null {
+	static getDerivedStateFromProps(props: CourseProps, state: State): State | null {
 		const {
 			courseId,
 			slideId,
@@ -310,7 +310,8 @@ class Course extends Component<Props, State> {
 
 		if(slideType &&
 			(slideType === SlideType.Lesson
-				|| (slideType === SlideType.Exercise && !pageInfo.isAcceptedAlert))) {
+				|| (slideType === SlideType.Exercise && !pageInfo.isAcceptedAlert)
+				|| (slideType === SlideType.Exercise && !pageInfo.isReview))) {
 			return Slide;
 		}
 
@@ -481,12 +482,8 @@ class Course extends Component<Props, State> {
 	}
 
 	getPreviousSlideUrl = (slideInfo: CourseSlideInfo): string | null => {
-		const { courseId, pageInfo: { isAcceptedSolutions, }, } = this.props;
+		const { courseId, } = this.props;
 		const { previous, current, } = slideInfo;
-
-		if(isAcceptedSolutions && current) {
-			return constructPathToSlide(courseId, current.slug);
-		}
 
 		return previous
 			? constructPathToSlide(courseId, previous.slug)
@@ -685,4 +682,4 @@ class Course extends Component<Props, State> {
 	};
 }
 
-export default Course;
+export { Course, CourseProps };

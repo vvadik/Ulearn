@@ -32,7 +32,7 @@ using Ulearn.Common.Api.Swagger;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
-using Ulearn.Core.Helpers;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Metrics;
 using Ulearn.Core.RunCheckerJobApi;
 using Ulearn.Core.Telegram;
@@ -46,6 +46,7 @@ using Ulearn.Web.Api.Models;
 using Ulearn.Web.Api.Models.Binders;
 using Ulearn.Web.Api.Models.Responses.SlideBlocks;
 using Ulearn.Web.Api.Swagger;
+using Ulearn.Web.Api.Utils;
 using Ulearn.Web.Api.Workers;
 using Vostok.Applications.AspNetCore.Builders;
 using Vostok.Hosting.Abstractions;
@@ -124,7 +125,8 @@ namespace Ulearn.Web.Api
 		protected override IApplicationBuilder UseStaticFiles(IApplicationBuilder app)
 		{
 			var contentTypeProvider = new FileExtensionContentTypeProvider(CourseStaticFilesHelper.AllowedExtensions);
-			var coursesDirectory = Path.Combine(CourseManager.GetCoursesDirectory().FullName, "Courses");
+			var coursesDirectory = Path.Combine(WebCourseManager.GetCoursesDirectory().FullName, "Courses");
+			new DirectoryInfo(coursesDirectory).EnsureExists();
 
 			var options = new RewriteOptions()
 				.AddRewrite(@"^courses/([^/]+)/files/(.+)", "courses/$1/$2", skipRemainingRules: true);
@@ -239,6 +241,7 @@ namespace Ulearn.Web.Api
 			services.AddScoped<AntiPlagiarismResultObserver>();
 			services.AddScoped<StyleErrorsResultObserver>();
 			services.AddScoped<LtiResultObserver>();
+			services.AddScoped<ControllerUtils>();
 
 			services.AddDatabaseServices();
 		}
@@ -246,6 +249,8 @@ namespace Ulearn.Web.Api
 		protected override void ConfigureBackgroundWorkers(IVostokAspNetCoreApplicationBuilder builder)
 		{
 			builder.AddHostedServiceFromApplication<ArchiveGroupsWorker>();
+			builder.AddHostedServiceFromApplication<RefreshMaterializedViewsWorker>();
+			builder.AddHostedServiceFromApplication<UpdateCoursesWorker>();
 		}
 
 		public void ConfigureAuthServices(IServiceCollection services, WebApiConfiguration configuration)

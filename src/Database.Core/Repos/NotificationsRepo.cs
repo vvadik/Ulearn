@@ -13,6 +13,7 @@ using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 
 namespace Database.Repos
 {
@@ -27,17 +28,17 @@ namespace Database.Repos
 		private readonly IUnitsRepo unitsRepo;
 		private readonly ICourseRolesRepo courseRolesRepo;
 		private readonly IUsersRepo usersRepo;
-		private readonly IWebCourseManager courseManager;
+		private readonly ICourseStorage courseStorage;
 
 		public NotificationsRepo(UlearnDb db, IServiceProvider serviceProvider,
-			IUnitsRepo unitsRepo, ICourseRolesRepo courseRolesRepo, IUsersRepo usersRepo, IWebCourseManager courseManager)
+			IUnitsRepo unitsRepo, ICourseRolesRepo courseRolesRepo, IUsersRepo usersRepo, ICourseStorage courseStorage)
 		{
 			this.db = db;
 			this.serviceProvider = serviceProvider;
 			this.unitsRepo = unitsRepo;
 			this.usersRepo = usersRepo;
 			this.courseRolesRepo = courseRolesRepo;
-			this.courseManager = courseManager;
+			this.courseStorage = courseStorage;
 		}
 
 		private static DateTime CalculateNextTryTime(DateTime createTime, int failsCount)
@@ -269,7 +270,7 @@ namespace Database.Repos
 			Course course = null;
 			if (!string.IsNullOrWhiteSpace(notification.CourseId))
 			{
-				course = await courseManager.FindCourseAsync(notification.CourseId);
+				course = courseStorage.FindCourse(notification.CourseId);
 				if (course == null)
 					return;
 			}
@@ -405,7 +406,7 @@ namespace Database.Repos
 		{
 			if (notification.CourseId != "")
 			{
-				var course = await courseManager.FindCourseAsync(notification.CourseId);
+				var course = courseStorage.FindCourse(notification.CourseId);
 				if (course != null)
 				{
 					var visibleUnits = await unitsRepo.GetPublishedUnitIds(course);

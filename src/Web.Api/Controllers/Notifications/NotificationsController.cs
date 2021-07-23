@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
 using Vostok.Logging.Abstractions;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Web.Api.Models.Parameters.Notifications;
 using Ulearn.Web.Api.Models.Responses.Notifications;
 using Web.Api.Configuration;
@@ -28,13 +29,13 @@ namespace Ulearn.Web.Api.Controllers.Notifications
 		private static int? commentsFeedNotificationTransportId;
 		private static ILog log => LogProvider.Get().ForContext(typeof(NotificationsController));
 
-		public NotificationsController(IWebCourseManager courseManager, UlearnDb db,
+		public NotificationsController(ICourseStorage courseStorage, UlearnDb db,
 			IUsersRepo usersRepo,
 			IFeedRepo feedRepo,
 			IServiceProvider serviceProvider,
 			INotificationDataPreloader notificationDataPreloader,
 			IOptions<WebApiConfiguration> options)
-			: base(courseManager, db, usersRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 			this.feedRepo = feedRepo;
 			this.serviceProvider = serviceProvider;

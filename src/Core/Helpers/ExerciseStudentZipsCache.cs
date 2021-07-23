@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides;
 using Vostok.Logging.Abstractions;
 

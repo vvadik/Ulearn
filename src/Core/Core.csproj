@@ -7,6 +7,8 @@
 		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 	</PropertyGroup>
 	<ItemGroup>
+		<PackageReference Include="Google.Apis" Version="1.52.0" />
+		<PackageReference Include="Google.Apis.Sheets.v4" Version="1.52.0.2338" />
 		<PackageReference Include="JetBrains.Annotations" Version="2020.3.0" />
 		<PackageReference Include="MarkdownDeep.NET.Core" Version="1.5.0.4" />
 		<PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.3" />
@@ -32,6 +34,7 @@
 		<PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
 		<PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
 		<PackageReference Include="Telegram.Bot" Version="15.7.1" />
+		<PackageReference Include="Vostok.Applications.Scheduled" Version="0.2.7" />
 		<PackageReference Include="Vostok.Logging.Console" Version="1.0.5" />
 		<PackageReference Include="Vostok.Logging.File" Version="1.0.12" />
 		<PackageReference Include="Vostok.Logging.Formatting" Version="1.0.5" />

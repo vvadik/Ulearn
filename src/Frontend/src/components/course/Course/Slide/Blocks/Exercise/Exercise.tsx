@@ -1,14 +1,14 @@
 import React, { createRef, RefObject } from 'react';
 
 import { Controlled, } from "react-codemirror2";
-import { Checkbox, FLAT_THEME, Modal, Select, ThemeContext, Toast, Tooltip, } from "ui";
-import { Review } from "./Review/Review";
+import { Checkbox, FLAT_THEME, Select, ThemeContext, Toast, Tooltip, } from "ui";
+import Review from "./Review";
 import { CongratsModal } from "./CongratsModal/CongratsModal";
 import { ExerciseOutput, HasOutput } from "./ExerciseOutput/ExerciseOutput";
 import { ExerciseFormHeader } from "./ExerciseFormHeader/ExerciseFormHeader";
 import Controls from "./Controls/Controls";
 import LoginForContinue from "src/components/notificationModal/LoginForContinue";
-import DownloadedHtmlContent from "src/components/common/DownloadedHtmlContent.js";
+import { AcceptedSolutionsModal } from "./AcceptedSolutions/AcceptedSolutions";
 import { Info } from 'icons';
 
 import { darkFlat } from "src/uiTheme";
@@ -16,8 +16,10 @@ import { darkFlat } from "src/uiTheme";
 import classNames from 'classnames';
 import moment from "moment";
 
+import * as acceptedSolutionsApi from "src/api/acceptedSolutions";
 import { exerciseSolutions, loadFromCache, saveToCache, } from "src/utils/localStorageManager";
 import { convertDefaultTimezoneToLocal } from "src/utils/momentUtils";
+import { isInstructor } from "src/utils/courseRoles";
 import {
 	getLastSuccessSubmission,
 	getReviewsWithoutDeleted,
@@ -31,10 +33,10 @@ import {
 	ReviewInfoWithMarker,
 	SubmissionColor,
 	submissionIsLast,
+	isAcceptedSolutionsWillNotDiscardScore
 } from "./ExerciseUtils";
 
 import { Language, } from "src/consts/languages";
-import { constructPathToAcceptedSolutions, } from "src/consts/routes";
 import { DeviceType } from "src/consts/deviceType";
 import {
 	AutomaticExerciseCheckingResult as CheckingResult,
@@ -61,7 +63,7 @@ import styles from './Exercise.less';
 import texts from './Exercise.texts';
 import { UserInfo } from "src/utils/courseRoles";
 import { getReviewAnchorTop } from "../../InstructorReview/utils";
-
+import { ShortUserInfo } from "../../../../../../models/users";
 
 export interface FromReduxDispatch {
 	sendCode: (courseId: string, slideId: string, value: string, language: Language,) => unknown;
@@ -70,7 +72,7 @@ export interface FromReduxDispatch {
 	) => unknown;
 	deleteReviewComment:
 		(courseId: string, slideId: string, submissionId: number, reviewId: number, commentId: number) => unknown;
-	visitAcceptedSolutions: (courseId: string, slideId: string) => unknown;
+	skipExercise: (courseId: string, slideId: string, onSuccess: () => void) => unknown;
 }
 
 export interface FromReduxProps {
@@ -422,8 +424,8 @@ class Exercise extends React.Component<Props, State> {
 		const hasOutput = currentSubmission
 			&& HasOutput(visibleCheckingResponse?.message, currentSubmission.automaticChecking,
 				expectedOutput);
-		const isAcceptedSolutionsWillNotDiscardScore = submissions.filter(
-			s => s.automaticChecking?.result === AutomaticExerciseCheckingResult.RightAnswer).length > 0 || slideProgress.isSkipped;
+		const isSafeShowAcceptedSolutions = isAcceptedSolutionsWillNotDiscardScore(submissions,
+			slideProgress.isSkipped);
 		const outputMessage = visibleCheckingResponse?.message || visibleCheckingResponse?.submission?.automaticChecking?.output;
 
 		return (
@@ -476,11 +478,11 @@ class Exercise extends React.Component<Props, State> {
 						onShowOutputButtonClicked={ this.toggleOutput }
 					/> }
 					{ attemptsStatistics && <Controls.StatisticsHint attemptsStatistics={ attemptsStatistics }/> }
-					{ (!hideSolutions && (isAllHintsShowed || isAcceptedSolutionsWillNotDiscardScore))
+					{ (!hideSolutions && (isAllHintsShowed || isSafeShowAcceptedSolutions)
+						&& attemptsStatistics && attemptsStatistics.usersWithRightAnswerCount > 0)
 					&& <Controls.AcceptedSolutionsButton
-						acceptedSolutionsUrl={ constructPathToAcceptedSolutions(courseId, slideId) }
 						onVisitAcceptedSolutions={ this.openAcceptedSolutionsModal }
-						isShowAcceptedSolutionsAvailable={ isAcceptedSolutionsWillNotDiscardScore }
+						isShowAcceptedSolutionsAvailable={ isSafeShowAcceptedSolutions }
 					/> }
 					{ this.isVisualizerEnabled() &&
 					<Controls.VisualizerButton
@@ -682,12 +684,15 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	openAcceptedSolutionsModal = (): void => {
-		const { slideContext: { courseId, slideId, }, visitAcceptedSolutions, submissions, } = this.props;
+		const { slideContext: { courseId, slideId, }, submissions, slideProgress, skipExercise,} = this.props;
 
-		if(!hasSuccessSubmission(submissions)) {
-			visitAcceptedSolutions(courseId, slideId);
+		if(isAcceptedSolutionsWillNotDiscardScore(submissions, slideProgress.isSkipped)) {
+			this.openModal({ type: ModalType.acceptedSolutions });
+		} else {
+			skipExercise(courseId, slideId, () => {
+				this.openModal({ type: ModalType.acceptedSolutions });
+			});
 		}
-		this.openModal({ type: ModalType.acceptedSolutions });
 	};
 
 	renderOverview = (submission: SubmissionInfoRedux): React.ReactElement => {
@@ -768,7 +773,7 @@ class Exercise extends React.Component<Props, State> {
 	};
 
 	renderModal = (modalData: ModalData<ModalType>): React.ReactNode => {
-		const { hideSolutions, slideContext: { courseId, slideId, }, } = this.props;
+		const { hideSolutions, slideContext: { courseId, slideId, }, user, forceInitialCode, } = this.props;
 
 		switch (modalData.type) {
 			case ModalType.congrats: {
@@ -795,20 +800,21 @@ class Exercise extends React.Component<Props, State> {
 			case ModalType.studentsSubmissions:
 				break;
 			case ModalType.acceptedSolutions: {
+				const instructor = isInstructor(
+					{
+						isSystemAdministrator: user!.isSystemAdministrator,
+						courseRole: user!.courseRole
+					});
 				return (
-					<DownloadedHtmlContent
-						url={ constructPathToAcceptedSolutions(courseId, slideId) }
-						injectInWrapperAfterContentReady={ (html: React.ReactNode) =>
-							<Modal onClose={ this.closeModal }>
-								<Modal.Header>
-									{ texts.acceptedSolutions.title }
-								</Modal.Header>
-								<Modal.Body>
-									{ texts.acceptedSolutions.content }
-									{ html }
-								</Modal.Body>
-							</Modal> }
-					/>);
+					<AcceptedSolutionsModal
+						courseId={ courseId }
+						slideId={ slideId }
+						isInstructor={ instructor && !forceInitialCode }
+						user={ user as ShortUserInfo }
+						onClose={ this.closeModal }
+						acceptedSolutionsApi={ acceptedSolutionsApi }
+					/>
+				);
 			}
 		}
 	};

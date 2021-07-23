@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Ulearn.Core.Courses.Manager;
 using Vostok.Logging.Abstractions;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Quizzes;
@@ -14,19 +15,19 @@ namespace Database.Repos.Groups
 		private readonly IVisitsRepo visitsRepo;
 		private readonly IUserQuizzesRepo userQuizzesRepo;
 		private readonly IUnitsRepo unitsRepo;
-		private readonly IWebCourseManager courseManager;
+		private readonly ICourseStorage courseStorage;
 		private static ILog log => LogProvider.Get().ForContext(typeof(ManualCheckingsForOldSolutionsAdder));
 
 		public ManualCheckingsForOldSolutionsAdder(
 			IUserSolutionsRepo userSolutionsRepo, ISlideCheckingsRepo slideCheckingsRepo, IVisitsRepo visitsRepo, IUserQuizzesRepo userQuizzesRepo,
-			IUnitsRepo unitsRepo, IWebCourseManager courseManager)
+			IUnitsRepo unitsRepo, ICourseStorage courseStorage)
 		{
 			this.userSolutionsRepo = userSolutionsRepo;
 			this.slideCheckingsRepo = slideCheckingsRepo;
 			this.visitsRepo = visitsRepo;
 			this.userQuizzesRepo = userQuizzesRepo;
 			this.unitsRepo = unitsRepo;
-			this.courseManager = courseManager;
+			this.courseStorage = courseStorage;
 		}
 
 		public async Task AddManualCheckingsForOldSolutionsAsync(string courseId, IEnumerable<string> usersIds)
@@ -39,7 +40,7 @@ namespace Database.Repos.Groups
 		{
 			log.Info($"Создаю ручные проверки для всех решения пользователя {userId} в курсе {courseId}");
 
-			var course = await courseManager.GetCourseAsync(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIds(course, userId);
 
 			/* For exercises */
@@ -49,7 +50,7 @@ namespace Database.Repos.Groups
 				.ToDictionary(g => g.Key, g => g.ToList());
 			foreach (var acceptedSubmissionsForSlide in acceptedSubmissionsBySlide.Values)
 				/* If exists at least one manual checking for at least one submissions on slide, then ignore this slide */
-				if (!acceptedSubmissionsForSlide.Any(s => s.ManualCheckings.Any()))
+				if (acceptedSubmissionsForSlide.All(s => s.ManualChecking == null))
 				{
 					/* Otherwise found the latest accepted submission */
 					var lastSubmission = acceptedSubmissionsForSlide.OrderByDescending(s => s.Timestamp).First();

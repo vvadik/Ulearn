@@ -4,6 +4,7 @@ using Database;
 using Database.Models;
 using Database.Repos;
 using Database.Repos.Users;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Metrics;
 using Ulearn.Core.RunCheckerJobApi;
@@ -14,15 +15,15 @@ namespace Ulearn.Web.Api.Controllers.Runner
 	{
 		private static string ulearnBotUserId;
 
-		private readonly IWebCourseManager courseManager;
+		private readonly ICourseStorage courseStorage;
 		private readonly MetricSender metricSender;
 		private readonly ISlideCheckingsRepo slideCheckingsRepo;
 		private readonly IUsersRepo usersRepo;
 
-		public StyleErrorsResultObserver(IWebCourseManager courseManager, MetricSender metricSender,
+		public StyleErrorsResultObserver(ICourseStorage courseStorage, MetricSender metricSender,
 			IUsersRepo usersRepo, ISlideCheckingsRepo slideCheckingsRepo)
 		{
-			this.courseManager = courseManager;
+			this.courseStorage = courseStorage;
 			this.metricSender = metricSender;
 			this.slideCheckingsRepo = slideCheckingsRepo;
 			this.usersRepo = usersRepo;
@@ -40,7 +41,7 @@ namespace Ulearn.Web.Api.Controllers.Runner
 			if (!checking.IsRightAnswer)
 				return;
 
-			var exerciseSlide = (await courseManager.FindCourseAsync(submission.CourseId))
+			var exerciseSlide = courseStorage.FindCourse(submission.CourseId)
 				?.FindSlideByIdNotSafe(submission.SlideId) as ExerciseSlide;
 			if (exerciseSlide == null)
 				return;
@@ -50,10 +51,10 @@ namespace Ulearn.Web.Api.Controllers.Runner
 
 			var exerciseMetricId = RunnerSetResultController.GetExerciseMetricId(submission.CourseId, exerciseSlide);
 
-			await CreateStyleErrorsReviewsForSubmission(submission.Id, result.StyleErrors, exerciseMetricId);
+			await CreateStyleErrorsReviewsForSubmission(submission, result.StyleErrors, exerciseMetricId);
 		}
 
-		public async Task<List<ExerciseCodeReview>> CreateStyleErrorsReviewsForSubmission(int? submissionId, List<StyleError> styleErrors, string exerciseMetricId)
+		public async Task<List<ExerciseCodeReview>> CreateStyleErrorsReviewsForSubmission(UserExerciseSubmission submission, List<StyleError> styleErrors, string exerciseMetricId)
 		{
 			if (ulearnBotUserId == null)
 				ulearnBotUserId = await usersRepo.GetUlearnBotUserId();
@@ -64,7 +65,7 @@ namespace Ulearn.Web.Api.Controllers.Runner
 			foreach (var error in styleErrors)
 			{
 				var review = await slideCheckingsRepo.AddExerciseCodeReview(
-					submissionId,
+					submission,
 					ulearnBotUserId,
 					error.Span.StartLinePosition.Line,
 					error.Span.StartLinePosition.Character,

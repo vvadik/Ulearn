@@ -41,7 +41,7 @@ namespace Database.Repos
 		Task NotCountOldAttemptsToQuizzesWithManualChecking(string courseId, string userId);
 		Task NotCountOldAttemptsToQuizzesWithAutomaticChecking(string courseId, string userId);
 		Task<ExerciseCodeReview> AddExerciseCodeReview(ManualExerciseChecking checking, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime = true);
-		Task<ExerciseCodeReview> AddExerciseCodeReview([CanBeNull] int? submissionId, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime = false);
+		Task<ExerciseCodeReview> AddExerciseCodeReview([CanBeNull] UserExerciseSubmission submission, string userId, int startLine, int startPosition, int finishLine, int finishPosition, string comment, bool setAddingTime = false);
 		Task<ExerciseCodeReview> FindExerciseCodeReviewById(int reviewId);
 		Task DeleteExerciseCodeReview(ExerciseCodeReview review);
 		Task UpdateExerciseCodeReview(ExerciseCodeReview review, string newComment);
@@ -56,5 +56,6 @@ namespace Database.Repos
 		Task<DateTime?> GetExerciseLastRightAnswerDate(string courseId, Guid slideId);
 		Task<int> GetExerciseUsersCount(string courseId, Guid slideId);
 		Task<int> GetExerciseUsersWithRightAnswerCount(string courseId, Guid slideId);
+		Task RefreshExerciseStatisticsMaterializedViews();
 	}
 }

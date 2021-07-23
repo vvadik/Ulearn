@@ -9,6 +9,7 @@ using Database.Repos.Groups;
 using Database.Repos.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Web.Api.Authorization;
 using Ulearn.Web.Api.Models.Responses.CodeReviewStatistics;
@@ -23,14 +24,14 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly IGroupMembersRepo groupMembersRepo;
 		private readonly ICourseRolesRepo courseRolesRepo;
 
-		public CodeReviewStatisticsController(IWebCourseManager courseManager,
+		public CodeReviewStatisticsController(ICourseStorage courseStorage,
 			ISlideCheckingsRepo slideCheckingsRepo,
 			IUsersRepo usersRepo,
 			IGroupsRepo groupsRepo,
 			IGroupMembersRepo groupMembersRepo,
 			ICourseRolesRepo courseRolesRepo,
 			UlearnDb db)
-			: base(courseManager, db, usersRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 			this.slideCheckingsRepo = slideCheckingsRepo;
 			this.groupsRepo = groupsRepo;
@@ -46,7 +47,7 @@ namespace Ulearn.Web.Api.Controllers
 		public async Task<ActionResult<CodeReviewInstructorsStatisticsResponse>> InstructorsStatistics([FromQuery][BindRequired] string courseId,
 			int count = 10000, DateTime? from = null, DateTime? to = null)
 		{
-			var course = await courseManager.FindCourseAsync(courseId);
+			var course = courseStorage.FindCourse(courseId);
 			if (course == null)
 				return NotFound();
 
@@ -90,7 +91,7 @@ namespace Ulearn.Web.Api.Controllers
 							slide => new CodeReviewExerciseStatistics
 							{
 								SlideId = slide.Id,
-								ReviewedSubmissionsCount = checkingsCheckedByInstructor.Where(c => c.SlideId == slide.Id).DistinctBy(c => c.SubmissionId).Count(),
+								ReviewedSubmissionsCount = checkingsCheckedByInstructor.Count(c => c.SlideId == slide.Id),
 								QueueSize = checkingQueue.Count(c => c.SlideId == slide.Id),
 								CommentsCount = comments.Count(c => c.ExerciseChecking.SlideId == slide.Id),
 							}

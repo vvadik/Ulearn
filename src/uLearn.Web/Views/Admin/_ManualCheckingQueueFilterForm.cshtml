@@ -15,6 +15,7 @@
 		CourseId = Model.CourseId,
 		SelectedGroupsIds = Model.SelectedGroupsIds,
 		Groups = Model.Groups,
+		UsersIdsWithGroupsAccess = Model.GroupsAccesses.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Select(s => s.UserId).ToList()),
 	})
 
 	<div class="form-group">

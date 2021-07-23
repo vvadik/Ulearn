@@ -37,6 +37,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Use64BitIISExpress />
     <LangVersion>default</LangVersion>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
   <PropertyGroup>
     <GeneratedMSBuildEditorConfigFile>$(IntermediateOutputPath)$(MSBuildProjectName).GeneratedMSBuildEditorConfig.editorconfig</GeneratedMSBuildEditorConfigFile>
@@ -671,6 +672,10 @@
     <Reference Include="UnidecodeSharpCore, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\UnidecodeSharpCore.2.0.1\lib\net45\UnidecodeSharpCore.dll</HintPath>
     </Reference>
+    <Reference Include="Vostok.Applications.Scheduled, Version=0.2.7.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Applications.Scheduled.0.2.7\lib\netstandard2.0\Vostok.Applications.Scheduled.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Vostok.ClusterClient.Context, Version=0.1.4.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\packages\Vostok.ClusterClient.Context.0.1.4\lib\netstandard2.0\Vostok.ClusterClient.Context.dll</HintPath>
       <Private>True</Private>
@@ -743,8 +748,16 @@
       <HintPath>..\packages\Vostok.Hercules.Client.Abstractions.0.1.7\lib\netstandard2.0\Vostok.Hercules.Client.Abstractions.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Vostok.Hosting.Abstractions, Version=0.3.5.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Hosting.Abstractions.0.3.5\lib\netstandard2.0\Vostok.Hosting.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Vostok.Logging.Abstractions, Version=1.0.20.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\packages\Vostok.Logging.Abstractions.1.0.20\lib\netstandard2.0\Vostok.Logging.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.Logging.Context, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.Logging.Context.1.0.1\lib\netstandard2.0\Vostok.Logging.Context.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Vostok.Logging.File, Version=1.0.12.0, Culture=neutral, PublicKeyToken=null">
@@ -773,6 +786,10 @@
     </Reference>
     <Reference Include="Vostok.Metrics.Hercules, Version=0.1.2.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\packages\Vostok.Metrics.Hercules.0.1.2\lib\netstandard2.0\Vostok.Metrics.Hercules.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Vostok.ServiceDiscovery.Abstractions, Version=0.1.4.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Vostok.ServiceDiscovery.Abstractions.0.1.4\lib\netstandard2.0\Vostok.ServiceDiscovery.Abstractions.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Vostok.Telemetry.Kontur, Version=1.0.52.0, Culture=neutral, PublicKeyToken=null">
@@ -837,7 +854,6 @@
     <Compile Include="Extensions\OwinRequestExtensions.cs" />
     <Compile Include="Extensions\StringExtensions_should.cs" />
     <Compile Include="Extensions\UserExtensions.cs" />
-    <Compile Include="Helpers\ExcelWorksheetBuilder.cs" />
     <Compile Include="Helpers\TelegramHelper.cs" />
     <Compile Include="Kontur.Passport\KonturPassportConstants.cs" />
     <Compile Include="Kontur.Passport\KonturPassportAuthenticationExtensions.cs" />
@@ -848,7 +864,6 @@
     <Compile Include="Kontur.Passport\PassportClient.cs" />
     <Compile Include="Kontur.Passport\Provider\KonturPassportReturnEndpointContext.cs" />
     <Compile Include="Kontur.Passport\SigningKeysProvider.cs" />
-    <Compile Include="Models\AcceptedSolutionsPageModel.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AnalyticsTablePageModel.cs" />
     <Compile Include="Models\BlockRenderContext.cs" />
@@ -899,11 +914,6 @@
     <Compile Include="LTI\LtiUtils.cs" />
     <Compile Include="LTI\SecurityHandler.cs" />
     <Compile Include="CreateListOfUsedTokens.cs" />
-    <Compile Include="Views\Course\AcceptedSolutionsHtml.generated.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>AcceptedSolutionsHtml.cshtml</DependentUpon>
-    </Compile>
     <Compile Include="Views\Course\SlideHtml.generated.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -1032,7 +1042,6 @@
     <Content Include="Views\Account\Manage.cshtml" />
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Course\Slide.cshtml" />
-    <Content Include="Views\Course\AcceptedSolutions.cshtml" />
     <Content Include="Views\Account\List.cshtml" />
     <Content Include="Views\Admin\Units.cshtml" />
     <Content Include="Views\Analytics\UnitSheet.cshtml" />
@@ -1048,11 +1057,6 @@
       <Generator>RazorGenerator</Generator>
       <LastGenOutput>SlideHtml.generated.cs</LastGenOutput>
     </Content>
-    <Content Include="Views\Course\AcceptedSolutionsHtml.cshtml">
-      <Generator>RazorGenerator</Generator>
-      <LastGenOutput>AcceptedSolutionsHtml.generated.cs</LastGenOutput>
-    </Content>
-    <Content Include="Views\Course\AcceptedAlert.cshtml" />
     <Content Include="Views\Sandbox\Index.cshtml" />
     <Content Include="Views\Sandbox\GetDetails.cshtml" />
     <Content Include="Views\Course\LtiQuizSlide.cshtml" />

@@ -3,23 +3,20 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
 using Database;
 using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using Microsoft.AspNet.Identity;
-using OfficeOpenXml;
-using OfficeOpenXml.Style;
 using Ulearn.Common;
 using uLearn.Web.Extensions;
 using uLearn.Web.FilterAttributes;
-using uLearn.Web.Helpers;
 using uLearn.Web.Models;
 using Ulearn.Common.Extensions;
-using Ulearn.Core;
+using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
@@ -32,7 +29,7 @@ namespace uLearn.Web.Controllers
 	public class AnalyticsController : JsonDataContractController
 	{
 		private readonly ULearnDb db;
-		private readonly CourseManager courseManager;
+		private readonly ICourseStorage courseStorage;
 
 		private readonly VisitsRepo visitsRepo;
 		private readonly UserSolutionsRepo userSolutionsRepo;
@@ -40,23 +37,25 @@ namespace uLearn.Web.Controllers
 		private readonly UsersRepo usersRepo;
 		private readonly UnitsRepo unitsRepo;
 		private readonly AdditionalScoresRepo additionalScoresRepo;
+		private readonly UlearnConfiguration configuration;
 
 		public AnalyticsController()
-			: this(new ULearnDb(), WebCourseManager.Instance)
+			: this(new ULearnDb(), WebCourseManager.CourseStorageInstance)
 		{
 		}
 
-		public AnalyticsController(ULearnDb db, WebCourseManager courseManager)
+		public AnalyticsController(ULearnDb db, ICourseStorage courseStorage)
 		{
 			this.db = db;
-			this.courseManager = courseManager;
+			this.courseStorage = courseStorage;
 
 			additionalScoresRepo = new AdditionalScoresRepo(db);
 			userSolutionsRepo = new UserSolutionsRepo(db);
-			groupsRepo = new GroupsRepo(db, courseManager);
+			groupsRepo = new GroupsRepo(db, courseStorage);
 			usersRepo = new UsersRepo(db);
 			visitsRepo = new VisitsRepo(db);
 			unitsRepo = new UnitsRepo(db);
+			configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
@@ -75,7 +74,7 @@ namespace uLearn.Web.Controllers
 
 			var realPeriodFinish = periodFinish.Add(TimeSpan.FromDays(1));
 
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var visibleUnitsIds = unitsRepo.GetVisibleUnitIds(course, User);
 			var visibleUnits = course.GetUnits(visibleUnitsIds);
 			if (!unitId.HasValue)
@@ -93,6 +92,7 @@ namespace uLearn.Web.Controllers
 			var slidesIds = slides.Select(s => s.Id).ToList();
 
 			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
+			var groupsAccesses = groupsRepo.GetGroupsAccesses(groups.Select(g => g.Id));
 			var filterOptions = ControllerUtils.GetFilterOptionsByGroup<VisitsFilterOptions>(groupsRepo, User, courseId, groupsIds);
 			filterOptions.SlidesIds = slidesIds;
 			filterOptions.PeriodStart = periodStart;
@@ -134,6 +134,7 @@ namespace uLearn.Web.Controllers
 				Unit = selectedUnit,
 				SelectedGroupsIds = groupsIds,
 				Groups = groups,
+				GroupsAccesses = groupsAccesses,
 				ShowStatisticsLink = User.HasAccessFor(courseId, CourseRole.CourseAdmin),
 
 				PeriodStart = periodStart,
@@ -168,7 +169,7 @@ namespace uLearn.Web.Controllers
 
 			var realPeriodFinish = periodFinish.Add(TimeSpan.FromDays(1));
 
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var visibleUnitsIds = unitsRepo.GetVisibleUnitIds(course, User);
 			var visibleUnits = course.GetUnits(visibleUnitsIds);
 			if (!unitId.HasValue)
@@ -187,6 +188,7 @@ namespace uLearn.Web.Controllers
 			var slidesIds = slides.Select(s => s.Id).ToList();
 
 			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
+			var groupsAccesses = groupsRepo.GetGroupsAccesses(groups.Select(g => g.Id));
 			var filterOptions = ControllerUtils.GetFilterOptionsByGroup<VisitsFilterOptions>(groupsRepo, User, courseId, groupsIds);
 			filterOptions.SlidesIds = slidesIds;
 			filterOptions.PeriodStart = periodStart;
@@ -205,6 +207,7 @@ namespace uLearn.Web.Controllers
 				Unit = selectedUnit,
 				SelectedGroupsIds = groupsIds,
 				Groups = groups,
+				GroupsAccesses = groupsAccesses,
 
 				PeriodStart = periodStart,
 				PeriodFinish = periodFinish,
@@ -299,182 +302,6 @@ namespace uLearn.Web.Controllers
 			return true;
 		}
 
-		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		public ActionResult ExportCourseStatisticsAsJson(CourseStatisticsParams param)
-		{
-			if (param.CourseId == null)
-				return HttpNotFound();
-
-			var model = GetCourseStatisticsModel(param, 3000);
-
-			var filename = model.CourseId + ".json";
-			Response.AddHeader("Content-Disposition", "attachment;filename=" + filename);
-
-			return Json(new CourseStatisticsModel(model), JsonRequestBehavior.AllowGet);
-		}
-
-		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		public ActionResult ExportCourseStatisticsAsXml(CourseStatisticsParams param)
-		{
-			if (param.CourseId == null)
-				return HttpNotFound();
-
-			var model = GetCourseStatisticsModel(param, 3000);
-
-			var filename = model.CourseId + ".xml";
-			Response.AddHeader("Content-Disposition", "attachment;filename=" + filename);
-
-			return Content(new CourseStatisticsModel(model).XmlSerialize(), "text/xml");
-		}
-
-		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		public ActionResult ExportCourseStatisticsAsXlsx(CourseStatisticsParams param)
-		{
-			if (param.CourseId == null)
-				return HttpNotFound();
-
-			var model = GetCourseStatisticsModel(param, 3000);
-
-			var package = new ExcelPackage();
-			FillCourseStatisticsExcelWorksheet(
-				package.Workbook.Worksheets.Add(model.CourseTitle),
-				model
-			);
-			FillCourseStatisticsExcelWorksheet(
-				package.Workbook.Worksheets.Add("Только полные баллы"),
-				model,
-				onlyFullScores: true
-			);
-
-			var filename = model.CourseId + ".xlsx";
-			Response.AddHeader("Content-Disposition", "attachment;filename=" + filename);
-			Response.Charset = "";
-			Response.Cache.SetCacheability(HttpCacheability.NoCache);
-			Response.ContentType = "application/vnd.ms-excel";
-			package.SaveAs(Response.OutputStream);
-			Response.End();
-			return new EmptyResult();
-		}
-
-		private void FillCourseStatisticsExcelWorksheet(ExcelWorksheet worksheet, CourseStatisticPageModel model, bool onlyFullScores = false)
-		{
-			var builder = new ExcelWorksheetBuilder(worksheet);
-
-			builder.AddStyleRule(s => s.Font.Bold = true);
-
-			builder.AddCell("", 3);
-			builder.AddCell("За весь курс", model.ScoringGroups.Count);
-			builder.AddStyleRule(s => s.Border.Left.Style = ExcelBorderStyle.Thin);
-			foreach (var unit in model.Units)
-			{
-				var colspan = 0;
-				foreach (var scoringGroup in model.GetUsingUnitScoringGroups(unit, model.ScoringGroups).Values)
-				{
-					var shouldBeSolvedSlides = model.ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, scoringGroup.Id)];
-					colspan += shouldBeSolvedSlides.Count + 1;
-					if (shouldBeSolvedSlides.Count > 0 && scoringGroup.CanBeSetByInstructor)
-						colspan++;
-				}
-
-				builder.AddCell(unit.Title, colspan);
-			}
-
-			builder.PopStyleRule(); // Border.Left
-			builder.GoToNewLine();
-
-			builder.AddCell("Фамилия Имя");
-			builder.AddCell("Эл. почта");
-			builder.AddCell("Группа");
-			foreach (var scoringGroup in model.ScoringGroups.Values)
-				builder.AddCell(scoringGroup.Abbreviation);
-			foreach (var unit in model.Units)
-			{
-				builder.AddStyleRuleForOneCell(s => s.Border.Left.Style = ExcelBorderStyle.Thin);
-				foreach (var scoringGroup in model.GetUsingUnitScoringGroups(unit, model.ScoringGroups).Values)
-				{
-					var shouldBeSolvedSlides = model.ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, scoringGroup.Id)];
-					builder.AddCell(scoringGroup.Abbreviation);
-
-					builder.AddStyleRule(s => s.TextRotation = 90);
-					builder.AddStyleRule(s => s.Font.Bold = false);
-					foreach (var slide in shouldBeSolvedSlides)
-						builder.AddCell($"{scoringGroup.Abbreviation}: {slide.Title}");
-					if (shouldBeSolvedSlides.Count > 0 && scoringGroup.CanBeSetByInstructor)
-						builder.AddCell("Доп");
-					builder.PopStyleRule();
-					builder.PopStyleRule();
-				}
-			}
-
-			builder.GoToNewLine();
-
-			builder.AddStyleRule(s => s.Border.Bottom.Style = ExcelBorderStyle.Thin);
-			builder.AddStyleRuleForOneCell(s =>
-			{
-				s.HorizontalAlignment = ExcelHorizontalAlignment.Right;
-				s.Font.Size = 10;
-			});
-			builder.AddCell("Максимум:", 3);
-			foreach (var scoringGroup in model.ScoringGroups.Values)
-				builder.AddCell(model.Units.Sum(unit => model.GetMaxScoreForUnitByScoringGroup(unit, scoringGroup)));
-			foreach (var unit in model.Units)
-			{
-				builder.AddStyleRuleForOneCell(s => s.Border.Left.Style = ExcelBorderStyle.Thin);
-				foreach (var scoringGroup in model.GetUsingUnitScoringGroups(unit, model.ScoringGroups).Values)
-				{
-					var shouldBeSolvedSlides = model.ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, scoringGroup.Id)];
-					builder.AddCell(model.GetMaxScoreForUnitByScoringGroup(unit, scoringGroup));
-					foreach (var slide in shouldBeSolvedSlides)
-						builder.AddCell(slide.MaxScore);
-					if (shouldBeSolvedSlides.Count > 0 && scoringGroup.CanBeSetByInstructor)
-						builder.AddCell(scoringGroup.MaxAdditionalScore);
-				}
-			}
-
-			builder.PopStyleRule(); // Bottom.Border
-			builder.GoToNewLine();
-
-			builder.AddStyleRule(s => s.Font.Bold = false);
-
-			foreach (var user in model.VisitedUsers)
-			{
-				builder.AddCell(user.UserVisibleName);
-				builder.AddCell(user.UserEmail);
-				var userGroups = model.Groups.Where(g => model.VisitedUsersGroups[user.UserId].Contains(g.Id)).Select(g => g.Name).ToList();
-				builder.AddCell(string.Join(", ", userGroups));
-				foreach (var scoringGroup in model.ScoringGroups.Values)
-				{
-					var scoringGroupScore = model.Units.Sum(unit => model.GetTotalScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup));
-					var scoringGroupOnlyFullScore = model.Units.Sum(unit => model.GetTotalOnlyFullScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup));
-					builder.AddCell(onlyFullScores ? scoringGroupOnlyFullScore : scoringGroupScore);
-				}
-
-				foreach (var unit in model.Units)
-				{
-					builder.AddStyleRuleForOneCell(s => s.Border.Left.Style = ExcelBorderStyle.Thin);
-					foreach (var scoringGroup in model.GetUsingUnitScoringGroups(unit, model.ScoringGroups).Values)
-					{
-						var shouldBeSolvedSlides = model.ShouldBeSolvedSlidesByUnitScoringGroup[Tuple.Create(unit.Id, scoringGroup.Id)];
-						var scoringGroupScore = model.GetTotalScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup);
-						var scoringGroupOnlyFullScore = model.GetTotalOnlyFullScoreForUserInUnitByScoringGroup(user.UserId, unit, scoringGroup);
-						builder.AddCell(onlyFullScores ? scoringGroupOnlyFullScore : scoringGroupScore);
-						foreach (var slide in shouldBeSolvedSlides)
-						{
-							var slideScore = model.ScoreByUserAndSlide[Tuple.Create(user.UserId, slide.Id)];
-							builder.AddCell(onlyFullScores ? model.GetOnlyFullScore(slideScore, slide) : slideScore);
-						}
-
-						if (shouldBeSolvedSlides.Count > 0 && scoringGroup.CanBeSetByInstructor)
-							builder.AddCell(model.AdditionalScores[Tuple.Create(user.UserId, unit.Id, scoringGroup.Id)]);
-					}
-				}
-
-				builder.GoToNewLine();
-			}
-
-			for (var column = 1; column <= builder.ColumnsCount; column++)
-				worksheet.Column(column).AutoFit(0.1);
-		}
 
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Student)]
 		public ActionResult CourseStatistics(CourseStatisticsParams param, int max = 200)
@@ -500,7 +327,7 @@ namespace uLearn.Web.Controllers
 			var courseId = param.CourseId;
 			var periodStart = param.PeriodStartDate;
 			var periodFinish = param.PeriodFinishDate;
-			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
+			var groupsIds = Request.GetMultipleValuesFromQueryString("groupsIds");
 			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
 			var isStudent = !isInstructor;
 
@@ -510,7 +337,7 @@ namespace uLearn.Web.Controllers
 
 			var realPeriodFinish = periodFinish.Add(TimeSpan.FromDays(1));
 
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var visibleUnitsIds = unitsRepo.GetVisibleUnitIds(course, User);
 			var visibleUnits = course.GetUnits(visibleUnitsIds);
 
@@ -565,9 +392,21 @@ namespace uLearn.Web.Controllers
 				.ToDictionary(kv => kv.Key, kv => kv.Value)
 				.ToSortedDictionary();
 
-			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
-			if (!isInstructor)
+			List<Group> groups;
+			Dictionary<int, List<GroupAccess>> groupsAccesses = null;
+			if (isInstructor)
+			{
+				groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
+				groupsAccesses = groupsRepo.GetGroupsAccesses(groups.Select(g => g.Id));
+			}
+			else
 				groups = groupsRepo.GetUserGroups(courseId, currentUserId);
+
+			var uriBuilder = new ExportUriBuilder(configuration.BaseUrlApi, courseId);
+			var jsonExportUrl = uriBuilder.BuildExportJsonUrl();
+			var xmlExportUrl = uriBuilder.BuildExportXmlUrl();
+			var xlsxExportUrl = uriBuilder.BuildExportXlsxUrl();
+
 			var model = new CourseStatisticPageModel
 			{
 				IsInstructor = isInstructor,
@@ -576,6 +415,7 @@ namespace uLearn.Web.Controllers
 				Units = visibleUnits,
 				SelectedGroupsIds = groupsIds,
 				Groups = groups,
+				GroupsAccesses = groupsAccesses,
 				PeriodStart = periodStart,
 				PeriodFinish = periodFinish,
 				VisitedUsers = visitedUsers,
@@ -588,6 +428,9 @@ namespace uLearn.Web.Controllers
 				AdditionalScores = additionalScores,
 				UsersGroupsIds = usersGroupsIds,
 				EnabledAdditionalScoringGroupsForGroups = enabledAdditionalScoringGroupsForGroups,
+				JsonExportUrl = jsonExportUrl,
+				XmlExportUrl = xmlExportUrl,
+				XlsxExportUrl = xlsxExportUrl
 			};
 			return model;
 		}
@@ -655,7 +498,7 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult UserUnitStatistics(string courseId, Guid unitId, string userId)
 		{
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var user = usersRepo.FindUserById(userId);
 			if (user == null)
 				return HttpNotFound();
@@ -675,12 +518,12 @@ namespace uLearn.Web.Controllers
 				.ToList();
 			var reviewedSubmissions = userSolutionsRepo
 				.GetAllAcceptedSubmissionsByUser(courseId, exercises.Select(s => s.Id), userId)
-				.Where(s => s.ManualCheckings.Any(c => c.IsChecked))
+				.Where(s => s.ManualChecking != null && s.ManualChecking.IsChecked)
 				.OrderByDescending(s => s.Timestamp)
 				.DistinctBy(u => u.SlideId)
 				.ToList();
 			var userScores = visitsRepo.GetScoresForSlides(courseId, userId, slides.Select(s => s.Id));
-			
+
 			var unitIndex = visibleUnits.FindIndex(u => u.Id == unitId);
 			var previousUnit = unitIndex == 0 ? null : visibleUnits[unitIndex - 1];
 			var nextUnit = unitIndex == visibleUnits.Count - 1 ? null : visibleUnits[unitIndex + 1];
@@ -704,7 +547,7 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Student)]
 		public ActionResult RatingByPoints(string courseId, Guid slideId, int? groupId = null)
 		{
-			var course = courseManager.FindCourse(courseId);
+			var course = courseStorage.FindCourse(courseId);
 			if (course == null)
 				return HttpNotFound();
 			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
@@ -714,7 +557,7 @@ namespace uLearn.Web.Controllers
 			if (exerciseBlock == null)
 				return HttpNotFound();
 			var smallPointsIsBetter = exerciseBlock.SmallPointsIsBetter;
-			
+
 			var currentUserId = User.Identity.GetUserId();
 			var isAdministrator = User.HasAccessFor(courseId, CourseRole.CourseAdmin);
 			var isStudent = !isInstructor;
@@ -761,16 +604,16 @@ namespace uLearn.Web.Controllers
 						hideOtherUsersNames = true;
 				}
 			}
-			
+
 			var userIds = users?.Select(u => u.Id).ToList();
 			var pointsByUser = GetPointsByUser(courseId, slideId, userIds);
 			var usersOrderedByPoints = GetUsersOrderedByPoints(pointsByUser, smallPointsIsBetter);
-			
+
 			if (showAllUsers)
 				users = usersRepo.GetUsersByIds(usersOrderedByPoints).ToList();
 			if (users == null)
 				users = usersRepo.GetUsersByIds(new[] { currentUserId }).ToList();
-			
+
 			var model = new ExerciseRatingByPointsModel
 			{
 				Course = course,
@@ -810,7 +653,7 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
 		public ActionResult UsersProgress(string courseId, Guid unitId, DateTime periodStart)
 		{
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var unit = course.FindUnitByIdNotSafe(unitId);
 			if (unit == null)
 				return HttpNotFound();
@@ -888,7 +731,7 @@ namespace uLearn.Web.Controllers
 			if (user == null || user.IsDeleted)
 				return HttpNotFound();
 
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var visibleUnits = unitsRepo.GetVisibleUnitIds(course, User);
 			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
 			var slide = course.FindSlideById(slideId, isInstructor, visibleUnits) as ExerciseSlide;
@@ -973,7 +816,7 @@ namespace uLearn.Web.Controllers
 		public Unit PreviousUnit { get; set; }
 		public Unit NextUnit { get; set; }
 	}
-	
+
 	public class ExerciseRatingByPointsModel
 	{
 		public Course Course { get; set; }
@@ -1001,5 +844,30 @@ namespace uLearn.Web.Controllers
 		public UserInfo[] Users;
 		public Dictionary<string, string> GroupsNames;
 		public Slide[] Slides;
+	}
+
+	public class ExportUriBuilder
+	{
+		private readonly Uri baseUri;
+		private readonly string courseId;
+
+		public ExportUriBuilder(string baseUri, string courseId)
+		{
+			this.baseUri = new Uri(new Uri(baseUri) , $"/course-score-sheet/export/");
+			this.courseId = courseId;
+		}
+
+		public string BuildExportJsonUrl() => BuildUri($"{courseId}.json");
+
+		public string BuildExportXmlUrl() => BuildUri( $"{courseId}.xml");
+
+		public string BuildExportXlsxUrl() => BuildUri($"{courseId}.xlsx");
+
+		private string BuildUri(string fileNameWithExtenstion)
+		{
+			var uri = new Uri(baseUri, fileNameWithExtenstion);
+			var builder = new UriBuilder(uri) { Query = courseId };
+			return builder.Uri.ToString();
+		}
 	}
 }

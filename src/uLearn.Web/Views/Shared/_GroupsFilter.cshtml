@@ -1,5 +1,7 @@
 ﻿@using Database.Models
 @using Database.Extensions
+@using Microsoft.AspNet.Identity
+@using Ulearn.Common.Extensions
 @using uLearn.Web.Extensions
 @using Ulearn.Core.Extensions
 
@@ -42,19 +44,24 @@
 				HtmlAttributes = new { data_divider = "true", data_exclusive = "true" }
 			});
 		}
+		var groupsAndInstructors = Model.Groups
+			.Select(g => (Group: g, Accesses: Model.UsersIdsWithGroupsAccess?.GetOrDefault(g.Id))).ToArray();
+		Array.Sort(groupsAndInstructors, new GroupsComparer(User.Identity.GetUserId()));
+		var orderedGroups = groupsAndInstructors.Select(t => t.Group);
 		groupsListItems.AddRange(
-			Model.Groups.Select(
-				group => new SelectListItemWithAttributes
-				{
-					Text = group.Name.TruncateWithEllipsis(40),
-					Value = group.Id.ToString(),
-					Selected = Model.SelectedGroupsIds.Contains(group.Id.ToString())
-				})
+			orderedGroups
+				.Select(
+					group => new SelectListItemWithAttributes
+					{
+						Text = group.Name.TruncateWithEllipsis(40),
+						Value = group.Id.ToString(),
+						Selected = Model.SelectedGroupsIds.Contains(group.Id.ToString())
+					})
 			);
 	}
 
 	@Html.DropDownListWithItemAttributes(
-		"group",
+		Model.InputControlName,
 		groupsListItems,
 		new
 		{

@@ -355,6 +355,7 @@ function replaceReviewMarker(
 	return { reviews: newCurrentReviews, selectedReviewLine: line, };
 }
 
+
 export interface PreviousManualCheckingInfo {
 	submission: SubmissionInfo;
 	index: number;
@@ -374,6 +375,11 @@ export function getPreviousManualCheckingInfo(
 	return undefined;
 }
 
+function isAcceptedSolutionsWillNotDiscardScore(submissions: SubmissionInfo[], isSkipped: boolean): boolean {
+	return submissions.filter(
+		s => s.automaticChecking?.result === AutomaticExerciseCheckingResult.RightAnswer).length > 0 || isSkipped;
+}
+
 export {
 	SubmissionColor,
 	ReviewInfoWithMarker,
@@ -391,4 +397,5 @@ export {
 	getSelectedReviewIdByCursor,
 	loadLanguageStyles,
 	replaceReviewMarker,
+	isAcceptedSolutionsWillNotDiscardScore
 };

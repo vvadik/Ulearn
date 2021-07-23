@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 using Database;
 using Database.Models.Quizzes;
 using Database.Repos;
-using Ulearn.Core;
+using Microsoft.Extensions.DependencyInjection;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Quizzes;
 using Ulearn.Core.Courses.Slides.Quizzes.Blocks;
 
@@ -16,12 +17,13 @@ namespace ManualUtils
 		private const int MaxFillInBlockSize = 8 * 1024;
 
 		// Обновляет пройденные тесты с нулевым баллом
-		public static async Task UpdateTests(UlearnDb db, string courseId)
+		public static async Task UpdateTests(IServiceProvider serviceProvider, string courseId)
 		{
-			var courseManager = new CourseManager(CourseManager.GetCoursesDirectory());
-			var course = courseManager.GetCourse(courseId);
-			var slideCheckingsRepo = new SlideCheckingsRepo(db, null);
-			var visitsRepo = new VisitsRepo(db, slideCheckingsRepo);
+			var db = serviceProvider.GetService<UlearnDb>();
+			var courseStorage = serviceProvider.GetService<ICourseStorage>();
+			var visitsRepo = serviceProvider.GetService<IVisitsRepo>();
+
+			var course = courseStorage.GetCourse(courseId);
 			var tests = course.GetSlidesNotSafe().OfType<QuizSlide>().ToList();
 			foreach (var test in tests)
 			{

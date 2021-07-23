@@ -81,9 +81,7 @@ interface UnitsInfo {
 interface PageInfo {
 	isLti: boolean;
 	isReview: boolean;
-	isAcceptedSolutions: boolean;
 	isNavigationVisible: boolean;
-	isAcceptedAlert: boolean;
 }
 
 export {

@@ -14,6 +14,7 @@ namespace Database.Models
 		[Required]
 		[Index("IDX_Like_ByUserAndSubmission", 2)]
 		[Index("IDX_Like_BySubmission")]
+		[Index("IDX_Like_Course_Slide_Submission", 3)]
 		public int SubmissionId { get; set; }
 
 		[Required]
@@ -25,5 +26,14 @@ namespace Database.Models
 
 		[Required]
 		public DateTime Timestamp { get; set; }
+
+		[Required]
+		[StringLength(100)]
+		[Index("IDX_Likes_Course_Slide_Submission", 1)]
+		public string CourseId { get; set; }
+
+		[Required]
+		[Index("IDX_Likes_Course_Slide_Submission", 2)]
+		public Guid SlideId { get; set; }
 	}
 }

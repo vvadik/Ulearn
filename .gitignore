@@ -214,3 +214,5 @@ src/uLearn\.Web/Courses
 /src/CourseTool/renderer/reactBuild
 
 *.less.d.ts
+
+!.gitkeep

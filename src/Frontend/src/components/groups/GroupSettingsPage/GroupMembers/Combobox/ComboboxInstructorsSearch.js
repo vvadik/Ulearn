@@ -64,9 +64,7 @@ class ComboboxInstructorsSearch extends Component {
 	};
 
 	renderNotFound = () => {
-		const msg = this.state.query
-			? 'В этом курсе нет преподавателей c таким именем'
-			: 'В этом курсе больше нет преподавателей';
+		const msg = 'Не найдено. Возможно, вы не выдали права на странице «Студенты и преподаватели»';
 
 		return <span>{msg}</span>;
 	};

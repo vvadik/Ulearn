@@ -43,8 +43,7 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 			var botReviews = submission.NotDeletedReviews
 				.Select(r => ToReviewInfo(r, true, reviewId2Comments))
 				.ToList();
-			var manualCheckingReviews = submission.ManualCheckings
-				.SelectMany(c => c.NotDeletedReviews)
+			var manualCheckingReviews = (submission.ManualChecking?.NotDeletedReviews).EmptyIfNull()
 				.Select(r => ToReviewInfo(r, false, reviewId2Comments))
 				.ToList();
 			var automaticChecking = submission.AutomaticChecking == null
@@ -56,7 +55,7 @@ namespace Ulearn.Web.Api.Models.Responses.Exercise
 				Language = submission.Language,
 				Timestamp = submission.Timestamp,
 				AutomaticChecking = automaticChecking,
-				ManualCheckingPassed = submission.ManualCheckings.Any(mc => mc.IsChecked),
+				ManualCheckingPassed = submission.ManualChecking?.IsChecked ?? false,
 				ManualCheckingReviews =  manualCheckingReviews.Where(r => r.Author != null).ToList()
 			};
 		}

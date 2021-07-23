@@ -39,10 +39,12 @@ namespace Database.Repos
 				await db.SaveChangesAsync();
 				return await FindVisit(courseId, slideId, userId);
 			}
+
 			if (visit.IpAddress != ipAddress)
 			{
 				visit.IpAddress = ipAddress;
 			}
+
 			await db.SaveChangesAsync();
 			return visit;
 		}
@@ -84,8 +86,8 @@ namespace Database.Repos
 		public async Task<Dictionary<Guid, LastVisit>> GetLastVisitsInCourse(string courseId, string userId)
 		{
 			return (await db.LastVisits
-				.Where(v => v.CourseId == courseId && v.UserId == userId)
-				.ToListAsync())
+					.Where(v => v.CourseId == courseId && v.UserId == userId)
+					.ToListAsync())
 				.ToDictSafe(v => v.SlideId, v => v);
 		}
 
@@ -103,18 +105,19 @@ namespace Database.Repos
 			return visits.ToDictionary(v => v!.CourseId, v => v!.Timestamp, StringComparer.OrdinalIgnoreCase);
 		}
 
-		public async Task<Dictionary<string, Visit>> FindLastVisit(List<string> userIds)
+		public async Task<Dictionary<string, Visit>> FindLastVisitsInGroup(int groupId)
 		{
-			return await db.Visits
-				.Where(v => userIds.Contains(v.UserId))
-				.Select(v => v.UserId)
-				.Distinct()
-				.Select(u => db.Visits
-					.Where(v => v.UserId == u)
-					.OrderByDescending(v => v.Timestamp)
-					.FirstOrDefault()
-				)
-				.ToDictionaryAsync(v => v.UserId, v => v);
+			return (await db.GroupMembers
+					.Where(m => m.GroupId == groupId && !m.User.IsDeleted)
+					.Select(u => u.UserId)
+					.Select(u => db.Visits
+						.Where(v => v.UserId == u)
+						.OrderByDescending(v => v.Timestamp)
+						.FirstOrDefault()
+					)
+					.ToListAsync())
+				.Where(v => v != null)
+				.ToDictionary(v => v.UserId, v => v);
 		}
 
 		public async Task<HashSet<Guid>> GetIdOfVisitedSlides(string courseId, string userId)

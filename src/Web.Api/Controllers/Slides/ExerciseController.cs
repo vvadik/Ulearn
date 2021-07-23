@@ -16,6 +16,7 @@ using Ulearn.Common;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Core;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
@@ -42,15 +43,16 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		private readonly IUnitsRepo unitsRepo;
 		private readonly MetricSender metricSender;
 		private readonly IServiceScopeFactory serviceScopeFactory;
+		private readonly IWebCourseManager courseManager;
 		private readonly StyleErrorsResultObserver styleErrorsResultObserver;
 		private readonly ErrorsBot errorsBot = new ErrorsBot();
 		private static ILog log => LogProvider.Get().ForContext(typeof(ExerciseController));
 
-		public ExerciseController(IWebCourseManager courseManager, UlearnDb db, MetricSender metricSender,
+		public ExerciseController(ICourseStorage courseStorage, IWebCourseManager courseManager, UlearnDb db, MetricSender metricSender,
 			IUsersRepo usersRepo, IUserSolutionsRepo userSolutionsRepo, ICourseRolesRepo courseRolesRepo, IVisitsRepo visitsRepo,
 			ISlideCheckingsRepo slideCheckingsRepo, IGroupsRepo groupsRepo, StyleErrorsResultObserver styleErrorsResultObserver,
 			IStyleErrorsRepo styleErrorsRepo, IUnitsRepo unitsRepo, IServiceScopeFactory serviceScopeFactory)
-			: base(courseManager, db, usersRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 			this.metricSender = metricSender;
 			this.userSolutionsRepo = userSolutionsRepo;
@@ -62,6 +64,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			this.unitsRepo = unitsRepo;
 			this.styleErrorsResultObserver = styleErrorsResultObserver;
 			this.serviceScopeFactory = serviceScopeFactory;
+			this.courseManager = courseManager;
 		}
 
 		[HttpPost("/slides/{courseId}/{slideId}/exercise/submit")]
@@ -96,7 +99,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.Instructor);
 			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIds(course, UserId);
-			var exerciseSlide = (await courseManager.FindCourseAsync(courseId))?.FindSlideById(slideId, isInstructor, visibleUnitsIds) as ExerciseSlide;
+			var exerciseSlide = courseStorage.FindCourse(courseId)?.FindSlideById(slideId, isInstructor, visibleUnitsIds) as ExerciseSlide;
 			if (exerciseSlide == null)
 				return NotFound(new ErrorResponse("Slide not found"));
 
@@ -123,7 +126,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			metricSender.SendCount($"exercise.{courseId.ToLower(CultureInfo.InvariantCulture)}.try");
 			metricSender.SendCount($"exercise.{exerciseMetricId}.try");
 
-			var course = await courseManager.GetCourseAsync(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var exerciseBlock = exerciseSlide.Exercise;
 			var buildResult = exerciseBlock.BuildSolution(userCode);
 
@@ -184,18 +187,18 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			}
 
 			if (!hasAutomaticChecking)
-				await RunnerSetResultController.SendToReviewAndUpdateScore(submissionNoTracking, courseManager, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender);
+				await RunnerSetResultController.SendToReviewAndUpdateScore(submissionNoTracking, courseStorage, slideCheckingsRepo, groupsRepo, visitsRepo, metricSender);
 
 			// StyleErrors для C# proj и file устанавливаются только здесь, берутся из buildResult. В StyleErrorsResultObserver.ProcessResult попадают только ошибки из docker
 			if (buildResult.HasStyleErrors)
 			{
 				var styleErrors = await ConvertStyleErrors(buildResult);
-				submissionNoTracking.Reviews = await styleErrorsResultObserver.CreateStyleErrorsReviewsForSubmission(submissionId, styleErrors, exerciseMetricId);
+				submissionNoTracking.Reviews = await styleErrorsResultObserver.CreateStyleErrorsReviewsForSubmission(submissionNoTracking, styleErrors, exerciseMetricId);
 			}
 
 			var score = await visitsRepo.GetScore(courseId, exerciseSlide.Id, userId);
-			var waitingForManualChecking = submissionNoTracking.ManualCheckings.Any(c => !c.IsChecked) ? true : (bool?)null;
-			var prohibitFurtherManualChecking = submissionNoTracking.ManualCheckings.Any(c => c.ProhibitFurtherManualCheckings);
+			var waitingForManualChecking = !submissionNoTracking.ManualChecking?.IsChecked;
+			var prohibitFurtherManualChecking = submissionNoTracking.ManualChecking?.ProhibitFurtherManualCheckings ?? false;
 			var result = new RunSolutionResponse(SolutionRunStatus.Success)
 			{
 				Score = score,
@@ -267,10 +270,10 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		[Authorize(AuthenticationSchemes = "Bearer,Identity.Application")]
 		public async Task<ActionResult<RunSolutionResponse>> GetStudentZip([FromRoute] string courseId, [FromRoute] Guid slideId, [FromRoute] string studentZipName)
 		{
-			var course = await courseManager.GetCourseAsync(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(UserId, courseId, CourseRoleType.Instructor);
 			var visibleUnits = await unitsRepo.GetVisibleUnitIds(course, UserId);
-			var slide = (await courseManager.FindCourseAsync(courseId))?.FindSlideById(slideId, isInstructor, visibleUnits);
+			var slide = courseStorage.FindCourse(courseId)?.FindSlideById(slideId, isInstructor, visibleUnits);
 			if (slide is not ExerciseSlide exerciseSlide)
 				return NotFound();
 

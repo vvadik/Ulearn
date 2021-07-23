@@ -34,7 +34,9 @@ namespace Database
 
 		public void MigrateToLatestVersion()
 		{
+			Database.SetCommandTimeout(TimeSpan.FromMinutes(5));
 			Database.Migrate();
+			Database.SetCommandTimeout(TimeSpan.FromSeconds(30));
 		}
 
 		public Task CreateInitialDataAsync(InitialDataCreator creator)
@@ -151,6 +153,12 @@ namespace Database
 				.HasForeignKey(d => d.NotificationId)
 				.OnDelete(DeleteBehavior.Cascade);
 
+			modelBuilder.Entity<ExerciseCodeReview>()
+				.HasOne(s => s.ExerciseChecking)
+				.WithMany(c => c.Reviews)
+				.HasForeignKey(p => p.ExerciseCheckingId)
+				.OnDelete(DeleteBehavior.Cascade);
+
 			modelBuilder.Entity<UserQuizSubmission>()
 				.HasOne(s => s.AutomaticChecking)
 				.WithOne(c => c.Submission)
@@ -163,7 +171,14 @@ namespace Database
 				.HasForeignKey<ManualQuizChecking>(p => p.Id)
 				.OnDelete(DeleteBehavior.Restrict);
 
+			modelBuilder.Entity<UserExerciseSubmission>()
+				.HasOne(s => s.ManualChecking)
+				.WithOne(c => c.Submission)
+				.HasForeignKey<ManualExerciseChecking>(p => p.Id)
+				.OnDelete(DeleteBehavior.Restrict);
+
 			SetDeleteBehavior<CourseRole, ApplicationUser>(modelBuilder, r => r.User, r => r.UserId, DeleteBehavior.Cascade);
+			SetDeleteBehavior<ReceivedCommentToCodeReviewNotification, ExerciseCodeReviewComment>(modelBuilder, c => c.Comment, c => c.CommentId, DeleteBehavior.Cascade);
 
 			SetDeleteBehavior<ExerciseCodeReview, ApplicationUser>(modelBuilder, c => c.Author, c => c.AuthorId);
 
@@ -178,28 +193,7 @@ namespace Database
 
 			SetDeleteBehavior<GraderClient, ApplicationUser>(modelBuilder, c => c.User, c => c.UserId);
 
-			SetDeleteBehavior<Notification, ApplicationUser>(modelBuilder, c => c.InitiatedBy, c => c.InitiatedById);
-			SetDeleteBehavior<AddedInstructorNotification, ApplicationUser>(modelBuilder, c => c.AddedUser, c => c.AddedUserId);
-			SetDeleteBehavior<LikedYourCommentNotification, ApplicationUser>(modelBuilder, c => c.LikedUser, c => c.LikedUserId);
-			SetDeleteBehavior<JoinedToYourGroupNotification, ApplicationUser>(modelBuilder, c => c.JoinedUser, c => c.JoinedUserId);
-			SetDeleteBehavior<JoinedToYourGroupNotification, Group>(modelBuilder, c => c.Group, c => c.GroupId);
-			SetDeleteBehavior<GrantedAccessToGroupNotification, GroupAccess>(modelBuilder, c => c.Access, c => c.AccessId);
-			SetDeleteBehavior<RevokedAccessToGroupNotification, GroupAccess>(modelBuilder, c => c.Access, c => c.AccessId);
-			SetDeleteBehavior<CreatedGroupNotification, Group>(modelBuilder, c => c.Group, c => c.GroupId);
-			SetDeleteBehavior<PassedManualExerciseCheckingNotification, ManualExerciseChecking>(modelBuilder, c => c.Checking, c => c.CheckingId);
-			SetDeleteBehavior<PassedManualQuizCheckingNotification, ManualQuizChecking>(modelBuilder, c => c.Checking, c => c.CheckingId);
 			SetDeleteBehavior<ReceivedAdditionalScoreNotification, AdditionalScore>(modelBuilder, c => c.Score, c => c.ScoreId, DeleteBehavior.Cascade);
-
-			SetDeleteBehavior<NewCommentNotification, Comment>(modelBuilder, c => c.Comment, c => c.CommentId);
-			SetDeleteBehavior<NewCommentFromYourGroupStudentNotification, Comment>(modelBuilder, c => c.Comment, c => c.CommentId);
-			SetDeleteBehavior<LikedYourCommentNotification, Comment>(modelBuilder, c => c.Comment, c => c.CommentId);
-			SetDeleteBehavior<RepliedToYourCommentNotification, Comment>(modelBuilder, c => c.Comment, c => c.CommentId);
-			SetDeleteBehavior<RepliedToYourCommentNotification, Comment>(modelBuilder, c => c.ParentComment, c => c.ParentCommentId);
-
-			SetDeleteBehavior<UploadedPackageNotification, CourseVersion>(modelBuilder, c => c.CourseVersion, c => c.CourseVersionId);
-			SetDeleteBehavior<PublishedPackageNotification, CourseVersion>(modelBuilder, c => c.CourseVersion, c => c.CourseVersionId);
-
-			SetDeleteBehavior<CourseExportedToStepikNotification, StepikExportProcess>(modelBuilder, c => c.Process, c => c.ProcessId);
 
 			SetDeleteBehavior<XQueueWatcher, ApplicationUser>(modelBuilder, c => c.User, c => c.UserId);
 
@@ -215,6 +209,14 @@ namespace Database
 			SetDeleteBehavior<LabelOnGroup, GroupLabel>(modelBuilder, c => c.Label, c => c.LabelId);
 
 			SetDeleteBehavior<SystemAccess, ApplicationUser>(modelBuilder, c => c.GrantedBy, c => c.GrantedById);
+
+			modelBuilder.Entity<ExerciseAttemptedUsersCount>()
+				.ToView(ExerciseAttemptedUsersCount.ViewName)
+				.HasNoKey();
+
+			modelBuilder.Entity<ExerciseUsersWithRightAnswerCount>()
+				.ToView(ExerciseUsersWithRightAnswerCount.ViewName)
+				.HasNoKey();
 
 			CreateIndexes(modelBuilder);
 		}
@@ -261,6 +263,7 @@ namespace Database
 			AddIndex<EnabledAdditionalScoringGroup>(modelBuilder, c => c.GroupId);
 
 			AddIndex<ExerciseCodeReview>(modelBuilder, c => c.ExerciseCheckingId);
+			AddIndex<ExerciseCodeReview>(modelBuilder, c => new { c.CourseId, c.SlideId, c.SubmissionAuthorId });
 
 			AddIndex<FeedViewTimestamp>(modelBuilder, c => c.UserId);
 			AddIndex<FeedViewTimestamp>(modelBuilder, c => c.Timestamp);
@@ -288,6 +291,9 @@ namespace Database
 
 			AddIndex<Like>(modelBuilder, c => c.SubmissionId);
 			AddIndex<Like>(modelBuilder, c => new { c.UserId, c.SubmissionId });
+			AddIndex<Like>(modelBuilder, c => new { c.CourseId, c.SlideId, c.SubmissionId });
+
+			AddIndex<AcceptedSolutionsPromote>(modelBuilder, c => new { c.CourseId, c.SlideId });
 
 			AddIndex<LtiConsumer>(modelBuilder, c => c.Key);
 
@@ -432,7 +438,8 @@ namespace Database
 		public DbSet<CommentsPolicy> CommentsPolicies { get; set; }
 
 		public DbSet<CourseVersion> CourseVersions { get; set; }
-		public DbSet<CourseFile> CourseFiles { get; set; }
+		public DbSet<CourseVersionFile> CourseVersionFiles { get; set; }
+
 		public DbSet<CourseGit> CourseGitRepos { get; set; }
 
 		public DbSet<ManualExerciseChecking> ManualExerciseCheckings { get; set; }
@@ -496,5 +503,10 @@ namespace Database
 		public DbSet<StyleErrorSettings> StyleErrorSettings { get; set; }
 
 		public DbSet<WorkQueueItem> WorkQueueItems { get; set; }
+
+		public DbSet<AcceptedSolutionsPromote> AcceptedSolutionsPromotes { get; set; }
+
+		public DbSet<ExerciseAttemptedUsersCount> ExerciseAttemptedUsersCounts { get; set; }
+		public DbSet<ExerciseUsersWithRightAnswerCount> ExerciseUsersWithRightAnswerCounts { get; set; }
 	}
 }

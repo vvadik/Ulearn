@@ -16,7 +16,6 @@ interface State {
 }
 
 export interface Props extends IControlWithText {
-	acceptedSolutionsUrl: string,
 	isShowAcceptedSolutionsAvailable: boolean,
 	tooltipTrigger?: TooltipTrigger,
 

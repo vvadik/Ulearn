@@ -21,6 +21,35 @@ namespace Database.Migrations
                 .HasAnnotation("ProductVersion", "5.0.3")
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+            modelBuilder.Entity("Database.Models.AcceptedSolutionsPromote", b =>
+                {
+                    b.Property<int>("SubmissionId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CourseId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<Guid>("SlideId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("SubmissionId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("CourseId", "SlideId");
+
+                    b.ToTable("AcceptedSolutionsPromotes");
+                });
+
             modelBuilder.Entity("Database.Models.AdditionalScore", b =>
                 {
                     b.Property<int>("Id")
@@ -565,32 +594,6 @@ namespace Database.Migrations
                     b.ToTable("CourseAccesses");
                 });
 
-            modelBuilder.Entity("Database.Models.CourseFile", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<string>("CourseId")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<Guid>("CourseVersionId")
-                        .HasColumnType("uuid");
-
-                    b.Property<byte[]>("File")
-                        .IsRequired()
-                        .HasColumnType("bytea");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseVersionId");
-
-                    b.ToTable("CourseFiles");
-                });
-
             modelBuilder.Entity("Database.Models.CourseGit", b =>
                 {
                     b.Property<int>("Id")
@@ -711,6 +714,25 @@ namespace Database.Migrations
                     b.ToTable("CourseVersions");
                 });
 
+            modelBuilder.Entity("Database.Models.CourseVersionFile", b =>
+                {
+                    b.Property<Guid>("CourseVersionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CourseId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<byte[]>("File")
+                        .IsRequired()
+                        .HasColumnType("bytea");
+
+                    b.HasKey("CourseVersionId");
+
+                    b.ToTable("CourseVersionFiles");
+                });
+
             modelBuilder.Entity("Database.Models.EnabledAdditionalScoringGroup", b =>
                 {
                     b.Property<int>("Id")
@@ -732,6 +754,21 @@ namespace Database.Migrations
                     b.ToTable("EnabledAdditionalScoringGroups");
                 });
 
+            modelBuilder.Entity("Database.Models.ExerciseAttemptedUsersCount", b =>
+                {
+                    b.Property<int>("AttemptedUsersCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CourseId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("SlideId")
+                        .HasColumnType("uuid");
+
+                    b.ToView("ExerciseAttemptedUsersCounts");
+                });
+
             modelBuilder.Entity("Database.Models.ExerciseCodeReview", b =>
                 {
                     b.Property<int>("Id")
@@ -751,6 +788,11 @@ namespace Database.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("CourseId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
                     b.Property<int?>("ExerciseCheckingId")
                         .HasColumnType("integer");
 
@@ -766,11 +808,18 @@ namespace Database.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
+                    b.Property<Guid>("SlideId")
+                        .HasColumnType("uuid");
+
                     b.Property<int>("StartLine")
                         .HasColumnType("integer");
 
                     b.Property<int>("StartPosition")
                         .HasColumnType("integer");
+
+                    b.Property<string>("SubmissionAuthorId")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
 
                     b.Property<int?>("SubmissionId")
                         .HasColumnType("integer");
@@ -781,7 +830,11 @@ namespace Database.Migrations
 
                     b.HasIndex("ExerciseCheckingId");
 
+                    b.HasIndex("SubmissionAuthorId");
+
                     b.HasIndex("SubmissionId");
+
+                    b.HasIndex("CourseId", "SlideId", "SubmissionAuthorId");
 
                     b.ToTable("ExerciseCodeReviews");
                 });
@@ -846,6 +899,21 @@ namespace Database.Migrations
                     b.HasIndex("SubmissionId");
 
                     b.ToTable("ExerciseSolutionByGraders");
+                });
+
+            modelBuilder.Entity("Database.Models.ExerciseUsersWithRightAnswerCount", b =>
+                {
+                    b.Property<string>("CourseId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("SlideId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("UsersWithRightAnswerCount")
+                        .HasColumnType("integer");
+
+                    b.ToView("ExerciseUsersWithRightAnswerCounts");
                 });
 
             modelBuilder.Entity("Database.Models.FeedViewTimestamp", b =>
@@ -1133,6 +1201,14 @@ namespace Database.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
+                    b.Property<string>("CourseId")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<Guid>("SlideId")
+                        .HasColumnType("uuid");
+
                     b.Property<int>("SubmissionId")
                         .HasColumnType("integer");
 
@@ -1149,6 +1225,8 @@ namespace Database.Migrations
                     b.HasIndex("SubmissionId");
 
                     b.HasIndex("UserId", "SubmissionId");
+
+                    b.HasIndex("CourseId", "SlideId", "SubmissionId");
 
                     b.ToTable("Likes");
                 });
@@ -1217,8 +1295,7 @@ namespace Database.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+                        .HasColumnType("integer");
 
                     b.Property<string>("CourseId")
                         .IsRequired()
@@ -1247,9 +1324,6 @@ namespace Database.Migrations
                     b.Property<Guid>("SlideId")
                         .HasColumnType("uuid");
 
-                    b.Property<int>("SubmissionId")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("timestamp without time zone");
 
@@ -1261,8 +1335,6 @@ namespace Database.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("LockedById");
-
-                    b.HasIndex("SubmissionId");
 
                     b.HasIndex("UserId");
 
@@ -2715,6 +2787,25 @@ namespace Database.Migrations
                     b.HasDiscriminator().HasValue("RepliedToYourCommentNotification");
                 });
 
+            modelBuilder.Entity("Database.Models.AcceptedSolutionsPromote", b =>
+                {
+                    b.HasOne("Database.Models.UserExerciseSubmission", "Submission")
+                        .WithMany()
+                        .HasForeignKey("SubmissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Database.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Submission");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Database.Models.AdditionalScore", b =>
                 {
                     b.HasOne("Database.Models.ApplicationUser", "Instructor")
@@ -2865,17 +2956,6 @@ namespace Database.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Database.Models.CourseFile", b =>
-                {
-                    b.HasOne("Database.Models.CourseVersion", "CourseVersion")
-                        .WithMany()
-                        .HasForeignKey("CourseVersionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CourseVersion");
-                });
-
             modelBuilder.Entity("Database.Models.CourseRole", b =>
                 {
                     b.HasOne("Database.Models.ApplicationUser", "User")
@@ -2895,6 +2975,17 @@ namespace Database.Migrations
                         .IsRequired();
 
                     b.Navigation("Author");
+                });
+
+            modelBuilder.Entity("Database.Models.CourseVersionFile", b =>
+                {
+                    b.HasOne("Database.Models.CourseVersion", "CourseVersion")
+                        .WithMany()
+                        .HasForeignKey("CourseVersionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CourseVersion");
                 });
 
             modelBuilder.Entity("Database.Models.EnabledAdditionalScoringGroup", b =>
@@ -2918,7 +3009,12 @@ namespace Database.Migrations
 
                     b.HasOne("Database.Models.ManualExerciseChecking", "ExerciseChecking")
                         .WithMany("Reviews")
-                        .HasForeignKey("ExerciseCheckingId");
+                        .HasForeignKey("ExerciseCheckingId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Database.Models.ApplicationUser", "SubmissionAuthor")
+                        .WithMany()
+                        .HasForeignKey("SubmissionAuthorId");
 
                     b.HasOne("Database.Models.UserExerciseSubmission", "Submission")
                         .WithMany("Reviews")
@@ -2929,6 +3025,8 @@ namespace Database.Migrations
                     b.Navigation("ExerciseChecking");
 
                     b.Navigation("Submission");
+
+                    b.Navigation("SubmissionAuthor");
                 });
 
             modelBuilder.Entity("Database.Models.ExerciseCodeReviewComment", b =>
@@ -3106,15 +3204,15 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Database.Models.ManualExerciseChecking", b =>
                 {
+                    b.HasOne("Database.Models.UserExerciseSubmission", "Submission")
+                        .WithOne("ManualChecking")
+                        .HasForeignKey("Database.Models.ManualExerciseChecking", "Id")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Database.Models.ApplicationUser", "LockedBy")
                         .WithMany()
                         .HasForeignKey("LockedById");
-
-                    b.HasOne("Database.Models.UserExerciseSubmission", "Submission")
-                        .WithMany("ManualCheckings")
-                        .HasForeignKey("SubmissionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.HasOne("Database.Models.ApplicationUser", "User")
                         .WithMany()
@@ -3159,7 +3257,7 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "InitiatedBy")
                         .WithMany()
                         .HasForeignKey("InitiatedById")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("InitiatedBy");
@@ -3467,7 +3565,7 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.Comments.Comment", "Comment")
                         .WithMany()
                         .HasForeignKey("CommentId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Comment");
@@ -3478,7 +3576,7 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "AddedUser")
                         .WithMany()
                         .HasForeignKey("AddedUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("AddedUser");
@@ -3489,7 +3587,7 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.StepikExportProcess", "Process")
                         .WithMany()
                         .HasForeignKey("ProcessId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Process");
@@ -3500,7 +3598,7 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.Group", "Group")
                         .WithMany()
                         .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Group");
@@ -3511,7 +3609,7 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.GroupAccess", "Access")
                         .WithMany()
                         .HasForeignKey("AccessId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Access");
@@ -3555,13 +3653,13 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.Group", "Group")
                         .WithMany()
                         .HasForeignKey("GroupId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Database.Models.ApplicationUser", "JoinedUser")
                         .WithMany()
                         .HasForeignKey("JoinedUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Group");
@@ -3574,7 +3672,7 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ManualExerciseChecking", "Checking")
                         .WithMany()
                         .HasForeignKey("CheckingId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Checking");
@@ -3585,7 +3683,7 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ManualQuizChecking", "Checking")
                         .WithMany()
                         .HasForeignKey("CheckingId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Checking");
@@ -3596,7 +3694,7 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.CourseVersion", "CourseVersion")
                         .WithMany()
                         .HasForeignKey("CourseVersionId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("CourseVersion");
@@ -3627,7 +3725,8 @@ namespace Database.Migrations
                 {
                     b.HasOne("Database.Models.ExerciseCodeReviewComment", "Comment")
                         .WithMany()
-                        .HasForeignKey("CommentId");
+                        .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Comment");
                 });
@@ -3637,7 +3736,7 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.GroupAccess", "Access")
                         .WithMany()
                         .HasForeignKey("AccessId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Access");
@@ -3648,7 +3747,7 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.CourseVersion", "CourseVersion")
                         .WithMany()
                         .HasForeignKey("CourseVersionId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("CourseVersion");
@@ -3659,7 +3758,7 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.ApplicationUser", "LikedUser")
                         .WithMany()
                         .HasForeignKey("LikedUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("LikedUser");
@@ -3670,7 +3769,7 @@ namespace Database.Migrations
                     b.HasOne("Database.Models.Comments.Comment", "ParentComment")
                         .WithMany()
                         .HasForeignKey("ParentCommentId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ParentComment");
@@ -3726,7 +3825,7 @@ namespace Database.Migrations
                 {
                     b.Navigation("Likes");
 
-                    b.Navigation("ManualCheckings");
+                    b.Navigation("ManualChecking");
 
                     b.Navigation("Reviews");
                 });

@@ -7,7 +7,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -19,7 +18,6 @@ using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using GitCourseUpdater;
-using Ionic.Zip;
 using Microsoft.VisualBasic.FileIO;
 using Ulearn.Common;
 using uLearn.Web.Extensions;
@@ -29,6 +27,7 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Units;
@@ -42,7 +41,8 @@ namespace uLearn.Web.Controllers
 	{
 		private static ILog log => LogProvider.Get().ForContext(typeof(AdminController));
 
-		private readonly WebCourseManager courseManager = WebCourseManager.Instance;
+		private readonly IWebCourseManager courseManager = WebCourseManager.CourseManagerInstance;
+		private readonly ICourseStorage courseStorage = WebCourseManager.CourseStorageInstance;
 		private readonly ULearnDb db;
 		private readonly UsersRepo usersRepo;
 		private readonly UserRolesRepo userRolesRepo;
@@ -72,7 +72,7 @@ namespace uLearn.Web.Controllers
 			commentsRepo = new CommentsRepo(db);
 			userManager = new ULearnUserManager(db);
 			coursesRepo = new CoursesRepo(db);
-			groupsRepo = new GroupsRepo(db, courseManager);
+			groupsRepo = new GroupsRepo(db, courseStorage);
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
 			userSolutionsRepo = new UserSolutionsRepo(db);
 			certificatesRepo = new CertificatesRepo(db);
@@ -82,7 +82,7 @@ namespace uLearn.Web.Controllers
 			styleErrorsRepo = new StyleErrorsRepo(db);
 			certificateGenerator = new CertificateGenerator(db);
 			tempCoursesRepo = new TempCoursesRepo(db);
-			reposDirectory = CourseManager.GetCoursesDirectory().GetSubdirectory("Repos");
+			reposDirectory = WebCourseManager.GetCoursesDirectory().GetSubdirectory("Repos");
 			var configuration = ApplicationConfiguration.Read<UlearnConfiguration>();
 			gitSecret = configuration.Git.Webhook.Secret;
 			var antiplagiarismClientConfiguration = ApplicationConfiguration.Read<UlearnConfiguration>().AntiplagiarismClient;
@@ -100,7 +100,7 @@ namespace uLearn.Web.Controllers
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		public ActionResult Units(string courseId)
 		{
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var appearances = db.UnitAppearances.Where(u => u.CourseId == course.Id).ToList();
 			var unitAppearances = course.GetUnitsNotSafe()
 				.Select(unit => Tuple.Create(unit, appearances.FirstOrDefault(a => a.UnitId == unit.Id)))
@@ -154,8 +154,9 @@ namespace uLearn.Web.Controllers
 			else
 			{
 				var path = courseManager.GetExtractedCourseDirectory(courseId);
-				stream = ZipUtils.CreateZipFromDirectory(new List<string> { path.FullName }, null, null);
+				stream = ZipUtils.CreateZipFromDirectory(new List<string> { path.FullName }, new List<string> { ".meta" }, null);
 			}
+
 			return File(stream, "application/zip", packageName);
 		}
 
@@ -259,7 +260,8 @@ namespace uLearn.Web.Controllers
 
 			Guid versionId;
 			Exception error;
-			using(var inputStream = ZipUtils.GetZipWithFileWithNameInRoot(tmpFileName, "course.xml")) {
+			using (var inputStream = ZipUtils.GetZipWithFileWithNameInRoot(tmpFileName, "course.xml"))
+			{
 				(versionId, error) = await UploadCourse(courseId, inputStream, User.Identity.GetUserId()).ConfigureAwait(false);
 			}
 
@@ -297,7 +299,8 @@ namespace uLearn.Web.Controllers
 			try
 			{
 				using (IGitRepo git = new GitRepo(repoUrl, reposDirectory, publicKey, privateKey, new DirectoryInfo(Path.GetTempPath())))
-				{ // В GitRepo используется Monitor. Он должен быть освобожден в том же потоке, что и взят.
+				{
+					// В GitRepo используется Monitor. Он должен быть освобожден в том же потоке, что и взят.
 					git.Checkout(branch);
 					var commitInfo = git.GetCurrentCommitInfo();
 					foreach (var courseRepo in courses)
@@ -363,7 +366,7 @@ namespace uLearn.Web.Controllers
 				{
 					git.Checkout(courseRepo.Branch);
 					commitInfo = git.GetCurrentCommitInfo();
-					(zip, pathToCourseXml) = git.GetCurrentStateAsZip(pathToCourseXml); 
+					(zip, pathToCourseXml) = git.GetCurrentStateAsZip(pathToCourseXml);
 				}
 			}
 			catch (GitException ex)
@@ -422,7 +425,7 @@ namespace uLearn.Web.Controllers
 			log.Info($"Successfully update course files '{courseId}'");
 
 			await coursesRepo.AddCourseVersion(courseId, versionId, userId,
-				pathToCourseXmlInRepo, uploadedFromRepoUrl, commitInfo?.Hash, commitInfo?.Message);
+				pathToCourseXmlInRepo, uploadedFromRepoUrl, commitInfo?.Hash, commitInfo?.Message, await destinationFile.ReadAllContentAsync());
 			await NotifyAboutCourseVersion(courseId, versionId, userId);
 			try
 			{
@@ -448,13 +451,13 @@ namespace uLearn.Web.Controllers
 			var versionId = Guid.NewGuid();
 
 			if (!courseManager.TryCreateCourse(courseId, courseTitle, versionId))
-				return RedirectToAction("Courses", "Course",  new { courseId = courseId, courseTitle = courseTitle });
+				return RedirectToAction("Courses", "Course", new { courseId = courseId, courseTitle = courseTitle });
 
 			var userId = User.Identity.GetUserId();
-			await coursesRepo.AddCourseVersion(courseId, versionId, userId, null, null, null, null).ConfigureAwait(false);
-			await coursesRepo.MarkCourseVersionAsPublished(versionId).ConfigureAwait(false);
 			var courseFile = courseManager.GetStagingCourseFile(courseId);
-			await coursesRepo.AddCourseFile(courseId, versionId, courseFile.ReadAllContent()).ConfigureAwait(false);
+			var courseContent = await courseFile.ReadAllContentAsync();
+			await coursesRepo.AddCourseVersion(courseId, versionId, userId, null, null, null, null, courseContent).ConfigureAwait(false);
+			await coursesRepo.MarkCourseVersionAsPublished(versionId).ConfigureAwait(false);
 			await NotifyAboutPublishedCourseVersion(courseId, versionId, userId).ConfigureAwait(false);
 
 			return RedirectToAction("Packages", new { courseId, onlyPrivileged = true });
@@ -473,8 +476,7 @@ namespace uLearn.Web.Controllers
 		private ActionResult PackagesInternal(string courseId, string error = "", bool openStep1 = false, bool openStep2 = false)
 		{
 			var hasPackage = courseManager.HasPackageFor(courseId);
-			var lastUpdate = courseManager.GetLastWriteTime(courseId);
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var courseVersions = coursesRepo.GetCourseVersions(courseId).ToList();
 			var publishedVersion = coursesRepo.GetPublishedCourseVersion(courseId);
 			var courseRepo = coursesRepo.GetCourseRepoSettings(courseId);
@@ -482,7 +484,6 @@ namespace uLearn.Web.Controllers
 			{
 				Course = course,
 				HasPackage = hasPackage,
-				LastUpdate = lastUpdate,
 				Versions = courseVersions,
 				PublishedVersion = publishedVersion,
 				CourseGit = courseRepo,
@@ -499,7 +500,7 @@ namespace uLearn.Web.Controllers
 
 			var userId = User.Identity.GetUserId();
 
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var commentsPolicy = commentsRepo.GetCommentsPolicy(courseId);
 
 			var comments = commentsRepo.GetCourseComments(courseId)
@@ -556,7 +557,7 @@ namespace uLearn.Web.Controllers
 
 			return result;
 		}
-		
+
 		private HashSet<Guid> GetMergedCheckingQueueSlideIds(ManualCheckingQueueFilterOptions filterOptions)
 		{
 			var result = slideCheckingsRepo.GetManualCheckingQueueSlideIds<ManualExerciseChecking>(filterOptions);
@@ -567,7 +568,7 @@ namespace uLearn.Web.Controllers
 		private ActionResult InternalCheckingQueue(string courseId, bool done, List<string> groupsIds, string userId = "", Guid? slideId = null, string message = "")
 		{
 			const int maxShownQueueSize = 500;
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 
 			var filterOptions = GetManualCheckingFilterOptionsByGroup(courseId, groupsIds);
 			if (filterOptions.UserIds == null)
@@ -586,14 +587,15 @@ namespace uLearn.Web.Controllers
 				return RedirectToAction("CheckingQueue", new { courseId, group = string.Join(",", groupsIds) });
 
 			var groups = groupsRepo.GetAvailableForUserGroups(courseId, User);
-			
+			var groupsAccesses = groupsRepo.GetGroupsAccesses(groups.Select(g => g.Id));
+
 			var alreadyChecked = done;
 			Dictionary<int, List<ExerciseCodeReview>> reviews = null;
 			Dictionary<int, string> solutions = null;
 			if (alreadyChecked)
 			{
 				reviews = slideCheckingsRepo.GetExerciseCodeReviewForCheckings(checkings.Select(c => c.Id));
-				var submissionsIds = checkings.Select(c => (c as ManualExerciseChecking)?.SubmissionId).Where(s => s.HasValue).Select(s => s.Value);
+				var submissionsIds = checkings.Select(c => (c as ManualExerciseChecking)?.Id).Where(s => s.HasValue).Select(s => s.Value);
 				solutions = userSolutionsRepo.GetSolutionsForSubmissions(submissionsIds);
 			}
 
@@ -615,11 +617,12 @@ namespace uLearn.Web.Controllers
 						ContextTimestamp = c.Timestamp,
 						ContextReviews = alreadyChecked ? reviews.GetOrDefault(c.Id, new List<ExerciseCodeReview>()) : new List<ExerciseCodeReview>(),
 						ContextExerciseSolution = alreadyChecked && c is ManualExerciseChecking checking ?
-							solutions.GetOrDefault(checking.SubmissionId, "") :
+							solutions.GetOrDefault(checking.Id, "") :
 							"",
 					};
 				}).ToList(),
 				Groups = groups,
+				GroupsAccesses = groupsAccesses,
 				SelectedGroupsIds = groupsIds,
 				Message = message,
 				AlreadyChecked = alreadyChecked,
@@ -658,7 +661,7 @@ namespace uLearn.Web.Controllers
 			/* Remove divider iff it is first or last item */
 			if (allCheckingsSlides.First().Key == Guid.Empty || allCheckingsSlides.Last().Key == Guid.Empty)
 				allCheckingsSlides.RemoveAll(kvp => kvp.Key == Guid.Empty);
-			
+
 			return allCheckingsSlides;
 		}
 
@@ -732,6 +735,7 @@ namespace uLearn.Web.Controllers
 				itemToCheckId = itemToCheck.Id;
 				transaction.Commit();
 			}
+
 			return await InternalManualChecking<T>(courseId, itemToCheckId, ignoreLock: true, groupsIds: groupsIds).ConfigureAwait(false);
 		}
 
@@ -758,7 +762,7 @@ namespace uLearn.Web.Controllers
 			var groupsIds = Request.GetMultipleValuesFromQueryString("group");
 			return CheckNextManualCheckingForSlide<ManualExerciseChecking>(courseId, slideId, groupsIds, previous);
 		}
-		
+
 		public async Task<ActionResult> GetNextManualCheckingExerciseForSlide(string courseId, Guid slideId, int previous)
 		{
 			var action = await CheckNextExerciseForSlide(courseId, slideId, previous).ConfigureAwait(false);
@@ -767,7 +771,7 @@ namespace uLearn.Web.Controllers
 			var url = Url.RouteUrl(redirect.RouteName, redirect.RouteValues);
 			return Json(new { url });
 		}
-		
+
 		public async Task<ActionResult> GetNextManualCheckingQuizForSlide(string courseId, Guid slideId, int previous)
 		{
 			var action = await CheckNextQuizForSlide(courseId, slideId, previous).ConfigureAwait(false);
@@ -814,7 +818,7 @@ namespace uLearn.Web.Controllers
 			var userRolesByEmail = User.IsSystemAdministrator() ? usersRepo.FilterUsersByEmail(queryModel) : null;
 			var userRoles = usersRepo.FilterUsers(queryModel);
 			var tempCourses = tempCoursesRepo.GetTempCourses().Select(s => s.CourseId).ToHashSet(StringComparer.OrdinalIgnoreCase);
-			var courses = courseManager.GetCourses()
+			var courses = courseStorage.GetCourses()
 				.ToDictionary(c => c.Id, c => (c, tempCourses.Contains(c.Id)), StringComparer.OrdinalIgnoreCase);
 			var model = GetUserListModel(userRolesByEmail.EmptyIfNull().Concat(userRoles).DistinctBy(r => r.UserId).ToList(),
 				courses,
@@ -908,7 +912,7 @@ namespace uLearn.Web.Controllers
 
 			var versionIdGuid = (Guid)versionId;
 
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var version = courseManager.GetVersion(versionIdGuid);
 
 			var courseDiff = new CourseDiff(course, version);
@@ -934,7 +938,7 @@ namespace uLearn.Web.Controllers
 			var authorId = tempCoursesRepo.Find(courseId).AuthorId;
 			var baseCourseId = courseId.Replace($"_{authorId}", ""); // todo добавить поле baseCourseId в сущность tempCourse
 			var baseCourseVersion = coursesRepo.GetPublishedCourseVersion(baseCourseId).Id;
-			return RedirectToAction("Diagnostics", new {courseId, versionId = baseCourseVersion});
+			return RedirectToAction("Diagnostics", new { courseId, versionId = baseCourseVersion });
 		}
 
 		public static void CopyFilesRecursively(DirectoryInfo source, DirectoryInfo target)
@@ -965,10 +969,7 @@ namespace uLearn.Web.Controllers
 			log.Info($"Публикую версию курса {courseId}. ID версии: {versionId}");
 			var versionFile = courseManager.GetCourseVersionFile(versionId);
 			var courseFile = courseManager.GetStagingCourseFile(courseId);
-			var oldCourse = courseManager.GetCourse(courseId);
-
-			log.Info($"загружаю {versionId} курса {courseId} в таблицу {nameof(CourseFile)}");
-			await coursesRepo.AddCourseFile(courseId, versionId, courseFile.ReadAllContent()).ConfigureAwait(false);
+			var oldCourse = courseStorage.GetCourse(courseId);
 
 			/* First, try to load course from LRU-cache or zip file */
 			log.Info($"Загружаю версию {versionId}");
@@ -1032,6 +1033,7 @@ namespace uLearn.Web.Controllers
 					isPublishedCourseVersionFound |= publishedCourseVersion.Id == version.Id;
 					continue;
 				}
+
 				versionsAfterPublishedCount++;
 				if (version.CommitHash == null && (version.LoadingTime > timeLimit || (version.PublishTime.HasValue && version.PublishTime.Value > timeLimit)))
 					continue;
@@ -1125,7 +1127,7 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult Certificates(string courseId)
 		{
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var certificateTemplates = certificatesRepo.GetTemplates(courseId).ToDictionary(t => t.Id);
 			var certificates = certificatesRepo.GetCertificates(courseId);
 			var templateParameters = certificateTemplates.ToDictionary(
@@ -1438,7 +1440,7 @@ namespace uLearn.Web.Controllers
 			if (user == null)
 				return HttpNotFound();
 			var instructor = await userManager.FindByIdAsync(User.Identity.GetUserId());
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 
 			var builtinParameters = certificateGenerator.GetBuiltinTemplateParameters(template);
 			var builtinParametersValues = builtinParameters.ToDictionary(
@@ -1461,7 +1463,7 @@ namespace uLearn.Web.Controllers
 		[HttpPost]
 		public async Task<ActionResult> SetAdditionalScore(string courseId, Guid unitId, string userId, string scoringGroupId, string score)
 		{
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			if (!course.Settings.Scoring.Groups.ContainsKey(scoringGroupId))
 				return HttpNotFound();
 			var unit = course.GetUnitsNotSafe().FirstOrDefault(u => u.Id == unitId);
@@ -1545,31 +1547,13 @@ namespace uLearn.Web.Controllers
 			return Json(new { status = "ok" });
 		}
 
-		[SysAdminsOnly]
-		[HttpPost]
-		public async Task<ActionResult> UploadPublishedCoursesToBd()
-		{
-			var courses = courseManager.GetCourses();
-			foreach (var course in courses)
-			{
-				var publishedVersion = coursesRepo.GetPublishedCourseVersion(course.Id);
-				if (publishedVersion == null)
-					continue;
-				var fileInfo = courseManager.GetStagingCourseFile(course.Id);
-				var content = await fileInfo.ReadAllContentAsync().ConfigureAwait(false);
-				await coursesRepo.AddCourseFile(course.Id, publishedVersion.Id, content).ConfigureAwait(false);
-			}
-
-			return Json(new { status = "ok" });
-		}
-
 		[ValidateAntiForgeryToken]
 		[HandleHttpAntiForgeryException]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.CourseAdmin)]
 		[HttpPost]
 		public async Task<ActionResult> SetSuspicionLevels(string courseId, Guid slideId, Language language, string faintSuspicion = null, string strongSuspicion = null)
 		{
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			if (course.FindSlideByIdNotSafe(slideId) != null)
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden, "Course does not contain a slide");
 
@@ -1603,6 +1587,7 @@ namespace uLearn.Web.Controllers
 				result = d;
 				return true;
 			}
+
 			return false;
 		}
 	}
@@ -1680,7 +1665,6 @@ namespace uLearn.Web.Controllers
 	{
 		public string Title { get; set; }
 		public string Id { get; set; }
-		public DateTime LastWriteTime { get; set; }
 		public bool IsTemp { get; set; }
 	}
 
@@ -1688,7 +1672,6 @@ namespace uLearn.Web.Controllers
 	{
 		public Course Course { get; set; }
 		public bool HasPackage { get; set; }
-		public DateTime LastUpdate { get; set; }
 		public List<CourseVersion> Versions { get; set; }
 		public CourseVersion PublishedVersion { get; set; }
 		public CourseGit CourseGit { get; set; }
@@ -1715,6 +1698,7 @@ namespace uLearn.Web.Controllers
 		public List<ManualCheckingQueueItemViewModel> Checkings { get; set; }
 		public string Message { get; set; }
 		public List<Group> Groups { get; set; }
+		public Dictionary<int, List<GroupAccess>> GroupsAccesses { get; set; }
 		public List<string> SelectedGroupsIds { get; set; }
 		public string SelectedGroupsIdsJoined => string.Join(",", SelectedGroupsIds);
 		public bool AlreadyChecked { get; set; }

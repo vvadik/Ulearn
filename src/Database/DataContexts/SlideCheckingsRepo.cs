@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Data.Entity;
 using System.Diagnostics;
 using System.Linq;
@@ -59,18 +58,18 @@ namespace Database.DataContexts
 
 		public bool HasManualExerciseChecking(string courseId, Guid slideId, string userId, int submissionId)
 		{
-			return db.ManualExerciseCheckings.Any(c => c.CourseId == courseId && c.UserId == userId && c.SlideId == slideId && c.SubmissionId == submissionId);
+			return db.ManualExerciseCheckings.Any(c => c.CourseId == courseId && c.UserId == userId && c.SlideId == slideId && c.Id == submissionId);
 		}
 
 		public async Task<ManualExerciseChecking> AddManualExerciseChecking(string courseId, Guid slideId, string userId, UserExerciseSubmission submission)
 		{
 			var manualChecking = new ManualExerciseChecking
 			{
+				Id = submission.Id,
 				CourseId = courseId,
 				SlideId = slideId,
 				UserId = userId,
 				Timestamp = DateTime.Now,
-				SubmissionId = submission.Id,
 			};
 			db.ManualExerciseCheckings.Add(manualChecking);
 
@@ -144,11 +143,11 @@ namespace Database.DataContexts
 			return GetScoreAndPercentByScoresAndPercents(slide, checkedScoresAndPercents);
 		}
 
-		public static (int Score, int? Percent) GetExerciseSubmissionManualCheckingsScoreAndPercent(IList<ManualExerciseChecking> manualCheckings, ExerciseSlide slide)
+		public static (int Score, int? Percent) GetExerciseSubmissionManualCheckingsScoreAndPercent([CanBeNull] ManualExerciseChecking manualChecking, ExerciseSlide slide)
 		{
-			var checkedScoresAndPercents = manualCheckings
+			var checkedScoresAndPercents = Enumerable.Repeat(manualChecking, 1)
+				.Where(c => c != null)
 				.Where(c => c.IsChecked)
-				.OrderBy(c => c.Timestamp)
 				.Select(c => (c.Score, c.Percent))
 				.ToList();
 			return GetScoreAndPercentByScoresAndPercents(slide, checkedScoresAndPercents);
@@ -395,6 +394,9 @@ namespace Database.DataContexts
 		{
 			var review = db.ExerciseCodeReviews.Add(new ExerciseCodeReview
 			{
+				CourseId = submission?.CourseId ?? checking?.CourseId,
+				SlideId = (submission?.SlideId ?? checking?.SlideId)!.Value,
+				SubmissionAuthorId = submission?.UserId ?? checking?.UserId,
 				AuthorId = userId,
 				Comment = comment,
 				ExerciseCheckingId = checking?.Id,
@@ -450,16 +452,12 @@ namespace Database.DataContexts
 		public List<string> GetTopUserReviewComments(string courseId, Guid slideId, string userId, int count)
 		{
 			var sw = Stopwatch.StartNew();
-			var result = db.ExerciseCodeReviews.Include(r => r.ExerciseChecking)
-				.Where(r => r.ExerciseChecking.CourseId == courseId &&
-							r.ExerciseChecking.SlideId == slideId &&
-							r.AuthorId == userId &&
-							!r.HiddenFromTopComments &&
-							!r.IsDeleted)
+			var result = db.ExerciseCodeReviews
+				.Where(r => r.CourseId == courseId && r.SlideId == slideId && r.AuthorId == userId && !r.HiddenFromTopComments && !r.IsDeleted)
 				.ToList()
 				.GroupBy(r => r.Comment)
 				.OrderByDescending(g => g.Count())
-				.ThenByDescending(g => g.Max(r => r.ExerciseChecking.Timestamp))
+				.ThenByDescending(g => g.Max(r => r.AddingTime))
 				.Take(count)
 				.Select(g => g.Key)
 				.ToList();
@@ -470,13 +468,9 @@ namespace Database.DataContexts
 		public List<string> GetTopOtherUsersReviewComments(string courseId, Guid slideId, string userId, int count, List<string> excludeComments)
 		{
 			var sw = Stopwatch.StartNew();
-			var excludeCommentsSet = excludeComments.ToImmutableHashSet();
-			var result = db.ExerciseCodeReviews.Include(r => r.ExerciseChecking)
-				.Where(r => r.ExerciseChecking.CourseId == courseId &&
-							r.ExerciseChecking.SlideId == slideId &&
-							r.AuthorId != userId &&
-							!r.HiddenFromTopComments &&
-							!r.IsDeleted)
+			var excludeCommentsSet = excludeComments.ToHashSet();
+			var result = db.ExerciseCodeReviews
+				.Where(r => r.CourseId == courseId && r.SlideId == slideId && r.AuthorId != userId && !r.HiddenFromTopComments && !r.IsDeleted)
 				.GroupBy(r => r.Comment)
 				.OrderByDescending(g => g.Count())
 				.Take(count * 2)
@@ -491,13 +485,9 @@ namespace Database.DataContexts
 
 		public async Task HideFromTopCodeReviewComments(string courseId, Guid slideId, string userId, string comment)
 		{
-			var reviews = db.ExerciseCodeReviews.Include(r => r.ExerciseChecking)
-				.Where(r => r.ExerciseChecking.CourseId == courseId &&
-							r.ExerciseChecking.SlideId == slideId &&
-							r.AuthorId == userId &&
-							r.Comment == comment &&
-							!r.IsDeleted);
-
+			var reviews = db.ExerciseCodeReviews
+				.Where(r => r.CourseId == courseId && r.SlideId == slideId && r.AuthorId == userId && r.Comment == comment && !r.IsDeleted)
+				.ToList();
 			foreach (var review in reviews)
 				review.HiddenFromTopComments = true;
 			await db.SaveChangesAsync().ConfigureAwait(false);
@@ -507,12 +497,9 @@ namespace Database.DataContexts
 		{
 			var sw = Stopwatch.StartNew();
 			var lastYear = DateTime.Today.AddYears(-1);
-			var result = db.ExerciseCodeReviews.Where(
-				r => r.ExerciseChecking.CourseId == courseId &&
-					r.ExerciseChecking.SlideId == slideId &&
-					!r.IsDeleted &&
-					r.ExerciseChecking.Timestamp > lastYear
-			).ToList();
+			var result = db.ExerciseCodeReviews
+				.Where(r => r.CourseId == courseId && r.SlideId == slideId && !r.IsDeleted && r.AddingTime > lastYear)
+				.ToList();
 			log.Info("GetLastYearReviewComments " + sw.ElapsedMilliseconds + " ms");
 			return result;
 		}

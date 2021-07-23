@@ -6,8 +6,9 @@ import Exercise, { FromReduxDispatch, FromReduxProps, Props } from './Exercise';
 import { AutomaticExerciseCheckingResult as CheckingResult } from "src/models/exercise";
 import { RootState } from "src/models/reduxState";
 
-import { userProgressUpdateAction } from "src/actions/userProgress";
 import { sendCode, addReviewComment, deleteReviewComment, } from "src/actions/exercise";
+import { skipExercise } from "src/actions/userProgress";
+
 import { Language } from "src/consts/languages";
 import { buildUserInfo } from "src/utils/courseRoles";
 import { getSlideInfoById } from "../../../CourseUtils";
@@ -53,8 +54,8 @@ const mapDispatchToProps = (dispatch: Dispatch): FromReduxDispatch => ({
 		commentId: number
 	) => deleteReviewComment(courseId, slideId, submissionId, reviewId, commentId)(dispatch),
 
-	visitAcceptedSolutions: (courseId: string, slideId: string,
-	) => dispatch(userProgressUpdateAction(courseId, slideId, { isSkipped: true })),
+	skipExercise: (courseId: string, slideId: string, onSuccess: () => void,
+	) => skipExercise(courseId, slideId, onSuccess)(dispatch),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Exercise);

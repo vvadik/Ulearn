@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Configuration;
 using System.Threading.Tasks;
 using Vostok.Logging.Abstractions;
@@ -21,7 +21,7 @@ namespace GiftsGranter
 			if (!IsBotEnabled)
 				return;
 
-			log.Info($"Отправляю в телеграм-канал {channel} сообщение об выданных призах:\n{message}");
+			log.Info($"Отправляю в телеграм-канал {channel} сообщение:\n{message}");
 			try
 			{
 				await telegramClient.SendTextMessageAsync(channel, message, parseMode: parseMode, disableWebPagePreview: true).ConfigureAwait(false);

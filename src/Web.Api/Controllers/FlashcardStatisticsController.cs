@@ -9,6 +9,7 @@ using Database.Repos;
 using Database.Repos.Flashcards;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Web.Api.Models.Responses.Flashcards;
 
 namespace Ulearn.Web.Api.Controllers
@@ -19,8 +20,8 @@ namespace Ulearn.Web.Api.Controllers
 		private ICourseRolesRepo courseRolesRepo;
 		private IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo;
 
-		public FlashcardStatisticsController(IWebCourseManager courseManager, UlearnDb db, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo)
-			: base(courseManager, db, usersRepo)
+		public FlashcardStatisticsController(ICourseStorage courseStorage, UlearnDb db, IUsersRepo usersRepo, ICourseRolesRepo courseRolesRepo, IUsersFlashcardsVisitsRepo usersFlashcardsVisitsRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 			this.courseRolesRepo = courseRolesRepo;
 			this.usersFlashcardsVisitsRepo = usersFlashcardsVisitsRepo;
@@ -33,7 +34,7 @@ namespace Ulearn.Web.Api.Controllers
 		[HttpGet]
 		public async Task<ActionResult<FlashcardsStatistics>> FlashcardsStatistics([FromQuery][BindRequired] string courseId)
 		{
-			var course = await courseManager.FindCourseAsync(courseId);
+			var course = courseStorage.FindCourse(courseId);
 			if (course == null)
 				return NotFound();
 			var hasUserAccessToCourse = await courseRolesRepo.HasUserAccessToCourse(UserId, course.Id, CourseRoleType.Instructor);

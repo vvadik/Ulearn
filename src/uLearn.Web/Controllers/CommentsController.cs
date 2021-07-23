@@ -9,9 +9,9 @@ using Database.DataContexts;
 using Database.Extensions;
 using Database.Models;
 using Microsoft.AspNet.Identity;
+using Ulearn.Core.Courses.Manager;
 using uLearn.Web.FilterAttributes;
 using uLearn.Web.Models;
-using Ulearn.Core;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Quizzes;
@@ -20,7 +20,7 @@ namespace uLearn.Web.Controllers
 {
 	public class CommentsController : Controller
 	{
-		private readonly CourseManager courseManager = WebCourseManager.Instance;
+		private readonly ICourseStorage courseStorage = WebCourseManager.CourseStorageInstance;
 		private readonly CommentsRepo commentsRepo;
 		private readonly NotificationsRepo notificationsRepo;
 		private readonly CoursesRepo coursesRepo;
@@ -45,7 +45,7 @@ namespace uLearn.Web.Controllers
 
 		public ActionResult SlideComments(string courseId, Guid slideId, bool openInstructorsComments = false)
 		{
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var visibleUnits = unitsRepo.GetVisibleUnitIds(course, User);
 			var slide = course.FindSlideById(slideId, false, visibleUnits);
 			if (slide == null)

@@ -5,18 +5,19 @@ using System.Security.Principal;
 using Database.Extensions;
 using Database.Models;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 
 namespace Database.DataContexts
 {
 	public class UnitsRepo
 	{
 		private readonly ULearnDb db;
-		private readonly WebCourseManager courseManager;
+		private readonly ICourseStorage courseStorage;
 
 		public UnitsRepo(ULearnDb db)
 		{
 			this.db = db;
-			courseManager = WebCourseManager.Instance;
+			courseStorage = WebCourseManager.CourseStorageInstance;
 		}
 
 		public IEnumerable<Guid> GetVisibleUnitIds(Course course, IPrincipal user)
@@ -54,10 +55,10 @@ namespace Database.DataContexts
 				.Select(u => new { u.CourseId, u.UnitId })
 				.AsEnumerable()
 				.GroupBy(p => p.CourseId)
-				.Where(g => courseManager.FindCourse(g.Key) != null)
+				.Where(g => courseStorage.FindCourse(g.Key) != null)
 				.Where(g =>
 				{
-					var units = courseManager.GetCourse(g.Key).GetUnitsNotSafe().Select(u => u.Id).ToHashSet();
+					var units = courseStorage.GetCourse(g.Key).GetUnitsNotSafe().Select(u => u.Id).ToHashSet();
 					units.IntersectWith(g.Select(p => p.UnitId));
 					return units.Any();
 				})

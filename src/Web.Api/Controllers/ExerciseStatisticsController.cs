@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Web.Api.Controllers.Slides;
 using Ulearn.Web.Api.Models.Responses.ExerciseStatistics;
@@ -29,10 +30,10 @@ namespace Ulearn.Web.Api.Controllers
 		private readonly SlideRenderer slideRenderer;
 		private readonly IUnitsRepo unitsRepo;
 
-		public ExerciseStatisticsController(IWebCourseManager courseManager, IUserSolutionsRepo userSolutionsRepo, UlearnDb db, IUsersRepo usersRepo,
+		public ExerciseStatisticsController(ICourseStorage courseStorage, IUserSolutionsRepo userSolutionsRepo, UlearnDb db, IUsersRepo usersRepo,
 			IUserSolutionsRepo solutionsRepo, IUserQuizzesRepo userQuizzesRepo, IVisitsRepo visitsRepo, IGroupsRepo groupsRepo,
 			SlideRenderer slideRenderer, ICourseRolesRepo courseRolesRepo, ICoursesRepo coursesRepo, IUnitsRepo unitsRepo)
-			: base(courseManager, db, usersRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 			this.coursesRepo = coursesRepo;
 			this.courseRolesRepo = courseRolesRepo;
@@ -52,7 +53,7 @@ namespace Ulearn.Web.Api.Controllers
 		public async Task<ActionResult<CourseExercisesStatisticsResponse>> CourseStatistics([FromQuery][BindRequired] string courseId,
 			int count = 10000, DateTime? from = null, DateTime? to = null)
 		{
-			var course = await courseManager.FindCourseAsync(courseId);
+			var course = courseStorage.FindCourse(courseId);
 			if (course == null)
 				return NotFound();
 

@@ -11,6 +11,7 @@ using Database.Models;
 using Microsoft.AspNet.Identity;
 using uLearn.Web.FilterAttributes;
 using Ulearn.Core;
+using Ulearn.Core.Courses.Manager;
 
 namespace uLearn.Web.Controllers
 {
@@ -18,21 +19,21 @@ namespace uLearn.Web.Controllers
 	public class FeedController : JsonDataContractController
 	{
 		private readonly ULearnDb db;
-		private readonly CourseManager courseManager;
+		private readonly ICourseStorage courseStorage;
 
 		private readonly FeedRepo feedRepo;
 
 		private static FeedNotificationTransport commonFeedNotificationTransport;
 
 		public FeedController()
-			: this(new ULearnDb(), WebCourseManager.Instance)
+			: this(new ULearnDb(), WebCourseManager.CourseStorageInstance)
 		{
 		}
 
-		public FeedController(ULearnDb db, CourseManager courseManager)
+		public FeedController(ULearnDb db, ICourseStorage courseStorage)
 		{
 			this.db = db;
-			this.courseManager = courseManager;
+			this.courseStorage = courseStorage;
 			feedRepo = new FeedRepo(db);
 
 			if (commonFeedNotificationTransport == null)
@@ -148,7 +149,7 @@ namespace uLearn.Web.Controllers
 				CommentsNotifications = commentsNotifications,
 				CommentsLastViewTimestamp = commentsLastViewTimestamp,
 				CommentsNotificationsTransportId = commonFeedNotificationTransport.Id,
-				CourseManager = courseManager,
+				CourseStorage = courseStorage,
 			};
 		}
 
@@ -194,7 +195,7 @@ namespace uLearn.Web.Controllers
 		public DateTime? ImportantLastViewTimestamp { get; set; }
 		public DateTime? CommentsLastViewTimestamp { get; set; }
 
-		public CourseManager CourseManager { get; set; }
+		public ICourseStorage CourseStorage { get; set; }
 
 		public int CommentsNotificationsTransportId { get; set; }
 	}

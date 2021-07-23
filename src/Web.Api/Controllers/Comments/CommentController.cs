@@ -19,6 +19,7 @@ using Ulearn.Common;
 using Ulearn.Common.Api;
 using Ulearn.Common.Api.Models.Responses;
 using Ulearn.Common.Extensions;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Web.Api.Models.Parameters.Comments;
 using Ulearn.Web.Api.Models.Responses.Comments;
@@ -30,10 +31,10 @@ namespace Ulearn.Web.Api.Controllers.Comments
 	[Route("/comments/{commentId:int:min(0)}")]
 	public class CommentController : BaseCommentController
 	{
-		public CommentController(IWebCourseManager courseManager, UlearnDb db,
+		public CommentController(ICourseStorage courseStorage, UlearnDb db,
 			IUsersRepo usersRepo, ICommentsRepo commentsRepo, ICommentLikesRepo commentLikesRepo, ICoursesRepo coursesRepo, ICourseRolesRepo courseRolesRepo,
 			INotificationsRepo notificationsRepo, IGroupMembersRepo groupMembersRepo, IGroupAccessesRepo groupAccessesRepo, IVisitsRepo visitsRepo, IUnitsRepo unitsRepo)
-			: base(courseManager, db, usersRepo, commentsRepo, commentLikesRepo, coursesRepo, courseRolesRepo, notificationsRepo, groupMembersRepo, groupAccessesRepo, visitsRepo, unitsRepo)
+			: base(courseStorage, db, usersRepo, commentsRepo, commentLikesRepo, coursesRepo, courseRolesRepo, notificationsRepo, groupMembersRepo, groupAccessesRepo, visitsRepo, unitsRepo)
 		{
 		}
 
@@ -86,7 +87,7 @@ namespace Ulearn.Web.Api.Controllers.Comments
 				return NotFound(new ErrorResponse($"Comment {commentId} not found"));
 			var canUserSeeNotApprovedComments = await CanUserSeeNotApprovedCommentsAsync(UserId, comment.CourseId).ConfigureAwait(false);
 
-			var course = await courseManager.FindCourseAsync(comment.CourseId);
+			var course = courseStorage.FindCourse(comment.CourseId);
 			var visibleUnitsIds = await unitsRepo.GetVisibleUnitIds(course, UserId);
 			var isInstructor = await courseRolesRepo.HasUserAccessToCourse(User.GetUserId(), comment.CourseId, CourseRoleType.Instructor).ConfigureAwait(false);
 			var slide = course.FindSlideById(comment.SlideId, isInstructor, visibleUnitsIds);
@@ -292,7 +293,6 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		/// </summary>
 		[HttpPost("like")]
 		[Authorize]
-		[SwaggerResponse((int)HttpStatusCode.Conflict, "You have liked the comment already")]
 		public async Task<IActionResult> Like(int commentId)
 		{
 			if (await commentLikesRepo.DidUserLikeComment(commentId, UserId).ConfigureAwait(false))
@@ -310,7 +310,6 @@ namespace Ulearn.Web.Api.Controllers.Comments
 		/// </summary>
 		[HttpDelete("like")]
 		[Authorize]
-		[SwaggerResponse((int)HttpStatusCode.NotFound, "You don't have like for the comment")]
 		public async Task<IActionResult> Unlike(int commentId)
 		{
 			if (!await commentLikesRepo.DidUserLikeComment(commentId, UserId).ConfigureAwait(false))

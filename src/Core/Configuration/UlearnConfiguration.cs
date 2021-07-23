@@ -138,6 +138,8 @@ namespace Ulearn.Core.Configuration
 		[CanBeNull] public XQueueWatcherConfiguration XQueueWatcher { get; set; }
 		
 		public bool DisableKonturServices { get; set; }
+
+		public string GoogleAccessCredentials { get; set; }
 	}
 
 	public class VideoAnnotationsClientConfiguration

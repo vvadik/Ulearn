@@ -4,6 +4,7 @@
     <TargetFramework>net5.0</TargetFramework>
     <AssemblyTitle>Notifications</AssemblyTitle>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Spam.Api.Client" Version="1.3.3.1" />

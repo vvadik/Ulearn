@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -30,7 +30,7 @@ namespace GiftsGranter
 			return FuncUtils.TrySeveralTimesAsync(async () =>
 			{
 				var response = await client.GetAsync($"https://staff.skbkontur.ru/api/{url}").ConfigureAwait(false);
-				return GetJsonResponse(response);
+				return GetJsonResponse(response, url);
 			}, 3).GetAwaiter().GetResult();
 		}
 
@@ -46,7 +46,7 @@ namespace GiftsGranter
 			var client = CreateHttpClient();
 			var content = new StringContent(JsonConvert.SerializeObject(jsonContent), Encoding.UTF8, "application/json");
 			var response = client.PostAsync($"https://staff.skbkontur.ru/api/{url}", content).Result;
-			return GetJsonResponse(response);
+			return GetJsonResponse(response, url);
 		}
 
 		public JObject GetUser(string sid)
@@ -77,17 +77,17 @@ namespace GiftsGranter
 			var client = new HttpClient();
 			AddClientAuthorizationHeader(client);
 			var response = client.PostAsync(passportUri, content).Result;
-			var responseJson = GetJsonResponse(response);
+			var responseJson = GetJsonResponse(response, passportUri);
 			return responseJson["refresh_token"].Value<string>();
 		}
 
-		private JObject GetJsonResponse(HttpResponseMessage response)
+		private JObject GetJsonResponse(HttpResponseMessage response, string url)
 		{
 			string result = response.Content.ReadAsStringAsync().Result;
 			if (response.StatusCode != HttpStatusCode.OK)
 			{
 				log.Error("Hint: If invalid_grant ask KONTUR\\pe to generate new refresh_token. It works 180 days.");
-				throw new Exception(result);
+				throw new Exception($"Url: {url}\nResult:\n{result}");
 			}
 			return JObject.Parse(result);
 		}
@@ -102,7 +102,7 @@ namespace GiftsGranter
 			});
 			AddClientAuthorizationHeader(client);
 			var response = client.PostAsync(passportUri, content).Result;
-			var responseJson = GetJsonResponse(response);
+			var responseJson = GetJsonResponse(response, passportUri);
 			authToken = responseJson["access_token"].Value<string>();
 		}
 

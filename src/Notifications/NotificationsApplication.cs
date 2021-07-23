@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Ulearn.Common.Api;
+using Ulearn.Core.Courses.Manager;
 using Vostok.Logging.Abstractions;
 using Ulearn.Core.Metrics;
 using Vostok.Hosting.Abstractions;
@@ -77,6 +78,7 @@ namespace Notifications
 			services.AddScoped<DeliveriesProcessor>();
 			services.AddScoped(sp => new MetricSender(
 				((IOptions<NotificationsConfiguration>)sp.GetService(typeof(IOptions<NotificationsConfiguration>)))!.Value.GraphiteServiceName));
+			services.AddSingleton<UpdateCoursesWorker>();
 			services.AddDatabaseServices();
 		}
 

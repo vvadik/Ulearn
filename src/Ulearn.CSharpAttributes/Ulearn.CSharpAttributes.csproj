@@ -3,6 +3,7 @@
 		<RootNamespace>Ulearn</RootNamespace>
 		<TargetFrameworks>net472;net5.0</TargetFrameworks>
 		<LangVersion>default</LangVersion>
+		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 	</PropertyGroup>
 	<ItemGroup>
 	  <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />

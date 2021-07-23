@@ -4,6 +4,7 @@
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <RootNamespace>XQueueWatcher</RootNamespace>
     <OutputType>Exe</OutputType>
+    <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Graphite, Version=1.3.0.0, Culture=neutral, PublicKeyToken=db1870846884bbb9">

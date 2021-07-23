@@ -22,6 +22,7 @@ namespace Database.Repos
 		public async Task<List<string>> GetPublishedCourseIds()
 		{
 			return await db.CourseVersions
+				.Where(v => v.PublishTime != null)
 				.Select(v => v.CourseId)
 				.Distinct()
 				.ToListAsync();
@@ -44,7 +45,7 @@ namespace Database.Repos
 		}
 
 		public async Task<CourseVersion> AddCourseVersion(string courseId, Guid versionId, string authorId,
-			string pathToCourseXml, string repoUrl, string commitHash, string description)
+			string pathToCourseXml, string repoUrl, string commitHash, string description, byte[] courseContent)
 		{
 			var courseVersion = new CourseVersion
 			{
@@ -59,7 +60,15 @@ namespace Database.Repos
 				RepoUrl = repoUrl
 			};
 			db.CourseVersions.Add(courseVersion);
-			await db.SaveChangesAsync();
+			var courseVersionFile = new CourseVersionFile
+			{
+				CourseVersionId = versionId,
+				CourseVersion = courseVersion,
+				CourseId = courseId,
+				File = courseContent
+			};
+			db.CourseVersionFiles.Add(courseVersionFile);
+			await db.SaveChangesAsync(); // автоматически выполнит обе операции в транзации
 
 			return courseVersion;
 		}
@@ -190,36 +199,15 @@ namespace Database.Repos
 				.Distinct().ToList();
 		}
 
-		// Add new and remove old course file
-		public async Task AddCourseFile(string courseId, Guid versionId, byte[] content)
+		public async Task<CourseVersionFile> GetVersionFile(Guid courseVersion)
 		{
-			var file = new CourseFile
-			{
-				CourseId = courseId,
-				CourseVersionId = versionId,
-				File = content
-			};
-			db.CourseFiles.RemoveRange(db.CourseFiles.Where(f => f.CourseId == courseId));
-			db.CourseFiles.Add(file);
-			await db.SaveChangesAsync();
+			return await db.CourseVersionFiles.FirstOrDefaultAsync(f => f.CourseVersionId == courseVersion);
 		}
 
-		public async Task<CourseFile> GetCourseFile(string courseId)
+		public async Task<CourseVersionFile> GetPublishedVersionFile(string courseId)
 		{
-			return await db.CourseFiles.FirstOrDefaultAsync(f => f.CourseId == courseId);
-		}
-
-		public async Task<List<string>> GetCourseIdsFromCourseFiles()
-		{
-			return await db.CourseFiles.Select(cf => cf.CourseId).ToListAsync();
-		}
-
-		// Итерирование выполняется лениво и должно быть закончено до выполнения любых других методов
-		// AsNoTracking делает запрос ленивым
-		// Запрос всего списка сразу приведет к переполнению памяти в базе.
-		public IQueryable<CourseFile> GetCourseFilesLazyNotSafe(IEnumerable<string> existingOnDiskCourseIds)
-		{
-			return db.CourseFiles.Where(a => !existingOnDiskCourseIds.Contains(a.CourseId)).AsNoTracking();
+			var publishedCourseVersion = await GetPublishedCourseVersion(courseId);
+			return await GetVersionFile(publishedCourseVersion.Id);
 		}
 	}
 }

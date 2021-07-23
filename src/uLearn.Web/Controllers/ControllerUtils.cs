@@ -4,7 +4,6 @@ using System.Linq;
 using System.Security.Principal;
 using System.Web.Configuration;
 using System.Web.Mvc;
-using ApprovalUtilities.Utilities;
 using Database;
 using Database.DataContexts;
 using Database.Extensions;
@@ -71,7 +70,8 @@ namespace uLearn.Web.Controllers
 			}
 		}
 
-		public static T GetFilterOptionsByGroup<T>(GroupsRepo groupsRepo, IPrincipal User, string courseId, List<string> groupsIds, bool allowSeeGroupForAnyMember = false) where T : AbstractFilterOptionByCourseAndUsers, new()
+		public static T GetFilterOptionsByGroup<T>(GroupsRepo groupsRepo, IPrincipal User, string courseId,
+			List<string> groupsIds, bool allowSeeGroupForAnyMember = false) where T : AbstractFilterOptionByCourseAndUsers, new()
 		{
 			var result = new T { CourseId = courseId };
 
@@ -111,7 +111,7 @@ namespace uLearn.Web.Controllers
 				if (allowSeeGroupForAnyMember)
 					hasAccessToGroup |= group2GroupMembersIds[groupIdInt].Contains(User.Identity.GetUserId());
 				if (hasAccessToGroup)
-					usersIds.AddAll(group2GroupMembersIds[groupIdInt]);
+					usersIds.UnionWith(group2GroupMembersIds[groupIdInt]);
 			}
 
 			result.UserIds = usersIds.ToList();
@@ -130,8 +130,8 @@ namespace uLearn.Web.Controllers
 			/* if groupsIds is empty, get members of all own groups. Available for instructors */
 			if (groupsIds.Count == 0 || groupsIds.Any(string.IsNullOrEmpty))
 			{
-				var accessableGroupsIds = groupsRepo.GetMyGroupsFilterAccessibleToUser(course.Id, User).Select(g => g.Id).ToList();
-				return enabledAdditionalScoringGroupsForGroups.Where(kv => accessableGroupsIds.Contains(kv.Key)).SelectMany(kv => kv.Value).ToList();
+				var accessibleGroupsIds = groupsRepo.GetMyGroupsFilterAccessibleToUser(course.Id, User).Select(g => g.Id).ToList();
+				return enabledAdditionalScoringGroupsForGroups.Where(kv => accessibleGroupsIds.Contains(kv.Key)).SelectMany(kv => kv.Value).ToList();
 			}
 
 			var result = new List<string>();

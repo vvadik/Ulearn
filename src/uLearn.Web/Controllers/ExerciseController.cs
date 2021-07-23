@@ -19,9 +19,9 @@ using uLearn.Web.Models;
 using Ulearn.Common;
 using Ulearn.Common.Api;
 using Ulearn.Common.Extensions;
-using Ulearn.Core;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
@@ -37,7 +37,7 @@ namespace uLearn.Web.Controllers
 	public class ExerciseController : JsonDataContractController
 	{
 		private readonly ULearnDb db;
-		private readonly CourseManager courseManager;
+		private readonly ICourseStorage courseStorage;
 		private readonly MetricSender metricSender;
 
 		private readonly UserSolutionsRepo userSolutionsRepo;
@@ -54,21 +54,21 @@ namespace uLearn.Web.Controllers
 		private static ILog log => LogProvider.Get().ForContext(typeof(ExerciseController));
 
 		public ExerciseController()
-			: this(new ULearnDb(), WebCourseManager.Instance, new MetricSender(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName), ApplicationConfiguration.Read<WebApiConfiguration>())
+			: this(new ULearnDb(), WebCourseManager.CourseStorageInstance, new MetricSender(ApplicationConfiguration.Read<UlearnConfiguration>().GraphiteServiceName), ApplicationConfiguration.Read<WebApiConfiguration>())
 		{
 		}
 
-		public ExerciseController(ULearnDb db, WebCourseManager courseManager, MetricSender metricSender, WebApiConfiguration configuration)
+		public ExerciseController(ULearnDb db, ICourseStorage courseStorage, MetricSender metricSender, WebApiConfiguration configuration)
 		{
 			this.db = db;
-			this.courseManager = courseManager;
+			this.courseStorage = courseStorage;
 			this.metricSender = metricSender;
 			baseUrlApi = configuration.BaseUrlApi;
 			authCookieName = configuration.Web.CookieName;
 
 			userSolutionsRepo = new UserSolutionsRepo(db);
 			slideCheckingsRepo = new SlideCheckingsRepo(db);
-			groupsRepo = new GroupsRepo(db, courseManager);
+			groupsRepo = new GroupsRepo(db, courseStorage);
 			visitsRepo = new VisitsRepo(db);
 			notificationsRepo = new NotificationsRepo(db);
 			usersRepo = new UsersRepo(db);
@@ -145,7 +145,7 @@ namespace uLearn.Web.Controllers
 		[ValidateInput(false)]
 		public async Task<ActionResult> HideFromTopCodeReviewComments(string courseId, Guid slideId, string comment)
 		{
-			var slide = courseManager.FindCourse(courseId)?.FindSlideByIdNotSafe(slideId) as ExerciseSlide;
+			var slide = courseStorage.FindCourse(courseId)?.FindSlideByIdNotSafe(slideId) as ExerciseSlide;
 			if (slide == null)
 				return HttpNotFound();
 
@@ -189,7 +189,7 @@ namespace uLearn.Web.Controllers
 
 			if (review.ExerciseCheckingId.HasValue && review.ExerciseChecking.IsChecked)
 			{
-				var course = courseManager.FindCourse(submissionCourseId);
+				var course = courseStorage.FindCourse(submissionCourseId);
 				var slideId = review.ExerciseChecking.SlideId;
 				var unit = course?.FindUnitBySlideIdNotSafe(slideId, isInstructor);
 				if (unit != null && unitsRepo.IsUnitVisibleForStudents(course, unit.Id))
@@ -240,7 +240,7 @@ namespace uLearn.Web.Controllers
 
 			using (var transaction = db.Database.BeginTransaction())
 			{
-				var course = courseManager.GetCourse(checking.CourseId);
+				var course = courseStorage.GetCourse(checking.CourseId);
 				var slide = (ExerciseSlide)course.FindSlideByIdNotSafe(checking.SlideId);
 
 				/* Invalid form: percent isn't integer */
@@ -283,7 +283,7 @@ namespace uLearn.Web.Controllers
 
 		[System.Web.Mvc.HttpPost]
 		[ULearnAuthorize(MinAccessLevel = CourseRole.Instructor)]
-		public async Task<ActionResult> SimpleScoreExercise(int submissionId, int exercisePercent, bool ignoreNewestSubmission = false, int? updateCheckingId = null)
+		public async Task<ActionResult> SimpleScoreExercise(int submissionId, int exercisePercent, bool ignoreNewestSubmission = false)
 		{
 			var submission = userSolutionsRepo.FindSubmissionById(submissionId);
 			var courseId = submission.CourseId;
@@ -293,11 +293,11 @@ namespace uLearn.Web.Controllers
 			if (!User.HasAccessFor(courseId, CourseRole.Instructor))
 				return new HttpStatusCodeResult(HttpStatusCode.Forbidden);
 
-			var slide = courseManager.FindCourse(courseId)?.FindSlideByIdNotSafe(slideId) as ExerciseSlide;
+			var slide = courseStorage.FindCourse(courseId)?.FindSlideByIdNotSafe(slideId) as ExerciseSlide;
 			if (slide == null)
 				return new HttpStatusCodeResult(HttpStatusCode.NotFound);
 
-			if (!ignoreNewestSubmission && !updateCheckingId.HasValue)
+			if (!ignoreNewestSubmission && submission.ManualChecking == null)
 			{
 				var lastAcceptedSubmission = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).OrderByDescending(s => s.Timestamp).FirstOrDefault();
 				if (lastAcceptedSubmission != null && lastAcceptedSubmission.Id != submission.Id)
@@ -315,8 +315,8 @@ namespace uLearn.Web.Controllers
 
 			await slideCheckingsRepo.RemoveWaitingManualCheckings<ManualExerciseChecking>(courseId, slideId, userId).ConfigureAwait(false);
 			ManualExerciseChecking checking;
-			if (updateCheckingId.HasValue)
-				checking = slideCheckingsRepo.FindManualCheckingById<ManualExerciseChecking>(updateCheckingId.Value);
+			if (submission.ManualChecking != null)
+				checking = submission.ManualChecking;
 			else
 				checking = await slideCheckingsRepo.AddManualExerciseChecking(courseId, slideId, userId, submission).ConfigureAwait(false);
 
@@ -351,7 +351,7 @@ namespace uLearn.Web.Controllers
 			if (userId == "")
 				userId = User.Identity.GetUserId();
 
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var visibleUnits = unitsRepo.GetVisibleUnitIds(course, User);
 			var slide = course.FindSlideById(slideId, isInstructor, visibleUnits);
 			var submissions = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).ToList();
@@ -379,10 +379,9 @@ namespace uLearn.Web.Controllers
 
 			var submissionReviews = submission?.GetAllReviews();
 
-			var hasUncheckedReview = submission?.ManualCheckings.Any(c => !c.IsChecked) ?? false;
-			var hasCheckedReview = submission?.ManualCheckings.Any(c => c.IsChecked) ?? false;
-			var reviewState = hasCheckedReview ? ExerciseReviewState.Reviewed :
-				hasUncheckedReview ? ExerciseReviewState.WaitingForReview :
+			var hasCheckedReview = submission?.ManualChecking?.IsChecked;
+			var reviewState = hasCheckedReview == true ? ExerciseReviewState.Reviewed :
+				hasCheckedReview == false ? ExerciseReviewState.WaitingForReview :
 				ExerciseReviewState.NotReviewed;
 
 			var submissions = onlyAccepted ?
@@ -404,7 +403,7 @@ namespace uLearn.Web.Controllers
 		private UserExerciseSubmission GetExerciseSubmissionShownByDefault(string courseId, Guid slideId, string userId, bool allowNotAccepted = false)
 		{
 			var submissions = userSolutionsRepo.GetAllAcceptedSubmissionsByUser(courseId, slideId, userId).ToList();
-			var lastSubmission = submissions.LastOrDefault(s => s.ManualCheckings != null && s.ManualCheckings.Any()) ??
+			var lastSubmission = submissions.LastOrDefault(s => s.ManualChecking != null) ??
 								submissions.LastOrDefault(s => s.AutomaticCheckingIsRightAnswer);
 			if (lastSubmission == null && allowNotAccepted)
 				lastSubmission = userSolutionsRepo.GetAllSubmissionsByUser(courseId, slideId, userId).ToList().LastOrDefault();
@@ -434,7 +433,7 @@ namespace uLearn.Web.Controllers
 				submission = GetExerciseSubmissionShownByDefault(courseId, slideId, currentUserId, instructorView);
 			}
 
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var slide = course.FindSlideByIdNotSafe(slideId);
 			if (slide == null)
 				return HttpNotFound();
@@ -471,18 +470,18 @@ namespace uLearn.Web.Controllers
 		{
 			var reviewedSubmission = userSolutionsRepo
 				.GetAllAcceptedSubmissionsByUser(courseId, new []{slideId}, userId)
-				.Where(s => s.ManualCheckings.Any(c => c.IsChecked))
+				.Where(s => s.ManualChecking != null && s.ManualChecking.IsChecked)
 				.OrderByDescending(s => s.Timestamp)
 				.FirstOrDefault();
-			var lastManualChecking = reviewedSubmission?.ManualCheckings.OrderBy(c => c.Timestamp).LastOrDefault(c => c.IsChecked);
+			var manualChecking = reviewedSubmission?.ManualChecking;
 
-			if (lastManualChecking == null || !lastManualChecking.NotDeletedReviews.Any())
+			if (manualChecking == null || !manualChecking.NotDeletedReviews.Any())
 				return new EmptyResult();
 			return PartialView("~/Views/Exercise/_ExerciseLastReviewComments.cshtml",
 				new ExerciseLastReviewCommentModel
 				{
 					ReviewedSubmission = reviewedSubmission,
-					NotDeletedReviews = lastManualChecking.NotDeletedReviews
+					NotDeletedReviews = manualChecking.NotDeletedReviews
 				});
 		}
 
@@ -525,7 +524,7 @@ namespace uLearn.Web.Controllers
 		{
 			const int maxUsersCount = 30;
 
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var slide = course.GetSlideByIdNotSafe(slideId) as ExerciseSlide;
 
 			if (slide == null)
@@ -593,9 +592,9 @@ namespace uLearn.Web.Controllers
 		{
 			log.Warn("StudentZip request {courseId} {slideId}");
 			var isInstructor = User.HasAccessFor(courseId, CourseRole.Instructor);
-			var course = courseManager.GetCourse(courseId);
+			var course = courseStorage.GetCourse(courseId);
 			var visibleUnits = unitsRepo.GetVisibleUnitIds(course, User);
-			var slide = courseManager.FindCourse(courseId)?.FindSlideById(slideId, isInstructor, visibleUnits);
+			var slide = courseStorage.FindCourse(courseId)?.FindSlideById(slideId, isInstructor, visibleUnits);
 			if (!(slide is ExerciseSlide))
 				return HttpNotFound();
 
@@ -611,7 +610,7 @@ namespace uLearn.Web.Controllers
 
 			var cookie = Request.Headers.Get("Cookie");
 			IWebApiClient webApiClient = new WebApiClient(new ApiClientSettings(baseUrlApi));
-			var response = await webApiClient.GetStudentZipFile(courseId, slideId, studentZipName, cookie == null ? null : new Header("Cookie", cookie));
+			var response = await webApiClient.GetStudentZipFile(courseId, slideId, studentZipName, cookie == null ? (Header?)null : new Header("Cookie", cookie));
 
 			if (response == null)
 				return new HttpStatusCodeResult(500);

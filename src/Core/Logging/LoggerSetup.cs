@@ -4,6 +4,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using Vostok.Logging.Abstractions;
 using Ulearn.Core.Configuration;
+using Ulearn.Core.Courses.Manager;
 using Vostok.Logging.Abstractions.Values;
 using Vostok.Logging.Console;
 using Vostok.Logging.File;
@@ -26,60 +27,95 @@ namespace Ulearn.Core.Logging
 
 		public static ILog Setup(HostLogConfiguration hostLog, string subdirectory = null, bool addInLogProvider = true)
 		{
+			var (minimumLevel, dbMinimumLevel) = GetMinimumLevels(hostLog);
+			var min = dbMinimumLevel > minimumLevel ? minimumLevel : dbMinimumLevel;
+
 			ILog consoleLog = null;
 			if (hostLog.Console)
-				consoleLog = new ConsoleLog(new ConsoleLogSettings { OutputTemplate = OutputTemplate })
-					.WithMinimumLevel(LogLevel.Info);
+				consoleLog = new ConsoleLog(new ConsoleLogSettings { OutputTemplate = OutputTemplate });
 
 			ILog telegramLog = null;
 			if (hostLog.ErrorLogsToTelegram)
 				telegramLog = new TelegramLog { OutputTemplate = OutputTemplate }
 					.WithMinimumLevel(LogLevel.Error);
 
-			var pathFormat = hostLog.PathFormat;
 			ILog fileLog = null;
-			if (!string.IsNullOrEmpty(pathFormat))
-			{
-				pathFormat = pathFormat.Replace("{Date}", "{RollingSuffix}"); // Для совместимости с настройками appsettings.json, написанными для серилога
-				if (Path.IsPathRooted(pathFormat) && subdirectory != null)
-				{
-					var directory = Path.GetDirectoryName(pathFormat);
-					var fileName = Path.GetFileName(pathFormat);
-					pathFormat = Path.Combine(directory, subdirectory, fileName);
-				}
-
-				var minimumLevelString = hostLog.MinimumLevel ?? "debug";
-				var dbMinimumLevelString = hostLog.DbMinimumLevel ?? "";
-				if (!TryParseLogLevel(minimumLevelString, out var minimumLevel))
-					minimumLevel = LogLevel.Debug;
-				if (!TryParseLogLevel(dbMinimumLevelString, out var dbMinimumLevel))
-					dbMinimumLevel = minimumLevel;
-
-				var fileLogSettings = new FileLogSettings
-				{
-					FilePath = pathFormat,
-					RollingStrategy = new RollingStrategyOptions
-					{
-						MaxFiles = 0,
-						Type = RollingStrategyType.Hybrid,
-						Period = RollingPeriod.Day,
-						MaxSize = 4 * 1073741824L,
-					},
-					OutputTemplate = OutputTemplate
-				};
-				var min = dbMinimumLevel > minimumLevel ? minimumLevel : dbMinimumLevel;
-				fileLog = new FileLog(fileLogSettings)
-					.WithMinimumLevelForSourceContext("ULearnDb", dbMinimumLevel) // Database
-					.WithMinimumLevel(min);
-			}
+			if (!string.IsNullOrEmpty(hostLog.PathFormat))
+				fileLog = SetupFileLog(subdirectory, hostLog.PathFormat);
 
 			var log = new CompositeLog(new[] { fileLog, consoleLog, telegramLog }.Where(l => l != null).ToArray())
-				.WithProperty("threadId", () => Environment.CurrentManagedThreadId)
-				.WithMinimumLevel(LogLevel.Debug);
+				.WithProperty("threadId", () => Environment.CurrentManagedThreadId);
+			log = FilterLogs(log, minimumLevel, dbMinimumLevel)
+				.WithMinimumLevel(min);
 
 			if (addInLogProvider)
 				LogProvider.Configure(log);
 			return log;
+		}
+
+		private static ILog SetupFileLog(string subdirectory, string pathFormat)
+		{
+			pathFormat = pathFormat.Replace("{Date}", "{RollingSuffix}"); // Для совместимости с настройками appsettings.json, написанными для серилога
+			if (Path.IsPathRooted(pathFormat) && subdirectory != null)
+			{
+				var directory = Path.GetDirectoryName(pathFormat);
+				var fileName = Path.GetFileName(pathFormat);
+				pathFormat = Path.Combine(directory, subdirectory, fileName);
+			}
+
+			var fileLogSettings = new FileLogSettings
+			{
+				FilePath = pathFormat,
+				RollingStrategy = new RollingStrategyOptions
+				{
+					MaxFiles = 0,
+					Type = RollingStrategyType.Hybrid,
+					Period = RollingPeriod.Day,
+					MaxSize = 4 * 1073741824L,
+				},
+				OutputTemplate = OutputTemplate
+			};
+			return new FileLog(fileLogSettings);
+		}
+
+		public static (LogLevel MinimumLevel, LogLevel DbMinimumLevel) GetMinimumLevels(HostLogConfiguration hostLog)
+		{
+			var minimumLevelString = hostLog.MinimumLevel ?? "debug";
+			var dbMinimumLevelString = hostLog.DbMinimumLevel ?? "";
+			if (!TryParseLogLevel(minimumLevelString, out var minimumLevel))
+				minimumLevel = LogLevel.Debug;
+			if (!TryParseLogLevel(dbMinimumLevelString, out var dbMinimumLevel))
+				dbMinimumLevel = minimumLevel;
+			return (minimumLevel, dbMinimumLevel);
+		}
+
+		public static ILog FilterLogs(ILog log, LogLevel minimumLevel, LogLevel dbMinimumLevel)
+		{
+			return log.WithMinimumLevelForSourceContext("ULearnDb", dbMinimumLevel) // Database
+				.DropEvents(e => IsDropDatabaseCoreLogEventForDrop(e, dbMinimumLevel))
+				.DropEvents(e => IsSchedulerLogEventForDrop(e, minimumLevel));
+		}
+
+		private static bool IsDropDatabaseCoreLogEventForDrop(LogEvent e, LogLevel dbMinimumLevel)
+		{
+			if (dbMinimumLevel < LogLevel.Info || e.Level >= dbMinimumLevel || e.Properties == null)
+				return false;
+			var sourceContext = GetSourceContext(e);
+			if (sourceContext == null)
+				return false;
+			return sourceContext.Contains("Microsoft.EntityFrameworkCore.Database.Command")
+					|| sourceContext.Contains("Microsoft.EntityFrameworkCore.Infrastructure");
+		}
+
+		private static bool IsSchedulerLogEventForDrop(LogEvent e, LogLevel minimumLevel)
+		{
+			if (minimumLevel < LogLevel.Info || e.Level > LogLevel.Info || e.Properties == null)
+				return false;
+			var isScheduler = GetSourceContext(e)?.Contains("Scheduler") ?? false;
+			if (!isScheduler)
+				return false;
+			bool IsJobWithName(string jobName) => GetOperationContext(e)?.Contains(jobName) ?? false;
+			return IsJobWithName(UpdateCoursesWorker.UpdateCoursesJobName) || IsJobWithName(UpdateCoursesWorker.UpdateTempCoursesJobName);
 		}
 
 		[CanBeNull]
@@ -88,6 +124,14 @@ namespace Ulearn.Core.Logging
 			if (@event?.Properties == null)
 				return null;
 			return @event.Properties.TryGetValue(WellKnownProperties.SourceContext, out var value) ? value as SourceContextValue : null;
+		}
+
+		[CanBeNull]
+		public static OperationContextValue GetOperationContext([CanBeNull] LogEvent @event)
+		{
+			if (@event?.Properties == null)
+				return null;
+			return @event.Properties.TryGetValue(WellKnownProperties.OperationContext, out var value) ? value as OperationContextValue : null;
 		}
 
 		// Для совместимости с настройками appsettings.json, написанными для серилога

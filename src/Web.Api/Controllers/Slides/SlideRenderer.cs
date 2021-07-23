@@ -117,7 +117,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 		
 		private async Task<IEnumerable<IApiSlideBlock>> RenderBlock(ImageGalleryBlock b, SlideRenderContext context)
 		{
-			return new[] { new ImageGalleryBlockResponse(b, context.BaseUrlWeb, context.CourseId, context.Slide.Unit.UnitDirectoryRelativeToCourse) };
+			return new[] { new ImageGalleryBlockResponse(b, context.BaseUrlApi, context.CourseId, context.Slide.Unit.UnitDirectoryRelativeToCourse) };
 		}
 		
 		private async Task<IEnumerable<IApiSlideBlock>> RenderBlock(TexBlock b, SlideRenderContext context)
@@ -162,7 +162,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 				.Include(s => s.AutomaticChecking).ThenInclude(c => c.DebugLogs)
 				.Include(s => s.SolutionCode)
 				.Include(s => s.Reviews).ThenInclude(c => c.Author)
-				.Include(s => s.ManualCheckings).ThenInclude(c => c.Reviews).ThenInclude(r => r.Author)
+				.Include(s => s.ManualChecking).ThenInclude(c => c.Reviews).ThenInclude(r => r.Author)
 				.ToListAsync();
 			var codeReviewComments = await slideCheckingsRepo.GetExerciseCodeReviewComments(context.CourseId, context.Slide.Id, context.UserId);
 			var isCourseAdmin = await courseRolesRepo.HasUserAccessToCourse(context.UserId, context.CourseId, CourseRoleType.CourseAdmin);

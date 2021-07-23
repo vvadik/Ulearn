@@ -141,9 +141,6 @@ namespace Database.Models
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public override int Id { get; set; }
 
-		[Required]
-		public int SubmissionId { get; set; }
-
 		public virtual UserExerciseSubmission Submission { get; set; }
 
 		[Required]

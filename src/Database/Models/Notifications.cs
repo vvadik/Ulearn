@@ -617,7 +617,7 @@ namespace Database.Models
 
 		public override List<string> GetRecipientsIds(ULearnDb db, Course course)
 		{
-			return new GroupsRepo(db, WebCourseManager.Instance).GetInstructorsOfAllGroupsWhereUserIsMember(CourseId, Comment.Author).ToList();
+			return new GroupsRepo(db, WebCourseManager.CourseStorageInstance).GetInstructorsOfAllGroupsWhereUserIsMember(CourseId, Comment.Author).ToList();
 		}
 
 		public override bool IsNotificationForEveryone => true;
@@ -774,7 +774,7 @@ namespace Database.Models
 				return null;
 
 			var commentsText = GetReviewsText(Checking, html: true);
-			var score = SlideCheckingsRepo.GetExerciseSubmissionManualCheckingsScoreAndPercent(new List<ManualExerciseChecking> { Checking }, slide).Score;
+			var score = SlideCheckingsRepo.GetExerciseSubmissionManualCheckingsScoreAndPercent(Checking, slide).Score;
 
 			return $"{InitiatedBy.VisibleName.EscapeHtml()} {(IsRecheck ? "пере" : "")}проверил{InitiatedBy.Gender.ChooseEnding()} ваше решение в «{GetSlideTitle(course, slide).EscapeHtml()}»<br/><br/>" +
 					$"<b>Вы получили {score.PluralizeInRussian(RussianPluralizationOptions.Score)}</b><br/><br/>" +
@@ -788,7 +788,7 @@ namespace Database.Models
 				return null;
 
 			var commentsText = GetReviewsText(Checking, html: false);
-			var score = SlideCheckingsRepo.GetExerciseSubmissionManualCheckingsScoreAndPercent(new List<ManualExerciseChecking> { Checking }, slide).Score;
+			var score = SlideCheckingsRepo.GetExerciseSubmissionManualCheckingsScoreAndPercent(Checking, slide).Score;
 
 			return $"{InitiatedBy.VisibleName} {(IsRecheck ? "пере" : "")}проверил{InitiatedBy.Gender.ChooseEnding()} ваше решение в «{GetSlideTitle(course, slide)}»\n" +
 					$"Вы получили {score.PluralizeInRussian(RussianPluralizationOptions.Score)}\n\n" +
@@ -1252,7 +1252,7 @@ namespace Database.Models
 
 		public override List<string> GetRecipientsIds(ULearnDb db, Course course)
 		{
-			var groupsRepo = new GroupsRepo(db, WebCourseManager.Instance);
+			var groupsRepo = new GroupsRepo(db, WebCourseManager.CourseStorageInstance);
 			var accesses = groupsRepo.GetGroupAccesses(GroupId);
 			return accesses.Select(a => a.UserId).Concat(new[] { Group.OwnerId }).ToList();
 		}
@@ -1375,7 +1375,7 @@ namespace Database.Models
 
 		public override List<string> GetRecipientsIds(ULearnDb db, Course course)
 		{
-			var groupsRepo = new GroupsRepo(db, WebCourseManager.Instance);
+			var groupsRepo = new GroupsRepo(db, WebCourseManager.CourseStorageInstance);
 			var accesses = groupsRepo.GetGroupAccesses(GroupId);
 			return accesses.Select(a => a.UserId).Concat(new[] { Group.OwnerId }).ToList();
 		}

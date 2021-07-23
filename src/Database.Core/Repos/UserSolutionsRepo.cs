@@ -11,6 +11,7 @@ using Vostok.Logging.Abstractions;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
 using Ulearn.Core;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Slides.Exercises.Blocks;
 using Ulearn.Core.RunCheckerJobApi;
@@ -23,17 +24,17 @@ namespace Database.Repos
 		private readonly UlearnDb db;
 		private readonly ITextsRepo textsRepo;
 		private readonly IWorkQueueRepo workQueueRepo;
-		private readonly IWebCourseManager courseManager;
+		private readonly ICourseStorage courseStorage;
 		private const int queueId = 1;
 
 		public UserSolutionsRepo(UlearnDb db,
 			ITextsRepo textsRepo, IWorkQueueRepo workQueueRepo,
-			IWebCourseManager courseManager)
+			ICourseStorage courseStorage)
 		{
 			this.db = db;
 			this.textsRepo = textsRepo;
 			this.workQueueRepo = workQueueRepo;
-			this.courseManager = courseManager;
+			this.courseStorage = courseStorage;
 		}
 
 		public async Task<int> AddUserExerciseSubmission(
@@ -98,47 +99,12 @@ namespace Database.Repos
 			return submission.Id;
 		}
 
-		///<returns>(likesCount, isLikedByThisUsed)</returns>
-		public async Task<Tuple<int, bool>> Like(int solutionId, string userId)
-		{
-			return await FuncUtils.TrySeveralTimesAsync(() => TryLike(solutionId, userId), 3);
-		}
-
-		private async Task<Tuple<int, bool>> TryLike(int solutionId, string userId)
-		{
-			using (var transaction = db.Database.BeginTransaction())
-			{
-				var solutionForLike = await db.UserExerciseSubmissions.FindAsync(solutionId);
-				if (solutionForLike == null)
-					throw new Exception("Solution " + solutionId + " not found");
-				var hisLike = await db.SolutionLikes.FirstOrDefaultAsync(like => like.UserId == userId && like.SubmissionId == solutionId);
-				var votedAlready = hisLike != null;
-				var likesCount = solutionForLike.Likes.Count;
-				if (votedAlready)
-				{
-					db.SolutionLikes.Remove(hisLike);
-					likesCount--;
-				}
-				else
-				{
-					db.SolutionLikes.Add(new Like { SubmissionId = solutionId, Timestamp = DateTime.Now, UserId = userId });
-					likesCount++;
-				}
-
-				await db.SaveChangesAsync();
-
-				await transaction.CommitAsync();
-
-				return Tuple.Create(likesCount, !votedAlready);
-			}
-		}
-
 		public IQueryable<UserExerciseSubmission> GetAllSubmissions(string courseId, bool includeManualAndAutomaticCheckings = true)
 		{
 			var query = db.UserExerciseSubmissions.AsQueryable();
 			if (includeManualAndAutomaticCheckings)
 				query = query
-					.Include(s => s.ManualCheckings)
+					.Include(s => s.ManualChecking)
 					.Include(s => s.AutomaticChecking);
 			return query.Where(x => x.CourseId == courseId);
 		}
@@ -166,6 +132,13 @@ namespace Database.Repos
 		{
 			return GetAllSubmissions(courseId, slidesIds).Where(s => s.AutomaticCheckingIsRightAnswer);
 		}
+
+		public IQueryable<UserExerciseSubmission> GetAllAcceptedSubmissions(string courseId, Guid slideId)
+		{
+			return db.UserExerciseSubmissions
+				.Where(s => s.CourseId == courseId && s.SlideId == slideId && s.AutomaticCheckingIsRightAnswer);
+		}
+
 
 		public IQueryable<UserExerciseSubmission> GetAllAcceptedSubmissions(string courseId)
 		{
@@ -208,55 +181,6 @@ namespace Database.Repos
 			if (userIds != null)
 				query = query.Where(v => userIds.Contains(v.UserId));
 			return query;
-		}
-
-		// Переписать, см в Database
-		[Obsolete]
-		public async Task<List<AcceptedSolutionInfo>> GetBestTrendingAndNewAcceptedSolutions(string courseId, List<Guid> slidesIds)
-		{
-			var prepared = await GetAllAcceptedSubmissions(courseId, slidesIds)
-				.GroupBy(x => x.CodeHash,
-					(codeHash, ss) => new
-					{
-						codeHash,
-						timestamp = ss.Min(s => s.Timestamp)
-					})
-				.Join(
-					GetAllAcceptedSubmissions(courseId, slidesIds),
-					g => g,
-					s => new { codeHash = s.CodeHash, timestamp = s.Timestamp }, (k, s) => new { submission = s, k.timestamp })
-				.Select(x => new { x.submission.Id, likes = x.submission.Likes.Count, x.timestamp })
-				.ToListAsync();
-
-			var best = prepared
-				.OrderByDescending(x => x.likes);
-			var timeNow = DateTime.Now;
-			var trending = prepared
-				.OrderByDescending(x => (x.likes + 1) / timeNow.Subtract(x.timestamp).TotalMilliseconds);
-			var newest = prepared
-				.OrderByDescending(x => x.timestamp);
-			var selectedSubmissionsIds = best.Take(3).Concat(trending.Take(3)).Concat(newest).Distinct().Take(10).Select(x => x.Id);
-
-			var selectedSubmissions = await db.UserExerciseSubmissions
-				.Where(s => selectedSubmissionsIds.Contains(s.Id))
-				.Select(s => new
-				{
-					s.Id,
-					Code = s.SolutionCode.Text,
-					Likes = s.Likes.Select(y => y.UserId)
-				})
-				.ToListAsync();
-			return selectedSubmissions
-				.Select(s => new AcceptedSolutionInfo(s.Code, s.Id, s.Likes))
-				.OrderByDescending(info => info.UsersWhoLike.Count)
-				.ToList();
-		}
-
-		// Переписать, см в Database
-		[Obsolete]
-		public async Task<List<AcceptedSolutionInfo>> GetBestTrendingAndNewAcceptedSolutions(string courseId, Guid slideId)
-		{
-			return await GetBestTrendingAndNewAcceptedSolutions(courseId, new List<Guid> { slideId });
 		}
 
 		public async Task<int> GetAcceptedSolutionsCount(string courseId, Guid slideId)
@@ -399,7 +323,7 @@ namespace Database.Repos
 				.Include(s => s.AutomaticChecking).ThenInclude(c => c.CompilationError)
 				.Include(s => s.SolutionCode)
 				.Include(s => s.Reviews).ThenInclude(c => c.Author)
-				.Include(s => s.ManualCheckings).ThenInclude(c => c.Reviews).ThenInclude(r => r.Author)
+				.Include(s => s.ManualChecking).ThenInclude(c => c.Reviews).ThenInclude(r => r.Author)
 				.SingleOrDefaultAsync(x => x.Id == id);
 		}
 
@@ -469,7 +393,7 @@ namespace Database.Repos
 			var isWebRunner = checking.CourseId == "web" && checking.SlideId == Guid.Empty;
 			var exerciseSlide = isWebRunner
 				? null
-				: (ExerciseSlide)(await courseManager.GetCourseAsync(checking.CourseId))
+				: (ExerciseSlide)(courseStorage.GetCourse(checking.CourseId))
 				.GetSlideByIdNotSafe(checking.SlideId);
 
 			var withFullDescription = (exerciseSlide?.Exercise as PolygonExerciseBlock)?.ShowTestDescription ?? false;
