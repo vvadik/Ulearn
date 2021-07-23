@@ -8,6 +8,7 @@ using Database.Repos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Web.Api.Models.Responses.Review;
 
 namespace Ulearn.Web.Api.Controllers.Review
@@ -16,10 +17,10 @@ namespace Ulearn.Web.Api.Controllers.Review
 	public class FavouriteReviewsController : BaseController
 	{
 		public FavouriteReviewsController(
-			IWebCourseManager courseManager,
+			ICourseStorage courseStorage,
 			UlearnDb db,
 			IUsersRepo usersRepo)
-			: base(courseManager, db, usersRepo)
+			: base(courseStorage, db, usersRepo)
 		{
 		}
 
