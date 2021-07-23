@@ -13,7 +13,6 @@ namespace Ulearn.Web.Api.Utils
 		FileInfo GetStagingTempCourseFile(string courseId);
 		DirectoryInfo GetExtractedCourseDirectory(string courseId);
 		FileInfo GetCourseVersionFile(Guid versionId);
-		void WaitWhileCourseIsLocked(string courseId);
 		void ReloadCourseNotSafe(string courseId, bool notifyAboutErrors = true);
 		void ExtractTempCourseChanges(string tempCourseId);
 		bool TryCreateTempCourse(string courseId, string courseTitle, Guid firstVersionId);

@@ -30,7 +30,7 @@ namespace Database
 			{
 				var courseId = publishedVersion.CourseId;
 				var publishedVersionId = publishedVersion.Id;
-				UpdateCourseOrTempCourseToVersionFromDirectory(courseId, new CourseVersionToken(publishedVersionId));
+				await UpdateCourseOrTempCourseToVersionFromDirectory(courseId, new CourseVersionToken(publishedVersionId));
 			}
 		}
 
@@ -42,7 +42,7 @@ namespace Database
 			{
 				var courseId = tempCourse.CourseId;
 				var publishedLoadingTime = tempCourse.LoadingTime;
-				UpdateCourseOrTempCourseToVersionFromDirectory(courseId, new CourseVersionToken(publishedLoadingTime));
+				await UpdateCourseOrTempCourseToVersionFromDirectory(courseId, new CourseVersionToken(publishedLoadingTime));
 			}
 		}
 

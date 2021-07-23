@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
@@ -46,11 +45,13 @@ namespace Ulearn.Core.Courses.Manager
 
 		protected static readonly ConcurrentDictionary<CourseVersionToken, bool> brokenVersions = new ConcurrentDictionary<CourseVersionToken, bool>();
 
+		public static readonly string CoursesSubdirectory = "Courses";
+
 		public CourseManager(DirectoryInfo baseDirectory)
 			: this(
 				baseDirectory.GetSubdirectory("Courses.Staging"),
 				baseDirectory.GetSubdirectory("Courses.Versions"),
-				baseDirectory.GetSubdirectory("Courses"),
+				baseDirectory.GetSubdirectory(CoursesSubdirectory),
 				baseDirectory.GetSubdirectory("TempCourseStaging")
 			)
 		{
@@ -366,98 +367,25 @@ namespace Ulearn.Core.Courses.Manager
 			courseStorage.AddOrUpdateCourse(course);
 		}
 
-		private readonly TimeSpan waitBetweenLockTries = TimeSpan.FromSeconds(0.1);
-		private readonly TimeSpan lockLifeTime = TimeSpan.FromMinutes(20);
 		private const int updateCourseEachOperationTriesCount = 5;
-
-		private FileInfo GetCourseLockFile(string courseId)
-		{
-			return coursesDirectory.GetFile("~" + courseId + ".lock");
-		}
-
-		private static bool TryCreateLockFile(FileInfo lockFile)
-		{
-			var tempFileName = Path.GetTempFileName();
-			try
-			{
-				if (!lockFile.Directory.Exists)
-					lockFile.Directory.Create();
-				new FileInfo(tempFileName).MoveTo(lockFile.FullName);
-				return true;
-			}
-			catch (IOException)
-			{
-				return false;
-			}
-		}
-
-		public void LockCourse(string courseId)
-		{
-			var lockFile = GetCourseLockFile(courseId);
-			while (true)
-			{
-				if (TryCreateLockFile(lockFile))
-					return;
-
-				log.Info($"Курс {courseId} заблокирован, жду {waitBetweenLockTries.TotalSeconds} секунд");
-
-				Thread.Sleep(waitBetweenLockTries);
-
-				try
-				{
-					lockFile.Refresh();
-					/* If lock-file has been created ago, just delete it and unzip course again */
-					if (lockFile.Exists && lockFile.LastWriteTime < DateTime.Now.Subtract(lockLifeTime))
-					{
-						log.Info($"Курс {courseId} заблокирован слишком давно, снимаю блокировку");
-
-						lockFile.Delete();
-						UnzipCourseFile(GetStagingCourseFile(courseId));
-					}
-				}
-				catch (IOException)
-				{
-				}
-			}
-		}
-
-		public void ReleaseCourse(string courseId)
-		{
-			GetCourseLockFile(courseId).Delete();
-		}
-
-		public void WaitWhileCourseIsLocked(string courseId)
-		{
-			LockCourse(courseId);
-			log.Info($"Course is locked {courseId}");
-			ReleaseCourse(courseId);
-			log.Info($"Course lock released {courseId}");
-		}
 
 		protected void MoveCourse(Course course, DirectoryInfo sourceDirectory, DirectoryInfo destinationDirectory)
 		{
 			using var tempDirectory = new TempDirectory(Path.GetRandomFileName());
-			LockCourse(course.Id);
+
+			FuncUtils.TrySeveralTimes(() => Directory.Move(destinationDirectory.FullName, tempDirectory.DirectoryInfo.FullName), updateCourseEachOperationTriesCount);
+
 			try
 			{
-				FuncUtils.TrySeveralTimes(() => Directory.Move(destinationDirectory.FullName, tempDirectory.DirectoryInfo.FullName), updateCourseEachOperationTriesCount);
-
-				try
-				{
-					FuncUtils.TrySeveralTimes(() => Directory.Move(sourceDirectory.FullName, destinationDirectory.FullName), updateCourseEachOperationTriesCount);
-				}
-				catch (IOException)
-				{
-					/* In case of any file system's error rollback previous operation */
-					FuncUtils.TrySeveralTimes(() => Directory.Move(tempDirectory.DirectoryInfo.FullName, destinationDirectory.FullName), updateCourseEachOperationTriesCount);
-					throw;
-				}
-				UpdateCourse(course);
+				FuncUtils.TrySeveralTimes(() => Directory.Move(sourceDirectory.FullName, destinationDirectory.FullName), updateCourseEachOperationTriesCount);
 			}
-			finally
+			catch (IOException)
 			{
-				ReleaseCourse(course.Id);
+				/* In case of any file system's error rollback previous operation */
+				FuncUtils.TrySeveralTimes(() => Directory.Move(tempDirectory.DirectoryInfo.FullName, destinationDirectory.FullName), updateCourseEachOperationTriesCount);
+				throw;
 			}
+			UpdateCourse(course);
 		}
 
 		public static DirectoryInfo GetCoursesDirectory()
@@ -510,7 +438,7 @@ namespace Ulearn.Core.Courses.Manager
 
 #region UpdateInMemoryCourseFromCommonDirectory
 
-		protected void UpdateCourseOrTempCourseToVersionFromDirectory(string courseId, CourseVersionToken publishedVersionToken)
+		protected async Task UpdateCourseOrTempCourseToVersionFromDirectory(string courseId, CourseVersionToken publishedVersionToken)
 		{
 			if (brokenVersions.ContainsKey(publishedVersionToken))
 				return;
@@ -519,7 +447,7 @@ namespace Ulearn.Core.Courses.Manager
 				return;
 			try
 			{
-				UpdateCourseFromDirectory(courseId, publishedVersionToken);
+				await UpdateCourseFromDirectory(courseId, publishedVersionToken);
 			}
 			catch (Exception ex)
 			{
@@ -532,13 +460,12 @@ namespace Ulearn.Core.Courses.Manager
 			}
 		}
 
-		private void UpdateCourseFromDirectory(string courseId, CourseVersionToken publishedVersionToken)
+		private async Task UpdateCourseFromDirectory(string courseId, CourseVersionToken publishedVersionToken)
 		{
 			var courseDirectory = GetExtractedCourseDirectory(courseId);
 			if (!courseDirectory.Exists)
 				return;
-			LockCourse(courseId);
-			try
+			using (await CourseLock.Lock(courseId))
 			{
 				var courseVersionToken = CourseVersionToken.Load(courseDirectory);
 				if (courseVersionToken != publishedVersionToken)
@@ -547,10 +474,6 @@ namespace Ulearn.Core.Courses.Manager
 					return;
 				var course = loader.Load(courseDirectory);
 				CourseStorageUpdaterInstance.AddOrUpdateCourse(course);
-			}
-			finally
-			{
-				ReleaseCourse(courseId);
 			}
 		}
 

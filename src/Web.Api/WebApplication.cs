@@ -126,7 +126,7 @@ namespace Ulearn.Web.Api
 		protected override IApplicationBuilder UseStaticFiles(IApplicationBuilder app)
 		{
 			var contentTypeProvider = new FileExtensionContentTypeProvider(CourseStaticFilesHelper.AllowedExtensions);
-			var coursesDirectory = Path.Combine(MasterCourseManager.GetCoursesDirectory().FullName, "Courses");
+			var coursesDirectory = Path.Combine(MasterCourseManager.GetCoursesDirectory().FullName, MasterCourseManager.CoursesSubdirectory);
 			new DirectoryInfo(coursesDirectory).EnsureExists();
 
 			var options = new RewriteOptions()

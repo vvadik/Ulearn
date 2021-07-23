@@ -81,24 +81,23 @@ namespace Ulearn.Web.Api.Controllers.Runner
 
 			if (slide is ExerciseSlide exerciseSlide)
 			{
-				log.Info($"Ожидаю, если курс {submission.CourseId} заблокирован");
-				courseManager.WaitWhileCourseIsLocked(submission.CourseId);
-				log.Info($"Курс {submission.CourseId} разблокирован");
+				using (await CourseLock.Lock(submission.CourseId))
+				{
+					var courseDictionary = courseManager.GetExtractedCourseDirectory(submission.CourseId).FullName;
+					if (exerciseSlide is PolygonExerciseSlide)
+						return ((PolygonExerciseBlock)exerciseSlide.Exercise).CreateSubmission(
+							submission.Id.ToString(),
+							submission.SolutionCode.Text,
+							submission.Language,
+							courseDictionary
+						);
 
-				var courseDictionary = courseManager.GetExtractedCourseDirectory(submission.CourseId).FullName;
-				if (exerciseSlide is PolygonExerciseSlide)
-					return ((PolygonExerciseBlock)exerciseSlide.Exercise).CreateSubmission(
+					return exerciseSlide.Exercise.CreateSubmission(
 						submission.Id.ToString(),
 						submission.SolutionCode.Text,
-						submission.Language,
 						courseDictionary
 					);
-
-				return exerciseSlide.Exercise.CreateSubmission(
-					submission.Id.ToString(),
-					submission.SolutionCode.Text,
-					courseDictionary
-				);
+				}
 			}
 
 			return new FileRunnerSubmission

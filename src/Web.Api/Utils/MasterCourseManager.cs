@@ -6,6 +6,7 @@ using Database.Models;
 using Database.Repos;
 using Microsoft.Extensions.DependencyInjection;
 using Ulearn.Core.Courses;
+using Ulearn.Core.Courses.Manager;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Helpers;
 using Vostok.Logging.Abstractions;
@@ -67,14 +68,17 @@ namespace Ulearn.Web.Api.Utils
 					log.Error(error, message);
 					return;
 				}
-				try
+				using (await CourseLock.Lock(courseId))
 				{
-					MoveCourse(course, courseDirectory.DirectoryInfo, GetExtractedCourseDirectory(courseId));
-					CourseStorageUpdaterInstance.AddOrUpdateCourse(course);
-				}
-				catch (Exception ex)
-				{
-					log.Error(ex, $"Не смог переместить курс {courseId} версия {publishedVersionToken} из временной папки в общую");
+					try
+					{
+						MoveCourse(course, courseDirectory.DirectoryInfo, GetExtractedCourseDirectory(courseId));
+						CourseStorageUpdaterInstance.AddOrUpdateCourse(course);
+					}
+					catch (Exception ex)
+					{
+						log.Error(ex, $"Не смог переместить курс {courseId} версия {publishedVersionToken} из временной папки в общую");
+					}
 				}
 			}
 		}
