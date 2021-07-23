@@ -15,6 +15,7 @@ using Ulearn.Common.Extensions;
 using Ulearn.Core.Configuration;
 using Ulearn.Core.Courses.Slides;
 using Ulearn.Core.Courses.Units;
+using Ulearn.Core.Helpers;
 using Ulearn.Core.Telegram;
 using Vostok.Logging.Abstractions;
 
@@ -469,7 +470,7 @@ namespace Ulearn.Core.Courses.Manager
 		}
 
 
-		#region WorkWithCourseInTemporaryDirectory
+#region WorkWithCourseInTemporaryDirectory
 
 		public async Task<TempDirectory> ExtractCourseVersionToTemporaryDirectory(string courseId, Guid versionId, byte[] zipContent)
 		{

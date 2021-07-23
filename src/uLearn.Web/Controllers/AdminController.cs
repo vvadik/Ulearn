@@ -33,6 +33,7 @@ using Ulearn.Core.Courses.Slides.Exercises;
 using Ulearn.Core.Courses.Units;
 using Ulearn.Core.CSharp;
 using Ulearn.Core.Extensions;
+using Ulearn.Core.Helpers;
 
 namespace uLearn.Web.Controllers
 {
@@ -245,18 +246,13 @@ namespace uLearn.Web.Controllers
 			if (fileName == null || !fileName.ToLower().EndsWith(".zip"))
 				return RedirectToAction("Packages", new { courseId });
 
-			var tmpFileName = Path.GetTempFileName();
-			using (var tmpFile = new FileStream(tmpFileName, FileMode.Create, FileAccess.Write))
-				await file.InputStream.CopyToAsync(tmpFile);
-
+			using var tempFile = courseManager.SaveVersionZipToTemporaryDirectory(courseId, new Guid(), file.InputStream);
 			Guid versionId;
 			Exception error;
-			using (var inputStream = ZipUtils.GetZipWithFileWithNameInRoot(tmpFileName, "course.xml"))
+			using (var inputStream = ZipUtils.GetZipWithFileWithNameInRoot(tempFile.FileInfo.FullName, "course.xml"))
 			{
 				(versionId, error) = await UploadCourse(courseId, inputStream, User.Identity.GetUserId()).ConfigureAwait(false);
 			}
-
-			new FileInfo(tmpFileName).Delete();
 
 			if (error != null)
 			{
@@ -289,7 +285,7 @@ namespace uLearn.Web.Controllers
 			var infoForUpload = new List<(string CourseId, MemoryStream Zip, CommitInfo CommitInfo, string PathToCourseXml)>();
 			try
 			{
-				using (IGitRepo git = new GitRepo(repoUrl, reposDirectory, publicKey, privateKey, new DirectoryInfo(Path.GetTempPath())))
+				using (IGitRepo git = new GitRepo(repoUrl, reposDirectory, publicKey, privateKey, new DirectoryInfo(TempDirectory.TempDirectoryPath)))
 				{
 					// В GitRepo используется Monitor. Он должен быть освобожден в том же потоке, что и взят.
 					git.Checkout(branch);
@@ -353,7 +349,7 @@ namespace uLearn.Web.Controllers
 			CommitInfo commitInfo = null;
 			try
 			{
-				using (IGitRepo git = new GitRepo(courseRepo.RepoUrl, reposDirectory, publicKey, privateKey, new DirectoryInfo(Path.GetTempPath())))
+				using (IGitRepo git = new GitRepo(courseRepo.RepoUrl, reposDirectory, publicKey, privateKey, new DirectoryInfo(TempDirectory.TempDirectoryPath)))
 				{
 					git.Checkout(courseRepo.Branch);
 					commitInfo = git.GetCurrentCommitInfo();

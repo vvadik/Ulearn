@@ -1,7 +1,8 @@
 ﻿using System;
 using System.IO;
+using Ulearn.Common;
 
-namespace Ulearn.Common
+namespace Ulearn.Core.Helpers
 {
 	public class TempFile: IDisposable
 	{
@@ -9,7 +10,7 @@ namespace Ulearn.Common
 
 		public TempFile(string fileName, Stream stream)
 		{
-			var path = Path.Combine(Path.GetTempPath(), fileName);
+			var path = Path.Combine(TempDirectory.TempDirectoryPath, fileName);
 			using (var file = new FileStream(path, FileMode.Create, FileAccess.Write))
 				stream.CopyTo(file);
 			FileInfo = new FileInfo(path);

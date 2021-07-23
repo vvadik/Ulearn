@@ -85,7 +85,7 @@ namespace Ulearn.Web.Api.Utils
 			if (!tempCourseLoaded)
 			{
 				tempCourseLoaded = true;
-				await base.UpdateTempC ourses(); // TODO: сбрасывать не хэлп не загрузившиеся временные курсы 
+				await base.UpdateTempCourses();
 			}
 		}
 
