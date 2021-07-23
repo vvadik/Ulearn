@@ -2,7 +2,7 @@ export function returnPromiseAfterDelay<T>(ms: number,
 	result?: T,
 	callback?: () => void,
 ): Promise<T> {
-	if(result) {
+	if(result !== undefined) {
 		return new Promise(resolve => setTimeout(resolve, ms))
 			.then(() => {
 				callback?.();
