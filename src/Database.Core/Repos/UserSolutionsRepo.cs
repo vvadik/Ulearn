@@ -203,7 +203,7 @@ namespace Database.Repos
 
 		public async Task<HashSet<Guid>> GetIdOfPassedSlides(string courseId, string userId)
 		{
-			using (var scope = new TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions { IsolationLevel = IsolationLevel.ReadUncommitted}, TransactionScopeAsyncFlowOption.Enabled))
+			using (var scope = new TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions { IsolationLevel = IsolationLevel.ReadUncommitted }, TransactionScopeAsyncFlowOption.Enabled))
 			{
 				var ids = await db.AutomaticExerciseCheckings
 					.Where(x => x.IsRightAnswer && x.CourseId == courseId && x.UserId == userId)
@@ -217,7 +217,7 @@ namespace Database.Repos
 
 		public async Task<bool> IsSlidePassed(string courseId, string userId, Guid slideId)
 		{
-			using (var scope = new TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions { IsolationLevel = IsolationLevel.ReadUncommitted}, TransactionScopeAsyncFlowOption.Enabled))
+			using (var scope = new TransactionScope(TransactionScopeOption.RequiresNew, new TransactionOptions { IsolationLevel = IsolationLevel.ReadUncommitted }, TransactionScopeAsyncFlowOption.Enabled))
 			{
 				var result = await db.AutomaticExerciseCheckings
 					.AnyAsync(x => x.IsRightAnswer && x.CourseId == courseId && x.UserId == userId && x.SlideId == slideId);
@@ -236,7 +236,7 @@ namespace Database.Repos
 
 		public async Task<AutomaticExerciseCheckingStatus?> GetSubmissionAutomaticCheckingStatus(int id)
 		{
-			return await FuncUtils.TrySeveralTimesAsync(async () => await TryGetSubmissionAutomaticCheckingStatus(id), 3, () =>  Task.Delay(200));
+			return await FuncUtils.TrySeveralTimesAsync(async () => await TryGetSubmissionAutomaticCheckingStatus(id), 3, () => Task.Delay(200));
 		}
 
 		private async Task<AutomaticExerciseCheckingStatus?> TryGetSubmissionAutomaticCheckingStatus(int id)
@@ -272,12 +272,12 @@ namespace Database.Repos
 				if (work == null)
 					return null;
 
-				var workItemId= int.Parse(work.ItemId);
+				var workItemId = int.Parse(work.ItemId);
 				submission = await db.UserExerciseSubmissions
 					.Include(s => s.AutomaticChecking)
 					.Include(s => s.SolutionCode)
 					.FirstOrDefaultAsync(s => s.Id == workItemId
-						&& (s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting || s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Running));
+											&& (s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Waiting || s.AutomaticChecking.Status == AutomaticExerciseCheckingStatus.Running));
 				var minutes = TimeSpan.FromMinutes(15);
 				var notSoLongAgo = DateTime.Now - TimeSpan.FromMinutes(15);
 				if (submission == null)
@@ -317,7 +317,7 @@ namespace Database.Repos
 		private async Task<UserExerciseSubmission> TryFindSubmissionByIdNoTracking(int id)
 		{
 			return await db.UserExerciseSubmissions
-				.AsNoTracking()	
+				.AsNoTracking()
 				.Include(s => s.AutomaticChecking).ThenInclude(c => c.Output)
 				.Include(s => s.AutomaticChecking).ThenInclude(c => c.DebugLogs)
 				.Include(s => s.AutomaticChecking).ThenInclude(c => c.CompilationError)
@@ -325,6 +325,17 @@ namespace Database.Repos
 				.Include(s => s.Reviews).ThenInclude(c => c.Author)
 				.Include(s => s.ManualChecking).ThenInclude(c => c.Reviews).ThenInclude(r => r.Author)
 				.SingleOrDefaultAsync(x => x.Id == id);
+		}
+
+		public async Task<IList<ExerciseCodeReview>> FindSubmissionReviewsBySubmissionIdNoTracking(int submissionId)
+		{
+			var submission = await db.UserExerciseSubmissions
+				.AsNoTracking()
+				.Include(s => s.Reviews).ThenInclude(c => c.Author)
+				.Include(s => s.ManualChecking).ThenInclude(c => c.Reviews).ThenInclude(r => r.Author)
+				.SingleOrDefaultAsync(x => x.Id == submissionId);
+
+			return submission.Reviews.Concat(submission.ManualChecking.Reviews).ToList();
 		}
 
 		public async Task<UserExerciseSubmission> FindSubmissionById(int id)
@@ -344,7 +355,7 @@ namespace Database.Repos
 
 		public async Task SaveResult(RunningResults result, Func<UserExerciseSubmission, Task> onSave)
 		{
-			log.Info($"Сохраняю информацию о проверке решения {result.Id}"); 
+			log.Info($"Сохраняю информацию о проверке решения {result.Id}");
 
 			await workQueueRepo.RemoveByItemId(queueId, result.Id);
 
@@ -401,16 +412,14 @@ namespace Database.Repos
 			var compilationErrorHash = (await textsRepo.AddText(result.CompilationOutput)).Hash;
 			var output = result.GetOutput(withFullDescription).NormalizeEoln();
 			var outputHash = (await textsRepo.AddText(output)).Hash;
-			
+
 			var logs = result.GetLogs().NormalizeEoln();
 			var logsHash = (await textsRepo.AddText(logs)).Hash;
-
-			
 
 			var isRightAnswer = IsRightAnswer(result, output, exerciseSlide?.Exercise);
 
 			var elapsed = DateTime.Now - checking.Timestamp;
-			elapsed = elapsed < TimeSpan.FromDays(1) ? elapsed : new TimeSpan(0, 23, 59, 59); 
+			elapsed = elapsed < TimeSpan.FromDays(1) ? elapsed : new TimeSpan(0, 23, 59, 59);
 			var newChecking = new AutomaticExerciseChecking
 			{
 				Id = checking.Id,
@@ -451,7 +460,7 @@ namespace Database.Repos
 				var expectedOutput = exerciseBlock.ExpectedOutput.NormalizeEoln();
 				return output.Equals(expectedOutput);
 			}
-			
+
 			if (exerciseBlock.ExerciseType == ExerciseType.CheckPoints)
 			{
 				if (!result.Points.HasValue)
@@ -488,6 +497,7 @@ namespace Database.Repos
 					log.Info($"Посылка {submissionId} проверена");
 					return;
 				}
+
 				if (submissionAutomaticCheckingStatus == AutomaticExerciseCheckingStatus.Error)
 				{
 					log.Warn($"Во время проверки посылки {submissionId} произошла ошибка");

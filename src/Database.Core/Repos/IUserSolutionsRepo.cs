@@ -38,10 +38,12 @@ namespace Database.Repos
 		IQueryable<UserExerciseSubmission> GetAllSubmissions(int max, int skip);
 		Task<UserExerciseSubmission> FindSubmissionByIdNoTracking(int id);
 		Task<UserExerciseSubmission> FindSubmissionById(string id);
+		Task<UserExerciseSubmission> FindSubmissionById(int id);
 		Task<List<UserExerciseSubmission>> FindSubmissionsByIds(IEnumerable<int> checkingsIds);
 		Task SaveResult(RunningResults result, Func<UserExerciseSubmission, Task> onSave);
-		Task RunAutomaticChecking(int submissionId, [CanBeNull]string sandbox, TimeSpan timeout, bool waitUntilChecked, int priority);
+		Task RunAutomaticChecking(int submissionId, [CanBeNull] string sandbox, TimeSpan timeout, bool waitUntilChecked, int priority);
 		Task<Dictionary<int, string>> GetSolutionsForSubmissions(IEnumerable<int> submissionsIds);
 		Task<UserExerciseSubmission> GetUnhandledSubmission(string agentName, List<string> sandboxes);
+		Task<IList<ExerciseCodeReview>> FindSubmissionReviewsBySubmissionIdNoTracking(int submissionId);
 	}
 }

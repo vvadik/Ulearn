@@ -206,9 +206,9 @@ namespace Database.Repos
 			if (submissionBefore != null)
 				query = query.Where(c => c.Submission.Timestamp < submissionBefore);
 			var checkedScoresAndPercents = (await query
-					.Select(c => new { c.Percent, c.SubmissionId })
+					.Select(c => new { c.Percent, c.Id })
 					.ToListAsync())
-				.ToDictionary(k => k.SubmissionId, v => v.Percent);
+				.ToDictionary(k => k.Id, v => v.Percent);
 			return checkedScoresAndPercents;
 		}
 
