@@ -57,6 +57,15 @@ namespace Ulearn.Web.Api.Utils
 			var courseInMemory = CourseStorageInstance.FindCourse(courseId);
 			if (courseInMemory != null && courseInMemory.CourseVersionToken == publishedVersionToken)
 				return;
+
+			if (courseInMemory == null) // Проверяем, вдруг на диске актуальная версия
+			{
+				await UpdateCourseOrTempCourseToVersionFromDirectory(courseId, publishedVersionToken);
+				courseInMemory = CourseStorageInstance.FindCourse(courseId);
+				if (courseInMemory != null && courseInMemory.CourseVersionToken == publishedVersionToken)
+					return;
+			}
+
 			var courseFile = await coursesRepo.GetVersionFile(publishedCourseVersions.Id);
 			using (var courseDirectory = await ExtractCourseVersionToTemporaryDirectory(courseId, publishedCourseVersions.Id, courseFile.File))
 			{
@@ -89,7 +98,17 @@ namespace Ulearn.Web.Api.Utils
 			if (!tempCourseLoaded)
 			{
 				tempCourseLoaded = true;
-				await base.UpdateTempCourses();
+				using (var scope = serviceScopeFactory.CreateScope())
+				{
+					var tempCoursesRepo = scope.ServiceProvider.GetService<ITempCoursesRepo>();
+					var tempCourses = await tempCoursesRepo.GetTempCoursesAsync();
+					foreach (var tempCourse in tempCourses)
+					{
+						var courseId = tempCourse.CourseId;
+						var publishedLoadingTime = tempCourse.LoadingTime;
+						await UpdateCourseOrTempCourseToVersionFromDirectory(courseId, new CourseVersionToken(publishedLoadingTime));
+					}
+				}
 			}
 		}
 
