@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Ulearn.Common;
 using Ulearn.Common.Extensions;
@@ -32,7 +33,7 @@ namespace Ulearn.Core.Helpers
 			return CourseManager.GetCoursesDirectory().GetSubdirectory("ExerciseStudentZips");
 		}
 
-		public FileInfo GenerateOrFindZip(string courseId, Slide slide, string courseDirectory)
+		public async Task<FileInfo> GenerateOrFindZip(string courseId, Slide slide, string courseDirectory)
 		{
 			var cacheCourseDirectory = cacheDirectory.GetSubdirectory(courseId);
 			var zipFile = cacheCourseDirectory.GetFile($"{slide.Id}.zip");
@@ -40,7 +41,10 @@ namespace Ulearn.Core.Helpers
 			{
 				cacheCourseDirectory.EnsureExists();
 				log.Info($"Собираю zip-архив с упражнением: курс {courseId}, слайд «{slide.Title}» ({slide.Id}), файл {zipFile.FullName}");
-				builder.BuildStudentZip(slide, zipFile, courseDirectory);
+				using (await CourseLock.AcquireReaderLock(courseId))
+				{
+					builder.BuildStudentZip(slide, zipFile, courseDirectory);
+				}
 			}
 
 			return zipFile;

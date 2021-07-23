@@ -283,7 +283,7 @@ namespace Ulearn.Web.Api.Controllers.Slides
 			if ((exerciseSlide.Exercise as UniversalExerciseBlock)?.NoStudentZip ?? false)
 				return NotFound();
 
-			var zipFile = courseManager.GenerateOrFindStudentZip(courseId, exerciseSlide);
+			var zipFile = await courseManager.GenerateOrFindStudentZip(courseId, exerciseSlide);
 
 			return PhysicalFile(zipFile.FullName, "application/zip", studentZipName);
 		}

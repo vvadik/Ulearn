@@ -465,7 +465,7 @@ namespace Ulearn.Core.Courses.Manager
 			var courseDirectory = GetExtractedCourseDirectory(courseId);
 			if (!courseDirectory.Exists)
 				return;
-			using (await CourseLock.Lock(courseId))
+			using (await CourseLock.AcquireReaderLock(courseId))
 			{
 				var courseVersionToken = CourseVersionToken.Load(courseDirectory);
 				if (courseVersionToken != publishedVersionToken)

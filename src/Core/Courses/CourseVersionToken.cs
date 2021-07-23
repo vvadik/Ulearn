@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Ulearn.Common.Extensions;
+using Vostok.Logging.Abstractions;
 
 namespace Ulearn.Core.Courses
 {
@@ -14,6 +15,8 @@ namespace Ulearn.Core.Courses
 	[DataContract]
 	public class CourseVersionToken : IEqualityComparer<CourseVersionToken>
 	{
+		private static ILog log => LogProvider.Get().ForContext(typeof(CourseVersionToken));
+
 		public CourseVersionToken()
 		{
 		}
@@ -28,21 +31,24 @@ namespace Ulearn.Core.Courses
 			LoadingTime = tempCourseLoadingTime;
 		}
 
-		private const string FileName = ".version";
+		private const string fileName = ".version";
 		[NotNull]
 		// Из общей папки читать CourseVersionToken нужно под дисковым локом на курс
 		public static CourseVersionToken Load(DirectoryInfo courseDirectory)
 		{
-			var versionFile = courseDirectory.GetFile(FileName);
+			var versionFile = courseDirectory.GetFile(fileName);
 			if (!versionFile.Exists)
-				throw new Exception($".version not exists in {courseDirectory.FullName}");
+			{
+				log.Error($".version not exists in {courseDirectory.FullName}");
+				return new CourseVersionToken(default(Guid)); // Допустимо только в CourseTool
+			}
 			return JsonConvert.DeserializeObject<CourseVersionToken>(versionFile.ContentAsUtf8());
 		}
 
 		// Из общей папки писать CourseVersionToken нужно под дисковым локом на курс
 		public async Task Save(DirectoryInfo directory)
 		{
-			var fullName = Path.Combine(directory.FullName, FileName);
+			var fullName = Path.Combine(directory.FullName, fileName);
 			using var file = File.Open(fullName, FileMode.Create, FileAccess.Write, FileShare.None);
 			var json = JsonConvert.SerializeObject(this, Formatting.Indented);
 			var bytes = Encoding.UTF8.GetBytes(json);

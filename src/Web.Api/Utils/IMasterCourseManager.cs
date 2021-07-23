@@ -12,10 +12,9 @@ namespace Ulearn.Web.Api.Utils
 		FileInfo GetStagingCourseFile(string courseId);
 		FileInfo GetStagingTempCourseFile(string courseId);
 		DirectoryInfo GetExtractedCourseDirectory(string courseId);
-		FileInfo GetCourseVersionFile(Guid versionId);
 		void ReloadCourseNotSafe(string courseId, bool notifyAboutErrors = true);
 		void ExtractTempCourseChanges(string tempCourseId);
 		bool TryCreateTempCourse(string courseId, string courseTitle, Guid firstVersionId);
-		FileInfo GenerateOrFindStudentZip(string courseId, Slide slide);
+		Task<FileInfo> GenerateOrFindStudentZip(string courseId, Slide slide);
 	}
 }

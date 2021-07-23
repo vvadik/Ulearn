@@ -68,7 +68,7 @@ namespace Ulearn.Web.Api.Utils
 					log.Error(error, message);
 					return;
 				}
-				using (await CourseLock.Lock(courseId))
+				using (await CourseLock.AcquireWriterLock(courseId))
 				{
 					try
 					{
@@ -93,9 +93,9 @@ namespace Ulearn.Web.Api.Utils
 			}
 		}
 
-		public FileInfo GenerateOrFindStudentZip(string courseId, Slide slide)
+		public async Task<FileInfo> GenerateOrFindStudentZip(string courseId, Slide slide)
 		{
-			return exerciseStudentZipsCache.GenerateOrFindZip(courseId, slide, GetExtractedCourseDirectory(courseId).FullName);
+			return await exerciseStudentZipsCache.GenerateOrFindZip(courseId, slide, GetExtractedCourseDirectory(courseId).FullName);
 		}
 	}
 }

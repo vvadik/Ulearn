@@ -22,7 +22,15 @@ namespace Ulearn.Core.Courses.Manager
 			this.courseId = courseId;
 		}
 
-		public static async Task<CourseLock> Lock(string courseId)
+		// TODO сейчас локи не отличаются
+		public static async Task<CourseLock> AcquireWriterLock(string courseId)
+		{
+			var courseLock = new CourseLock(courseId);
+			await courseLock.Lock(int.MaxValue);
+			return courseLock;
+		}
+
+		public static async Task<CourseLock> AcquireReaderLock(string courseId)
 		{
 			var courseLock = new CourseLock(courseId);
 			await courseLock.Lock(int.MaxValue);

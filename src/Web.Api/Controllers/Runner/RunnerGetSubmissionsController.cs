@@ -81,7 +81,7 @@ namespace Ulearn.Web.Api.Controllers.Runner
 
 			if (slide is ExerciseSlide exerciseSlide)
 			{
-				using (await CourseLock.Lock(submission.CourseId))
+				using (await CourseLock.AcquireReaderLock(submission.CourseId))
 				{
 					var courseDictionary = courseManager.GetExtractedCourseDirectory(submission.CourseId).FullName;
 					if (exerciseSlide is PolygonExerciseSlide)

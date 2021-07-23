@@ -479,7 +479,7 @@ namespace ManualUtils
 			}
 		}
 
-		private static async Task UploadStagingFromDbAndExtractToCourses(IServiceProvider serviceProvider)
+		/*private static async Task UploadStagingFromDbAndExtractToCourses(IServiceProvider serviceProvider)
 		{
 			var db = serviceProvider.GetService<UlearnDb>();
 			var courseManager = serviceProvider.GetService<IMasterCourseManager>();
@@ -503,7 +503,7 @@ namespace ManualUtils
 						f.Attributes &= ~FileAttributes.ReadOnly;
 				}
 			}
-		}
+		}*/
 
 		private static async Task SetCourseIdAndSlideIdInLikesAndPromotes(UlearnDb db)
 		{
@@ -558,7 +558,7 @@ namespace ManualUtils
 			}
 		}
 
-		private static async Task UploadCourseVersions(IServiceProvider serviceProvider)
+		/*private static async Task UploadCourseVersions(IServiceProvider serviceProvider)
 		{
 			using (var scope = serviceProvider.CreateScope())
 			{
@@ -589,7 +589,7 @@ namespace ManualUtils
 				}
 				Console.WriteLine($"Uploaded {i}");
 			}
-		}
+		}*/
 
 		private static async Task<byte[]> ReadAllContentAsync(FileInfo file)
 		{
