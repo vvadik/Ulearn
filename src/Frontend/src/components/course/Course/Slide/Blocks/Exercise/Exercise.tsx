@@ -390,7 +390,6 @@ class Exercise extends React.Component<Props, State> {
 		const {
 			expectedOutput, submissions, user,
 			slideProgress, maxScore, languages,
-			slideContext: { courseId, slideId, },
 			hideSolutions, renderedHints,
 			attemptsStatistics, isAuthenticated,
 		} = this.props;
@@ -448,7 +447,7 @@ class Exercise extends React.Component<Props, State> {
 					/>
 					{ exerciseCodeDoc && isReview &&
 					<Review
-						isReviewCanBeAdded={ () => true }
+						isReviewOrCommentCanBeAdded={ () => true }
 						editReviewOrComment={ () => ({}) }
 						user={ user }
 						addReviewComment={ this.addReviewComment }
