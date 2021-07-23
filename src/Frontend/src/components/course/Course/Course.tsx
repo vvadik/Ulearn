@@ -310,7 +310,6 @@ class Course extends Component<CourseProps, State> {
 
 		if(slideType &&
 			(slideType === SlideType.Lesson
-				|| (slideType === SlideType.Exercise && !pageInfo.isAcceptedAlert)
 				|| (slideType === SlideType.Exercise && !pageInfo.isReview))) {
 			return Slide;
 		}

@@ -36,7 +36,6 @@ import {
 import { InstructorReviewInfo, InstructorReviewInfoWithAnchor, Props, State } from "./InstructorReview.types";
 import texts from "./InstructorReview.texts";
 import styles from './InstructorReview.less';
-import { submissions } from "../../../../../consts/routes";
 
 
 class InstructorReview extends React.Component<Props, State> {
@@ -53,20 +52,27 @@ class InstructorReview extends React.Component<Props, State> {
 	constructor(props: Props) {
 		super(props);
 
-		const { studentSubmissions, favouriteReviews, } = props;
+		const { studentSubmissions, favouriteReviews, scoresBySubmissionId, } = props;
+
 		let currentSubmission: SubmissionInfo | undefined = undefined;
 		let diffInfo: DiffInfo | undefined = undefined;
 		let reviews: InstructorReviewInfo[] | undefined = [];
 		let outdatedReviews: InstructorReviewInfo[] | undefined = [];
+		let curScore: number | undefined = undefined;
+		let prevScore: number | undefined = undefined;
+
 		const favReviewsByUser = favouriteReviews?.filter(r => r.isFavourite);
 		const favReviews = favouriteReviews?.filter(r => !r.isFavourite);
 		const favouriteReviewsSet = new Set(favReviews?.map(r => r.text));
 		const favouriteByUserSet = new Set(favReviewsByUser?.map(r => r.text));
 
-		if(studentSubmissions) {
+		if(studentSubmissions && scoresBySubmissionId) {
 			const submissionInfo = this.getSubmissionInfo(studentSubmissions, 0);
 			currentSubmission = submissionInfo.submission;
 			diffInfo = submissionInfo.diffInfo;
+
+			curScore = scoresBySubmissionId[currentSubmission.id];
+			prevScore = diffInfo && scoresBySubmissionId[diffInfo.prevReviewedSubmission.id];
 
 			const allReviews = this.getReviewsFromSubmission(currentSubmission, diffInfo, false,);
 			reviews = allReviews.reviews;
@@ -86,6 +92,8 @@ class InstructorReview extends React.Component<Props, State> {
 			diffInfo: diffInfo,
 			favouriteReviewsSet,
 			favouriteByUserSet,
+			curScore,
+			prevScore,
 		};
 	}
 
@@ -125,9 +133,9 @@ class InstructorReview extends React.Component<Props, State> {
 	}
 
 	componentDidUpdate = (prevProps: Readonly<Props>, prevState: Readonly<State>): void => {
-		const { studentSubmissions, } = this.props;
+		const { studentSubmissions, scoresBySubmissionId, } = this.props;
 		const { currentSubmission, reviews, diffInfo, showDiff, } = this.state;
-		if(!currentSubmission && studentSubmissions && studentSubmissions.length > 0) {
+		if(!currentSubmission && scoresBySubmissionId && studentSubmissions && studentSubmissions.length > 0) {
 			this.loadSubmission(studentSubmissions, 0);
 			return;
 		}
@@ -175,6 +183,7 @@ class InstructorReview extends React.Component<Props, State> {
 		const { showDiff, } = this.state;
 		const { submission, diffInfo } = this.getSubmissionInfo(studentSubmissions, index);
 		const { reviews, outdatedReviews } = this.getReviewsFromSubmission(submission, diffInfo, showDiff);
+
 		this.setState({
 			currentSubmission: submission,
 			diffInfo,
@@ -275,16 +284,37 @@ class InstructorReview extends React.Component<Props, State> {
 	};
 
 	static getDerivedStateFromProps(props: Readonly<Props>, state: Readonly<State>): Partial<State> | null {
-		const { favouriteReviews, } = props;
-		const { favouriteReviewsSet, favouriteByUserSet, } = state;
+		const { favouriteReviews, studentSubmissions, scoresBySubmissionId, } = props;
+		const { favouriteReviewsSet, favouriteByUserSet, curScore, prevScore, } = state;
 		const favReviewsByUser = favouriteReviews?.filter(r => r.isFavourite);
 		const favReviews = favouriteReviews?.filter(r => !r.isFavourite);
 
+		let newState: Partial<State> = {};
+
 		if(favReviewsByUser?.length !== favouriteByUserSet?.size || favReviews?.length !== favouriteReviewsSet?.size) {
-			return {
+			newState = {
+				...newState,
 				favouriteReviewsSet: new Set(favReviews?.map(r => r.text)),
 				favouriteByUserSet: new Set(favReviewsByUser?.map(r => r.text)),
 			};
+		}
+
+		if(studentSubmissions && scoresBySubmissionId) {
+			const prevReview = getPreviousManualCheckingInfo(studentSubmissions, 0);
+			const newScore = scoresBySubmissionId[studentSubmissions[0].id];
+			const newPrevScore = prevReview && scoresBySubmissionId[prevReview.submission.id];
+
+			if(newScore !== curScore || newPrevScore !== prevScore) {
+				newState = {
+					...newState,
+					curScore: newScore,
+					prevScore: newPrevScore,
+				};
+			}
+		}
+
+		if(Object.keys(newState).length > 0) {
+			return newState;
 		}
 
 		return null;
@@ -302,8 +332,8 @@ class InstructorReview extends React.Component<Props, State> {
 		const {
 			currentTab,
 			currentSubmission,
-			prevReviewScore,
-			currentScore,
+			curScore,
+			prevScore,
 		} = this.state;
 
 		if(!student || !studentSubmissions || !studentGroups || !favouriteReviews || !currentSubmission) {
@@ -315,9 +345,9 @@ class InstructorReview extends React.Component<Props, State> {
 				<BlocksWrapper withoutBottomPaddings>
 					<h3 className={ styles.reviewHeader }>
 						<span className={ styles.reviewStudentName }>
-							{ texts.getStudentInfo(student.visibleName, studentGroups[0].name) }
+							{ texts.getStudentInfo(student.visibleName, studentGroups) }
 						</span>
-						{ texts.getReviewInfo(studentSubmissions, prevReviewScore, currentScore) }
+						{ texts.getReviewInfo(studentSubmissions, prevScore, curScore,) }
 					</h3>
 					<Tabs value={ currentTab } onValueChange={ this.onTabChange }>
 						<Tabs.Tab key={ InstructorReviewTabs.Review } id={ InstructorReviewTabs.Review }>
@@ -369,20 +399,22 @@ class InstructorReview extends React.Component<Props, State> {
 	renderSubmissions(): React.ReactNode {
 		const {
 			slideContext,
-			onScoreSubmit,
+			scoresBySubmissionId,
 			onProhibitFurtherReviewToggleChange,
 			prohibitFurtherManualChecking,
 			favouriteReviews,
+			studentSubmissions,
 		} = this.props;
 		const {
-			prevReviewScore,
-			currentScore,
 			currentSubmission,
+			diffInfo,
 		} = this.state;
 
-		if(!favouriteReviews || !currentSubmission) {
+		if(!favouriteReviews || !currentSubmission || !studentSubmissions) {
 			return null;
 		}
+		const lastSubmissionId = studentSubmissions[0].id;
+		const isNewReview = currentSubmission.id === lastSubmissionId;
 
 		return (
 			<BlocksWrapper>
@@ -393,10 +425,13 @@ class InstructorReview extends React.Component<Props, State> {
 					renderContent={ this.renderEditor }
 				/>
 				<ScoreControls
-					curReviewScore={ currentScore ?? currentScore }
-					prevReviewScore={ prevReviewScore }
+					scoreSaved={ isNewReview && scoresBySubmissionId && !!scoresBySubmissionId[currentSubmission.id] }
+					isCurReviewNew={ isNewReview }
+					curReviewDate={ !isNewReview ? currentSubmission.timestamp : undefined }
+					curReviewScore={ scoresBySubmissionId ? scoresBySubmissionId[currentSubmission.id] : undefined }
+					prevReviewScore={ isNewReview && scoresBySubmissionId && diffInfo ? scoresBySubmissionId[diffInfo.prevReviewedSubmission.id] : undefined }
 					exerciseTitle={ slideContext.title }
-					onSubmit={ onScoreSubmit }
+					onSubmit={ this.onScoreButtonPressed }
 					onToggleChange={ onProhibitFurtherReviewToggleChange }
 					toggleChecked={ prohibitFurtherManualChecking }
 				/>
@@ -415,6 +450,21 @@ class InstructorReview extends React.Component<Props, State> {
 		return Promise.resolve('no submission');
 	};
 
+	onScoreButtonPressed = (score: number): void => {
+		const {
+			onScoreSubmit,
+		} = this.props;
+		const {
+			currentSubmission,
+		} = this.state;
+
+		if(!currentSubmission) {
+			return;
+		}
+
+		onScoreSubmit(currentSubmission.id, score);
+	};
+
 	onZeroScoreButtonPressed = (): void => {
 		const {
 			onScoreSubmit,
@@ -429,9 +479,9 @@ class InstructorReview extends React.Component<Props, State> {
 			return;
 		}
 
-		onScoreSubmit(0);
+		onScoreSubmit(currentSubmission.id, 0);
 		onProhibitFurtherReviewToggleChange(false);
-		addReview(currentSubmission.id, this.shameComment, 0, 0, 0, 1);
+		addReview(currentSubmission.id, this.shameComment, 0, 0, 0, 1).then(r => this.highlightReview(r.id));
 	};
 
 	renderTopControls(): React.ReactElement {
@@ -508,7 +558,7 @@ class InstructorReview extends React.Component<Props, State> {
 						selectedReviewId={ selectedReviewId }
 						onReviewClick={ this.selectComment }
 						reviews={ this.getAllReviewsAsInstructorReviews() }
-						isReviewCanBeAdded={ this.isReviewCanBeAdded }
+						isReviewOrCommentCanBeAdded={ this.isReviewCanBeAdded }
 					/>
 				</div>
 				{ addCommentFormCoords &&

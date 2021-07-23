@@ -310,7 +310,6 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 		} = review;
 		const {
 			editingReviewId,
-			editingParentReviewId,
 			editingCommentValue,
 		} = this.state;
 		const authorToRender = author ?? this.botUser;
@@ -503,7 +502,7 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 		commentReply: string,
 		id: number,
 	): React.ReactNode => {
-		const isReviewCanBeAdded = this.props.isReviewCanBeAdded(commentReply);
+		const isCommentCanBeAdded = this.props.isReviewOrCommentCanBeAdded(commentReply);
 		return (
 			<ThemeContext.Provider value={ textareaHidden }>
 				<div className={ styles.commentReplyTextArea }>
@@ -519,8 +518,8 @@ class Review extends React.Component<ReviewProps, ReviewState> {
 					/>
 				</div>
 				<button
-					disabled={ !isReviewCanBeAdded }
-					className={ isReviewCanBeAdded ? styles.commentReplyButtonActive : styles.commentReplyButton }
+					disabled={ !isCommentCanBeAdded }
+					className={ isCommentCanBeAdded ? styles.commentReplyButtonActive : styles.commentReplyButton }
 					onClick={ this.sendComment }
 					data-tid={ id }
 					onFocus={ this.selectComment }>

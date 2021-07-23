@@ -355,6 +355,7 @@ const loadingTimes = {
 	favouriteReviews: 100,
 	addReview: 100,
 	toggleReviewFavourite: 100,
+	scoreSubmit: 100,
 	getPlagiarismStatus: 100,
 	submissions: 100,
 };
@@ -444,8 +445,13 @@ const args: Props = {
 	onProhibitFurtherReviewToggleChange(value: boolean) {
 		this.prohibitFurtherManualChecking = value;
 	},
-	onScoreSubmit(score: number) {
-		return;
+	onScoreSubmit(submissionId: number, score: number) {
+		return returnPromiseAfterDelay(loadingTimes.scoreSubmit, score, () => {
+			if(!this.scoresBySubmissionId) {
+				this.scoresBySubmissionId = {};
+			}
+			this.scoresBySubmissionId[submissionId] = score;
+		});
 	},
 	deleteReviewOrComment(submissionId: number, reviewId: number, parentReviewId?: number,) {
 		const submission = this.studentSubmissions?.find(s => s.id === submissionId);
@@ -597,6 +603,7 @@ const args: Props = {
 	getStudentSubmissions(studentId: string, courseId: string, slideId: string): Promise<SubmissionInfo[] | string> {
 		return returnPromiseAfterDelay(loadingTimes.submissions, submissions, () => {
 			this.studentSubmissions = submissions;
+			this.scoresBySubmissionId = { 1: 25 };
 		});
 	},
 };

@@ -39,7 +39,7 @@ export interface ApiFromRedux {
 	getFavouriteReviews: (courseId: string, slideId: string,) => Promise<FavouriteReviewResponse | string>;
 	getStudentGroups: (courseId: string, studentId: string,) => Promise<GroupsInfoResponse | string>;
 
-	onScoreSubmit: (score: number) => void;
+	onScoreSubmit: (submissionId: number, score: number) => Promise<number>;
 	onProhibitFurtherReviewToggleChange: (value: boolean) => void;
 	onAddReview: (comment: string) => Promise<FavouriteReview>;
 	onAddReviewToFavourite: (comment: string) => Promise<FavouriteReview>;
@@ -55,7 +55,9 @@ export interface ApiFromRedux {
 	) => Promise<ReviewInfo>;
 	addReviewComment: (submissionId: number, reviewId: number, comment: string) => Promise<ReviewCommentResponse>;
 	deleteReviewOrComment: (submissionId: number, reviewId: number, commentId?: number) => Promise<Response>;
-	editReviewOrComment: (text: string, submissionId: number, reviewId: number, commentId?: number) => Promise<ReviewInfo | ReviewCommentResponse>;
+	editReviewOrComment: (text: string, submissionId: number, reviewId: number,
+		commentId?: number
+	) => Promise<ReviewInfo | ReviewCommentResponse>;
 }
 
 export interface Props extends PropsFromRedux, ApiFromRedux {
@@ -101,6 +103,9 @@ export interface State {
 	outdatedReviews: ReviewInfo[];
 	markers: TextMarkersByReviewId;
 
+	curScore?: number;
+	prevScore?: number;
+
 	editor: null | Editor;
 
 	addCommentValue: string;
@@ -108,8 +113,6 @@ export interface State {
 	addCommentRanges?: { startRange: CodeMirror.Position; endRange: CodeMirror.Position; };
 
 	initialCode?: string;
-	prevReviewScore?: number;
-	currentScore?: number;
 
 	favouriteReviewsSet: Set<string>;
 	favouriteByUserSet: Set<string>;

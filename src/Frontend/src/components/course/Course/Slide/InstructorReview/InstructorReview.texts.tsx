@@ -3,6 +3,7 @@ import { SubmissionInfo } from "src/models/exercise";
 import { convertDefaultTimezoneToLocal } from "src/utils/momentUtils";
 import React from "react";
 import getPluralForm from "src/utils/getPluralForm";
+import { ShortGroupInfo } from "../../../../../models/comments";
 
 const texts = {
 	getTabName: (tab: InstructorReviewTabs): string => {
@@ -15,8 +16,8 @@ const texts = {
 				return 'Решение студента';
 		}
 	},
-	getStudentInfo: (visibleName: string, groupName?: string): string => {
-		return groupName ? `${ visibleName } (${ groupName })` : visibleName;
+	getStudentInfo: (visibleName: string, groups?: ShortGroupInfo[]): string => {
+		return groups ? `${ visibleName } (${ groups.map(g => g.name).join(', ') })` : visibleName;
 	},
 	getReviewInfo: (submissions: SubmissionInfo[], prevReviewScore?: number, currentScore?: number): string => {
 		if(currentScore !== undefined) {
@@ -52,7 +53,8 @@ const texts = {
 		removedColor: string,
 	): React.ReactElement => <>
 		Diff с предыдущим ревью:
-		<span className={ addedColor }> { addedCount } { getPluralForm(addedCount, 'строку', 'строки', 'строк') } добавили</span>,
+		<span className={ addedColor }> { addedCount } { getPluralForm(addedCount, 'строку', 'строки',
+			'строк') } добавили</span>,
 		<span className={ removedColor }> { removedCount } – удалили</span>
 	</>,
 };
